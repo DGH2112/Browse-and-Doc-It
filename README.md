@@ -2,9 +2,9 @@
 
 Author:   David Hoyle
 
-Version:  1.2
+Version:  1.3
 
-Date:     06 May 2017
+Date:     05 Jan 2018
 
 Web Page: http://www.davidghoyle.co.uk/WordPress/?page_id=872
 
@@ -16,17 +16,13 @@ This is an Embarcadero RAD Studio plug-in to provide code browsing and documenta
 current build provide support for the following version of RAD Studio:
  * XE;
  * XE2;
- * XE3*;
- * XE4*;
- * XE5*;
- * XE6*;
+ * XE3;
+ * XE4;
+ * XE5;
+ * XE6;
  * XE7;
- * XE8*;
+ * XE8;
  * XE10 Seattle;
  * XE10.1 Berlin;
  * XE10.2 Tokyo.
 
-* Note these version will need to be compiled as I do not have them.
-
-In order to compile the software yourself you will need the following components:
- * Virtual Treeview.

@@ -1,0 +1,38 @@
+'
+' The GetUserName function retrieves the user name of the current thread. This
+' is the name of the user currently logged onto the system.
+'
+' BOOL GetUserName(
+'   LPTSTR lpBuffer,  // address of name buffer
+'   LPDWORD nSize   // address of size of name buffer
+' );
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @precon  None.
+' @postcon Function retrieves the user name of the current thread
+'
+' @param   lpBuffer as a String - Points to the buffer to receive the
+'          null-terminated string containing the user's logon name. If this
+'          buffer is not large enough to contain the entire user name, the
+'          function fails.
+' @param   nSize as a Long - Pointer to a DWORD that, on input, specifies the
+'          maximum size, in characters, of the buffer specified by the lpBuffer
+'          parameter. If this buffer is not large enough to contain the entire
+'          user name, the function fails. If the function succeeds, it will
+'          place the number of characters copied to the buffer into the DWORD
+'          that nSize points to.
+'
+' @return  a Long - If the function succeeds, the return value is nonzero, and
+'          the variable pointed to by nSize contains the number of characters
+'          copied to the buffer specified by lpBuffer, including the terminating
+'          null character. If the function fails, the return value is zero. To
+'          get extended error information, call GetLastError.
+'
+' @remark  If the current thread is impersonating another client, the
+'          GetUserName function returns the user name of the client that the
+'          thread is impersonating.
+'
+Declare Function GetUserName Lib "advapi32.dll" Alias "GetUserNameA" ( _
+  ByVal lpBuffer As String, nSize As Long) As Long

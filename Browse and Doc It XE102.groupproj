@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{BA41C309-29D5-414B-950B-8A1A47C300D0}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Test\BrowseAndDocItTests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Test\BrowseAndDocItTestApp.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DLL\BrowseAndDocItXE102.dproj">
+            <Dependencies>Test\BrowseAndDocItTests.dproj</Dependencies>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="BrowseAndDocItTests">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocItTests:Clean">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocItTests:Make">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp:Clean">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp:Make">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BrowseAndDocItXE102" DependsOnTargets="BrowseAndDocItTests">
+        <MSBuild Projects="DLL\BrowseAndDocItXE102.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocItXE102:Clean" DependsOnTargets="BrowseAndDocItTests:Clean">
+        <MSBuild Projects="DLL\BrowseAndDocItXE102.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocItXE102:Make" DependsOnTargets="BrowseAndDocItTests:Make">
+        <MSBuild Projects="DLL\BrowseAndDocItXE102.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="BrowseAndDocItTests;BrowseAndDocItTestApp;BrowseAndDocItXE102"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="BrowseAndDocItTests:Clean;BrowseAndDocItTestApp:Clean;BrowseAndDocItXE102:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="BrowseAndDocItTests:Make;BrowseAndDocItTestApp:Make;BrowseAndDocItXE102:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

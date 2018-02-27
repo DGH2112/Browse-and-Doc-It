@@ -1,0 +1,3354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>BrowseAndDocItWizard.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AutoSaveModule.html">AutoSaveModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AutoSaveOptionsForm.html">AutoSaveOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="IDEAutoSave.html">IDEAutoSave.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocIt.html">BrowseAndDocIt.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocIt.html">BrowseAndDocIt.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CopyofBrowseAndDocIt.html">Copy of BrowseAndDocIt.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItWizard.html">BrowseAndDocItWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DockableModuleExplorer.html">DockableModuleExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ToolsAPIUtils.html">ToolsAPIUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestApp.html">BrowseAndDocItTestApp.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTests.html">BrowseAndDocItTests.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConsoleSort.html">ConsoleSort.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestForm.html">BrowseAndDocItTestForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Library.html">Library.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Package.html">Package.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Program.html">Program.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit2.html">Unit 2.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit.html">Unit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Delphi7HelpForBdsExpert.html">Delphi7HelpForBdsExpert.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="u_Delphi7HelpForBds.html">u_Delphi7HelpForBds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="w_Delphi7HelpForBds.html">w_Delphi7HelpForBds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHExplFrm.html">DGHExplFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHIDEExplorer.html">DGHIDEExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="IDEExplorer.html">IDEExplorer.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelper.html">ITHelper.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelper.html">ITHelper.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AdditionalZipFilesForm.html">AdditionalZipFilesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConfigurationForm.html">ConfigurationForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProcessingForm.html">ProcessingForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestingHelperUtils.html">TestingHelperUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestingHelperWizard.html">TestingHelperWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelperTests.html">ITHelperTests.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestTestingHelperUtils.html">TestTestingHelperUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a href="#Constants2">Constants</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a href="#ExportedHeadings2">Exported Headings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedFunctionsLabel.gif" alt=""/>&nbsp;<a href="#Exports2">Exports</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a href="#Finalization2">Finalization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a href="#Initialization2">Initialization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicResourceStringsLabel.gif" alt=""/>&nbsp;<a href="#ResourceStrings2">Resource Strings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a href="#Variables2">Variables</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit BrowseAndDocItWizard -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit BrowseAndDocItWizard</h1>
+        <p class="Comment">This module contains the packages main wizard interface. </p>
+        <p class="TagHeader">Known Bugs</p>
+        <ul>
+          <li class="SpecialTag">Line position of comment tags in coflicts is not right! </li>
+        </ul>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">17 Sep 2008 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1.0 </li>
+        </ul>
+      
+      <!-- Constants -->
+      <h2><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a name="Constants2"></a>Constants</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateConst.gif" alt=""/>&nbsp;<a name="Constants.strAOrAn"></a>strAOrAn</td>
+              <td>
+                <pre><span class="Identifier">strAOrAn</span> <span class="Symbol">:</span> <span class="ReservedWord">Array</span><span class="Symbol">[</span><span class="Identifier">False</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Identifier">True</span><span class="Symbol">]</span> <span class="ReservedWord">Of</span> <span class="ReservedWord">String</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="StringLiteral">'a'</span><span class="Symbol">,</span> <span class="StringLiteral">'an'</span><span class="Symbol">)</span></pre>
+              <p class="Comment">A simple array for outputting a or an. </p>
+          <!-- strAOrAn : Array[False..True] Of String = ('a', 'an') -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateConst.gif" alt=""/>&nbsp;<a name="Constants.strArrayOf"></a>strArrayOf</td>
+              <td>
+                <pre><span class="Identifier">strArrayOf</span> <span class="Symbol">:</span> <span class="ReservedWord">Array</span><span class="Symbol">[</span><span class="Identifier">False</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Identifier">True</span><span class="Symbol">]</span> <span class="ReservedWord">Of</span> <span class="ReservedWord">String</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="StringLiteral">''</span><span class="Symbol">,</span> <span class="StringLiteral">'Array Of '</span><span class="Symbol">)</span></pre>
+              <p class="Comment">A constant array of outputs for the ArrayOf property. </p>
+          <!-- strArrayOf : Array[False..True] Of String = ('', 'Array Of ') -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateConst.gif" alt=""/>&nbsp;<a name="Constants.strModifier"></a>strModifier</td>
+              <td>
+                <pre><span class="Identifier">strModifier</span> <span class="Symbol">:</span> <span class="ReservedWord">Array</span><span class="Symbol">[</span><span class="Identifier">pamNone</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Identifier">pamOut</span><span class="Symbol">]</span> <span class="ReservedWord">Of</span> <span class="ReservedWord">String</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="StringLiteral">''</span><span class="Symbol">,</span> <span class="StringLiteral">' as a reference'</span><span class="Symbol">,</span>
+  <span class="StringLiteral">' constant'</span><span class="Symbol">,</span> <span class="StringLiteral">' as out'</span><span class="Symbol">)</span></pre>
+              <p class="Comment">An array of parameter modifier phases. </p>
+          <!-- strModifier : Array[pamNone..pamOut] Of String = ('', ' as a reference',
+  ' constant', ' as out') -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateConst.gif" alt=""/>&nbsp;<a name="Constants.strVowels"></a>strVowels</td>
+              <td>
+                <pre><span class="Identifier">strVowels</span> <span class="Symbol">:</span> <span class="ReservedWord">Set</span> <span class="ReservedWord">Of</span> <span class="Identifier">Char</span> <span class="Symbol">=</span> <span class="Symbol">[</span><span class="StringLiteral">'a'</span><span class="Symbol">,</span> <span class="StringLiteral">'e'</span><span class="Symbol">,</span> <span class="StringLiteral">'i'</span><span class="Symbol">,</span> <span class="StringLiteral">'o'</span><span class="Symbol">,</span> <span class="StringLiteral">'u'</span><span class="Symbol">,</span> <span class="StringLiteral">'A'</span><span class="Symbol">,</span> <span class="StringLiteral">'E'</span><span class="Symbol">,</span> <span class="StringLiteral">'I'</span><span class="Symbol">,</span> <span class="StringLiteral">'O'</span><span class="Symbol">,</span> <span class="StringLiteral">'U'</span><span class="Symbol">]</span></pre>
+              <p class="Comment">A list of vowels. </p>
+          <!-- strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Exported Headings -->
+      <h2><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a name="ExportedHeadings2"></a>Exported Headings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.InitWizard"></a>InitWizard</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">InitWizard</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">BorlandIDEServices</span> <span class="Symbol">:</span> <span class="Identifier">IBorlandIDEServices</span><span class="Symbol">;</span>
+  <span class="Identifier">RegisterProc</span> <span class="Symbol">:</span> <span class="Identifier">TWizardRegisterProc</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Terminate</span> <span class="Symbol">:</span> <span class="Identifier">TWizardTerminateProc</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">StdCall</span></pre>
+          <!-- Function InitWizard(
+  const BorlandIDEServices : IBorlandIDEServices;
+  RegisterProc : TWizardRegisterProc;
+  var Terminate : TWizardTerminateProc
+) : Boolean; StdCall -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.Register"></a>Register</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="ReservedWord">Register</span></pre>
+          <!-- Procedure Register -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Exports -->
+      <h2><img class="verticallymiddle" src="Images/ExportedFunctionsLabel.gif" alt=""/>&nbsp;<a name="Exports2"></a>Exports</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicExportedFunction.gif" alt=""/>&nbsp;<a name="Exports.InitWizard"></a>InitWizard</td>
+              <td>
+                <pre><span class="Identifier">InitWizard</span> <span class="ReservedWord">Name</span> <span class="Identifier">WizardEntryPoint</span></pre>
+          <!-- InitWizard Name WizardEntryPoint -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Finalization -->
+      <h2><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a name="Finalization2"></a>Finalization</h2>
+        <p class="Comment">This finalization section removes this wizard from the IDE when the package is unloaded. </p>
+      <div class="Indent">
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.BuildNumber"></a>BuildNumber</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BuildNumber</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">iMajor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">iMinor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">iBugFix</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">iBuild</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <p class="Comment">This is a method which obtains information about the package from is version information with the package resources. </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">None. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Extracts and display the applications version number present within the EXE file. </li>
+              </ul>
+              <p class="TagHeader">Parameters</p>
+              <ul>
+                <li class="SpecialTag">iMajor as an Integer </li>
+                <li class="SpecialTag">iMinor as an Integer </li>
+                <li class="SpecialTag">iBugFix as an Integer </li>
+                <li class="SpecialTag">iBuild as an Integer </li>
+              </ul>
+          <!-- Procedure BuildNumber(
+  var iMajor : Integer;
+  var iMinor : Integer;
+  var iBugFix : Integer;
+  var iBuild : Integer
+) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.InitWizard"></a>InitWizard</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">InitWizard</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">BorlandIDEServices</span> <span class="Symbol">:</span> <span class="Identifier">IBorlandIDEServices</span><span class="Symbol">;</span>
+  <span class="Identifier">RegisterProc</span> <span class="Symbol">:</span> <span class="Identifier">TWizardRegisterProc</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Terminate</span> <span class="Symbol">:</span> <span class="Identifier">TWizardTerminateProc</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">StdCall</span></pre>
+              <p class="Comment">This is a procedure to initialising the wizard interface when loading the package as a DLL wizard. </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">None. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Initialises the wizard. </li>
+              </ul>
+              <p class="TagHeader">Parameters</p>
+              <ul>
+                <li class="SpecialTag">BorlandIDEServices as an IBorlandIDEServices constant </li>
+                <li class="SpecialTag">RegisterProc as a TWizardRegisterProc </li>
+                <li class="SpecialTag">Terminate as a TWizardTerminateProc as a reference </li>
+              </ul>
+              <p class="TagHeader">Returns</p>
+              <ul>
+                <li class="SpecialTag">a Boolean </li>
+              </ul>
+          <!-- Function InitWizard(
+  const BorlandIDEServices : IBorlandIDEServices;
+  RegisterProc : TWizardRegisterProc;
+  var Terminate : TWizardTerminateProc
+) : Boolean; StdCall -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.Register"></a>Register</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="ReservedWord">Register</span></pre>
+              <p class="Comment">This is the modules registry procedure so that the Delphi IDE can registry the wizard. </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">None. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Creates the following wizards and notifiers: 1) Browse And Doc It Wizard 2) Editor Notifier 3) Keyboard Binding Notifier </li>
+              </ul>
+          <!-- Procedure Register -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+          <!-- TBrowseAndDocItWizard -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TBrowseAndDocItWizard3"></a>TBrowseAndDocItWizard</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span></pre>
+                    <p class="Comment">This is the constructor method for the TPascalDocWizard class. This constructor create the explorer form and menus. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Initialises the wizard's internal data structures and creates a menu interface in the IDE. </li>
+                    </ul>
+              <!-- Constructor Create -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.CreateMenuItem"></a>CreateMenuItem</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CreateMenuItem</span><span class="Symbol">(</span>
+  <span class="Identifier">mmiParent</span> <span class="Symbol">:</span> <span class="Identifier">TMenuItem</span><span class="Symbol">;</span>
+  <span class="Identifier">strCaption</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">ClickProc</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span><span class="Symbol">;</span>
+  <span class="Identifier">AShortCut</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method creates menu items using the passed information. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">mmiParent must be a valid parent menu item in the IDE. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">A Sub menu ite is created under mmiParent. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">mmiParent as a TMenuItem </li>
+                      <li class="SpecialTag">strCaption as a String </li>
+                      <li class="SpecialTag">ClickProc as a TNotifyEvent </li>
+                      <li class="SpecialTag">AShortCut as a TShortCut </li>
+                    </ul>
+              <!-- Procedure CreateMenuItem(
+  mmiParent : TMenuItem;
+  strCaption : String;
+  ClickProc : TNotifyEvent;
+  AShortCut : TShortCut
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span></pre>
+                    <p class="Comment">This is the destructor method for the TBrowseAndDocItWizard class. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Saves the wizards settings and frees memory for interval structures. </li>
+                    </ul>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.DocumentationClick"></a>DocumentationClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DocumentationClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is an on click event handler for the documentation menu. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Invokes the documentation of the current active project. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure DocumentationClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.Execute"></a>Execute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Execute</span></pre>
+                    <p class="Comment">This is an exceute method for the wizard. Since this wizard is not implemented as a menu wizard this method has no code but is required for the interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+              <!-- Procedure Execute -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.Focus"></a>Focus</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Focus</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is an event handler for the On Focus event from the explorer frame. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Focuses the active editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure Focus(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.GetIDString"></a>GetIDString</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetIDString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                    <p class="Comment">This is a getter method for the IDString property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns the ID string for the wizard. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a string </li>
+                    </ul>
+              <!-- Function GetIDString : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.GetMenuText"></a>GetMenuText</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetMenuText</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                    <p class="Comment">This is a getter method for the MenuText property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Reutns the Menu text for the wizard. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a string </li>
+                    </ul>
+              <!-- Function GetMenuText : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.GetMethodDescription"></a>GetMethodDescription</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetMethodDescription</span><span class="Symbol">(</span>
+  <span class="Identifier">Method</span> <span class="Symbol">:</span> <span class="Identifier">TGenericMethodDecl</span><span class="Symbol">;</span>
+  <span class="Identifier">AComment</span> <span class="Symbol">:</span> <span class="Identifier">TComment</span><span class="Symbol">;</span>
+  <span class="Identifier">iIndent</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">CursorAdjust</span> <span class="Symbol">:</span> <span class="Identifier">TPoint</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This method returns a description for the method if it is a constructor, destructor, getter or setter method, else it returns an empty string. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Method is a valid instance of a method declatation to be described. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns a description of the method is applicable. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Method as a TGenericMethodDecl </li>
+                      <li class="SpecialTag">AComment as a TComment </li>
+                      <li class="SpecialTag">iIndent as an Integer </li>
+                      <li class="SpecialTag">CursorAdjust as a TPoint </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a String </li>
+                    </ul>
+              <!-- Function GetMethodDescription(
+  Method : TGenericMethodDecl;
+  AComment : TComment;
+  iIndent : Integer;
+  var CursorAdjust : TPoint
+) : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.GetName"></a>GetName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                    <p class="Comment">This is a getter method for the Name property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns the name of the wizard. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a string </li>
+                    </ul>
+              <!-- Function GetName : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.GetPropertyDescription"></a>GetPropertyDescription</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetPropertyDescription</span><span class="Symbol">(</span>
+  <span class="Identifier">Prop</span> <span class="Symbol">:</span> <span class="Identifier">TGenericProperty</span><span class="Symbol">;</span>
+  <span class="Identifier">AComment</span> <span class="Symbol">:</span> <span class="Identifier">TComment</span><span class="Symbol">;</span>
+  <span class="Identifier">iIndent</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This method returns a description for the method if it is a constructor, destructor, getter or setter method, else it returns an empty string. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Method is a valid instance of a method declatation to be described. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns a description of the method is applicable. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Prop as a TGenericProperty </li>
+                      <li class="SpecialTag">AComment as a TComment </li>
+                      <li class="SpecialTag">iIndent as an Integer </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a String </li>
+                    </ul>
+              <!-- Function GetPropertyDescription(
+  Prop : TGenericProperty;
+  AComment : TComment;
+  iIndent : Integer
+) : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.GetState"></a>GetState</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetState</span> <span class="Symbol">:</span> <span class="Identifier">TWizardState</span></pre>
+                    <p class="Comment">This is a getter method for the State property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Enables the wizard. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a TWizardState </li>
+                    </ul>
+              <!-- Function GetState : TWizardState -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.HelpClick"></a>HelpClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">HelpClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method invokes the HTML help page of the documentation to provide help for this addin. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sender is the menu item that invokes this event. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays the Help file. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure HelpClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.InsertBlockCommentClick"></a>InsertBlockCommentClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertBlockCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is a menu OnClick event for the insertion of a comment block at the cursor. This simple adds a comment block at the current cursor position in the active source code editor. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sender is the object initiating the event. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Inserts a block comment into the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure InsertBlockCommentClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.InsertCommentBlock"></a>InsertCommentBlock</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertCommentBlock</span><span class="Symbol">(</span>
+  <span class="Identifier">CommentType</span> <span class="Symbol">:</span> <span class="Identifier">TCommentType</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method inserts either a Block, Line or InSitu comment at the position of the curerent cursor depending on the passed partameter. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Inserts the specified comment. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">CommentType as a TCommentType </li>
+                    </ul>
+              <!-- Procedure InsertCommentBlock(
+  CommentType : TCommentType
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.InsertInSituCommentClick"></a>InsertInSituCommentClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertInSituCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is an action for the Insert In Situ Comment event handler. It inserts an in sity comment at the current cursor position. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Inserts an InSitu comment into the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure InsertInSituCommentClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.InsertLineCommentClick"></a>InsertLineCommentClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertLineCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is an on click event handler for the Insert Line Comment action. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Inserts a line comment at the cursor location in the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure InsertLineCommentClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.InsertMethodCommentClick"></a>InsertMethodCommentClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertMethodCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is a menu OnClick event for the insertion of a method comment. This method searches the IDE for the current module being edited and then creates a memory stream of the source and passes it to the Unit parser. It then finds the first method declaration prior to the cursor position, parses the declaration and output the information in as comment immediately above the method declaration. This comment block starts with '(**' to signify an ObjectPascalDoc comment that can be used by the documentation system. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sender is the object initiating the event. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Inserts a Method comment into the editor avoid the current method. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender As a TObject </li>
+                    </ul>
+              <!-- Procedure InsertMethodCommentClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.InsertPropertyCommentClick"></a>InsertPropertyCommentClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertPropertyCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is a menu OnClick event for the insertion of a property comment. This method searches the IDE for the current module being edited and then creates a memory stream of the source and passes it to the Unit parser. It then finds the first preperty declaration prior to the cursor position, parses the declaration and output the information in as comment immediately above the property declaration. This comment block starts with '(**' to signify an ObjectPascalDoc comment that can be used by the documentation system. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sender is the object initiating the event. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Inserts a property comment into the editor for the current property. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure InsertPropertyCommentClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.ModuleExplorerClick"></a>ModuleExplorerClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ModuleExplorerClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is a TMenuItem on click event. If display the module explorer if its not visible else hide or focuses the explorer. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sender is the object initiating the event. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays the Module Explorer. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure ModuleExplorerClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.OptionsChange"></a>OptionsChange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">OptionsChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is an event handler to be hooked the the Module Explorer Frames OnOptionsChange event handler. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Refreshes the current module view. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure OptionsChange(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.OptionsClick"></a>OptionsClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">OptionsClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is a TMenuItem on click event. it invokes the Options dialogue. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sender is the object initiating the event. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays the wizards Options dialogue. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure OptionsClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.OutputTag"></a>OutputTag</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">OutputTag</span><span class="Symbol">(</span>
+  <span class="Identifier">iIndent</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Tag</span> <span class="Symbol">:</span> <span class="Identifier">TTag</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This function returns the tag information indented and broken into line no wider than 80 characters. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Tag must be a valid comment tag. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns the tag information indented and broken into line no wider than 80 characters. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">iIndent as an Integer </li>
+                      <li class="SpecialTag">Tag as a TTag </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a String </li>
+                    </ul>
+              <!-- Function OutputTag(
+  iIndent : Integer;
+  Tag : TTag
+) : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.SelectionChange"></a>SelectionChange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SelectionChange</span><span class="Symbol">(</span>
+  <span class="Identifier">iIdentLine</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iIdentCol</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iCommentLine</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iCommentCol</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">SelectType</span> <span class="Symbol">:</span> <span class="Identifier">TSelectType</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method move the active editors cursor to the supplied position and centres the cursor on th screen. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">When a selection is made in the explorer the cursor is placed in the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">iIdentLine as an Integer </li>
+                      <li class="SpecialTag">iIdentCol as an Integer </li>
+                      <li class="SpecialTag">iCommentLine as an Integer </li>
+                      <li class="SpecialTag">iCommentCol as an Integer </li>
+                      <li class="SpecialTag">SelectType as a TSelectType </li>
+                    </ul>
+              <!-- Procedure SelectionChange(
+  iIdentLine : Integer;
+  iIdentCol : Integer;
+  iCommentLine : Integer;
+  iCommentCol : Integer;
+  SelectType : TSelectType
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.WriteMethodComment"></a>WriteMethodComment</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">WriteMethodComment</span><span class="Symbol">(</span>
+  <span class="Identifier">Method</span> <span class="Symbol">:</span> <span class="Identifier">TGenericMethodDecl</span><span class="Symbol">;</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">IOTASourceEditor</span><span class="Symbol">;</span>
+  <span class="Identifier">Writer</span> <span class="Symbol">:</span> <span class="Identifier">IOTAEditWriter</span><span class="Symbol">;</span>
+  <span class="Identifier">AComment</span> <span class="Symbol">:</span> <span class="Identifier">TComment</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TOTAEditPos</span></pre>
+                    <p class="Comment">This method writes the method comment to the active editor. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Method is a valid instance of a method declaration to be commented, Writer is a valid instance of an open tools api writer, iBufferPos is the buffer position to insert the comment and iCol is the column to indent the comment by. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">A method comment is inserted into the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Method as a TGenericMethodDecl </li>
+                      <li class="SpecialTag">Source as an IOTASourceEditor </li>
+                      <li class="SpecialTag">Writer as an IOTAEditWriter </li>
+                      <li class="SpecialTag">AComment as a TComment </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a TOTAEditPos </li>
+                    </ul>
+              <!-- Function WriteMethodComment(
+  Method : TGenericMethodDecl;
+  Source : IOTASourceEditor;
+  Writer : IOTAEditWriter;
+  AComment : TComment
+) : TOTAEditPos -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TBrowseAndDocItWizard.WritePropertyComment"></a>WritePropertyComment</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">WritePropertyComment</span><span class="Symbol">(</span>
+  <span class="Identifier">Prop</span> <span class="Symbol">:</span> <span class="Identifier">TGenericProperty</span><span class="Symbol">;</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">IOTASourceEditor</span><span class="Symbol">;</span>
+  <span class="Identifier">Writer</span> <span class="Symbol">:</span> <span class="Identifier">IOTAEditWriter</span><span class="Symbol">;</span>
+  <span class="Identifier">AComment</span> <span class="Symbol">:</span> <span class="Identifier">TComment</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TOTAEditPos</span></pre>
+                    <p class="Comment">This method write the property comment to the active editor. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">P is a valid instance of a property declaration to be commented, Writer is a valid instance of an open tools api writer, iBufferPos is the buffer position to insert the comment and iCol is the column to indent the comment by. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">A property comment it inserted into the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Prop as a TGenericProperty </li>
+                      <li class="SpecialTag">Source as an IOTASourceEditor </li>
+                      <li class="SpecialTag">Writer as an IOTAEditWriter </li>
+                      <li class="SpecialTag">AComment as a TComment </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a TOTAEditPos </li>
+                    </ul>
+              <!-- Function WritePropertyComment(
+  Prop : TGenericProperty;
+  Source : IOTASourceEditor;
+  Writer : IOTAEditWriter;
+  AComment : TComment
+) : TOTAEditPos -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TEditorNotifier -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TEditorNotifier3"></a>TEditorNotifier</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span></pre>
+                    <p class="Comment">This is the constructor method for the TEditorNotifier class. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Initialise the class be creating a time for handling editor changes. </li>
+                    </ul>
+              <!-- Constructor Create -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span></pre>
+                    <p class="Comment">This is the destructor method for the TEditorNotifier class. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Frees the timer control. </li>
+                    </ul>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.DetermineCompilerDefinitions"></a>DetermineCompilerDefinitions</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DetermineCompilerDefinitions</span><span class="Symbol">(</span>
+  <span class="Identifier">slDefines</span> <span class="Symbol">:</span> <span class="Identifier">TStringList</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method determines which sytem compiler definitions need to be put in the definition list. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">slDefines neds to be a valid TStringList </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Adds the relavent compiler definitions. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">slDefines as a TStringList </li>
+                    </ul>
+              <!-- Procedure DetermineCompilerDefinitions(
+  slDefines : TStringList
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.DockFormRefresh"></a>DockFormRefresh</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DockFormRefresh</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">DockForm</span> <span class="Symbol">:</span> <span class="Identifier">TDockableForm</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This an impementation of the DockFormRefresh method for the Editor Notifier interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Not used. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                      <li class="SpecialTag">DockForm as a TDockableForm </li>
+                    </ul>
+              <!-- Procedure DockFormRefresh(
+  const EditWindow : INTAEditWindow;
+  DockForm : TDockableForm
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.DockFormUpdated"></a>DockFormUpdated</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DockFormUpdated</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">DockForm</span> <span class="Symbol">:</span> <span class="Identifier">TDockableForm</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This an impementation of the DockFormUpdate method for the Editor Notifier interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Not used. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                      <li class="SpecialTag">DockForm as a TDockableForm </li>
+                    </ul>
+              <!-- Procedure DockFormUpdated(
+  const EditWindow : INTAEditWindow;
+  DockForm : TDockableForm
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.DockFormVisibleChanged"></a>DockFormVisibleChanged</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DockFormVisibleChanged</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">DockForm</span> <span class="Symbol">:</span> <span class="Identifier">TDockableForm</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This an impementation of the DockFormVisibleChange method for the Editor Notifier interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Not used. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                      <li class="SpecialTag">DockForm as a TDockableForm </li>
+                    </ul>
+              <!-- Procedure DockFormVisibleChanged(
+  const EditWindow : INTAEditWindow;
+  DockForm : TDockableForm
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.EditorViewActivated"></a>EditorViewActivated</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">EditorViewActivated</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditView</span> <span class="Symbol">:</span> <span class="Identifier">IOTAEditView</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This an impementation of the EditorViewActivate method for the Editor Notifier interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Forces an immediate update of the module explorer. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                      <li class="SpecialTag">EditView as an IOTAEditView constant </li>
+                    </ul>
+              <!-- Procedure EditorViewActivated(
+  const EditWindow : INTAEditWindow;
+  const EditView : IOTAEditView
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.EditorViewModified"></a>EditorViewModified</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">EditorViewModified</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditView</span> <span class="Symbol">:</span> <span class="Identifier">IOTAEditView</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This an impementation of the EditorViewModified method for the Editor Notifier interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Logs the last time the editor was updated. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                      <li class="SpecialTag">EditView as an IOTAEditView constant </li>
+                    </ul>
+              <!-- Procedure EditorViewModified(
+  const EditWindow : INTAEditWindow;
+  const EditView : IOTAEditView
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.RefreshTree"></a>RefreshTree</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">RefreshTree</span></pre>
+                    <p class="Comment">This method get and parsers the current editor and display it in the module explorer. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Creates an instance of the language module for the specified file extension and passes the language module to the Dockable Module Explorer for rendering. </li>
+                    </ul>
+              <!-- Procedure RefreshTree -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.TimerEventHandler"></a>TimerEventHandler</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">TimerEventHandler</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is a TTimer on Timer event handler. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Checks to see if the last time the editor was changes is beyond the wait time for the module to be updated. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure TimerEventHandler(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.WindowActivated"></a>WindowActivated</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WindowActivated</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This an impementation of the WindowActivated method for the Editor Notifier interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Not used. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                    </ul>
+              <!-- Procedure WindowActivated(
+  const EditWindow : INTAEditWindow
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.WindowCommand"></a>WindowCommand</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WindowCommand</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">Command</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Param</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Handled</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This an impementation of the WindowCommand method for the Editor Notifier interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Not used. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                      <li class="SpecialTag">Command as an Integer </li>
+                      <li class="SpecialTag">Param as an Integer </li>
+                      <li class="SpecialTag">Handled as a Boolean as a reference </li>
+                    </ul>
+              <!-- Procedure WindowCommand(
+  const EditWindow : INTAEditWindow;
+  Command : Integer;
+  Param : Integer;
+  var Handled : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.WindowNotification"></a>WindowNotification</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WindowNotification</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">Operation</span> <span class="Symbol">:</span> <span class="Identifier">TOperation</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is not used by this class and is therefore not implemented. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                      <li class="SpecialTag">Operation as a TOperation </li>
+                    </ul>
+              <!-- Procedure WindowNotification(
+  const EditWindow : INTAEditWindow;
+  Operation : TOperation
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.WindowShow"></a>WindowShow</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WindowShow</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">Show</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span>
+  <span class="Identifier">LoadedFromDesktop</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is not used by this class and is therefore not implemented. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">EditWindow as an INTAEditWindow constant </li>
+                      <li class="SpecialTag">Show as a Boolean </li>
+                      <li class="SpecialTag">LoadedFromDesktop as a Boolean </li>
+                    </ul>
+              <!-- Procedure WindowShow(
+  const EditWindow : INTAEditWindow;
+  Show : Boolean;
+  LoadedFromDesktop : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TKeyboardBinding -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TKeyboardBinding3"></a>TKeyboardBinding</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.BindKeyboard"></a>BindKeyboard</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BindKeyboard</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">BindingServices</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyBindingServices</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method binds all the Browse and Doc It keybindings to the methods in this class. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">All the keybinding are bound. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">BindingServices as an IOTAKeyBindingServices constant </li>
+                    </ul>
+              <!-- Procedure BindKeyboard(
+  const BindingServices : IOTAKeyBindingServices
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">Wizard</span> <span class="Symbol">:</span> <span class="Identifier">TBrowseAndDocItWizard</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is the constructor method for the TKeyboardBinding class. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Initialises the internal wizard reference. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Wizard as a TBrowseAndDocItWizard </li>
+                    </ul>
+              <!-- Constructor Create(
+  Wizard : TBrowseAndDocItWizard
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.FocusModuleExplorer"></a>FocusModuleExplorer</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FocusModuleExplorer</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is a handler for the Focus Modul Explorer keyboatf binding. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Asks the main wizard for focus the module explorer. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Context as an IOTAKeyContext constant </li>
+                      <li class="SpecialTag">KeyCode as a TShortcut </li>
+                      <li class="SpecialTag">BindingResult as a TKeyBindingResult as a reference </li>
+                    </ul>
+              <!-- Procedure FocusModuleExplorer(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.GetBindingType"></a>GetBindingType</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetBindingType</span> <span class="Symbol">:</span> <span class="Identifier">TBindingType</span></pre>
+                    <p class="Comment">This is a getter method for the BindingType property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Defines the keyboard binding as a partial binding set. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a TBindingType </li>
+                    </ul>
+              <!-- Function GetBindingType : TBindingType -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.GetDisplayName"></a>GetDisplayName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDisplayName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                    <p class="Comment">This is a getter method for the DisplayName property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns the diosplay name for the set of Keyboard Bindings. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a string </li>
+                    </ul>
+              <!-- Function GetDisplayName : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.GetName"></a>GetName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                    <p class="Comment">This is a getter method for the Name property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns the name of th keyboard binding set. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a string </li>
+                    </ul>
+              <!-- Function GetName : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.InsertBlockComment"></a>InsertBlockComment</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertBlockComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method calls the main wizards Insert Block Comment method. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">A block comment should be inserted into the editor at the current cursor position. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Context as an IOTAKeyContext constant </li>
+                      <li class="SpecialTag">KeyCode as a TShortcut </li>
+                      <li class="SpecialTag">BindingResult as a TKeyBindingResult as a reference </li>
+                    </ul>
+              <!-- Procedure InsertBlockComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.InsertInSituComment"></a>InsertInSituComment</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertInSituComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method calls the main wizards Insert In Situ comment at the position of the current cursor in the editor. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Should insert an insitu comment into the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Context as an IOTAKeyContext constant </li>
+                      <li class="SpecialTag">KeyCode as a TShortcut </li>
+                      <li class="SpecialTag">BindingResult as a TKeyBindingResult as a reference </li>
+                    </ul>
+              <!-- Procedure InsertInSituComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.InsertLineComment"></a>InsertLineComment</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertLineComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method calls the main wizards Insert Line Comment at the position of the current cursor in thr editor. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Should insert a Line comment into the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Context as an IOTAKeyContext constant </li>
+                      <li class="SpecialTag">KeyCode as a TShortcut </li>
+                      <li class="SpecialTag">BindingResult as a TKeyBindingResult as a reference </li>
+                    </ul>
+              <!-- Procedure InsertLineComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.InsertMethodComment"></a>InsertMethodComment</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertMethodComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method calls the main wizards Insert Method Comment at the position of the current cursor in the editor. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Should insert a method comment into the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Context as an IOTAKeyContext constant </li>
+                      <li class="SpecialTag">KeyCode as a TShortcut </li>
+                      <li class="SpecialTag">BindingResult as a TKeyBindingResult as a reference </li>
+                    </ul>
+              <!-- Procedure InsertMethodComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.InsertPropertyComment"></a>InsertPropertyComment</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertPropertyComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method calls the main wizards Insert Property Comment at the position of the current cursor in the editor. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Should insert a property comment into the editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Context as an IOTAKeyContext constant </li>
+                      <li class="SpecialTag">KeyCode as a TShortcut </li>
+                      <li class="SpecialTag">BindingResult as a TKeyBindingResult as a reference </li>
+                    </ul>
+              <!-- Procedure InsertPropertyComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TKeyboardBinding.ShowTokens"></a>ShowTokens</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowTokens</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is a keyboard binding event hanlder for showing the tokens in the parser. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays a form containsing the tokens in the current editor. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Context as an IOTAKeyContext constant </li>
+                      <li class="SpecialTag">KeyCode as a TShortcut </li>
+                      <li class="SpecialTag">BindingResult as a TKeyBindingResult as a reference </li>
+                    </ul>
+              <!-- Procedure ShowTokens(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Initialization -->
+      <h2><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a name="Initialization2"></a>Initialization</h2>
+        <p class="Comment">This initialization section installs an IDE Splash Screen item. </p>
+      <div class="Indent">
+      </div>
+      
+      <!-- Resource Strings -->
+      <h2><img class="verticallymiddle" src="Images/PublicResourceStringsLabel.gif" alt=""/>&nbsp;<a name="ResourceStrings2"></a>Resource Strings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strMethodAlreadyExists"></a>strMethodAlreadyExists</td>
+              <td>
+                <pre><span class="Identifier">strMethodAlreadyExists</span> <span class="Symbol">=</span> <span class="StringLiteral">'The method "%s" already has a comment. Do you'</span> <span class="Symbol">+</span>
+  <span class="StringLiteral">' want to update the comment with revised parameters and returns?'</span></pre>
+              <p class="Comment">This is a message to confirm you wish to update the current comment. </p>
+          <!-- strMethodAlreadyExists = 'The method "%s" already has a comment. Do you' +
+  ' want to update the comment with revised parameters and returns?' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strNoMethodFound"></a>strNoMethodFound</td>
+              <td>
+                <pre><span class="Identifier">strNoMethodFound</span> <span class="Symbol">=</span> <span class="StringLiteral">'No method found on or above the current cursor position.'</span></pre>
+              <p class="Comment">This is a message for no methods to comment. </p>
+          <!-- strNoMethodFound = 'No method found on or above the current cursor position.' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strNoPropertyFound"></a>strNoPropertyFound</td>
+              <td>
+                <pre><span class="Identifier">strNoPropertyFound</span> <span class="Symbol">=</span> <span class="StringLiteral">'No property found on or above the current cursor position.'</span></pre>
+              <p class="Comment">This is a message for no property to comment. </p>
+          <!-- strNoPropertyFound = 'No property found on or above the current cursor position.' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strPropertyAlreadyExists"></a>strPropertyAlreadyExists</td>
+              <td>
+                <pre><span class="Identifier">strPropertyAlreadyExists</span> <span class="Symbol">=</span> <span class="StringLiteral">'The property "%s" already has a comment. Do you'</span> <span class="Symbol">+</span>
+  <span class="StringLiteral">' want to continue?'</span></pre>
+              <p class="Comment">This is a message to confirm you wish to update the current comment. </p>
+          <!-- strPropertyAlreadyExists = 'The property "%s" already has a comment. Do you' +
+  ' want to continue?' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strRevision"></a>strRevision</td>
+              <td>
+                <pre><span class="Identifier">strRevision</span> <span class="Symbol">=</span> <span class="StringLiteral">' abcdefghijklmnopqrstuvwxyz'</span></pre>
+              <p class="Comment">This is a text string of revision from nil and a to z. </p>
+          <!-- strRevision = ' abcdefghijklmnopqrstuvwxyz' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strSplashScreenBuild"></a>strSplashScreenBuild</td>
+              <td>
+                <pre><span class="Identifier">strSplashScreenBuild</span> <span class="Symbol">=</span> <span class="StringLiteral">'Open Source Freeware by David Hoyle (Build %d.%d.%d.%d)'</span></pre>
+              <p class="Comment">This is another message string to appear in the BDS 2005/6 splash screen </p>
+          <!-- strSplashScreenBuild = 'Open Source Freeware by David Hoyle (Build %d.%d.%d.%d)' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strSplashScreenName"></a>strSplashScreenName</td>
+              <td>
+                <pre><span class="Identifier">strSplashScreenName</span> <span class="Symbol">=</span>
+  <span class="StringLiteral">'Browse and Doc It %d.%d%s for Borland Developer Studio 2006'</span></pre>
+              <p class="Comment">This is a message string to appear in the BDS 2005/6 splash screen </p>
+          <!-- strSplashScreenName =
+  'Browse and Doc It %d.%d%s for Borland Developer Studio 2006' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard"></a>TBrowseAndDocItWizard</td>
+              <td>
+                <pre><span class="Identifier">TBrowseAndDocItWizard</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">IOTAWizard</span> <span class="Symbol">,</span><span class="Identifier">TNotifierObject</span><span class="Symbol">)</span></pre>
+              <p class="Comment">This is the class which defined the Wizard interface. </p>
+          <!-- TBrowseAndDocItWizard = Class(IOTAWizard ,TNotifierObject) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Fields.FCounter"></a>FCounter</td>
+                      <td>
+                        <pre><span class="Identifier">FCounter</span> <span class="Symbol">=</span> <span class="Identifier">Integer</span></pre>
+                  <!-- FCounter = Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Fields.FFileName"></a>FFileName</td>
+                      <td>
+                        <pre><span class="Identifier">FFileName</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FFileName = String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Fields.FKeyBinding"></a>FKeyBinding</td>
+                      <td>
+                        <pre><span class="Identifier">FKeyBinding</span> <span class="Symbol">=</span> <span class="Identifier">Integer</span></pre>
+                  <!-- FKeyBinding = Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Fields.mmiPascalDocMenu"></a>mmiPascalDocMenu</td>
+                      <td>
+                        <pre><span class="Identifier">mmiPascalDocMenu</span> <span class="Symbol">=</span> <span class="Identifier">TMenuItem</span></pre>
+                  <!-- mmiPascalDocMenu = TMenuItem -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span></pre>
+                  <!-- Constructor Create -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.CreateMenuItem"></a>CreateMenuItem</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CreateMenuItem</span><span class="Symbol">(</span>
+  <span class="Identifier">mmiParent</span> <span class="Symbol">:</span> <span class="Identifier">TMenuItem</span><span class="Symbol">;</span>
+  <span class="Identifier">strCaption</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">ClickProc</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span><span class="Symbol">;</span>
+  <span class="Identifier">AShortCut</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure CreateMenuItem(
+  mmiParent : TMenuItem;
+  strCaption : String;
+  ClickProc : TNotifyEvent;
+  AShortCut : TShortCut
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span><span class="Symbol">;</span> <span class="ReservedWord">Override</span></pre>
+                  <!-- Destructor Destroy; Override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.DocumentationClick"></a>DocumentationClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DocumentationClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure DocumentationClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.Execute"></a>Execute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Execute</span></pre>
+                  <!-- Procedure Execute -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.Focus"></a>Focus</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Focus</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure Focus(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.GetIDString"></a>GetIDString</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetIDString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function GetIDString : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.GetMenuText"></a>GetMenuText</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetMenuText</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function GetMenuText : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.GetMethodDescription"></a>GetMethodDescription</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetMethodDescription</span><span class="Symbol">(</span>
+  <span class="Identifier">Method</span> <span class="Symbol">:</span> <span class="Identifier">TGenericMethodDecl</span><span class="Symbol">;</span>
+  <span class="Identifier">AComment</span> <span class="Symbol">:</span> <span class="Identifier">TComment</span><span class="Symbol">;</span>
+  <span class="Identifier">iIndent</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">CursorAdjust</span> <span class="Symbol">:</span> <span class="Identifier">TPoint</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function GetMethodDescription(
+  Method : TGenericMethodDecl;
+  AComment : TComment;
+  iIndent : Integer;
+  var CursorAdjust : TPoint
+) : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.GetName"></a>GetName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function GetName : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.GetPropertyDescription"></a>GetPropertyDescription</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetPropertyDescription</span><span class="Symbol">(</span>
+  <span class="Identifier">Prop</span> <span class="Symbol">:</span> <span class="Identifier">TGenericProperty</span><span class="Symbol">;</span>
+  <span class="Identifier">AComment</span> <span class="Symbol">:</span> <span class="Identifier">TComment</span><span class="Symbol">;</span>
+  <span class="Identifier">iIndent</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function GetPropertyDescription(
+  Prop : TGenericProperty;
+  AComment : TComment;
+  iIndent : Integer
+) : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.GetState"></a>GetState</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetState</span> <span class="Symbol">:</span> <span class="Identifier">TWizardState</span></pre>
+                  <!-- Function GetState : TWizardState -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.HelpClick"></a>HelpClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">HelpClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure HelpClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.InsertBlockCommentClick"></a>InsertBlockCommentClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertBlockCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertBlockCommentClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.InsertCommentBlock"></a>InsertCommentBlock</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertCommentBlock</span><span class="Symbol">(</span>
+  <span class="Identifier">CommentType</span> <span class="Symbol">:</span> <span class="Identifier">TCommentType</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertCommentBlock(
+  CommentType : TCommentType
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.InsertInSituCommentClick"></a>InsertInSituCommentClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertInSituCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertInSituCommentClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.InsertLineCommentClick"></a>InsertLineCommentClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertLineCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertLineCommentClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.InsertMethodCommentClick"></a>InsertMethodCommentClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertMethodCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertMethodCommentClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.InsertPropertyCommentClick"></a>InsertPropertyCommentClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertPropertyCommentClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertPropertyCommentClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.ModuleExplorerClick"></a>ModuleExplorerClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ModuleExplorerClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ModuleExplorerClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.OptionsChange"></a>OptionsChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">OptionsChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure OptionsChange(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.OptionsClick"></a>OptionsClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">OptionsClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure OptionsClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.OutputTag"></a>OutputTag</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">OutputTag</span><span class="Symbol">(</span>
+  <span class="Identifier">iIndent</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Tag</span> <span class="Symbol">:</span> <span class="Identifier">TTag</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function OutputTag(
+  iIndent : Integer;
+  Tag : TTag
+) : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.SelectionChange"></a>SelectionChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SelectionChange</span><span class="Symbol">(</span>
+  <span class="Identifier">iIdentLine</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iIdentCol</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iCommentLine</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iCommentCol</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">SelectType</span> <span class="Symbol">:</span> <span class="Identifier">TSelectType</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SelectionChange(
+  iIdentLine : Integer;
+  iIdentCol : Integer;
+  iCommentLine : Integer;
+  iCommentCol : Integer;
+  SelectType : TSelectType
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.WriteMethodComment"></a>WriteMethodComment</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">WriteMethodComment</span><span class="Symbol">(</span>
+  <span class="Identifier">Method</span> <span class="Symbol">:</span> <span class="Identifier">TGenericMethodDecl</span><span class="Symbol">;</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">IOTASourceEditor</span><span class="Symbol">;</span>
+  <span class="Identifier">Writer</span> <span class="Symbol">:</span> <span class="Identifier">IOTAEditWriter</span><span class="Symbol">;</span>
+  <span class="Identifier">AComment</span> <span class="Symbol">:</span> <span class="Identifier">TComment</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TOTAEditPos</span></pre>
+                  <!-- Function WriteMethodComment(
+  Method : TGenericMethodDecl;
+  Source : IOTASourceEditor;
+  Writer : IOTAEditWriter;
+  AComment : TComment
+) : TOTAEditPos -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TBrowseAndDocItWizard.Methods.WritePropertyComment"></a>WritePropertyComment</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">WritePropertyComment</span><span class="Symbol">(</span>
+  <span class="Identifier">Prop</span> <span class="Symbol">:</span> <span class="Identifier">TGenericProperty</span><span class="Symbol">;</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">IOTASourceEditor</span><span class="Symbol">;</span>
+  <span class="Identifier">Writer</span> <span class="Symbol">:</span> <span class="Identifier">IOTAEditWriter</span><span class="Symbol">;</span>
+  <span class="Identifier">AComment</span> <span class="Symbol">:</span> <span class="Identifier">TComment</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TOTAEditPos</span></pre>
+                  <!-- Function WritePropertyComment(
+  Prop : TGenericProperty;
+  Source : IOTASourceEditor;
+  Writer : IOTAEditWriter;
+  AComment : TComment
+) : TOTAEditPos -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TCommentType"></a>TCommentType</td>
+              <td>
+                <pre><span class="Identifier">TCommentType</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="Identifier">ctBlock</span><span class="Symbol">,</span> <span class="Identifier">ctLine</span><span class="Symbol">,</span> <span class="Identifier">ctInSitu</span><span class="Symbol">)</span></pre>
+              <p class="Comment">This emunerate descibed the different types of doc comment . </p>
+          <!-- TCommentType = (ctBlock, ctLine, ctInSitu) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier"></a>TEditorNotifier</td>
+              <td>
+                <pre><span class="Identifier">TEditorNotifier</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">INTAEditServicesNotifier</span> <span class="Symbol">,</span><span class="Identifier">TNotifierObject</span><span class="Symbol">)</span></pre>
+              <p class="Comment">This class handles notifications from the editor so that changes in the editor can be displayed. </p>
+          <!-- TEditorNotifier = Class(INTAEditServicesNotifier ,TNotifierObject) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FLastCursorPos"></a>FLastCursorPos</td>
+                      <td>
+                        <pre><span class="Identifier">FLastCursorPos</span> <span class="Symbol">=</span> <span class="Identifier">TOTAEditPos</span></pre>
+                  <!-- FLastCursorPos = TOTAEditPos -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FLastEditorName"></a>FLastEditorName</td>
+                      <td>
+                        <pre><span class="Identifier">FLastEditorName</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FLastEditorName = String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FUpdateTimer"></a>FUpdateTimer</td>
+                      <td>
+                        <pre><span class="Identifier">FUpdateTimer</span> <span class="Symbol">=</span> <span class="Identifier">TTimer</span></pre>
+                  <!-- FUpdateTimer = TTimer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span></pre>
+                  <!-- Constructor Create -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span><span class="Symbol">;</span> <span class="ReservedWord">Override</span></pre>
+                  <!-- Destructor Destroy; Override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.DetermineCompilerDefinitions"></a>DetermineCompilerDefinitions</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DetermineCompilerDefinitions</span><span class="Symbol">(</span>
+  <span class="Identifier">slDefines</span> <span class="Symbol">:</span> <span class="Identifier">TStringList</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure DetermineCompilerDefinitions(
+  slDefines : TStringList
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.DockFormRefresh"></a>DockFormRefresh</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DockFormRefresh</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">DockForm</span> <span class="Symbol">:</span> <span class="Identifier">TDockableForm</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure DockFormRefresh(
+  const EditWindow : INTAEditWindow;
+  DockForm : TDockableForm
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.DockFormUpdated"></a>DockFormUpdated</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DockFormUpdated</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">DockForm</span> <span class="Symbol">:</span> <span class="Identifier">TDockableForm</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure DockFormUpdated(
+  const EditWindow : INTAEditWindow;
+  DockForm : TDockableForm
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.DockFormVisibleChanged"></a>DockFormVisibleChanged</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DockFormVisibleChanged</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">DockForm</span> <span class="Symbol">:</span> <span class="Identifier">TDockableForm</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure DockFormVisibleChanged(
+  const EditWindow : INTAEditWindow;
+  DockForm : TDockableForm
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.EditorViewActivated"></a>EditorViewActivated</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">EditorViewActivated</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditView</span> <span class="Symbol">:</span> <span class="Identifier">IOTAEditView</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure EditorViewActivated(
+  const EditWindow : INTAEditWindow;
+  const EditView : IOTAEditView
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.EditorViewModified"></a>EditorViewModified</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">EditorViewModified</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditView</span> <span class="Symbol">:</span> <span class="Identifier">IOTAEditView</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure EditorViewModified(
+  const EditWindow : INTAEditWindow;
+  const EditView : IOTAEditView
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.RefreshTree"></a>RefreshTree</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">RefreshTree</span></pre>
+                  <!-- Procedure RefreshTree -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.TimerEventHandler"></a>TimerEventHandler</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">TimerEventHandler</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure TimerEventHandler(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.WindowActivated"></a>WindowActivated</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WindowActivated</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure WindowActivated(
+  const EditWindow : INTAEditWindow
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.WindowCommand"></a>WindowCommand</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WindowCommand</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">Command</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Param</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Handled</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure WindowCommand(
+  const EditWindow : INTAEditWindow;
+  Command : Integer;
+  Param : Integer;
+  var Handled : Boolean
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.WindowNotification"></a>WindowNotification</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WindowNotification</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">Operation</span> <span class="Symbol">:</span> <span class="Identifier">TOperation</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure WindowNotification(
+  const EditWindow : INTAEditWindow;
+  Operation : TOperation
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.WindowShow"></a>WindowShow</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WindowShow</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">EditWindow</span> <span class="Symbol">:</span> <span class="Identifier">INTAEditWindow</span><span class="Symbol">;</span>
+  <span class="Identifier">Show</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span>
+  <span class="Identifier">LoadedFromDesktop</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure WindowShow(
+  const EditWindow : INTAEditWindow;
+  Show : Boolean;
+  LoadedFromDesktop : Boolean
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding"></a>TKeyboardBinding</td>
+              <td>
+                <pre><span class="Identifier">TKeyboardBinding</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">IOTAKeyboardBinding</span> <span class="Symbol">,</span><span class="Identifier">TNotifierObject</span><span class="Symbol">)</span></pre>
+              <p class="Comment">This class represents a key binding notifier for installing and handling key bindings for this plugin. </p>
+          <!-- TKeyboardBinding = Class(IOTAKeyboardBinding ,TNotifierObject) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Fields.FWizard"></a>FWizard</td>
+                      <td>
+                        <pre><span class="Identifier">FWizard</span> <span class="Symbol">=</span> <span class="Identifier">TBrowseAndDocItWizard</span></pre>
+                  <!-- FWizard = TBrowseAndDocItWizard -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.BindKeyboard"></a>BindKeyboard</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BindKeyboard</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">BindingServices</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyBindingServices</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure BindKeyboard(
+  const BindingServices : IOTAKeyBindingServices
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">Wizard</span> <span class="Symbol">:</span> <span class="Identifier">TBrowseAndDocItWizard</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Constructor Create(
+  Wizard : TBrowseAndDocItWizard
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.FocusModuleExplorer"></a>FocusModuleExplorer</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FocusModuleExplorer</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FocusModuleExplorer(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.GetBindingType"></a>GetBindingType</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetBindingType</span> <span class="Symbol">:</span> <span class="Identifier">TBindingType</span></pre>
+                  <!-- Function GetBindingType : TBindingType -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.GetDisplayName"></a>GetDisplayName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDisplayName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function GetDisplayName : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.GetName"></a>GetName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function GetName : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.InsertBlockComment"></a>InsertBlockComment</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertBlockComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertBlockComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.InsertInSituComment"></a>InsertInSituComment</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertInSituComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertInSituComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.InsertLineComment"></a>InsertLineComment</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertLineComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertLineComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.InsertMethodComment"></a>InsertMethodComment</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertMethodComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertMethodComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.InsertPropertyComment"></a>InsertPropertyComment</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InsertPropertyComment</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure InsertPropertyComment(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TKeyboardBinding.Methods.ShowTokens"></a>ShowTokens</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowTokens</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Context</span> <span class="Symbol">:</span> <span class="Identifier">IOTAKeyContext</span><span class="Symbol">;</span>
+  <span class="Identifier">KeyCode</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">BindingResult</span> <span class="Symbol">:</span> <span class="Identifier">TKeyBindingResult</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ShowTokens(
+  const Context : IOTAKeyContext;
+  KeyCode : TShortcut;
+  var BindingResult : TKeyBindingResult
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.BaseDocumentation"></a>BaseDocumentation</td>
+              <td>
+                <pre><span class="Identifier">BaseDocumentation</span></pre>
+          <!-- BaseDocumentation -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.BaseLanguageModule"></a>BaseLanguageModule</td>
+              <td>
+                <pre><span class="Identifier">BaseLanguageModule</span></pre>
+          <!-- BaseLanguageModule -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Controls"></a>Controls</td>
+              <td>
+                <pre><span class="Identifier">Controls</span></pre>
+          <!-- Controls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.DGHLibrary"></a>DGHLibrary</td>
+              <td>
+                <pre><span class="Identifier">DGHLibrary</span></pre>
+          <!-- DGHLibrary -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Dialogs"></a>Dialogs</td>
+              <td>
+                <pre><span class="Identifier">Dialogs</span></pre>
+          <!-- Dialogs -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.DockableModuleExplorer"></a>DockableModuleExplorer</td>
+              <td>
+                <pre><span class="Identifier">DockableModuleExplorer</span></pre>
+          <!-- DockableModuleExplorer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.DockForm"></a>DockForm</td>
+              <td>
+                <pre><span class="Identifier">DockForm</span></pre>
+          <!-- DockForm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.DocumentationDispatcher"></a>DocumentationDispatcher</td>
+              <td>
+                <pre><span class="Identifier">DocumentationDispatcher</span></pre>
+          <!-- DocumentationDispatcher -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.DocumentationOptionsForm"></a>DocumentationOptionsForm</td>
+              <td>
+                <pre><span class="Identifier">DocumentationOptionsForm</span></pre>
+          <!-- DocumentationOptionsForm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ExtCtrls"></a>ExtCtrls</td>
+              <td>
+                <pre><span class="Identifier">ExtCtrls</span></pre>
+          <!-- ExtCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Forms"></a>Forms</td>
+              <td>
+                <pre><span class="Identifier">Forms</span></pre>
+          <!-- Forms -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.IniFiles"></a>IniFiles</td>
+              <td>
+                <pre><span class="Identifier">IniFiles</span></pre>
+          <!-- IniFiles -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Menus"></a>Menus</td>
+              <td>
+                <pre><span class="Identifier">Menus</span></pre>
+          <!-- Menus -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ModuleDispatcher"></a>ModuleDispatcher</td>
+              <td>
+                <pre><span class="Identifier">ModuleDispatcher</span></pre>
+          <!-- ModuleDispatcher -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ModuleExplorerFrame"></a>ModuleExplorerFrame</td>
+              <td>
+                <pre><span class="Identifier">ModuleExplorerFrame</span></pre>
+          <!-- ModuleExplorerFrame -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.OptionsForm"></a>OptionsForm</td>
+              <td>
+                <pre><span class="Identifier">OptionsForm</span></pre>
+          <!-- OptionsForm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.PsAPI"></a>PsAPI</td>
+              <td>
+                <pre><span class="Identifier">PsAPI</span></pre>
+          <!-- PsAPI -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ShellAPI"></a>ShellAPI</td>
+              <td>
+                <pre><span class="Identifier">ShellAPI</span></pre>
+          <!-- ShellAPI -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.TokenForm"></a>TokenForm</td>
+              <td>
+                <pre><span class="Identifier">TokenForm</span></pre>
+          <!-- TokenForm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ToolsAPI"></a>ToolsAPI</td>
+              <td>
+                <pre><span class="Identifier">ToolsAPI</span></pre>
+          <!-- ToolsAPI -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ToolsAPIUtils"></a>ToolsAPIUtils</td>
+              <td>
+                <pre><span class="Identifier">ToolsAPIUtils</span></pre>
+          <!-- ToolsAPIUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Types"></a>Types</td>
+              <td>
+                <pre><span class="Identifier">Types</span></pre>
+          <!-- Types -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Variables -->
+      <h2><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a name="Variables2"></a>Variables</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.bmSplashScreen"></a>bmSplashScreen</td>
+              <td>
+                <pre><span class="Identifier">bmSplashScreen</span> <span class="Symbol">:</span> <span class="Identifier">HBITMAP</span></pre>
+              <p class="Comment">This is a handle for the splash screen bitmap resource </p>
+          <!-- bmSplashScreen : HBITMAP -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iBugFix"></a>iBugFix</td>
+              <td>
+                <pre><span class="Identifier">iBugFix</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">This is a variable to hold the bug fix version number for the package. </p>
+          <!-- iBugFix : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iBuild"></a>iBuild</td>
+              <td>
+                <pre><span class="Identifier">iBuild</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">This is a variable to hold the build number for the package. </p>
+          <!-- iBuild : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iEditorIndex"></a>iEditorIndex</td>
+              <td>
+                <pre><span class="Identifier">iEditorIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">This is an index for the editor notifier required when the package is unloaded </p>
+          <!-- iEditorIndex : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iKeyBinding"></a>iKeyBinding</td>
+              <td>
+                <pre><span class="Identifier">iKeyBinding</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">An index for the keybinding nofitier - required when the package is unloaded </p>
+          <!-- iKeyBinding : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iLastUpdateTickCount"></a>iLastUpdateTickCount</td>
+              <td>
+                <pre><span class="Identifier">iLastUpdateTickCount</span> <span class="Symbol">:</span> <span class="Identifier">Cardinal</span></pre>
+              <p class="Comment">A private variable to hold the time of the last editor update. </p>
+          <!-- iLastUpdateTickCount : Cardinal -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iMajor"></a>iMajor</td>
+              <td>
+                <pre><span class="Identifier">iMajor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">This is a variable to hold the major version number for the package. </p>
+          <!-- iMajor : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iMinor"></a>iMinor</td>
+              <td>
+                <pre><span class="Identifier">iMinor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">This is a variable to hold the minor version number for the package. </p>
+          <!-- iMinor : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iWizardIndex"></a>iWizardIndex</td>
+              <td>
+                <pre><span class="Identifier">iWizardIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">This is an index for the wizard when register with the ide. Its required in order to remove it from memory. </p>
+          <!-- iWizardIndex : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

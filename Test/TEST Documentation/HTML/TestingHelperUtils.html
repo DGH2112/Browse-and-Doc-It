@@ -1,0 +1,972 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>TestingHelperUtils.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AutoSaveModule.html">AutoSaveModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AutoSaveOptionsForm.html">AutoSaveOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="IDEAutoSave.html">IDEAutoSave.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocIt.html">BrowseAndDocIt.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocIt.html">BrowseAndDocIt.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CopyofBrowseAndDocIt.html">Copy of BrowseAndDocIt.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItWizard.html">BrowseAndDocItWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DockableModuleExplorer.html">DockableModuleExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ToolsAPIUtils.html">ToolsAPIUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestApp.html">BrowseAndDocItTestApp.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTests.html">BrowseAndDocItTests.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConsoleSort.html">ConsoleSort.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestForm.html">BrowseAndDocItTestForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Library.html">Library.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Package.html">Package.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Program.html">Program.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit2.html">Unit 2.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit.html">Unit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Delphi7HelpForBdsExpert.html">Delphi7HelpForBdsExpert.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="u_Delphi7HelpForBds.html">u_Delphi7HelpForBds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="w_Delphi7HelpForBds.html">w_Delphi7HelpForBds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHExplFrm.html">DGHExplFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHIDEExplorer.html">DGHIDEExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="IDEExplorer.html">IDEExplorer.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelper.html">ITHelper.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelper.html">ITHelper.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AdditionalZipFilesForm.html">AdditionalZipFilesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConfigurationForm.html">ConfigurationForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProcessingForm.html">ProcessingForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestingHelperUtils.html">TestingHelperUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestingHelperWizard.html">TestingHelperWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelperTests.html">ITHelperTests.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestTestingHelperUtils.html">TestTestingHelperUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a href="#ExportedHeadings2">Exported Headings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a href="#Finalization2">Finalization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a href="#Initialization2">Initialization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit TestingHelperUtils -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit TestingHelperUtils</h1>
+        <p class="Comment">This module contains often used code for use through out this application. </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">16 Jul 2008 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1.0 </li>
+        </ul>
+      
+      <!-- Exported Headings -->
+      <h2><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a name="ExportedHeadings2"></a>Exported Headings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.AddMsg"></a>AddMsg</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">AddMsg</span><span class="Symbol">(</span>
+  <span class="Identifier">strText</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">ForeColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span><span class="Symbol">;</span>
+  <span class="Identifier">Style</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span><span class="Symbol">;</span>
+  <span class="Identifier">BackColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Pointer</span></pre>
+          <!-- Function AddMsg(
+  strText : String;
+  ForeColour : TColor;
+  Style : TFontStyles;
+  BackColour : TColor
+) : Pointer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.GetProcInfo"></a>GetProcInfo</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetProcInfo</span><span class="Symbol">(</span>
+  <span class="Identifier">strText</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">ProcInfoType</span> <span class="Symbol">:</span> <span class="Identifier">TProcInfoType</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+          <!-- Function GetProcInfo(
+  strText : String;
+  ProcInfoType : TProcInfoType
+) : String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.GetProjectName"></a>GetProjectName</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetProjectName</span><span class="Symbol">(</span>
+  <span class="Identifier">Project</span> <span class="Symbol">:</span> <span class="Identifier">IOTAProject</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+          <!-- Function GetProjectName(
+  Project : IOTAProject
+) : String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.ResolvePath"></a>ResolvePath</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ResolvePath</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">strFName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">strPath</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+          <!-- Function ResolvePath(
+  const strFName : String;
+  const strPath : String
+) : String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.ShowHelperMessages"></a>ShowHelperMessages</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowHelperMessages</span></pre>
+          <!-- Procedure ShowHelperMessages -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Finalization -->
+      <h2><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a name="Finalization2"></a>Finalization</h2>
+        <p class="Comment">Ensures the messages are cleared before the package is removed. </p>
+      <div class="Indent">
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.AddMsg"></a>AddMsg</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">AddMsg</span><span class="Symbol">(</span>
+  <span class="Identifier">strText</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">ForeColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span><span class="Symbol">;</span>
+  <span class="Identifier">Style</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span><span class="Symbol">;</span>
+  <span class="Identifier">BackColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Pointer</span></pre>
+              <p class="Comment">This method provides a short cut to adding messages to the IDE message window with the optional ability to add it to a message group. </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">None. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Adds a message to the IDEs message window. </li>
+              </ul>
+              <p class="TagHeader">Parameters</p>
+              <ul>
+                <li class="SpecialTag">strText as a String </li>
+                <li class="SpecialTag">ForeColour as a TColor </li>
+                <li class="SpecialTag">Style as a TFontStyles </li>
+                <li class="SpecialTag">BackColour as a TColor </li>
+              </ul>
+              <p class="TagHeader">Returns</p>
+              <ul>
+                <li class="SpecialTag">a Pointer </li>
+              </ul>
+          <!-- Function AddMsg(
+  strText : String;
+  ForeColour : TColor;
+  Style : TFontStyles;
+  BackColour : TColor
+) : Pointer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.ClearMessages"></a>ClearMessages</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ClearMessages</span></pre>
+              <p class="Comment">This function clears all the messages from the package's message window. </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">None. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Clears all the messages from the package's message window. </li>
+              </ul>
+          <!-- Procedure ClearMessages -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.GetProcInfo"></a>GetProcInfo</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetProcInfo</span><span class="Symbol">(</span>
+  <span class="Identifier">strText</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">ProcInfoType</span> <span class="Symbol">:</span> <span class="Identifier">TProcInfoType</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+              <p class="Comment">This function returns either the EXE, Params or Working Directory of the external tool information. strText should be 3 fields of information, EXE, Params and Working Dir separated by pipes (|). </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">None. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Returns either the EXE, Params or Working Directory of the external tool information. </li>
+              </ul>
+              <p class="TagHeader">Parameters</p>
+              <ul>
+                <li class="SpecialTag">strText as a String </li>
+                <li class="SpecialTag">ProcInfoType as a TProcInfoType </li>
+              </ul>
+              <p class="TagHeader">Returns</p>
+              <ul>
+                <li class="SpecialTag">a String </li>
+              </ul>
+          <!-- Function GetProcInfo(
+  strText : String;
+  ProcInfoType : TProcInfoType
+) : String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.GetProjectName"></a>GetProjectName</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetProjectName</span><span class="Symbol">(</span>
+  <span class="Identifier">Project</span> <span class="Symbol">:</span> <span class="Identifier">IOTAProject</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+              <p class="Comment">This function returns a project name with the DPRP or DPK extension. </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Project must be a valid instance of a IOTAProject interface. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Returns a project name with the DPRP or DPK extension. </li>
+              </ul>
+              <p class="TagHeader">Parameters</p>
+              <ul>
+                <li class="SpecialTag">Project as an IOTAProject </li>
+              </ul>
+              <p class="TagHeader">Returns</p>
+              <ul>
+                <li class="SpecialTag">a String </li>
+              </ul>
+          <!-- Function GetProjectName(
+  Project : IOTAProject
+) : String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.ResolvePath"></a>ResolvePath</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ResolvePath</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">strFName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">strPath</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+              <p class="Comment">This function resolve the path of the file name with respect to the path given to produce a full path to the file name. </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">None. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Resolve the path of the file name with respect to the path given to produce a full path to the file name </li>
+              </ul>
+              <p class="TagHeader">Parameters</p>
+              <ul>
+                <li class="SpecialTag">strFName as a String </li>
+                <li class="SpecialTag">strPath as a String </li>
+              </ul>
+              <p class="TagHeader">Returns</p>
+              <ul>
+                <li class="SpecialTag">a String </li>
+              </ul>
+          <!-- Function ResolvePath(
+  const strFName : String;
+  const strPath : String
+) : String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.ShowHelperMessages"></a>ShowHelperMessages</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowHelperMessages</span></pre>
+              <p class="Comment">This method displays the package's message tab. </p>
+              <p class="TagHeader">Pre-Conditions</p>
+              <ul>
+                <li class="SpecialTag">None. </li>
+              </ul>
+              <p class="TagHeader">Post-Conditions</p>
+              <ul>
+                <li class="SpecialTag">Displays the package's message tab. </li>
+              </ul>
+          <!-- Procedure ShowHelperMessages -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+          <!-- TDGHCustomMessage -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TDGHCustomMessage3"></a>TDGHCustomMessage</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.CalcRect"></a>CalcRect</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">CalcRect</span><span class="Symbol">(</span>
+  <span class="Identifier">Canvas</span> <span class="Symbol">:</span> <span class="Identifier">TCanvas</span><span class="Symbol">;</span>
+  <span class="Identifier">MaxWidth</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Wrap</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TRect</span></pre>
+                    <p class="Comment">This method is a null implementation for the INTACustomDrawMessage interface. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Canvas as a TCanvas </li>
+                      <li class="SpecialTag">MaxWidth as an Integer </li>
+                      <li class="SpecialTag">Wrap as a Boolean </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a TRect </li>
+                    </ul>
+              <!-- Function CalcRect(
+  Canvas : TCanvas;
+  MaxWidth : Integer;
+  Wrap : Boolean
+) : TRect -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">strMsg</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">ForeColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span><span class="Symbol">;</span>
+  <span class="Identifier">Style</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span><span class="Symbol">;</span>
+  <span class="Identifier">BackColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is the constructor method for the TDGHCustomMessage class. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Initialises the message with font attributes. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">strMsg as a String </li>
+                      <li class="SpecialTag">ForeColour as a TColor </li>
+                      <li class="SpecialTag">Style as a TFontStyles </li>
+                      <li class="SpecialTag">BackColour as a TColor </li>
+                    </ul>
+              <!-- Constructor Create(
+  strMsg : String;
+  ForeColour : TColor;
+  Style : TFontStyles;
+  BackColour : TColor
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.Draw"></a>Draw</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Draw</span><span class="Symbol">(</span>
+  <span class="Identifier">Canvas</span> <span class="Symbol">:</span> <span class="Identifier">TCanvas</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Rect</span> <span class="Symbol">:</span> <span class="Identifier">TRect</span><span class="Symbol">;</span>
+  <span class="Identifier">Wrap</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is the INTACustomDrawMessage implementation for rendering the custom message. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Draws the custom message with font attributes. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Canvas as a TCanvas </li>
+                      <li class="SpecialTag">Rect as a TRect constant </li>
+                      <li class="SpecialTag">Wrap as a Boolean </li>
+                    </ul>
+              <!-- Procedure Draw(
+  Canvas : TCanvas;
+  const Rect : TRect;
+  Wrap : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.GetColumnNumber"></a>GetColumnNumber</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetColumnNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                    <p class="Comment">This is a getter method for the ColumnNumber property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">A Null implementation. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">an Integer </li>
+                    </ul>
+              <!-- Function GetColumnNumber : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.GetFileName"></a>GetFileName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetFileName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                    <p class="Comment">This is a getter method for the FileName property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">A null implementation. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a string </li>
+                    </ul>
+              <!-- Function GetFileName : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.GetLineNumber"></a>GetLineNumber</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetLineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                    <p class="Comment">This is a getter method for the LineNumber property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">A null implentation. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">an Integer </li>
+                    </ul>
+              <!-- Function GetLineNumber : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.GetLineText"></a>GetLineText</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetLineText</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                    <p class="Comment">This is a getter method for the LineText property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns the message. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a string </li>
+                    </ul>
+              <!-- Function GetLineText : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.SetForeColour"></a>SetForeColour</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetForeColour</span><span class="Symbol">(</span>
+  <span class="Identifier">iColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is a setter method for the ForeColour property. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Update the font colour of the message. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">iColour as a TColor </li>
+                    </ul>
+              <!-- Procedure SetForeColour(
+  iColour : TColor
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHCustomMessage.ShowHelp"></a>ShowHelp</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowHelp</span></pre>
+                    <p class="Comment">This method is not implemented. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+              <!-- Procedure ShowHelp -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Initialization -->
+      <h2><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a name="Initialization2"></a>Initialization</h2>
+        <p class="Comment">There are no initialisations </p>
+      <div class="Indent">
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage"></a>TDGHCustomMessage</td>
+              <td>
+                <pre><span class="Identifier">TDGHCustomMessage</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">INTACustomDrawMessage</span> <span class="Symbol">,</span><span class="Identifier">IOTACustomMessage</span> <span class="Symbol">,</span><span class="Identifier">TInterfacedObject</span><span class="Symbol">)</span></pre>
+              <p class="Comment">This class defined a custom message for the IDE. </p>
+          <!-- TDGHCustomMessage = Class(INTACustomDrawMessage ,IOTACustomMessage ,TInterfacedObject) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Fields.FBackColour"></a>FBackColour</td>
+                      <td>
+                        <pre><span class="Identifier">FBackColour</span> <span class="Symbol">=</span> <span class="Identifier">TColor</span></pre>
+                  <!-- FBackColour = TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Fields.FForeColour"></a>FForeColour</td>
+                      <td>
+                        <pre><span class="Identifier">FForeColour</span> <span class="Symbol">=</span> <span class="Identifier">TColor</span></pre>
+                  <!-- FForeColour = TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Fields.FMsg"></a>FMsg</td>
+                      <td>
+                        <pre><span class="Identifier">FMsg</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FMsg = String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Fields.FStyle"></a>FStyle</td>
+                      <td>
+                        <pre><span class="Identifier">FStyle</span> <span class="Symbol">=</span> <span class="Identifier">TFontStyles</span></pre>
+                  <!-- FStyle = TFontStyles -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.CalcRect"></a>CalcRect</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">CalcRect</span><span class="Symbol">(</span>
+  <span class="Identifier">Canvas</span> <span class="Symbol">:</span> <span class="Identifier">TCanvas</span><span class="Symbol">;</span>
+  <span class="Identifier">MaxWidth</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Wrap</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TRect</span></pre>
+                  <!-- Function CalcRect(
+  Canvas : TCanvas;
+  MaxWidth : Integer;
+  Wrap : Boolean
+) : TRect -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">strMsg</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">ForeColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span><span class="Symbol">;</span>
+  <span class="Identifier">Style</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span><span class="Symbol">;</span>
+  <span class="Identifier">BackColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Constructor Create(
+  strMsg : String;
+  ForeColour : TColor;
+  Style : TFontStyles;
+  BackColour : TColor
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.Draw"></a>Draw</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Draw</span><span class="Symbol">(</span>
+  <span class="Identifier">Canvas</span> <span class="Symbol">:</span> <span class="Identifier">TCanvas</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Rect</span> <span class="Symbol">:</span> <span class="Identifier">TRect</span><span class="Symbol">;</span>
+  <span class="Identifier">Wrap</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure Draw(
+  Canvas : TCanvas;
+  const Rect : TRect;
+  Wrap : Boolean
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.GetColumnNumber"></a>GetColumnNumber</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetColumnNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function GetColumnNumber : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.GetFileName"></a>GetFileName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetFileName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function GetFileName : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.GetLineNumber"></a>GetLineNumber</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetLineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function GetLineNumber : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.GetLineText"></a>GetLineText</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetLineText</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function GetLineText : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.SetForeColour"></a>SetForeColour</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetForeColour</span><span class="Symbol">(</span>
+  <span class="Identifier">iColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetForeColour(
+  iColour : TColor
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Methods.ShowHelp"></a>ShowHelp</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowHelp</span></pre>
+                  <!-- Procedure ShowHelp -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TDGHCustomMessage.Properties.ForeColour"></a>ForeColour</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ForeColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">SetForeColour</span>
+</pre>
+                          <p class="Comment">This allows the colour of the font to be updated. </p>
+                          <p class="TagHeader">Pre-Conditions</p>
+                          <ul>
+                            <li class="SpecialTag">None. </li>
+                          </ul>
+                          <p class="TagHeader">Post-Conditions</p>
+                          <ul>
+                            <li class="SpecialTag">Updates the font colour of the message. </li>
+                          </ul>
+                          <p class="TagHeader">Returns</p>
+                          <ul>
+                            <li class="SpecialTag">a TColor </li>
+                          </ul>
+                  <!-- Property ForeColour : TColor
+   Write SetForeColour
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TProcInfoType"></a>TProcInfoType</td>
+              <td>
+                <pre><span class="Identifier">TProcInfoType</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="Identifier">pitEXE</span><span class="Symbol">,</span> <span class="Identifier">pitParam</span><span class="Symbol">,</span> <span class="Identifier">pitDir</span><span class="Symbol">)</span></pre>
+              <p class="Comment">An enumerate to define the type of information to be returned from GetProcInfo. </p>
+          <!-- TProcInfoType = (pitEXE, pitParam, pitDir) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Graphics"></a>Graphics</td>
+              <td>
+                <pre><span class="Identifier">Graphics</span></pre>
+          <!-- Graphics -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ToolsAPI"></a>ToolsAPI</td>
+              <td>
+                <pre><span class="Identifier">ToolsAPI</span></pre>
+          <!-- ToolsAPI -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

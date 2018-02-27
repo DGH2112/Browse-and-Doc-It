@@ -1,0 +1,30 @@
+'
+' The GetComputerName function retrieves the computer name of the current
+' system. This name is established at system startup, when it is initialized
+' from the registry.
+'
+' BOOL GetComputerName(
+'   LPTSTR lpBuffer,  // address of name buffer
+'   LPDWORD nSize   // address of size of name buffer
+' );
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @precon  None
+' @postcon Retrieves the computer name of the current system
+'
+' @param   lpBuffer as a String - Points to a buffer to receive the
+'          null-terminated character string containing the computer name.
+' @param   nSize as a Long - Points to a variable that specifies the maximum
+'          size, in characters, of the buffer. This value should be large enough
+'          to contain MAX_COMPUTERNAME_LENGTH + 1 characters.
+'
+' @return  a Long - If the function succeeds, the return value is nonzero and
+'          the variable represented by the nSize parameter contains the number
+'          of characters copied to the destination buffer, not including the
+'          terminating null character. If the function fails, the return value
+'          is zero. To get extended error information, call GetLastError.
+'
+Declare Function GetComputerName Lib "kernel32" Alias "GetComputerNameA" ( _
+  ByVal lpBuffer As String, nSize As Long) As Long

@@ -4,11 +4,13 @@
   VBE IDE.
 
   @Version 1.0
-  @Date    12 Jun 2010
+  @Date    05 Aug 2013
   @Author  David Hoyle
 
 **)
 library BrowseAndDocItVBEIDE;
+
+{$R 'ITHVerInfoBADIVBEIDE.res' 'ITHVerInfoBADIVBEIDE.RC'}
 
 uses
   ExceptionLog,
@@ -21,22 +23,21 @@ uses
   Functions in '..\Source\Functions.pas',
   IDETools in '..\Source\IDETools.pas',
   BrowseAndDocItAddin in '..\Source\BrowseAndDocItAddin.pas',
-  SynEdit in '..\..\..\LIBRARY\SynEdit\Source\SynEdit.pas',
-  SynEditHighlighter in '..\..\..\LIBRARY\SynEdit\Source\SynEditHighlighter.pas',
-  SynHighlighterVB in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterVB.pas',
-  SynEditMiscClasses in '..\..\..\LIBRARY\SynEdit\Source\SynEditMiscClasses.pas',
-  SynEditKeyConst in '..\..\..\LIBRARY\SynEdit\Source\SynEditKeyConst.pas',
-  SynEditTypes in '..\..\..\LIBRARY\SynEdit\Source\SynEditTypes.pas',
-  SynEditMiscProcs in '..\..\..\LIBRARY\SynEdit\Source\SynEditMiscProcs.pas',
-  SynHighlighterMulti in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterMulti.pas',
-  SynEditStrConst in '..\..\..\LIBRARY\SynEdit\Source\SynEditStrConst.pas',
-  SynRegExpr in '..\..\..\LIBRARY\SynEdit\Source\SynRegExpr.pas',
-  SynEditKbdHandler in '..\..\..\LIBRARY\SynEdit\Source\SynEditKbdHandler.pas',
-  SynEditKeyCmds in '..\..\..\LIBRARY\SynEdit\Source\SynEditKeyCmds.pas',
-  SynEditTextBuffer in '..\..\..\LIBRARY\SynEdit\Source\SynEditTextBuffer.pas',
-  SynTextDrawer in '..\..\..\LIBRARY\SynEdit\Source\SynTextDrawer.pas',
-  SynEditWordWrap in '..\..\..\LIBRARY\SynEdit\Source\SynEditWordWrap.pas',
-  PascalModule in '..\..\..\LIBRARY\PascalModule.pas',
+  SynEdit in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEdit.pas',
+  SynEditHighlighter in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditHighlighter.pas',
+  SynHighlighterVB in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynHighlighterVB.pas',
+  SynEditMiscClasses in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditMiscClasses.pas',
+  SynEditKeyConst in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditKeyConst.pas',
+  SynEditTypes in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditTypes.pas',
+  SynEditMiscProcs in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditMiscProcs.pas',
+  SynHighlighterMulti in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynHighlighterMulti.pas',
+  SynEditStrConst in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditStrConst.pas',
+  SynRegExpr in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynRegExpr.pas',
+  SynEditKbdHandler in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditKbdHandler.pas',
+  SynEditKeyCmds in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditKeyCmds.pas',
+  SynEditTextBuffer in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditTextBuffer.pas',
+  SynTextDrawer in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynTextDrawer.pas',
+  SynEditWordWrap in '..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditWordWrap.pas',
   Office2000_TLB in '..\..\..\Library\Office2000_TLB.pas',
   EventSink in '..\..\..\Library\EventSink.pas',
   VBEIDEModuleExplorer in '..\Source\VBEIDEModuleExplorer.pas' {frmDockableModuleExplorer},
@@ -44,7 +45,6 @@ uses
   TokenForm in '..\..\..\Library\TokenForm.pas' {frmTokenForm},
   BaseLanguageModule in '..\..\..\Library\BaseLanguageModule.pas',
   dghlibrary in '..\..\..\Library\dghlibrary.pas',
-  ModuleDispatcher in '..\..\..\Library\ModuleDispatcher.pas',
   VBModule in '..\..\..\Library\VBModule.pas',
   OptionsForm in '..\..\..\Library\OptionsForm.pas' {frmOptions},
   MethodDescriptionForm in '..\..\..\Library\MethodDescriptionForm.pas' {frmMethodDescriptions},
@@ -62,12 +62,8 @@ uses
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
   MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
-  SynUnicode in '..\..\..\Library\SynEdit\Source\SynUnicode.pas',
-  XMLModule in '..\..\..\Library\XMLModule.pas',
-  BackusNaurModule in '..\..\..\Library\BackusNaurModule.pas',
-  DFMModule in '..\..\..\Library\DFMModule.pas',
-  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas',
-  EidolonTypes in '..\..\..\Library\EidolonTypes.pas';
+  SynUnicode in '..\..\..\Library\SynEdit\SynEdit\Source\SynUnicode.pas',
+  CheckForUpdatesOptionsForm in '..\..\..\Library\CheckForUpdatesOptionsForm.pas' {frmCheckForUpdatesOptions};
 
 exports
   DllGetClassObject,

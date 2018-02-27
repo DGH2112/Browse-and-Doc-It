@@ -1,0 +1,119 @@
+/**
+
+  This is a grammar file for the Eidolon Time Location Schematic Diagrams.
+
+  @Date    01 Apr 2012
+  @Author  David Hoyle
+  @Version 1.0
+
+  @usesemicolon
+
+**/
+<Goal>            ::= ( <Road>            |
+                        <Object>          |
+                        <Ellipse>         |
+                        <Objects>         |
+                        <Diamond>         |
+                        <StaticObject>    |
+                        <StaticEllipse>   |
+                        <StaticDiamond>   |
+                        <Roads>           |
+                        <Margins>         |
+                        <Spacing>         |
+                        <CentreLine>      |
+                        <Lines>           |
+                        <NoText>          |
+                        <TextOrientation> |
+                        <Text>            |
+                        <Debug>
+                      )+;
+
+<Road>            ::= 'ROAD' <StartChainage> ',' <EndChainage> ',' <StartOffset> ','
+                      <EndOffset> ',' <Location> ',' <ColourName> [ ',' <RouteCode> ] ';';
+
+<Object>          ::= 'OBJECT' <StartChainage> ',' <EndChainage> ',' <LocationEx> ','
+                      <ColourName> ',' <StringLiteral> [ ',' <RouteCode> ]  ';';
+
+<Ellipse>         ::= 'ELLIPSE' <StartChainage> ',' <EndChainage> ',' <LocationEx> ','
+                      <ColourName> ',' <StringLiteral> [ ',' <RouteCode> ]  ';';
+
+<Diamond>         ::= 'DIAMOND' <StartChainage> ',' <EndChainage> ',' <LocationEx> ','
+                      <ColourName> ',' <StringLiteral> [ ',' <RouteCode> ]  ';';
+
+<StartOffset>     ::= <Integer>;
+
+<EndOffset>       ::= <Integer>;
+
+<Objects>         ::= 'OBJECTS' <Percentage> [ ',' <TLSSymbolName> ] ';';
+
+<Roads>           ::= 'ROADS' <Percentage> ';';
+
+<Margins>         ::= 'MARGINS' <Percentage> ';';
+
+<Spacing>         ::= 'SPACING' <Percentage> ';';
+
+<StartChainage>   ::= <Decimal>;
+
+<EndChainage>     ::= <Decimal>;
+
+<RouteCode>       ::= <StringLiteral>;
+
+<Debug>           ::= 'DEBUG' ';';
+
+<CentreLine>      ::= 'CENTRELINE' <Percentage> ';';
+
+<TLSSymbolName>   ::= <StringLiteral>;
+
+<Lines>           ::= 'LINES' <LineColour> ',' <LineStyle> ',' <LineWeight>;
+
+<NoText>          ::= 'NOTEXT' <StringLiteral> ';';
+
+<TextOrientation> ::= 'TEXTORIENTATION' <Orientation> [ ',' <TLSSymbolName> ] ';';
+
+<Orientation>     ::= 'HORIZONTAL' | 'VERTICAL';
+
+<Text>            ::= 'TEXT' ( 'OUTSIDE' | 'INSIDE' ) [ ',' <TLSSymbolName> ] ';';
+
+<StaticObject>    ::= 'STATICOBJECT' <StartChainage> ',' <EndChainage> ','
+                      <StartOffset> ',' <EndOffset> ',' <LocationEx> ','
+                      <ColourName> ',' <StringLiteral> [ ',' <RouteCode> ];
+
+<StaticEllipse>   ::= 'STATICELLIPSE' <StartChainage> ',' <EndChainage> ','
+                      <StartOffset> ',' <EndOffset> ',' <LocationEx> ','
+                      <ColourName> ',' <StringLiteral> [ ',' <RouteCode> ];
+
+<StaticDiamond>   ::= 'STATICDIAMOND' <StartChainage> ',' <EndChainage> ','
+                      <StartOffset> ',' <EndOffset> ',' <LocationEx> ','
+                      <ColourName> ',' <StringLiteral> [ ',' <RouteCode> ];
+
+<LineColour>      ::= <ColourName>;
+
+<LineStyle>       ::= 'SOLID' | 'ROUNDDOT' | 'SQUAREDOT' | 'DASH' | 'DASHDOT' | 'LONGDASH' |
+                      'LONGDASHDOT' | 'DASHDOTDOT';
+
+<LineWeight>      ::= '0.25' | '0.5' | '1' | '1.5' | '2.25' | '3' | '4.5' | '6' | 'DOUBLE' |
+                      'DOUBLETHINTHICK' | 'DOUBLETHICKTHIN' | 'TRIPLETHICKBETWEENTHIN';
+
+<Integer>         ::= [ '-' ] ('0'..'9')+;
+
+<Decimal>         ::= [ '-' ] ('0'..'9')+ [ '.' ('0'..'9')+ ];
+
+<Percentage>      ::= <Integer> '%';
+
+<Location>        ::= 'LEFT' | 'RIGHT';
+
+<LocationEx>      ::= <Location> | 'BOTH' | 'OVER' | 'OVER LEFT' | 'OVER RIGHT'| 'UNDER' ;
+
+<ColourName>      ::= 'BLACK' | 'BROWN' | 'OLIVEGREEN' | 'DARKGREEN' | 'DARKTEAL' |
+                      'DARKBLUE' | 'INDIGO' | 'GRAY-80%' | 'DARKRED' | 'ORANGE' |
+                      'DARKYELLOW' | 'GREEN' | 'TEAL' | 'BLUE' | 'BLUE-GRAY' |
+                      'GRAY-50%' | 'RED' | 'LIGHTORANGE' | 'LIME' | 'SEAGREEN' |
+                      'AQUA' | 'LIGHTBLUE' | 'VIOLET' | 'GRAY-40%' | 'PINK' |
+                      'GOLD' | 'YELLOW' | 'BRIGHTGREEN' | 'TURQUOISE' | 'SKYBLUE' |
+                      'PLUM' | 'GRAY-25%' | 'ROSE' | 'TAN' | 'LIGHTYELLOW' |
+                      'LIGHTGREEN' | 'LIGHTTURQUOISE' | 'PALEBLUE' | 'LAVENDER' |
+                      'WHITE';
+
+<StringLiteral>   ::= ? A series of characters enclosed in SINGLE quotes. ?;
+
+

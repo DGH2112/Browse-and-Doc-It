@@ -1,0 +1,2858 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>SynEditKeyCmds.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHEllipsisLabel.html">DGHEllipsisLabel.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CommonIDEFunctions.html">CommonIDEFunctions.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestApp2006.html">BrowseAndDocItTestApp2006.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestForm.html">BrowseAndDocItTestForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ExclusionsForm.html">ExclusionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BackusNaurModule.html">BackusNaurModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseDocumentation.html">BaseDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseLanguageModule.html">BaseLanguageModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="dghlibrary.html">dghlibrary.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationDispatcher.html">DocumentationDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationOptionsForm.html">DocumentationOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GenericTokenizer.html">GenericTokenizer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="HTMLDocumentation.html">HTMLDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MethodDescriptionForm.html">MethodDescriptionForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleDispatcher.html">ModuleDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleExplorerFrame.html">ModuleExplorerFrame.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OptionsForm.html">OptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PascalModule.html">PascalModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SpecialTagForm.html">SpecialTagForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEdit.html">SynEdit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditHighlighter.html">SynEditHighlighter.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditKbdHandler.html">SynEditKbdHandler.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditKeyCmds.html">SynEditKeyCmds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditKeyConst.html">SynEditKeyConst.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditMiscClasses.html">SynEditMiscClasses.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditMiscProcs.html">SynEditMiscProcs.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditStrConst.html">SynEditStrConst.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditTextBuffer.html">SynEditTextBuffer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditTypes.html">SynEditTypes.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditWordWrap.html">SynEditWordWrap.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynHighlighterCpp.html">SynHighlighterCpp.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynHighlighterMulti.html">SynHighlighterMulti.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynHighlighterPas.html">SynHighlighterPas.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynHighlighterVB.html">SynHighlighterVB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynRegExpr.html">SynRegExpr.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynTextDrawer.html">SynTextDrawer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynUnicode.html">SynUnicode.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GIFImage.html">GIFImage.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TokenForm.html">TokenForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBModule.html">VBModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MSAAIntf.html">MSAAIntf.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VirtualTrees.html">VirtualTrees.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VTAccessibilityFactory.html">VTAccessibilityFactory.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a href="#Constants2">Constants</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a href="#ExportedHeadings2">Exported Headings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a href="#initialization2">initialization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit SynEditKeyCmds -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit SynEditKeyCmds</h1>
+      
+      <!-- Constants -->
+      <h2><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a name="Constants2"></a>Constants</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecAutoCompletion"></a>ecAutoCompletion</td>
+              <td>
+                <pre><span class="Identifier">ecAutoCompletion</span> <span class="Symbol">=</span> <span class="Number">650</span></pre>
+          <!-- ecAutoCompletion = 650 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecBlockIndent"></a>ecBlockIndent</td>
+              <td>
+                <pre><span class="Identifier">ecBlockIndent</span> <span class="Symbol">=</span> <span class="Number">610</span></pre>
+          <!-- ecBlockIndent = 610 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecBlockUnindent"></a>ecBlockUnindent</td>
+              <td>
+                <pre><span class="Identifier">ecBlockUnindent</span> <span class="Symbol">=</span> <span class="Number">611</span></pre>
+          <!-- ecBlockUnindent = 611 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecChar"></a>ecChar</td>
+              <td>
+                <pre><span class="Identifier">ecChar</span> <span class="Symbol">=</span> <span class="Number">511</span></pre>
+          <!-- ecChar = 511 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecClearAll"></a>ecClearAll</td>
+              <td>
+                <pre><span class="Identifier">ecClearAll</span> <span class="Symbol">=</span> <span class="Number">508</span></pre>
+          <!-- ecClearAll = 508 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecColumnSelect"></a>ecColumnSelect</td>
+              <td>
+                <pre><span class="Identifier">ecColumnSelect</span> <span class="Symbol">=</span> <span class="Number">232</span></pre>
+          <!-- ecColumnSelect = 232 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecCommentBlock"></a>ecCommentBlock</td>
+              <td>
+                <pre><span class="Identifier">ecCommentBlock</span> <span class="Symbol">=</span> <span class="Number">251</span></pre>
+          <!-- ecCommentBlock = 251 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecContextHelp"></a>ecContextHelp</td>
+              <td>
+                <pre><span class="Identifier">ecContextHelp</span> <span class="Symbol">=</span> <span class="Number">490</span></pre>
+          <!-- ecContextHelp = 490 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecCopy"></a>ecCopy</td>
+              <td>
+                <pre><span class="Identifier">ecCopy</span> <span class="Symbol">=</span> <span class="Number">201</span></pre>
+          <!-- ecCopy = 201 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecCut"></a>ecCut</td>
+              <td>
+                <pre><span class="Identifier">ecCut</span> <span class="Symbol">=</span> <span class="Number">603</span></pre>
+          <!-- ecCut = 603 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecDeleteBOL"></a>ecDeleteBOL</td>
+              <td>
+                <pre><span class="Identifier">ecDeleteBOL</span> <span class="Symbol">=</span> <span class="Number">505</span></pre>
+          <!-- ecDeleteBOL = 505 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecDeleteChar"></a>ecDeleteChar</td>
+              <td>
+                <pre><span class="Identifier">ecDeleteChar</span> <span class="Symbol">=</span> <span class="Number">502</span></pre>
+          <!-- ecDeleteChar = 502 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecDeleteEOL"></a>ecDeleteEOL</td>
+              <td>
+                <pre><span class="Identifier">ecDeleteEOL</span> <span class="Symbol">=</span> <span class="Number">506</span></pre>
+          <!-- ecDeleteEOL = 506 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecDeleteLastChar"></a>ecDeleteLastChar</td>
+              <td>
+                <pre><span class="Identifier">ecDeleteLastChar</span> <span class="Symbol">=</span> <span class="Number">501</span></pre>
+          <!-- ecDeleteLastChar = 501 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecDeleteLastWord"></a>ecDeleteLastWord</td>
+              <td>
+                <pre><span class="Identifier">ecDeleteLastWord</span> <span class="Symbol">=</span> <span class="Number">504</span></pre>
+          <!-- ecDeleteLastWord = 504 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecDeleteLine"></a>ecDeleteLine</td>
+              <td>
+                <pre><span class="Identifier">ecDeleteLine</span> <span class="Symbol">=</span> <span class="Number">507</span></pre>
+          <!-- ecDeleteLine = 507 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecDeleteWord"></a>ecDeleteWord</td>
+              <td>
+                <pre><span class="Identifier">ecDeleteWord</span> <span class="Symbol">=</span> <span class="Number">503</span></pre>
+          <!-- ecDeleteWord = 503 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecDown"></a>ecDown</td>
+              <td>
+                <pre><span class="Identifier">ecDown</span> <span class="Symbol">=</span> <span class="Number">4</span></pre>
+          <!-- ecDown = 4 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecEditCommandFirst"></a>ecEditCommandFirst</td>
+              <td>
+                <pre><span class="Identifier">ecEditCommandFirst</span> <span class="Symbol">=</span> <span class="Number">501</span></pre>
+          <!-- ecEditCommandFirst = 501 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecEditCommandLast"></a>ecEditCommandLast</td>
+              <td>
+                <pre><span class="Identifier">ecEditCommandLast</span> <span class="Symbol">=</span> <span class="Number">1000</span></pre>
+          <!-- ecEditCommandLast = 1000 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecEditorBottom"></a>ecEditorBottom</td>
+              <td>
+                <pre><span class="Identifier">ecEditorBottom</span> <span class="Symbol">=</span> <span class="Number">16</span></pre>
+          <!-- ecEditorBottom = 16 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecEditorTop"></a>ecEditorTop</td>
+              <td>
+                <pre><span class="Identifier">ecEditorTop</span> <span class="Symbol">=</span> <span class="Number">15</span></pre>
+          <!-- ecEditorTop = 15 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotFocus"></a>ecGotFocus</td>
+              <td>
+                <pre><span class="Identifier">ecGotFocus</span> <span class="Symbol">=</span> <span class="Number">480</span></pre>
+          <!-- ecGotFocus = 480 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker0"></a>ecGotoMarker0</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker0</span> <span class="Symbol">=</span> <span class="Number">301</span></pre>
+          <!-- ecGotoMarker0 = 301 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker1"></a>ecGotoMarker1</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker1</span> <span class="Symbol">=</span> <span class="Number">302</span></pre>
+          <!-- ecGotoMarker1 = 302 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker2"></a>ecGotoMarker2</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker2</span> <span class="Symbol">=</span> <span class="Number">303</span></pre>
+          <!-- ecGotoMarker2 = 303 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker3"></a>ecGotoMarker3</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker3</span> <span class="Symbol">=</span> <span class="Number">304</span></pre>
+          <!-- ecGotoMarker3 = 304 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker4"></a>ecGotoMarker4</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker4</span> <span class="Symbol">=</span> <span class="Number">305</span></pre>
+          <!-- ecGotoMarker4 = 305 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker5"></a>ecGotoMarker5</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker5</span> <span class="Symbol">=</span> <span class="Number">306</span></pre>
+          <!-- ecGotoMarker5 = 306 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker6"></a>ecGotoMarker6</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker6</span> <span class="Symbol">=</span> <span class="Number">307</span></pre>
+          <!-- ecGotoMarker6 = 307 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker7"></a>ecGotoMarker7</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker7</span> <span class="Symbol">=</span> <span class="Number">308</span></pre>
+          <!-- ecGotoMarker7 = 308 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker8"></a>ecGotoMarker8</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker8</span> <span class="Symbol">=</span> <span class="Number">309</span></pre>
+          <!-- ecGotoMarker8 = 309 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoMarker9"></a>ecGotoMarker9</td>
+              <td>
+                <pre><span class="Identifier">ecGotoMarker9</span> <span class="Symbol">=</span> <span class="Number">310</span></pre>
+          <!-- ecGotoMarker9 = 310 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecGotoXY"></a>ecGotoXY</td>
+              <td>
+                <pre><span class="Identifier">ecGotoXY</span> <span class="Symbol">=</span> <span class="Number">17</span></pre>
+          <!-- ecGotoXY = 17 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecImeStr"></a>ecImeStr</td>
+              <td>
+                <pre><span class="Identifier">ecImeStr</span> <span class="Symbol">=</span> <span class="Number">550</span></pre>
+          <!-- ecImeStr = 550 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecInsertLine"></a>ecInsertLine</td>
+              <td>
+                <pre><span class="Identifier">ecInsertLine</span> <span class="Symbol">=</span> <span class="Number">510</span></pre>
+          <!-- ecInsertLine = 510 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecInsertMode"></a>ecInsertMode</td>
+              <td>
+                <pre><span class="Identifier">ecInsertMode</span> <span class="Symbol">=</span> <span class="Number">221</span></pre>
+          <!-- ecInsertMode = 221 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecLeft"></a>ecLeft</td>
+              <td>
+                <pre><span class="Identifier">ecLeft</span> <span class="Symbol">=</span> <span class="Number">1</span></pre>
+          <!-- ecLeft = 1 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecLineBreak"></a>ecLineBreak</td>
+              <td>
+                <pre><span class="Identifier">ecLineBreak</span> <span class="Symbol">=</span> <span class="Number">509</span></pre>
+          <!-- ecLineBreak = 509 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecLineEnd"></a>ecLineEnd</td>
+              <td>
+                <pre><span class="Identifier">ecLineEnd</span> <span class="Symbol">=</span> <span class="Number">8</span></pre>
+          <!-- ecLineEnd = 8 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecLineSelect"></a>ecLineSelect</td>
+              <td>
+                <pre><span class="Identifier">ecLineSelect</span> <span class="Symbol">=</span> <span class="Number">233</span></pre>
+          <!-- ecLineSelect = 233 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecLineStart"></a>ecLineStart</td>
+              <td>
+                <pre><span class="Identifier">ecLineStart</span> <span class="Symbol">=</span> <span class="Number">7</span></pre>
+          <!-- ecLineStart = 7 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecLostFocus"></a>ecLostFocus</td>
+              <td>
+                <pre><span class="Identifier">ecLostFocus</span> <span class="Symbol">=</span> <span class="Number">481</span></pre>
+          <!-- ecLostFocus = 481 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecLowerCase"></a>ecLowerCase</td>
+              <td>
+                <pre><span class="Identifier">ecLowerCase</span> <span class="Symbol">=</span> <span class="Number">621</span></pre>
+          <!-- ecLowerCase = 621 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecLowerCaseBlock"></a>ecLowerCaseBlock</td>
+              <td>
+                <pre><span class="Identifier">ecLowerCaseBlock</span> <span class="Symbol">=</span> <span class="Number">626</span></pre>
+          <!-- ecLowerCaseBlock = 626 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecMatchBracket"></a>ecMatchBracket</td>
+              <td>
+                <pre><span class="Identifier">ecMatchBracket</span> <span class="Symbol">=</span> <span class="Number">250</span></pre>
+          <!-- ecMatchBracket = 250 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecNone"></a>ecNone</td>
+              <td>
+                <pre><span class="Identifier">ecNone</span> <span class="Symbol">=</span> <span class="Number">0</span></pre>
+          <!-- ecNone = 0 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecNormalSelect"></a>ecNormalSelect</td>
+              <td>
+                <pre><span class="Identifier">ecNormalSelect</span> <span class="Symbol">=</span> <span class="Number">231</span></pre>
+          <!-- ecNormalSelect = 231 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecOverwriteMode"></a>ecOverwriteMode</td>
+              <td>
+                <pre><span class="Identifier">ecOverwriteMode</span> <span class="Symbol">=</span> <span class="Number">222</span></pre>
+          <!-- ecOverwriteMode = 222 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecPageBottom"></a>ecPageBottom</td>
+              <td>
+                <pre><span class="Identifier">ecPageBottom</span> <span class="Symbol">=</span> <span class="Number">14</span></pre>
+          <!-- ecPageBottom = 14 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecPageDown"></a>ecPageDown</td>
+              <td>
+                <pre><span class="Identifier">ecPageDown</span> <span class="Symbol">=</span> <span class="Number">10</span></pre>
+          <!-- ecPageDown = 10 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecPageLeft"></a>ecPageLeft</td>
+              <td>
+                <pre><span class="Identifier">ecPageLeft</span> <span class="Symbol">=</span> <span class="Number">11</span></pre>
+          <!-- ecPageLeft = 11 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecPageRight"></a>ecPageRight</td>
+              <td>
+                <pre><span class="Identifier">ecPageRight</span> <span class="Symbol">=</span> <span class="Number">12</span></pre>
+          <!-- ecPageRight = 12 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecPageTop"></a>ecPageTop</td>
+              <td>
+                <pre><span class="Identifier">ecPageTop</span> <span class="Symbol">=</span> <span class="Number">13</span></pre>
+          <!-- ecPageTop = 13 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecPageUp"></a>ecPageUp</td>
+              <td>
+                <pre><span class="Identifier">ecPageUp</span> <span class="Symbol">=</span> <span class="Number">9</span></pre>
+          <!-- ecPageUp = 9 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecPaste"></a>ecPaste</td>
+              <td>
+                <pre><span class="Identifier">ecPaste</span> <span class="Symbol">=</span> <span class="Number">604</span></pre>
+          <!-- ecPaste = 604 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecRedo"></a>ecRedo</td>
+              <td>
+                <pre><span class="Identifier">ecRedo</span> <span class="Symbol">=</span> <span class="Number">602</span></pre>
+          <!-- ecRedo = 602 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecRight"></a>ecRight</td>
+              <td>
+                <pre><span class="Identifier">ecRight</span> <span class="Symbol">=</span> <span class="Number">2</span></pre>
+          <!-- ecRight = 2 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecScrollDown"></a>ecScrollDown</td>
+              <td>
+                <pre><span class="Identifier">ecScrollDown</span> <span class="Symbol">=</span> <span class="Number">212</span></pre>
+          <!-- ecScrollDown = 212 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecScrollLeft"></a>ecScrollLeft</td>
+              <td>
+                <pre><span class="Identifier">ecScrollLeft</span> <span class="Symbol">=</span> <span class="Number">213</span></pre>
+          <!-- ecScrollLeft = 213 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecScrollRight"></a>ecScrollRight</td>
+              <td>
+                <pre><span class="Identifier">ecScrollRight</span> <span class="Symbol">=</span> <span class="Number">214</span></pre>
+          <!-- ecScrollRight = 214 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecScrollUp"></a>ecScrollUp</td>
+              <td>
+                <pre><span class="Identifier">ecScrollUp</span> <span class="Symbol">=</span> <span class="Number">211</span></pre>
+          <!-- ecScrollUp = 211 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelDown"></a>ecSelDown</td>
+              <td>
+                <pre><span class="Identifier">ecSelDown</span> <span class="Symbol">=</span> <span class="Identifier">ecDown</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelDown = ecDown + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelectAll"></a>ecSelectAll</td>
+              <td>
+                <pre><span class="Identifier">ecSelectAll</span> <span class="Symbol">=</span> <span class="Number">199</span></pre>
+          <!-- ecSelectAll = 199 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelection"></a>ecSelection</td>
+              <td>
+                <pre><span class="Identifier">ecSelection</span> <span class="Symbol">=</span> <span class="Number">100</span></pre>
+              <p class="Comment">**************************************************************************** </p>
+          <!-- ecSelection = 100 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelEditorBottom"></a>ecSelEditorBottom</td>
+              <td>
+                <pre><span class="Identifier">ecSelEditorBottom</span> <span class="Symbol">=</span> <span class="Identifier">ecEditorBottom</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelEditorBottom = ecEditorBottom + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelEditorTop"></a>ecSelEditorTop</td>
+              <td>
+                <pre><span class="Identifier">ecSelEditorTop</span> <span class="Symbol">=</span> <span class="Identifier">ecEditorTop</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelEditorTop = ecEditorTop + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelGotoXY"></a>ecSelGotoXY</td>
+              <td>
+                <pre><span class="Identifier">ecSelGotoXY</span> <span class="Symbol">=</span> <span class="Identifier">ecGotoXY</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelGotoXY = ecGotoXY + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelLeft"></a>ecSelLeft</td>
+              <td>
+                <pre><span class="Identifier">ecSelLeft</span> <span class="Symbol">=</span> <span class="Identifier">ecLeft</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelLeft = ecLeft + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelLineEnd"></a>ecSelLineEnd</td>
+              <td>
+                <pre><span class="Identifier">ecSelLineEnd</span> <span class="Symbol">=</span> <span class="Identifier">ecLineEnd</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelLineEnd = ecLineEnd + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelLineStart"></a>ecSelLineStart</td>
+              <td>
+                <pre><span class="Identifier">ecSelLineStart</span> <span class="Symbol">=</span> <span class="Identifier">ecLineStart</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelLineStart = ecLineStart + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelPageBottom"></a>ecSelPageBottom</td>
+              <td>
+                <pre><span class="Identifier">ecSelPageBottom</span> <span class="Symbol">=</span> <span class="Identifier">ecPageBottom</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelPageBottom = ecPageBottom + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelPageDown"></a>ecSelPageDown</td>
+              <td>
+                <pre><span class="Identifier">ecSelPageDown</span> <span class="Symbol">=</span> <span class="Identifier">ecPageDown</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelPageDown = ecPageDown + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelPageLeft"></a>ecSelPageLeft</td>
+              <td>
+                <pre><span class="Identifier">ecSelPageLeft</span> <span class="Symbol">=</span> <span class="Identifier">ecPageLeft</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelPageLeft = ecPageLeft + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelPageRight"></a>ecSelPageRight</td>
+              <td>
+                <pre><span class="Identifier">ecSelPageRight</span> <span class="Symbol">=</span> <span class="Identifier">ecPageRight</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelPageRight = ecPageRight + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelPageTop"></a>ecSelPageTop</td>
+              <td>
+                <pre><span class="Identifier">ecSelPageTop</span> <span class="Symbol">=</span> <span class="Identifier">ecPageTop</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelPageTop = ecPageTop + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelPageUp"></a>ecSelPageUp</td>
+              <td>
+                <pre><span class="Identifier">ecSelPageUp</span> <span class="Symbol">=</span> <span class="Identifier">ecPageUp</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelPageUp = ecPageUp + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelRight"></a>ecSelRight</td>
+              <td>
+                <pre><span class="Identifier">ecSelRight</span> <span class="Symbol">=</span> <span class="Identifier">ecRight</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelRight = ecRight + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelUp"></a>ecSelUp</td>
+              <td>
+                <pre><span class="Identifier">ecSelUp</span> <span class="Symbol">=</span> <span class="Identifier">ecUp</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelUp = ecUp + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelWord"></a>ecSelWord</td>
+              <td>
+                <pre><span class="Identifier">ecSelWord</span> <span class="Symbol">=</span> <span class="Number">198</span></pre>
+          <!-- ecSelWord = 198 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelWordLeft"></a>ecSelWordLeft</td>
+              <td>
+                <pre><span class="Identifier">ecSelWordLeft</span> <span class="Symbol">=</span> <span class="Identifier">ecWordLeft</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelWordLeft = ecWordLeft + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSelWordRight"></a>ecSelWordRight</td>
+              <td>
+                <pre><span class="Identifier">ecSelWordRight</span> <span class="Symbol">=</span> <span class="Identifier">ecWordRight</span> <span class="Symbol">+</span> <span class="Identifier">ecSelection</span></pre>
+          <!-- ecSelWordRight = ecWordRight + ecSelection -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker0"></a>ecSetMarker0</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker0</span> <span class="Symbol">=</span> <span class="Number">351</span></pre>
+          <!-- ecSetMarker0 = 351 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker1"></a>ecSetMarker1</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker1</span> <span class="Symbol">=</span> <span class="Number">352</span></pre>
+          <!-- ecSetMarker1 = 352 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker2"></a>ecSetMarker2</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker2</span> <span class="Symbol">=</span> <span class="Number">353</span></pre>
+          <!-- ecSetMarker2 = 353 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker3"></a>ecSetMarker3</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker3</span> <span class="Symbol">=</span> <span class="Number">354</span></pre>
+          <!-- ecSetMarker3 = 354 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker4"></a>ecSetMarker4</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker4</span> <span class="Symbol">=</span> <span class="Number">355</span></pre>
+          <!-- ecSetMarker4 = 355 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker5"></a>ecSetMarker5</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker5</span> <span class="Symbol">=</span> <span class="Number">356</span></pre>
+          <!-- ecSetMarker5 = 356 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker6"></a>ecSetMarker6</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker6</span> <span class="Symbol">=</span> <span class="Number">357</span></pre>
+          <!-- ecSetMarker6 = 357 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker7"></a>ecSetMarker7</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker7</span> <span class="Symbol">=</span> <span class="Number">358</span></pre>
+          <!-- ecSetMarker7 = 358 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker8"></a>ecSetMarker8</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker8</span> <span class="Symbol">=</span> <span class="Number">359</span></pre>
+          <!-- ecSetMarker8 = 359 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecSetMarker9"></a>ecSetMarker9</td>
+              <td>
+                <pre><span class="Identifier">ecSetMarker9</span> <span class="Symbol">=</span> <span class="Number">360</span></pre>
+          <!-- ecSetMarker9 = 360 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecShiftTab"></a>ecShiftTab</td>
+              <td>
+                <pre><span class="Identifier">ecShiftTab</span> <span class="Symbol">=</span> <span class="Number">613</span></pre>
+          <!-- ecShiftTab = 613 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecString"></a>ecString</td>
+              <td>
+                <pre><span class="Identifier">ecString</span> <span class="Symbol">=</span> <span class="Number">630</span></pre>
+          <!-- ecString = 630 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecTab"></a>ecTab</td>
+              <td>
+                <pre><span class="Identifier">ecTab</span> <span class="Symbol">=</span> <span class="Number">612</span></pre>
+          <!-- ecTab = 612 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecTitleCase"></a>ecTitleCase</td>
+              <td>
+                <pre><span class="Identifier">ecTitleCase</span> <span class="Symbol">=</span> <span class="Number">623</span></pre>
+          <!-- ecTitleCase = 623 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecToggleCase"></a>ecToggleCase</td>
+              <td>
+                <pre><span class="Identifier">ecToggleCase</span> <span class="Symbol">=</span> <span class="Number">622</span></pre>
+          <!-- ecToggleCase = 622 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecToggleCaseBlock"></a>ecToggleCaseBlock</td>
+              <td>
+                <pre><span class="Identifier">ecToggleCaseBlock</span> <span class="Symbol">=</span> <span class="Number">627</span></pre>
+          <!-- ecToggleCaseBlock = 627 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecToggleMode"></a>ecToggleMode</td>
+              <td>
+                <pre><span class="Identifier">ecToggleMode</span> <span class="Symbol">=</span> <span class="Number">223</span></pre>
+          <!-- ecToggleMode = 223 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecUndo"></a>ecUndo</td>
+              <td>
+                <pre><span class="Identifier">ecUndo</span> <span class="Symbol">=</span> <span class="Number">601</span></pre>
+          <!-- ecUndo = 601 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecUp"></a>ecUp</td>
+              <td>
+                <pre><span class="Identifier">ecUp</span> <span class="Symbol">=</span> <span class="Number">3</span></pre>
+          <!-- ecUp = 3 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecUpperCase"></a>ecUpperCase</td>
+              <td>
+                <pre><span class="Identifier">ecUpperCase</span> <span class="Symbol">=</span> <span class="Number">620</span></pre>
+          <!-- ecUpperCase = 620 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecUpperCaseBlock"></a>ecUpperCaseBlock</td>
+              <td>
+                <pre><span class="Identifier">ecUpperCaseBlock</span> <span class="Symbol">=</span> <span class="Number">625</span></pre>
+          <!-- ecUpperCaseBlock = 625 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecUserFirst"></a>ecUserFirst</td>
+              <td>
+                <pre><span class="Identifier">ecUserFirst</span> <span class="Symbol">=</span> <span class="Number">1001</span></pre>
+          <!-- ecUserFirst = 1001 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecViewCommandFirst"></a>ecViewCommandFirst</td>
+              <td>
+                <pre><span class="Identifier">ecViewCommandFirst</span> <span class="Symbol">=</span> <span class="Number">0</span></pre>
+          <!-- ecViewCommandFirst = 0 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecViewCommandLast"></a>ecViewCommandLast</td>
+              <td>
+                <pre><span class="Identifier">ecViewCommandLast</span> <span class="Symbol">=</span> <span class="Number">500</span></pre>
+          <!-- ecViewCommandLast = 500 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecWordLeft"></a>ecWordLeft</td>
+              <td>
+                <pre><span class="Identifier">ecWordLeft</span> <span class="Symbol">=</span> <span class="Number">5</span></pre>
+          <!-- ecWordLeft = 5 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ecWordRight"></a>ecWordRight</td>
+              <td>
+                <pre><span class="Identifier">ecWordRight</span> <span class="Symbol">=</span> <span class="Number">6</span></pre>
+          <!-- ecWordRight = 6 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateConst.gif" alt=""/>&nbsp;<a name="Constants.EditorCommandStrs"></a>EditorCommandStrs</td>
+              <td>
+                <pre><span class="Identifier">EditorCommandStrs</span> <span class="Symbol">:</span> <span class="ReservedWord">array</span><span class="Symbol">[</span><span class="Number">0</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Number">100</span><span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">TIdentMapEntry</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecNone</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecNone'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecLeft</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecLeft'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecRight</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecRight'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecUp</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecUp'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecDown</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecDown'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecWordLeft</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecWordLeft'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecWordRight</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecWordRight'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecLineStart</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecLineStart'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecLineEnd</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecLineEnd'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecPageUp</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecPageUp'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecPageDown</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecPageDown'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecPageLeft</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecPageLeft'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecPageRight</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecPageRight'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecPageTop</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecPageTop'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecPageBottom</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecPageBottom'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecEditorTop</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecEditorTop'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecEditorBottom</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecEditorBottom'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecGotoXY</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecGotoXY'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelLeft</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelLeft'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelRight</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelRight'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelUp</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelUp'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelDown</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelDown'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecSelWordLeft</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelWordLeft'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelWordRight</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecSelWordRight'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelLineStart</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelLineStart'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecSelLineEnd</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelLineEnd'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelPageUp</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelPageUp'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecSelPageDown</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelPageDown'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelPageLeft</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecSelPageLeft'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelPageRight</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelPageRight'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecSelPageTop</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelPageTop'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelPageBottom</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecSelPageBottom'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelEditorTop</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelEditorTop'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecSelEditorBottom</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelEditorBottom'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelGotoXY</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecSelGotoXY'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelWord</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelWord'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSelectAll</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSelectAll'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecDeleteLastChar</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecDeleteLastChar'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecDeleteChar</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecDeleteChar'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecDeleteWord</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecDeleteWord'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecDeleteLastWord</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecDeleteLastWord'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecDeleteBOL</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecDeleteBOL'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecDeleteEOL</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecDeleteEOL'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecDeleteLine</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecDeleteLine'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecClearAll</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecClearAll'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecLineBreak</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecLineBreak'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecInsertLine</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecInsertLine'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecChar</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecChar'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecImeStr</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecImeStr'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecUndo</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecUndo'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecRedo</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecRedo'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecCut</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecCut'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecCopy</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecCopy'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecPaste</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecPaste'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecScrollUp</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecScrollUp'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecScrollDown</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecScrollDown'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecScrollLeft</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecScrollLeft'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecScrollRight</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecScrollRight'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecInsertMode</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecInsertMode'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecOverwriteMode</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecOverwriteMode'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecToggleMode</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecToggleMode'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecBlockIndent</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecBlockIndent'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecBlockUnindent</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecBlockUnindent'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecTab</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecTab'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecShiftTab</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecShiftTab'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecMatchBracket</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecMatchBracket'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecCommentBlock</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecCommentBlock'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecNormalSelect</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecNormalSelect'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecColumnSelect</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecColumnSelect'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecLineSelect</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecLineSelect'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecAutoCompletion</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecAutoCompletion'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecUserFirst</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecUserFirst'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecContextHelp</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecContextHelp'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecGotoMarker0</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecGotoMarker0'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecGotoMarker1</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecGotoMarker1'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecGotoMarker2</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecGotoMarker2'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecGotoMarker3</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecGotoMarker3'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecGotoMarker4</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecGotoMarker4'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecGotoMarker5</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecGotoMarker5'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecGotoMarker6</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecGotoMarker6'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecGotoMarker7</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecGotoMarker7'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecGotoMarker8</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecGotoMarker8'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecGotoMarker9</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecGotoMarker9'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSetMarker0</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSetMarker0'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecSetMarker1</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSetMarker1'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSetMarker2</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecSetMarker2'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSetMarker3</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSetMarker3'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecSetMarker4</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSetMarker4'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSetMarker5</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecSetMarker5'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSetMarker6</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSetMarker6'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecSetMarker7</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSetMarker7'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSetMarker8</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecSetMarker8'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecSetMarker9</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecSetMarker9'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecUpperCase</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecUpperCase'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecLowerCase</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecLowerCase'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span>
+  <span class="Symbol">:</span> <span class="Identifier">ecToggleCase</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecToggleCase'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecTitleCase</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecTitleCase'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecUpperCaseBlock</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecUpperCaseBlock'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span>
+  <span class="Identifier">ecLowerCaseBlock</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecLowerCaseBlock'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecToggleCaseBlock</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span>
+  <span class="SingleLiteral">'ecToggleCaseBlock'</span><span class="Symbol">)</span><span class="Symbol">,</span><span class="Symbol">(</span><span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">ecString</span><span class="Symbol">;</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="SingleLiteral">'ecString'</span><span class="Symbol">)</span><span class="Symbol">)</span></pre>
+          <!-- EditorCommandStrs : array[0..100] of TIdentMapEntry = ((Value : ecNone; Name :
+  'ecNone'),(Value : ecLeft; Name : 'ecLeft'),(Value : ecRight; Name : 'ecRight'),(Value
+  : ecUp; Name : 'ecUp'),(Value : ecDown; Name : 'ecDown'),(Value : ecWordLeft;
+  Name : 'ecWordLeft'),(Value : ecWordRight; Name : 'ecWordRight'),(Value :
+  ecLineStart; Name : 'ecLineStart'),(Value : ecLineEnd; Name : 'ecLineEnd'),(Value
+  : ecPageUp; Name : 'ecPageUp'),(Value : ecPageDown; Name : 'ecPageDown'),(Value
+  : ecPageLeft; Name : 'ecPageLeft'),(Value : ecPageRight; Name : 'ecPageRight'),(Value
+  : ecPageTop; Name : 'ecPageTop'),(Value : ecPageBottom; Name : 'ecPageBottom'),(Value
+  : ecEditorTop; Name : 'ecEditorTop'),(Value : ecEditorBottom; Name :
+  'ecEditorBottom'),(Value : ecGotoXY; Name : 'ecGotoXY'),(Value : ecSelLeft;
+  Name : 'ecSelLeft'),(Value : ecSelRight; Name : 'ecSelRight'),(Value : ecSelUp;
+  Name : 'ecSelUp'),(Value : ecSelDown; Name : 'ecSelDown'),(Value :
+  ecSelWordLeft; Name : 'ecSelWordLeft'),(Value : ecSelWordRight; Name :
+  'ecSelWordRight'),(Value : ecSelLineStart; Name : 'ecSelLineStart'),(Value :
+  ecSelLineEnd; Name : 'ecSelLineEnd'),(Value : ecSelPageUp; Name : 'ecSelPageUp'),(Value
+  : ecSelPageDown; Name : 'ecSelPageDown'),(Value : ecSelPageLeft; Name :
+  'ecSelPageLeft'),(Value : ecSelPageRight; Name : 'ecSelPageRight'),(Value :
+  ecSelPageTop; Name : 'ecSelPageTop'),(Value : ecSelPageBottom; Name :
+  'ecSelPageBottom'),(Value : ecSelEditorTop; Name : 'ecSelEditorTop'),(Value :
+  ecSelEditorBottom; Name : 'ecSelEditorBottom'),(Value : ecSelGotoXY; Name :
+  'ecSelGotoXY'),(Value : ecSelWord; Name : 'ecSelWord'),(Value : ecSelectAll;
+  Name : 'ecSelectAll'),(Value : ecDeleteLastChar; Name : 'ecDeleteLastChar'),(Value
+  : ecDeleteChar; Name : 'ecDeleteChar'),(Value : ecDeleteWord; Name :
+  'ecDeleteWord'),(Value : ecDeleteLastWord; Name : 'ecDeleteLastWord'),(Value :
+  ecDeleteBOL; Name : 'ecDeleteBOL'),(Value : ecDeleteEOL; Name : 'ecDeleteEOL'),(Value
+  : ecDeleteLine; Name : 'ecDeleteLine'),(Value : ecClearAll; Name : 'ecClearAll'),(Value
+  : ecLineBreak; Name : 'ecLineBreak'),(Value : ecInsertLine; Name :
+  'ecInsertLine'),(Value : ecChar; Name : 'ecChar'),(Value : ecImeStr; Name :
+  'ecImeStr'),(Value : ecUndo; Name : 'ecUndo'),(Value : ecRedo; Name : 'ecRedo'),(Value
+  : ecCut; Name : 'ecCut'),(Value : ecCopy; Name : 'ecCopy'),(Value : ecPaste;
+  Name : 'ecPaste'),(Value : ecScrollUp; Name : 'ecScrollUp'),(Value :
+  ecScrollDown; Name : 'ecScrollDown'),(Value : ecScrollLeft; Name :
+  'ecScrollLeft'),(Value : ecScrollRight; Name : 'ecScrollRight'),(Value :
+  ecInsertMode; Name : 'ecInsertMode'),(Value : ecOverwriteMode; Name :
+  'ecOverwriteMode'),(Value : ecToggleMode; Name : 'ecToggleMode'),(Value :
+  ecBlockIndent; Name : 'ecBlockIndent'),(Value : ecBlockUnindent; Name :
+  'ecBlockUnindent'),(Value : ecTab; Name : 'ecTab'),(Value : ecShiftTab; Name :
+  'ecShiftTab'),(Value : ecMatchBracket; Name : 'ecMatchBracket'),(Value :
+  ecCommentBlock; Name : 'ecCommentBlock'),(Value : ecNormalSelect; Name :
+  'ecNormalSelect'),(Value : ecColumnSelect; Name : 'ecColumnSelect'),(Value :
+  ecLineSelect; Name : 'ecLineSelect'),(Value : ecAutoCompletion; Name :
+  'ecAutoCompletion'),(Value : ecUserFirst; Name : 'ecUserFirst'),(Value :
+  ecContextHelp; Name : 'ecContextHelp'),(Value : ecGotoMarker0; Name :
+  'ecGotoMarker0'),(Value : ecGotoMarker1; Name : 'ecGotoMarker1'),(Value :
+  ecGotoMarker2; Name : 'ecGotoMarker2'),(Value : ecGotoMarker3; Name :
+  'ecGotoMarker3'),(Value : ecGotoMarker4; Name : 'ecGotoMarker4'),(Value :
+  ecGotoMarker5; Name : 'ecGotoMarker5'),(Value : ecGotoMarker6; Name :
+  'ecGotoMarker6'),(Value : ecGotoMarker7; Name : 'ecGotoMarker7'),(Value :
+  ecGotoMarker8; Name : 'ecGotoMarker8'),(Value : ecGotoMarker9; Name :
+  'ecGotoMarker9'),(Value : ecSetMarker0; Name : 'ecSetMarker0'),(Value :
+  ecSetMarker1; Name : 'ecSetMarker1'),(Value : ecSetMarker2; Name :
+  'ecSetMarker2'),(Value : ecSetMarker3; Name : 'ecSetMarker3'),(Value :
+  ecSetMarker4; Name : 'ecSetMarker4'),(Value : ecSetMarker5; Name :
+  'ecSetMarker5'),(Value : ecSetMarker6; Name : 'ecSetMarker6'),(Value :
+  ecSetMarker7; Name : 'ecSetMarker7'),(Value : ecSetMarker8; Name :
+  'ecSetMarker8'),(Value : ecSetMarker9; Name : 'ecSetMarker9'),(Value :
+  ecUpperCase; Name : 'ecUpperCase'),(Value : ecLowerCase; Name : 'ecLowerCase'),(Value
+  : ecToggleCase; Name : 'ecToggleCase'),(Value : ecTitleCase; Name :
+  'ecTitleCase'),(Value : ecUpperCaseBlock; Name : 'ecUpperCaseBlock'),(Value :
+  ecLowerCaseBlock; Name : 'ecLowerCaseBlock'),(Value : ecToggleCaseBlock; Name :
+  'ecToggleCaseBlock'),(Value : ecString; Name : 'ecString')) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Exported Headings -->
+      <h2><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a name="ExportedHeadings2"></a>Exported Headings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.ConvertCodeStringToCommand"></a>ConvertCodeStringToCommand</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ConvertCodeStringToCommand</span><span class="Symbol">(</span>
+  <span class="Identifier">AString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span></pre>
+          <!-- Function ConvertCodeStringToCommand(
+  AString : string
+) : TSynEditorCommand -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.ConvertCodeStringToExtended"></a>ConvertCodeStringToExtended</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ConvertCodeStringToExtended</span><span class="Symbol">(</span>
+  <span class="Identifier">AString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+          <!-- Function ConvertCodeStringToExtended(
+  AString : string
+) : string -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.ConvertExtendedToCodeString"></a>ConvertExtendedToCodeString</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ConvertExtendedToCodeString</span><span class="Symbol">(</span>
+  <span class="Identifier">AString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+          <!-- Function ConvertExtendedToCodeString(
+  AString : string
+) : string -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.ConvertExtendedToCommand"></a>ConvertExtendedToCommand</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ConvertExtendedToCommand</span><span class="Symbol">(</span>
+  <span class="Identifier">AString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span></pre>
+          <!-- Function ConvertExtendedToCommand(
+  AString : string
+) : TSynEditorCommand -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.EditorCommandToCodeString"></a>EditorCommandToCodeString</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">EditorCommandToCodeString</span><span class="Symbol">(</span>
+  <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+          <!-- Function EditorCommandToCodeString(
+  Cmd : TSynEditorCommand
+) : string -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.EditorCommandToDescrString"></a>EditorCommandToDescrString</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">EditorCommandToDescrString</span><span class="Symbol">(</span>
+  <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+          <!-- Function EditorCommandToDescrString(
+  Cmd : TSynEditorCommand
+) : string -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.EditorCommandToIdent"></a>EditorCommandToIdent</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">EditorCommandToIdent</span><span class="Symbol">(</span>
+  <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">longint</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Ident</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+          <!-- Function EditorCommandToIdent(
+  Cmd : longint;
+  var Ident : string
+) : Boolean -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.GetEditorCommandExtended"></a>GetEditorCommandExtended</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">GetEditorCommandExtended</span><span class="Symbol">(</span>
+  <span class="Identifier">Proc</span> <span class="Symbol">:</span> <span class="Identifier">TGetStrProc</span>
+<span class="Symbol">)</span></pre>
+          <!-- Procedure GetEditorCommandExtended(
+  Proc : TGetStrProc
+) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.GetEditorCommandValues"></a>GetEditorCommandValues</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">GetEditorCommandValues</span><span class="Symbol">(</span>
+  <span class="Identifier">Proc</span> <span class="Symbol">:</span> <span class="Identifier">TGetStrProc</span>
+<span class="Symbol">)</span></pre>
+          <!-- Procedure GetEditorCommandValues(
+  Proc : TGetStrProc
+) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.IdentToEditorCommand"></a>IdentToEditorCommand</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">IdentToEditorCommand</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Ident</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">longint</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+          <!-- Function IdentToEditorCommand(
+  const Ident : string;
+  var Cmd : longint
+) : Boolean -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.IndexToEditorCommand"></a>IndexToEditorCommand</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">IndexToEditorCommand</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">AIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+          <!-- Function IndexToEditorCommand(
+  const AIndex : Integer
+) : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.ConvertCodeStringToCommand"></a>ConvertCodeStringToCommand</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ConvertCodeStringToCommand</span><span class="Symbol">(</span>
+  <span class="Identifier">AString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span></pre>
+          <!-- Function ConvertCodeStringToCommand(
+  AString : string
+) : TSynEditorCommand -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.ConvertCodeStringToExtended"></a>ConvertCodeStringToExtended</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ConvertCodeStringToExtended</span><span class="Symbol">(</span>
+  <span class="Identifier">AString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+          <!-- Function ConvertCodeStringToExtended(
+  AString : string
+) : string -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.ConvertExtendedToCodeString"></a>ConvertExtendedToCodeString</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ConvertExtendedToCodeString</span><span class="Symbol">(</span>
+  <span class="Identifier">AString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+          <!-- Function ConvertExtendedToCodeString(
+  AString : string
+) : string -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.ConvertExtendedToCommand"></a>ConvertExtendedToCommand</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">ConvertExtendedToCommand</span><span class="Symbol">(</span>
+  <span class="Identifier">AString</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span></pre>
+          <!-- Function ConvertExtendedToCommand(
+  AString : string
+) : TSynEditorCommand -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.EditorCommandToCodeString"></a>EditorCommandToCodeString</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">EditorCommandToCodeString</span><span class="Symbol">(</span>
+  <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+          <!-- Function EditorCommandToCodeString(
+  Cmd : TSynEditorCommand
+) : string -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.EditorCommandToDescrString"></a>EditorCommandToDescrString</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">EditorCommandToDescrString</span><span class="Symbol">(</span>
+  <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+          <!-- Function EditorCommandToDescrString(
+  Cmd : TSynEditorCommand
+) : string -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.EditorCommandToIdent"></a>EditorCommandToIdent</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">EditorCommandToIdent</span><span class="Symbol">(</span>
+  <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">longint</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Ident</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">boolean</span></pre>
+          <!-- Function EditorCommandToIdent(
+  Cmd : longint;
+  var Ident : string
+) : boolean -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.GetEditorCommandExtended"></a>GetEditorCommandExtended</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">GetEditorCommandExtended</span><span class="Symbol">(</span>
+  <span class="Identifier">Proc</span> <span class="Symbol">:</span> <span class="Identifier">TGetStrProc</span>
+<span class="Symbol">)</span></pre>
+          <!-- Procedure GetEditorCommandExtended(
+  Proc : TGetStrProc
+) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.GetEditorCommandValues"></a>GetEditorCommandValues</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">GetEditorCommandValues</span><span class="Symbol">(</span>
+  <span class="Identifier">Proc</span> <span class="Symbol">:</span> <span class="Identifier">TGetStrProc</span>
+<span class="Symbol">)</span></pre>
+          <!-- Procedure GetEditorCommandValues(
+  Proc : TGetStrProc
+) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.IdentToEditorCommand"></a>IdentToEditorCommand</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">IdentToEditorCommand</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Ident</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">longint</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">boolean</span></pre>
+          <!-- Function IdentToEditorCommand(
+  const Ident : string;
+  var Cmd : longint
+) : boolean -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.IndexToEditorCommand"></a>IndexToEditorCommand</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">IndexToEditorCommand</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">AIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+          <!-- Function IndexToEditorCommand(
+  const AIndex : Integer
+) : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+          <!-- TSynEditKeyStroke -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TSynEditKeyStroke3"></a>TSynEditKeyStroke</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.Assign"></a>Assign</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Assign</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure Assign(
+  Source : TPersistent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.GetShortCut"></a>GetShortCut</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetShortCut</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span></pre>
+              <!-- Function GetShortCut : TShortCut -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.GetShortCut2"></a>GetShortCut2</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetShortCut2</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span></pre>
+              <!-- Function GetShortCut2 : TShortCut -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.LoadFromStream"></a>LoadFromStream</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LoadFromStream</span><span class="Symbol">(</span>
+  <span class="Identifier">AStream</span> <span class="Symbol">:</span> <span class="Identifier">TStream</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure LoadFromStream(
+  AStream : TStream
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.SaveToStream"></a>SaveToStream</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveToStream</span><span class="Symbol">(</span>
+  <span class="Identifier">AStream</span> <span class="Symbol">:</span> <span class="Identifier">TStream</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SaveToStream(
+  AStream : TStream
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.SetCommand"></a>SetCommand</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetCommand</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetCommand(
+  const Value : TSynEditorCommand
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.SetKey"></a>SetKey</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetKey</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">word</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetKey(
+  const Value : word
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.SetKey2"></a>SetKey2</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetKey2</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">word</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetKey2(
+  const Value : word
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.SetShift"></a>SetShift</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetShift</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetShift(
+  const Value : TShiftState
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.SetShift2"></a>SetShift2</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetShift2</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetShift2(
+  const Value : TShiftState
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.SetShortCut"></a>SetShortCut</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetShortCut</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetShortCut(
+  const Value : TShortCut
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStroke.SetShortCut2"></a>SetShortCut2</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetShortCut2</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetShortCut2(
+  const Value : TShortCut
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TSynEditKeyStrokes -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TSynEditKeyStrokes3"></a>TSynEditKeyStrokes</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.Add"></a>Add</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">Add</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditKeyStroke</span></pre>
+              <!-- Function Add : TSynEditKeyStroke -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.AddKey"></a>AddKey</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">AddKey</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">ACmd</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">AKey</span> <span class="Symbol">:</span> <span class="Identifier">word</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">AShift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure AddKey(
+  const ACmd : TSynEditorCommand;
+  const AKey : word;
+  const AShift : TShiftState
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.Assign"></a>Assign</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Assign</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure Assign(
+  Source : TPersistent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Constructor Create(
+  AOwner : TPersistent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.FindCommand"></a>FindCommand</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindCommand</span><span class="Symbol">(</span>
+  <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+              <!-- Function FindCommand(
+  Cmd : TSynEditorCommand
+) : integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.FindKeycode"></a>FindKeycode</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindKeycode</span><span class="Symbol">(</span>
+  <span class="Identifier">Code</span> <span class="Symbol">:</span> <span class="Identifier">word</span><span class="Symbol">;</span>
+  <span class="Identifier">SS</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+              <!-- Function FindKeycode(
+  Code : word;
+  SS : TShiftState
+) : integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.FindKeycode2"></a>FindKeycode2</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindKeycode2</span><span class="Symbol">(</span>
+  <span class="Identifier">Code1</span> <span class="Symbol">:</span> <span class="Identifier">word</span><span class="Symbol">;</span>
+  <span class="Identifier">SS1</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span><span class="Symbol">;</span>
+  <span class="Identifier">Code2</span> <span class="Symbol">:</span> <span class="Identifier">word</span><span class="Symbol">;</span>
+  <span class="Identifier">SS2</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+              <!-- Function FindKeycode2(
+  Code1 : word;
+  SS1 : TShiftState;
+  Code2 : word;
+  SS2 : TShiftState
+) : integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.FindShortcut"></a>FindShortcut</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindShortcut</span><span class="Symbol">(</span>
+  <span class="Identifier">SC</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+              <!-- Function FindShortcut(
+  SC : TShortcut
+) : integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.FindShortcut2"></a>FindShortcut2</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindShortcut2</span><span class="Symbol">(</span>
+  <span class="Identifier">SC</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="Identifier">SC2</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+              <!-- Function FindShortcut2(
+  SC : TShortcut;
+  SC2 : TShortcut
+) : integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.GetItem"></a>GetItem</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetItem</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditKeyStroke</span></pre>
+              <!-- Function GetItem(
+  Index : Integer
+) : TSynEditKeyStroke -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.LoadFromStream"></a>LoadFromStream</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LoadFromStream</span><span class="Symbol">(</span>
+  <span class="Identifier">AStream</span> <span class="Symbol">:</span> <span class="Identifier">TStream</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure LoadFromStream(
+  AStream : TStream
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.ResetDefaults"></a>ResetDefaults</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetDefaults</span></pre>
+              <!-- Procedure ResetDefaults -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.SaveToStream"></a>SaveToStream</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveToStream</span><span class="Symbol">(</span>
+  <span class="Identifier">AStream</span> <span class="Symbol">:</span> <span class="Identifier">TStream</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SaveToStream(
+  AStream : TStream
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynEditKeyStrokes.SetItem"></a>SetItem</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetItem</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditKeyStroke</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetItem(
+  Index : Integer;
+  Value : TSynEditKeyStroke
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- initialization -->
+      <div class="Indent">
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.ESynKeyError"></a>ESynKeyError</td>
+              <td>
+                <pre><span class="Identifier">ESynKeyError</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">Exception</span><span class="Symbol">)</span></pre>
+          <!-- ESynKeyError = Class(Exception) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke"></a>TSynEditKeyStroke</td>
+              <td>
+                <pre><span class="Identifier">TSynEditKeyStroke</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TCollectionItem</span><span class="Symbol">)</span></pre>
+          <!-- TSynEditKeyStroke = Class(TCollectionItem) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Fields.FCommand"></a>FCommand</td>
+                      <td>
+                        <pre><span class="Identifier">FCommand</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span></pre>
+                  <!-- FCommand : TSynEditorCommand -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Fields.FKey"></a>FKey</td>
+                      <td>
+                        <pre><span class="Identifier">FKey</span> <span class="Symbol">:</span> <span class="Identifier">word</span></pre>
+                  <!-- FKey : word -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Fields.FKey2"></a>FKey2</td>
+                      <td>
+                        <pre><span class="Identifier">FKey2</span> <span class="Symbol">:</span> <span class="Identifier">word</span></pre>
+                  <!-- FKey2 : word -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Fields.FShift"></a>FShift</td>
+                      <td>
+                        <pre><span class="Identifier">FShift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span></pre>
+                  <!-- FShift : TShiftState -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Fields.FShift2"></a>FShift2</td>
+                      <td>
+                        <pre><span class="Identifier">FShift2</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span></pre>
+                  <!-- FShift2 : TShiftState -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.Assign"></a>Assign</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Assign</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Assign(
+  Source : TPersistent
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.GetShortCut"></a>GetShortCut</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetShortCut</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span></pre>
+                  <!-- Function GetShortCut : TShortCut -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.GetShortCut2"></a>GetShortCut2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetShortCut2</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span></pre>
+                  <!-- Function GetShortCut2 : TShortCut -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.LoadFromStream"></a>LoadFromStream</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LoadFromStream</span><span class="Symbol">(</span>
+  <span class="Identifier">AStream</span> <span class="Symbol">:</span> <span class="Identifier">TStream</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure LoadFromStream(
+  AStream : TStream
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.SaveToStream"></a>SaveToStream</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveToStream</span><span class="Symbol">(</span>
+  <span class="Identifier">AStream</span> <span class="Symbol">:</span> <span class="Identifier">TStream</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SaveToStream(
+  AStream : TStream
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.SetCommand"></a>SetCommand</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetCommand</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetCommand(
+  const Value : TSynEditorCommand
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.SetKey"></a>SetKey</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetKey</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">word</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetKey(
+  const Value : word
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.SetKey2"></a>SetKey2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetKey2</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">word</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetKey2(
+  const Value : word
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.SetShift"></a>SetShift</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetShift</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetShift(
+  const Value : TShiftState
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.SetShift2"></a>SetShift2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetShift2</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetShift2(
+  const Value : TShiftState
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.SetShortCut"></a>SetShortCut</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetShortCut</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetShortCut(
+  const Value : TShortCut
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Methods.SetShortCut2"></a>SetShortCut2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetShortCut2</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetShortCut2(
+  const Value : TShortCut
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Properties.Command"></a>Command</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Command</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FCommand</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetCommand</span>
+</pre>
+                  <!-- Property Command : TSynEditorCommand
+  Read FCommand
+  Write SetCommand
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Properties.Key"></a>Key</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">word</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FKey</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetKey</span>
+</pre>
+                  <!-- Property Key : word
+  Read FKey
+  Write SetKey
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Properties.Key2"></a>Key2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Key2</span> <span class="Symbol">:</span> <span class="Identifier">word</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FKey2</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetKey2</span>
+</pre>
+                  <!-- Property Key2 : word
+  Read FKey2
+  Write SetKey2
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Properties.Shift"></a>Shift</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FShift</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetShift</span>
+</pre>
+                  <!-- Property Shift : TShiftState
+  Read FShift
+  Write SetShift
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Properties.Shift2"></a>Shift2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Shift2</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FShift2</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetShift2</span>
+</pre>
+                  <!-- Property Shift2 : TShiftState
+  Read FShift2
+  Write SetShift2
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Properties.ShortCut"></a>ShortCut</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ShortCut</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetShortCut</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetShortCut</span>
+  <span class="ReservedWord">Default</span> <span class="Number">0</span>
+</pre>
+                  <!-- Property ShortCut : TShortCut
+  Read GetShortCut
+  Write SetShortCut
+  Default 0
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStroke.Properties.ShortCut2"></a>ShortCut2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ShortCut2</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetShortCut2</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetShortCut2</span>
+  <span class="ReservedWord">Default</span> <span class="Number">0</span>
+</pre>
+                  <!-- Property ShortCut2 : TShortCut
+  Read GetShortCut2
+  Write SetShortCut2
+  Default 0
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes"></a>TSynEditKeyStrokes</td>
+              <td>
+                <pre><span class="Identifier">TSynEditKeyStrokes</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TCollection</span><span class="Symbol">)</span></pre>
+          <!-- TSynEditKeyStrokes = Class(TCollection) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Fields.FOwner"></a>FOwner</td>
+                      <td>
+                        <pre><span class="Identifier">FOwner</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span></pre>
+                  <!-- FOwner : TPersistent -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.Add"></a>Add</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">Add</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditKeyStroke</span></pre>
+                  <!-- Function Add : TSynEditKeyStroke -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.AddKey"></a>AddKey</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">AddKey</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">ACmd</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">AKey</span> <span class="Symbol">:</span> <span class="Identifier">word</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">AShift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure AddKey(
+  const ACmd : TSynEditorCommand;
+  const AKey : word;
+  const AShift : TShiftState
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.Assign"></a>Assign</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Assign</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Assign(
+  Source : TPersistent
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Constructor Create(
+  AOwner : TPersistent
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.FindCommand"></a>FindCommand</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindCommand</span><span class="Symbol">(</span>
+  <span class="Identifier">Cmd</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditorCommand</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+                  <!-- Function FindCommand(
+  Cmd : TSynEditorCommand
+) : integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.FindKeycode"></a>FindKeycode</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindKeycode</span><span class="Symbol">(</span>
+  <span class="Identifier">Code</span> <span class="Symbol">:</span> <span class="Identifier">word</span><span class="Symbol">;</span>
+  <span class="Identifier">SS</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+                  <!-- Function FindKeycode(
+  Code : word;
+  SS : TShiftState
+) : integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.FindKeycode2"></a>FindKeycode2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindKeycode2</span><span class="Symbol">(</span>
+  <span class="Identifier">Code1</span> <span class="Symbol">:</span> <span class="Identifier">word</span><span class="Symbol">;</span>
+  <span class="Identifier">SS1</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span><span class="Symbol">;</span>
+  <span class="Identifier">Code2</span> <span class="Symbol">:</span> <span class="Identifier">word</span><span class="Symbol">;</span>
+  <span class="Identifier">SS2</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+                  <!-- Function FindKeycode2(
+  Code1 : word;
+  SS1 : TShiftState;
+  Code2 : word;
+  SS2 : TShiftState
+) : integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.FindShortcut"></a>FindShortcut</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindShortcut</span><span class="Symbol">(</span>
+  <span class="Identifier">SC</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+                  <!-- Function FindShortcut(
+  SC : TShortcut
+) : integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.FindShortcut2"></a>FindShortcut2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindShortcut2</span><span class="Symbol">(</span>
+  <span class="Identifier">SC</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span><span class="Symbol">;</span>
+  <span class="Identifier">SC2</span> <span class="Symbol">:</span> <span class="Identifier">TShortcut</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">integer</span></pre>
+                  <!-- Function FindShortcut2(
+  SC : TShortcut;
+  SC2 : TShortcut
+) : integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.GetItem"></a>GetItem</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetItem</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditKeyStroke</span></pre>
+                  <!-- Function GetItem(
+  Index : Integer
+) : TSynEditKeyStroke -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.LoadFromStream"></a>LoadFromStream</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LoadFromStream</span><span class="Symbol">(</span>
+  <span class="Identifier">AStream</span> <span class="Symbol">:</span> <span class="Identifier">TStream</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure LoadFromStream(
+  AStream : TStream
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.ResetDefaults"></a>ResetDefaults</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetDefaults</span></pre>
+                  <!-- Procedure ResetDefaults -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.SaveToStream"></a>SaveToStream</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveToStream</span><span class="Symbol">(</span>
+  <span class="Identifier">AStream</span> <span class="Symbol">:</span> <span class="Identifier">TStream</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SaveToStream(
+  AStream : TStream
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Methods.SetItem"></a>SetItem</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetItem</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditKeyStroke</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetItem(
+  Index : Integer;
+  Value : TSynEditKeyStroke
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynEditKeyStrokes.Properties.Items"></a>Items</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Items</span><span class="Symbol">[</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">]</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditKeyStroke</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetItem</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetItem</span>
+   <span class="ReservedWord">Default</span>
+</pre>
+                  <!-- Property Items[
+  Index : Integer
+] : TSynEditKeyStroke
+  Read GetItem
+  Write SetItem
+   Default
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSynEditorCommand"></a>TSynEditorCommand</td>
+              <td>
+                <pre><span class="Identifier">TSynEditorCommand</span> <span class="Symbol">=</span> <span class="Identifier">word</span></pre>
+          <!-- TSynEditorCommand = word -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Menus"></a>Menus</td>
+              <td>
+                <pre><span class="Identifier">Menus</span></pre>
+          <!-- Menus -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEditKeyConst"></a>SynEditKeyConst</td>
+              <td>
+                <pre><span class="Identifier">SynEditKeyConst</span></pre>
+          <!-- SynEditKeyConst -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEditStrConst"></a>SynEditStrConst</td>
+              <td>
+                <pre><span class="Identifier">SynEditStrConst</span></pre>
+          <!-- SynEditStrConst -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynUnicode"></a>SynUnicode</td>
+              <td>
+                <pre><span class="Identifier">SynUnicode</span></pre>
+          <!-- SynUnicode -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

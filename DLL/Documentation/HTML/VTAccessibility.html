@@ -1,0 +1,2040 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>VTAccessibility.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHEllipsisLabel.html">DGHEllipsisLabel.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItXE2.html">BrowseAndDocItXE2.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BADIInitialiseOTAInterfaces.html">BADIInitialiseOTAInterfaces.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BNFHighlighter.html">BNFHighlighter.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItWizard.html">BrowseAndDocItWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DockableModuleExplorer.html">DockableModuleExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DUnitCreator.html">DUnitCreator.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DUnitForm.html">DUnitForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EditorNotifier.html">EditorNotifier.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EidolonHighlighter.html">EidolonHighlighter.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="KeyboardBindings.html">KeyboardBindings.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProfilingForm.html">ProfilingForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ToolsAPIUtils.html">ToolsAPIUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BackusNaurModule.html">BackusNaurModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseDocumentation.html">BaseDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseLanguageModule.html">BaseLanguageModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="checkforupdates.html">checkforupdates.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CheckForUpdatesForm.html">CheckForUpdatesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CheckForUpdatesOptionsForm.html">CheckForUpdatesOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CommonIDEFunctions.html">CommonIDEFunctions.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DFMModule.html">DFMModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHLibrary.html">DGHLibrary.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationDispatcher.html">DocumentationDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationOptionsForm.html">DocumentationOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EidolonModule.html">EidolonModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EidolonTLSSchematicModule.html">EidolonTLSSchematicModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EidolonTypes.html">EidolonTypes.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GenericTokenizer.html">GenericTokenizer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="HTMLDocumentation.html">HTMLDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MethodDescriptionForm.html">MethodDescriptionForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleDispatcher.html">ModuleDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleExplorerFrame.html">ModuleExplorerFrame.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MSXML2_TLB.html">MSXML2_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OptionsForm.html">OptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PascalModule.html">PascalModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SpecialTagForm.html">SpecialTagForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TokenForm.html">TokenForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBModule.html">VBModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VirtualTrees.html">VirtualTrees.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VTAccessibility.html">VTAccessibility.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VTAccessibilityFactory.html">VTAccessibilityFactory.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VTHeaderPopup.html">VTHeaderPopup.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="XMLModule.html">XMLModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;<a href="#DocumentationConflicts2">Documentation Conflicts</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a href="#finalization2">finalization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/HintFolder.gif" alt=""/>&nbsp;<a href="#Hints2">Hints</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a href="#initialization2">initialization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a href="#Variables2">Variables</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit VTAccessibility -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit VTAccessibility</h1>
+      
+      <!-- Hints -->
+      <h2><img class="verticallymiddle" src="Images/HintFolder.gif" alt=""/>&nbsp;<a name="Hints"></a>Hints</h2>
+      <ul>
+        <li class="Hint">The symbol 'HasPopup' has not been referenced in the code. [CheckReferences]</li>
+        <li class="Hint">The symbol 'HasPopup' has not been referenced in the code. [CheckReferences]</li>
+      </ul>
+      
+      <h2><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;<a name="DocumentationConflicts"></a>Documentation Conflicts</h2>
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Class Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Class type 'TVirtualTreeAccessibility' is undocumented.</li>
+          <li class="DocConflictMissing">Class type 'TVirtualTreeItemAccessibility' is undocumented.</li>
+          <li class="DocConflictMissing">Class type 'TVTDefaultAccessibleItemProvider' is undocumented.</li>
+          <li class="DocConflictMissing">Class type 'TVTDefaultAccessibleProvider' is undocumented.</li>
+          <li class="DocConflictMissing">Class type 'TVTMultiColumnAccessibleItemProvider' is undocumented.</li>
+          <li class="DocConflictMissing">Class type 'TVTMultiColumnItemAccessibility' is undocumented.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Method Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.accDoDefaultAction' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.accHitTest' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.accLocation' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.accNavigate' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.accSelect' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Create' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.GetIDsOfNames' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.GetTypeInfo' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.GetTypeInfoCount' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accChild' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accChildCount' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accDefaultAction' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accDescription' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accFocus' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accHelp' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accHelpTopic' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accKeyboardShortcut' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accName' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accParent' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accRole' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accSelection' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accState' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Get_accValue' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Invoke' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Set_accName' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeAccessibility.Set_accValue' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.accLocation' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accChild' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accChildCount' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accDescription' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accFocus' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accName' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accParent' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accRole' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accState' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVirtualTreeItemAccessibility.Get_accValue' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVTDefaultAccessibleItemProvider.CreateIAccessible' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVTDefaultAccessibleProvider.CreateIAccessible' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVTMultiColumnAccessibleItemProvider.CreateIAccessible' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVTMultiColumnItemAccessibility.GetItemDescription' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVTMultiColumnItemAccessibility.Get_accDescription' has not been documented.</li>
+          <li class="DocConflictMissing">Method 'TVTMultiColumnItemAccessibility.Get_accName' has not been documented.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Module Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">This module has no document comment.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Module Finalization Section</h3>
+        <ul>
+          <li class="DocConflictMissing">The module is missing an Finalization comment.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Module Initialization Section</h3>
+        <ul>
+          <li class="DocConflictMissing">The module is missing an Initialization comment.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Variable Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Variable 'DefaultAccessibleItemProvider' is undocumented.</li>
+          <li class="DocConflictMissing">Variable 'DefaultAccessibleProvider' is undocumented.</li>
+          <li class="DocConflictMissing">Variable 'MultiColumnAccessibleProvider' is undocumented.</li>
+        </ul>
+      </div>
+      
+      <!-- finalization -->
+      <div class="Indent">
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+          <!-- TVirtualTreeAccessibility -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TVirtualTreeAccessibility3"></a>TVirtualTreeAccessibility</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.accDoDefaultAction"></a>accDoDefaultAction</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accDoDefaultAction</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function accDoDefaultAction(
+  varChild : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.accHitTest"></a>accHitTest</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accHitTest</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">xLeft</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">yTop</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function accHitTest(
+  xLeft : Integer;
+  yTop : Integer;
+  out pvarChild : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.accLocation"></a>accLocation</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accLocation</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pxLeft</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pyTop</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcxWidth</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcyHeight</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function accLocation(
+  out pxLeft : Integer;
+  out pyTop : Integer;
+  out pcxWidth : Integer;
+  out pcyHeight : Integer;
+  varChild : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.accNavigate"></a>accNavigate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accNavigate</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">navDir</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varStart</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarEndUpAt</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function accNavigate(
+  navDir : Integer;
+  varStart : OleVariant;
+  out pvarEndUpAt : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.accSelect"></a>accSelect</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accSelect</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">flagsSelect</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function accSelect(
+  flagsSelect : Integer;
+  varChild : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span><span class="WhiteSpace"> </span><span class="Identifier">Create</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">AVirtualTree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TVirtualStringTree</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+              <!-- Constructor Create(
+  AVirtualTree : TVirtualStringTree
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.GetIDsOfNames"></a>GetIDsOfNames</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">GetIDsOfNames</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">const</span><span class="WhiteSpace"> </span><span class="Identifier">IID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TGUID</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">Names</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">NameCount</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">LocaleID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">DispIDs</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span></pre>
+              <!-- Function GetIDsOfNames(
+  const IID : TGUID;
+  Names : Pointer;
+  NameCount : Integer;
+  LocaleID : Integer;
+  DispIDs : Pointer
+) : HRESULT -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.GetTypeInfo"></a>GetTypeInfo</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">GetTypeInfo</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Directive">Index</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">LocaleID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">TypeInfo</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span></pre>
+              <!-- Function GetTypeInfo(
+  Index : Integer;
+  LocaleID : Integer;
+  out TypeInfo
+) : HRESULT -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.GetTypeInfoCount"></a>GetTypeInfoCount</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">GetTypeInfoCount</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">Count</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span></pre>
+              <!-- Function GetTypeInfoCount(
+  out Count : Integer
+) : HRESULT -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accChild"></a>Get_accChild</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accChild</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">ppdispChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accChild(
+  varChild : OleVariant;
+  out ppdispChild : IDispatch
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accChildCount"></a>Get_accChildCount</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accChildCount</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcountChildren</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accChildCount(
+  out pcountChildren : Integer
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accDefaultAction"></a>Get_accDefaultAction</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accDefaultAction</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDefaultAction</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accDefaultAction(
+  varChild : OleVariant;
+  out pszDefaultAction : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accDescription"></a>Get_accDescription</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accDescription</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDescription</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accDescription(
+  varChild : OleVariant;
+  out pszDescription : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accFocus"></a>Get_accFocus</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accFocus</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accFocus(
+  out pvarChild : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accHelp"></a>Get_accHelp</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accHelp</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszHelp</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accHelp(
+  varChild : OleVariant;
+  out pszHelp : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accHelpTopic"></a>Get_accHelpTopic</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accHelpTopic</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszHelpFile</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pidTopic</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accHelpTopic(
+  out pszHelpFile : WideString;
+  varChild : OleVariant;
+  out pidTopic : Integer
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accKeyboardShortcut"></a>Get_accKeyboardShortcut</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accKeyboardShortcut</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszKeyboardShortcut</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accKeyboardShortcut(
+  varChild : OleVariant;
+  out pszKeyboardShortcut : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accName"></a>Get_accName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accName</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accName(
+  varChild : OleVariant;
+  out pszName : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accParent"></a>Get_accParent</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accParent</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">ppdispParent</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accParent(
+  out ppdispParent : IDispatch
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accRole"></a>Get_accRole</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accRole</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarRole</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accRole(
+  varChild : OleVariant;
+  out pvarRole : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accSelection"></a>Get_accSelection</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accSelection</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarChildren</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accSelection(
+  out pvarChildren : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accState"></a>Get_accState</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accState</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarState</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accState(
+  varChild : OleVariant;
+  out pvarState : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Get_accValue"></a>Get_accValue</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accValue</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszValue</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accValue(
+  varChild : OleVariant;
+  out pszValue : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Invoke"></a>Invoke</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Invoke</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Directive">DispID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">const</span><span class="WhiteSpace"> </span><span class="Identifier">IID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TGUID</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">LocaleID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">Flags</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Word</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">var</span><span class="WhiteSpace"> </span><span class="Identifier">Params</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">VarResult</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ExcepInfo</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ArgErr</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span></pre>
+              <!-- Function Invoke(
+  DispID : Integer;
+  const IID : TGUID;
+  LocaleID : Integer;
+  Flags : Word;
+  var Params;
+  VarResult : Pointer;
+  ExcepInfo : Pointer;
+  ArgErr : Pointer
+) : HRESULT -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Set_accName"></a>Set_accName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Set_accName</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">const</span><span class="WhiteSpace"> </span><span class="Identifier">pszName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+              <!-- Function Set_accName(
+  varChild : OleVariant;
+  const pszName : WideString
+) : HResult; stdcall -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeAccessibility.Set_accValue"></a>Set_accValue</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Set_accValue</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">const</span><span class="WhiteSpace"> </span><span class="Identifier">pszValue</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Set_accValue(
+  varChild : OleVariant;
+  const pszValue : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TVirtualTreeItemAccessibility -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TVirtualTreeItemAccessibility3"></a>TVirtualTreeItemAccessibility</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.accLocation"></a>accLocation</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accLocation</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pxLeft</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pyTop</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcxWidth</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcyHeight</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function accLocation(
+  out pxLeft : Integer;
+  out pyTop : Integer;
+  out pcxWidth : Integer;
+  out pcyHeight : Integer;
+  varChild : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accChild"></a>Get_accChild</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accChild</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">ppdispChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accChild(
+  varChild : OleVariant;
+  out ppdispChild : IDispatch
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accChildCount"></a>Get_accChildCount</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accChildCount</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcountChildren</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accChildCount(
+  out pcountChildren : Integer
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accDescription"></a>Get_accDescription</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accDescription</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDescription</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accDescription(
+  varChild : OleVariant;
+  out pszDescription : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accFocus"></a>Get_accFocus</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accFocus</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accFocus(
+  out pvarChild : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accName"></a>Get_accName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accName</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accName(
+  varChild : OleVariant;
+  out pszName : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accParent"></a>Get_accParent</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accParent</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">ppdispParent</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accParent(
+  out ppdispParent : IDispatch
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accRole"></a>Get_accRole</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accRole</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarRole</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accRole(
+  varChild : OleVariant;
+  out pvarRole : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accState"></a>Get_accState</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accState</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarState</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accState(
+  varChild : OleVariant;
+  out pvarState : OleVariant
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVirtualTreeItemAccessibility.Get_accValue"></a>Get_accValue</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accValue</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszValue</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accValue(
+  varChild : OleVariant;
+  out pszValue : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TVTDefaultAccessibleItemProvider -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TVTDefaultAccessibleItemProvider3"></a>TVTDefaultAccessibleItemProvider</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVTDefaultAccessibleItemProvider.CreateIAccessible"></a>CreateIAccessible</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">CreateIAccessible</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ATree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBaseVirtualTree</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span></pre>
+              <!-- Function CreateIAccessible(
+  ATree : TBaseVirtualTree
+) : IAccessible -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TVTDefaultAccessibleProvider -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TVTDefaultAccessibleProvider3"></a>TVTDefaultAccessibleProvider</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVTDefaultAccessibleProvider.CreateIAccessible"></a>CreateIAccessible</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">CreateIAccessible</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ATree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBaseVirtualTree</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span></pre>
+              <!-- Function CreateIAccessible(
+  ATree : TBaseVirtualTree
+) : IAccessible -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TVTMultiColumnAccessibleItemProvider -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TVTMultiColumnAccessibleItemProvider3"></a>TVTMultiColumnAccessibleItemProvider</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVTMultiColumnAccessibleItemProvider.CreateIAccessible"></a>CreateIAccessible</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">CreateIAccessible</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ATree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBaseVirtualTree</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span></pre>
+              <!-- Function CreateIAccessible(
+  ATree : TBaseVirtualTree
+) : IAccessible -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TVTMultiColumnItemAccessibility -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TVTMultiColumnItemAccessibility3"></a>TVTMultiColumnItemAccessibility</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVTMultiColumnItemAccessibility.GetItemDescription"></a>GetItemDescription</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">GetItemDescription</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDescription</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">IncludeMainColumn</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">boolean</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function GetItemDescription(
+  varChild : OleVariant;
+  out pszDescription : WideString;
+  IncludeMainColumn : boolean
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVTMultiColumnItemAccessibility.Get_accDescription"></a>Get_accDescription</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accDescription</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDescription</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accDescription(
+  varChild : OleVariant;
+  out pszDescription : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TVTMultiColumnItemAccessibility.Get_accName"></a>Get_accName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accName</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span></pre>
+              <!-- Function Get_accName(
+  varChild : OleVariant;
+  out pszName : WideString
+) : HResult -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- initialization -->
+      <div class="Indent">
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility"></a>TVirtualTreeAccessibility</td>
+              <td>
+                <pre><span class="Identifier">TVirtualTreeAccessibility</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TInterfacedObject</span><span class="Symbol">,</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="Symbol">,</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span><span class="Symbol">)</span></pre>
+          <!-- TVirtualTreeAccessibility = Class(TInterfacedObject, IDispatch, IAccessible) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Fields.FVirtualTree"></a>FVirtualTree</td>
+                      <td>
+                        <pre><span class="Identifier">FVirtualTree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TVirtualStringTree</span></pre>
+                  <!-- FVirtualTree : TVirtualStringTree -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.accDoDefaultAction"></a>accDoDefaultAction</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accDoDefaultAction</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function accDoDefaultAction(
+  varChild : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.accHitTest"></a>accHitTest</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accHitTest</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">xLeft</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">yTop</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function accHitTest(
+  xLeft : Integer;
+  yTop : Integer;
+  out pvarChild : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.accLocation"></a>accLocation</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accLocation</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pxLeft</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pyTop</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcxWidth</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcyHeight</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function accLocation(
+  out pxLeft : Integer;
+  out pyTop : Integer;
+  out pcxWidth : Integer;
+  out pcyHeight : Integer;
+  varChild : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.accNavigate"></a>accNavigate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accNavigate</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">navDir</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varStart</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarEndUpAt</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function accNavigate(
+  navDir : Integer;
+  varStart : OleVariant;
+  out pvarEndUpAt : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.accSelect"></a>accSelect</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accSelect</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">flagsSelect</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function accSelect(
+  flagsSelect : Integer;
+  varChild : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span><span class="WhiteSpace"> </span><span class="Identifier">Create</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">AVirtualTree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TVirtualStringTree</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                  <!-- Constructor Create(
+  AVirtualTree : TVirtualStringTree
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.GetIDsOfNames"></a>GetIDsOfNames</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">GetIDsOfNames</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">const</span><span class="WhiteSpace"> </span><span class="Identifier">IID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TGUID</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">Names</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">NameCount</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">LocaleID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">DispIDs</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function GetIDsOfNames(
+  const IID : TGUID;
+  Names : Pointer;
+  NameCount : Integer;
+  LocaleID : Integer;
+  DispIDs : Pointer
+) : HRESULT; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.GetTypeInfo"></a>GetTypeInfo</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">GetTypeInfo</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Directive">Index</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">LocaleID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">TypeInfo</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function GetTypeInfo(
+  Index : Integer;
+  LocaleID : Integer;
+  out TypeInfo
+) : HRESULT; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.GetTypeInfoCount"></a>GetTypeInfoCount</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">GetTypeInfoCount</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">Count</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function GetTypeInfoCount(
+  out Count : Integer
+) : HRESULT; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accChild"></a>Get_accChild</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accChild</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">ppdispChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accChild(
+  varChild : OleVariant;
+  out ppdispChild : IDispatch
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accChildCount"></a>Get_accChildCount</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accChildCount</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcountChildren</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accChildCount(
+  out pcountChildren : Integer
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accDefaultAction"></a>Get_accDefaultAction</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accDefaultAction</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDefaultAction</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accDefaultAction(
+  varChild : OleVariant;
+  out pszDefaultAction : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accDescription"></a>Get_accDescription</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accDescription</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDescription</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accDescription(
+  varChild : OleVariant;
+  out pszDescription : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accFocus"></a>Get_accFocus</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accFocus</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accFocus(
+  out pvarChild : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accHelp"></a>Get_accHelp</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accHelp</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszHelp</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accHelp(
+  varChild : OleVariant;
+  out pszHelp : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accHelpTopic"></a>Get_accHelpTopic</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accHelpTopic</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszHelpFile</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pidTopic</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accHelpTopic(
+  out pszHelpFile : WideString;
+  varChild : OleVariant;
+  out pidTopic : Integer
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accKeyboardShortcut"></a>Get_accKeyboardShortcut</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accKeyboardShortcut</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszKeyboardShortcut</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accKeyboardShortcut(
+  varChild : OleVariant;
+  out pszKeyboardShortcut : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accName"></a>Get_accName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accName</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accName(
+  varChild : OleVariant;
+  out pszName : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accParent"></a>Get_accParent</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accParent</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">ppdispParent</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accParent(
+  out ppdispParent : IDispatch
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accRole"></a>Get_accRole</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accRole</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarRole</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accRole(
+  varChild : OleVariant;
+  out pvarRole : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accSelection"></a>Get_accSelection</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accSelection</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarChildren</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accSelection(
+  out pvarChildren : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accState"></a>Get_accState</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accState</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarState</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accState(
+  varChild : OleVariant;
+  out pvarState : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Get_accValue"></a>Get_accValue</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accValue</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszValue</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accValue(
+  varChild : OleVariant;
+  out pszValue : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Invoke"></a>Invoke</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Invoke</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Directive">DispID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">const</span><span class="WhiteSpace"> </span><span class="Identifier">IID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TGUID</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">LocaleID</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">Flags</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Word</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">var</span><span class="WhiteSpace"> </span><span class="Identifier">Params</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">VarResult</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ExcepInfo</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ArgErr</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Pointer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Invoke(
+  DispID : Integer;
+  const IID : TGUID;
+  LocaleID : Integer;
+  Flags : Word;
+  var Params;
+  VarResult : Pointer;
+  ExcepInfo : Pointer;
+  ArgErr : Pointer
+) : HRESULT; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Set_accName"></a>Set_accName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Set_accName</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">const</span><span class="WhiteSpace"> </span><span class="Identifier">pszName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Set_accName(
+  varChild : OleVariant;
+  const pszName : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeAccessibility.Methods.Set_accValue"></a>Set_accValue</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Set_accValue</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">const</span><span class="WhiteSpace"> </span><span class="Identifier">pszValue</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Set_accValue(
+  varChild : OleVariant;
+  const pszValue : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility"></a>TVirtualTreeItemAccessibility</td>
+              <td>
+                <pre><span class="Identifier">TVirtualTreeItemAccessibility</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TVirtualTreeAccessibility</span><span class="Symbol">,</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span><span class="Symbol">)</span></pre>
+          <!-- TVirtualTreeItemAccessibility = Class(TVirtualTreeAccessibility, IAccessible) -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.accLocation"></a>accLocation</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">accLocation</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pxLeft</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pyTop</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcxWidth</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcyHeight</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function accLocation(
+  out pxLeft : Integer;
+  out pyTop : Integer;
+  out pcxWidth : Integer;
+  out pcyHeight : Integer;
+  varChild : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accChild"></a>Get_accChild</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accChild</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">ppdispChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accChild(
+  varChild : OleVariant;
+  out ppdispChild : IDispatch
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accChildCount"></a>Get_accChildCount</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accChildCount</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pcountChildren</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accChildCount(
+  out pcountChildren : Integer
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accDescription"></a>Get_accDescription</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accDescription</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDescription</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accDescription(
+  varChild : OleVariant;
+  out pszDescription : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accFocus"></a>Get_accFocus</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accFocus</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HRESULT</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accFocus(
+  out pvarChild : OleVariant
+) : HRESULT; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accName"></a>Get_accName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accName</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accName(
+  varChild : OleVariant;
+  out pszName : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accParent"></a>Get_accParent</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accParent</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">ppdispParent</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IDispatch</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accParent(
+  out ppdispParent : IDispatch
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accRole"></a>Get_accRole</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accRole</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarRole</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accRole(
+  varChild : OleVariant;
+  out pvarRole : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accState"></a>Get_accState</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accState</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pvarState</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accState(
+  varChild : OleVariant;
+  out pvarState : OleVariant
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVirtualTreeItemAccessibility.Methods.Get_accValue"></a>Get_accValue</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accValue</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszValue</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accValue(
+  varChild : OleVariant;
+  out pszValue : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TVTDefaultAccessibleItemProvider"></a>TVTDefaultAccessibleItemProvider</td>
+              <td>
+                <pre><span class="Identifier">TVTDefaultAccessibleItemProvider</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TInterfacedObject</span><span class="Symbol">,</span><span class="WhiteSpace"> </span><span class="Identifier">IVTAccessibleProvider</span><span class="Symbol">)</span></pre>
+          <!-- TVTDefaultAccessibleItemProvider = Class(TInterfacedObject, IVTAccessibleProvider) -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVTDefaultAccessibleItemProvider.Methods.CreateIAccessible"></a>CreateIAccessible</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">CreateIAccessible</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ATree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBaseVirtualTree</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span></pre>
+                  <!-- Function CreateIAccessible(
+  ATree : TBaseVirtualTree
+) : IAccessible -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TVTDefaultAccessibleProvider"></a>TVTDefaultAccessibleProvider</td>
+              <td>
+                <pre><span class="Identifier">TVTDefaultAccessibleProvider</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TInterfacedObject</span><span class="Symbol">,</span><span class="WhiteSpace"> </span><span class="Identifier">IVTAccessibleProvider</span><span class="Symbol">)</span></pre>
+          <!-- TVTDefaultAccessibleProvider = Class(TInterfacedObject, IVTAccessibleProvider) -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVTDefaultAccessibleProvider.Methods.CreateIAccessible"></a>CreateIAccessible</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">CreateIAccessible</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ATree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBaseVirtualTree</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span></pre>
+                  <!-- Function CreateIAccessible(
+  ATree : TBaseVirtualTree
+) : IAccessible -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TVTMultiColumnAccessibleItemProvider"></a>TVTMultiColumnAccessibleItemProvider</td>
+              <td>
+                <pre><span class="Identifier">TVTMultiColumnAccessibleItemProvider</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TInterfacedObject</span><span class="Symbol">,</span><span class="WhiteSpace"> </span><span class="Identifier">IVTAccessibleProvider</span><span class="Symbol">)</span></pre>
+          <!-- TVTMultiColumnAccessibleItemProvider = Class(TInterfacedObject, IVTAccessibleProvider) -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVTMultiColumnAccessibleItemProvider.Methods.CreateIAccessible"></a>CreateIAccessible</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">CreateIAccessible</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">ATree</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBaseVirtualTree</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span></pre>
+                  <!-- Function CreateIAccessible(
+  ATree : TBaseVirtualTree
+) : IAccessible -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TVTMultiColumnItemAccessibility"></a>TVTMultiColumnItemAccessibility</td>
+              <td>
+                <pre><span class="Identifier">TVTMultiColumnItemAccessibility</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TVirtualTreeItemAccessibility</span><span class="Symbol">,</span><span class="WhiteSpace"> </span><span class="Identifier">IAccessible</span><span class="Symbol">)</span></pre>
+          <!-- TVTMultiColumnItemAccessibility = Class(TVirtualTreeItemAccessibility, IAccessible) -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TVTMultiColumnItemAccessibility.Methods.GetItemDescription"></a>GetItemDescription</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">GetItemDescription</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDescription</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">IncludeMainColumn</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">boolean</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function GetItemDescription(
+  varChild : OleVariant;
+  out pszDescription : WideString;
+  IncludeMainColumn : boolean
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVTMultiColumnItemAccessibility.Methods.Get_accDescription"></a>Get_accDescription</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accDescription</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszDescription</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accDescription(
+  varChild : OleVariant;
+  out pszDescription : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TVTMultiColumnItemAccessibility.Methods.Get_accName"></a>Get_accName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">Get_accName</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">varChild</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">OleVariant</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">out</span><span class="WhiteSpace"> </span><span class="Identifier">pszName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">WideString</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">HResult</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">stdcall</span></pre>
+                  <!-- Function Get_accName(
+  varChild : OleVariant;
+  out pszName : WideString
+) : HResult; stdcall -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ActiveX"></a>ActiveX</td>
+              <td>
+                <pre><span class="Identifier">ActiveX</span></pre>
+          <!-- ActiveX -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Controls"></a>Controls</td>
+              <td>
+                <pre><span class="Identifier">Controls</span></pre>
+          <!-- Controls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Forms"></a>Forms</td>
+              <td>
+                <pre><span class="Identifier">Forms</span></pre>
+          <!-- Forms -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Math"></a>Math</td>
+              <td>
+                <pre><span class="Identifier">Math</span></pre>
+          <!-- Math -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.MSAAIntf"></a>MSAAIntf</td>
+              <td>
+                <pre><span class="Identifier">MSAAIntf</span></pre>
+          <!-- MSAAIntf -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Variants"></a>Variants</td>
+              <td>
+                <pre><span class="Identifier">Variants</span></pre>
+          <!-- Variants -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.VirtualTrees"></a>VirtualTrees</td>
+              <td>
+                <pre><span class="Identifier">VirtualTrees</span></pre>
+          <!-- VirtualTrees -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.VTAccessibilityFactory"></a>VTAccessibilityFactory</td>
+              <td>
+                <pre><span class="Identifier">VTAccessibilityFactory</span></pre>
+          <!-- VTAccessibilityFactory -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Variables -->
+      <h2><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a name="Variables2"></a>Variables</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.DefaultAccessibleItemProvider"></a>DefaultAccessibleItemProvider</td>
+              <td>
+                <pre><span class="Identifier">DefaultAccessibleItemProvider</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TVTDefaultAccessibleItemProvider</span></pre>
+          <!-- DefaultAccessibleItemProvider : TVTDefaultAccessibleItemProvider -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.DefaultAccessibleProvider"></a>DefaultAccessibleProvider</td>
+              <td>
+                <pre><span class="Identifier">DefaultAccessibleProvider</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TVTDefaultAccessibleProvider</span></pre>
+          <!-- DefaultAccessibleProvider : TVTDefaultAccessibleProvider -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.MultiColumnAccessibleProvider"></a>MultiColumnAccessibleProvider</td>
+              <td>
+                <pre><span class="Identifier">MultiColumnAccessibleProvider</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TVTMultiColumnAccessibleItemProvider</span></pre>
+          <!-- MultiColumnAccessibleProvider : TVTMultiColumnAccessibleItemProvider -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

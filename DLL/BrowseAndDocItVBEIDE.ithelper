@@ -1,0 +1,32 @@
+[Setup]
+WarnBefore=0
+WarnAfter=0
+IncBuild=0
+CopyVersionInfoFrom=D:\HoylD\Borland Studio Projects\IDE Addins\BrowseAndDocIt\Test\BrowseAndDocItTestsXE2.exe
+ExcludedResExts=.dcr
+EnabledVersionInfo=1
+IncludeInProject=1
+CompileWithBRCC32=0
+MajorVer=1
+MinorVer=0
+ReleaseVer=10
+BuildVer=2802
+ResourceName=ITHVerInfoBADIVBEIDE
+
+[Zipping]
+Enabled=0
+ZipFile=D:\HoylD\Web Page\Zips\browseanddocit.zip
+BasePath=D:\HoylD\Borland Studio Projects\
+
+[VersionInfo]
+CompanyName=Season's Fall Music
+FileDescription=
+FileVersion=1.0.10.2802
+InternalName=BrowseAndDocItVBEIDE.dll
+LegalCopyright=Season's Fall Music
+LegalTrademarks=Season's Fall Music
+OriginalFilename=BrowseAndDocItVBEIDE.dll
+ProductName=BrowseAndDocItVBEIDE.dll
+ProductVersion=1.0j
+Comments=
+

@@ -1,0 +1,64 @@
+'
+' This function returns an newly created worksheet with a unique name.
+'
+' @Version 1.6
+' @Date    23 Apr 2008
+'
+' @precon  None.
+' @postcon Returns a new work sheet in the current or new workbook with the name
+'          provided.
+'
+' @param   strName as a String
+' @param   bool1904Date as a Variant
+' @param   boolNewWorkbook as a Boolean
+' @param   objWorkbookToCreateWithin as a Workbook
+' @return  a WorkSheet
+'
+Public Function GetNewWorksheet(ByVal strName As String, _
+  Optional bool1904Date As Variant = Null, _
+  Optional boolNewWorkbook As Boolean = False, _
+  Optional objWorkbookToCreateWithin As Workbook = Nothing) As Worksheet
+  Const strValidChar As String = "abcedfghijklmnopqrstuvwxyzABCEDFGHIJKLMNOPQRSTUVWXYZ0123456789 `¬!""£$%^&*()_+-={};:'#@~,.<>|"
+  Dim Sh As Worksheet
+  Dim wb As Workbook
+  Dim boolOK As Long
+  Dim str As String
+  Dim i As Long
+  Exception.Push "PrivateFunctions.GetNewWorkSheet", strName, bool1904Date, _
+    boolNewWorkbook, objWorkbookToCreateWithin
+  On Error GoTo ErrHnd:
+  For i = 1 To Len(strName)
+    If InStr(strValidChar, Mid$(strName, i, 1)) = 0 Then
+      strName = Left$(strName, i - 1) & "#" & Right$(strName, Len(strName) - i)
+    End If
+  Next
+  If Len(strName) > 31 Then strName = Left$(strName, 31)
+  str = strName
+  If Len(str) > 31 Then str = Left$(str, 31)
+  If objWorkbookToCreateWithin Is Nothing Then
+    Set wb = ActiveWorkbook
+  Else
+    Set wb = objWorkbookToCreateWithin
+  End If
+  If boolNewWorkbook Then Set wb = Nothing
+  If wb Is Nothing Then Set wb = Workbooks.Add
+  If Not IsNull(bool1904Date) Then wb.Date1904 = bool1904Date
+  i = 1
+  Do
+    boolOK = True
+    For Each Sh In wb.Worksheets
+      If Sh.Name = str Then
+        If Len(strName) > 29 Then strName = Left$(strName, 29)
+        str = strName & "." & i
+        i = i + 1
+        boolOK = False
+        Exit For
+      End If
+    Next Sh
+  Loop Until boolOK
+  Set GetNewWorksheet = wb.Worksheets.Add
+  GetNewWorksheet.Name = str
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

@@ -1,0 +1,703 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>EditorNotifier.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHEllipsisLabel.html">DGHEllipsisLabel.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItXE2.html">BrowseAndDocItXE2.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BADIInitialiseOTAInterfaces.html">BADIInitialiseOTAInterfaces.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BNFHighlighter.html">BNFHighlighter.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItWizard.html">BrowseAndDocItWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DockableModuleExplorer.html">DockableModuleExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DUnitCreator.html">DUnitCreator.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DUnitForm.html">DUnitForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EditorNotifier.html">EditorNotifier.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EidolonHighlighter.html">EidolonHighlighter.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="KeyboardBindings.html">KeyboardBindings.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProfilingForm.html">ProfilingForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ToolsAPIUtils.html">ToolsAPIUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BackusNaurModule.html">BackusNaurModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseDocumentation.html">BaseDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseLanguageModule.html">BaseLanguageModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="checkforupdates.html">checkforupdates.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CheckForUpdatesForm.html">CheckForUpdatesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CheckForUpdatesOptionsForm.html">CheckForUpdatesOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CommonIDEFunctions.html">CommonIDEFunctions.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DFMModule.html">DFMModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHLibrary.html">DGHLibrary.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationDispatcher.html">DocumentationDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationOptionsForm.html">DocumentationOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EidolonModule.html">EidolonModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EidolonTLSSchematicModule.html">EidolonTLSSchematicModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EidolonTypes.html">EidolonTypes.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GenericTokenizer.html">GenericTokenizer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="HTMLDocumentation.html">HTMLDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MethodDescriptionForm.html">MethodDescriptionForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleDispatcher.html">ModuleDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleExplorerFrame.html">ModuleExplorerFrame.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MSXML2_TLB.html">MSXML2_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OptionsForm.html">OptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PascalModule.html">PascalModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SpecialTagForm.html">SpecialTagForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TokenForm.html">TokenForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBModule.html">VBModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VirtualTrees.html">VirtualTrees.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VTAccessibility.html">VTAccessibility.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VTAccessibilityFactory.html">VTAccessibilityFactory.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VTHeaderPopup.html">VTHeaderPopup.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="XMLModule.html">XMLModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/TodoFolder.gif" alt=""/>&nbsp;<a href="#refactor">Reactorings to Implement</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit EditorNotifier -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit EditorNotifier</h1>
+        <p class="Comment">This   module   contains   an   editor   notifier   that   monitors   the   coed   for   changes   and   in   turn   refreshes   the   module   explorer . </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">04   Aug   2011 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David   Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1 . 0 </li>
+        </ul>
+      
+      <!-- Reactorings to Implement -->
+      <h2><img class="verticallymiddle" src="Images/TodoFolder.gif" alt=""/>&nbsp;<a name="refactor"></a>Reactorings to Implement</h2>
+      <ul>
+        <li class="ToDoItem">Perhaps in hindsight, the compiler defines should be passed to the parsers create method rather than be part of the application options.</li>
+      </ul>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+          <!-- TEditorNotifier -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TEditorNotifier3"></a>TEditorNotifier</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span><span class="WhiteSpace"> </span><span class="Identifier">Create</span></pre>
+                    <p class="Comment">This   is   the   constructor   method   for   the   TEditorNotifier   class . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Initialise   the   class   be   creating   a   time   for   handling   editor   changes . </li>
+                    </ul>
+              <!-- Constructor Create -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span><span class="WhiteSpace"> </span><span class="Identifier">Destroy</span></pre>
+                    <p class="Comment">This   is   the   destructor   method   for   the   TEditorNotifier   class . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Frees   the   timer   control . </li>
+                    </ul>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.EditorInfo"></a>EditorInfo</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">EditorInfo</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">var</span><span class="WhiteSpace"> </span><span class="Identifier">strFileName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="ReservedWord">String</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">var</span><span class="WhiteSpace"> </span><span class="Identifier">boolModified</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Boolean</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This   method   extracts   the   filename ,   modified   status   and   the   editor   stream   of   code   for   the   BrowseAndDocItThread . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Extracts   the   filename ,   modified   status   and   the   editor   stream   of   code   for   the   BrowseAndDocItThread . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">strFileName   as   a   String   as   a   reference </li>
+                      <li class="SpecialTag">boolModified   as   a   Boolean   as   a   reference </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a   String </li>
+                    </ul>
+                    <p class="TagHeader">Reactorings to Implement</p>
+                    <ul>
+                      <li class="SpecialTag">Perhaps   in   hindsight ,   the   compiler   defines   should   be   passed   to   the   parsers   create   method   rather   than   be   part   of   the   application   options . </li>
+                    </ul>
+              <!-- Function EditorInfo(
+  var strFileName : String;
+  var boolModified : Boolean
+) : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.EnableTimer"></a>EnableTimer</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">EnableTimer</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">boolSuccessfulParse</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Boolean</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                    <p class="Comment">This   method   reenabled   the   timer   and   returns   whether   the   parse   failed   or   not . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Reenabled   the   timer   and   returns   whether   the   parse   failed   or   not . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">boolSuccessfulParse   as   a   Boolean </li>
+                    </ul>
+              <!-- Procedure EnableTimer(
+  boolSuccessfulParse : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.ExceptionMsg"></a>ExceptionMsg</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">ExceptionMsg</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">strExceptionMsg</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="ReservedWord">String</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                    <p class="Comment">This   method   displays   an   exception   message   in   a   dialogue   box . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays   an   exception   message   in   a   dialogue   box . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">strExceptionMsg   as   a   String </li>
+                    </ul>
+              <!-- Procedure ExceptionMsg(
+  strExceptionMsg : String
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.RenderDocument"></a>RenderDocument</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">RenderDocument</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">Module</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBaseLanguageModule</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                    <p class="Comment">This   method   renders   the   given   module   in   the   module   explorer   window . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Renders   the   given   module   in   the   module   explorer   window . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Module   as   a   TBaseLanguageModule </li>
+                    </ul>
+              <!-- Procedure RenderDocument(
+  Module : TBaseLanguageModule
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.ResetLastUpdateTickCount"></a>ResetLastUpdateTickCount</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">ResetLastUpdateTickCount</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">iNewValue</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="Number">0</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                    <p class="Comment">This   method   resets   the   last   update   tick   count   with   zero   or   an   optional   new   value . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Resets   the   last   update   tick   count   with   zero   or   an   optional   new   value . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">iNewValue   as   an   Integer </li>
+                    </ul>
+              <!-- Procedure ResetLastUpdateTickCount(
+  iNewValue : Integer = 0
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TEditorNotifier.TimerEventHandler"></a>TimerEventHandler</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">TimerEventHandler</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">Sender</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TObject</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   a   TTimer   on   Timer   event   handler . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Checks   to   see   if   the   last   time   the   editor   was   changes   is   beyond   the   wait   time   for   the   module   to   be   updated .   Creates   an   instance   of   the   thread   to   render   the   module   explorer . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure TimerEventHandler(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier"></a>TEditorNotifier</td>
+              <td>
+                <pre><span class="Identifier">TEditorNotifier</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TNotifierObject</span><span class="Symbol">)</span></pre>
+              <p class="Comment">This   class   handles   notifications   from   the   editor   so   that   changes   in   the   editor   can   be   displayed . </p>
+          <!-- TEditorNotifier = Class(TNotifierObject) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FBADIThreadMgr"></a>FBADIThreadMgr</td>
+                      <td>
+                        <pre><span class="Identifier">FBADIThreadMgr</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBrowseAndDocItThreadManager</span></pre>
+                  <!-- FBADIThreadMgr : TBrowseAndDocItThreadManager -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FLastCursorPos"></a>FLastCursorPos</td>
+                      <td>
+                        <pre><span class="Identifier">FLastCursorPos</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TOTAEditPos</span></pre>
+                  <!-- FLastCursorPos : TOTAEditPos -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FLastEditorName"></a>FLastEditorName</td>
+                      <td>
+                        <pre><span class="Identifier">FLastEditorName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="ReservedWord">String</span></pre>
+                  <!-- FLastEditorName : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FLastParserResult"></a>FLastParserResult</td>
+                      <td>
+                        <pre><span class="Identifier">FLastParserResult</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Boolean</span></pre>
+                  <!-- FLastParserResult : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FLastSize"></a>FLastSize</td>
+                      <td>
+                        <pre><span class="Identifier">FLastSize</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Int64</span></pre>
+                  <!-- FLastSize : Int64 -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FLastUpdateTickCount"></a>FLastUpdateTickCount</td>
+                      <td>
+                        <pre><span class="Identifier">FLastUpdateTickCount</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Cardinal</span></pre>
+                  <!-- FLastUpdateTickCount : Cardinal -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Fields.FUpdateTimer"></a>FUpdateTimer</td>
+                      <td>
+                        <pre><span class="Identifier">FUpdateTimer</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TTimer</span></pre>
+                  <!-- FUpdateTimer : TTimer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span><span class="WhiteSpace"> </span><span class="Identifier">Create</span></pre>
+                  <!-- Constructor Create -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span><span class="WhiteSpace"> </span><span class="Identifier">Destroy</span><span class="Symbol">;</span><span class="WhiteSpace"> </span><span class="Directive">Override</span></pre>
+                  <!-- Destructor Destroy; Override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.EditorInfo"></a>EditorInfo</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span><span class="WhiteSpace"> </span><span class="Identifier">EditorInfo</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">var</span><span class="WhiteSpace"> </span><span class="Identifier">strFileName</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="ReservedWord">String</span><span class="Symbol">;</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="ReservedWord">var</span><span class="WhiteSpace"> </span><span class="Identifier">boolModified</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Boolean</span><span class="LineEnd">
+</span><span class="Symbol">)</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="ReservedWord">String</span></pre>
+                  <!-- Function EditorInfo(
+  var strFileName : String;
+  var boolModified : Boolean
+) : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.EnableTimer"></a>EnableTimer</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">EnableTimer</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">boolSuccessfulParse</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Boolean</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                  <!-- Procedure EnableTimer(
+  boolSuccessfulParse : Boolean
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.ExceptionMsg"></a>ExceptionMsg</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">ExceptionMsg</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">strExceptionMsg</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="ReservedWord">String</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                  <!-- Procedure ExceptionMsg(
+  strExceptionMsg : String
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.RenderDocument"></a>RenderDocument</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">RenderDocument</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">Module</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TBaseLanguageModule</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                  <!-- Procedure RenderDocument(
+  Module : TBaseLanguageModule
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.ResetLastUpdateTickCount"></a>ResetLastUpdateTickCount</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">ResetLastUpdateTickCount</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">iNewValue</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">Integer</span><span class="WhiteSpace"> </span><span class="Symbol">=</span><span class="WhiteSpace"> </span><span class="Number">0</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                  <!-- Procedure ResetLastUpdateTickCount(
+  iNewValue : Integer = 0
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TEditorNotifier.Methods.TimerEventHandler"></a>TimerEventHandler</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span><span class="WhiteSpace"> </span><span class="Identifier">TimerEventHandler</span><span class="Symbol">(</span><span class="LineEnd">
+</span><span class="WhiteSpace">  </span><span class="Identifier">Sender</span><span class="WhiteSpace"> </span><span class="Symbol">:</span><span class="WhiteSpace"> </span><span class="Identifier">TObject</span><span class="LineEnd">
+</span><span class="Symbol">)</span></pre>
+                  <!-- Procedure TimerEventHandler(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.BaseLanguageModule"></a>BaseLanguageModule</td>
+              <td>
+                <pre><span class="Identifier">BaseLanguageModule</span></pre>
+          <!-- BaseLanguageModule -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.CommonIDEFunctions"></a>CommonIDEFunctions</td>
+              <td>
+                <pre><span class="Identifier">CommonIDEFunctions</span></pre>
+          <!-- CommonIDEFunctions -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Dialogs"></a>Dialogs</td>
+              <td>
+                <pre><span class="Identifier">Dialogs</span></pre>
+          <!-- Dialogs -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.DockableModuleExplorer"></a>DockableModuleExplorer</td>
+              <td>
+                <pre><span class="Identifier">DockableModuleExplorer</span></pre>
+          <!-- DockableModuleExplorer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.DockForm"></a>DockForm</td>
+              <td>
+                <pre><span class="Identifier">DockForm</span></pre>
+          <!-- DockForm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ExtCtrls"></a>ExtCtrls</td>
+              <td>
+                <pre><span class="Identifier">ExtCtrls</span></pre>
+          <!-- ExtCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Forms"></a>Forms</td>
+              <td>
+                <pre><span class="Identifier">Forms</span></pre>
+          <!-- Forms -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ToolsApi"></a>ToolsApi</td>
+              <td>
+                <pre><span class="Identifier">ToolsApi</span></pre>
+          <!-- ToolsApi -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ToolsAPIUtils"></a>ToolsAPIUtils</td>
+              <td>
+                <pre><span class="Identifier">ToolsAPIUtils</span></pre>
+          <!-- ToolsAPIUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

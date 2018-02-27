@@ -1,0 +1,653 @@
+/**
+
+  Visual Basic Language 6 VB/VBA Grammar.
+
+  Although this file contains all the grammar for Visual Basic VB 5-6 / VBA.
+
+  @Author  David Hoyle
+  @Date    31 Aug 2011
+  @Version 1.0
+
+  @usesemicolon
+
+**/
+
+<Goal>                                 ::= [ <Version> ]
+                                           <Attributes>*
+                                           [ <Options> ]
+                                           [ <Implements> ]
+                                           <Declarations>;
+
+<Version>                              ::= 'VERSION' <Identifier> <FloatingPointLiteral> [ 'CLASS' ] <LineTerminator>
+                                           <VBBegin>;
+
+<VBBegin>                              ::= 'BEGIN' [ ( <GUID> | <QualifiedIdentifier> ) <Identifier> ] <LineTerminator>
+                                           <VBBegin>* | <Attribute>*
+                                           'END' <LineTerminator>
+
+                                           |
+
+                                           'BEGINPROPERTY' <Identifier> <LineTerminator>
+                                           <VBBegin>* | <Attribute>*
+                                           'ENDPROPERTY' <LineTerminator>;
+
+<Attribute>                             ::= <QualifiedIdentifier> '=' [ <FloatingPointLiteral> | <Identifier> | <StringLiteral> ];
+
+<Attributes>                            ::= <Attribute>+;
+
+<Options>                               ::= ('OPTION' ( <BaseOption> | <CompareOption> | <PrivateOption> | <ExplicitOption> ) )*;
+
+<BaseOption>                            ::= 'BASE' ('0' | '1') <LineTerminator>;
+
+<CompareOption>                         ::= 'COMPARE' ('BINARY' | 'DATABASE' | 'TEXT') <LineTerminator>;
+
+<PrivateOption>                         ::= 'PRIVATE' 'MODULE' <LineTerminator>;
+
+<ExplicitOption>                        ::= 'EXPLICIT' <LineTerminator>;
+
+<Implements>                            ::= ('IMPLEMENTS' <QualifiedIdentifier> [ ',' <QualifiedIdentifier> ]* <LineTerminator>)*;
+
+<Declarations>                          ::= <InterfaceSection> <ImplementationSection>;
+
+<InterfaceSection>                      ::= (<Consts> | <Dims> | <Declares> | <Records> | <Enum>)*;
+
+<ImplementationSection>                 ::= (<Subs> | <Functions> | <Properties>)*;
+
+<Consts>                                ::= [ 'PUBLIC' | 'PRIVATE' ] 'CONST' <Identifier> [ 'AS' <QualifiedTypeIdentifier> ] '=' <ConstantExpression> <LineTerminator>;
+
+<Dims>                                  ::= [ 'DIM' | 'PUBLIC' | 'PRIVATE' ] <Vars> <LineTerminator>;
+
+<Vars>                                  ::= <VarDecl> ( [ ',' <VarDecl> ] )*;
+
+<VarDecl>                               ::= [ 'WITHEVENTS' ] <Identifier> <ProcessVar>;
+
+<ProcessVar>                            ::= [ '(' [ <ArraySizeDecl> ] ')' ] [ 'AS' [ 'NEW' ] <QualifiedIdentifier> ];
+
+<ArraySizeDecl>                         ::= <ArrayDimension> [ ',' <ArrayDimension> ];
+
+<ArrayDimension>                        ::= <IntegerLiteral> [ 'TO' <IntegerLiteral> ];
+
+<Declares>                              ::= [ 'PUBLIC' | 'PRIVATE' ] 'DECLARE' 'SUB' <Identifier>
+                                              'LIB' <StringLiteral> [ 'ALIAS' <StringLiteral> ] [ '(' [ <ArgList> ] ')' ]
+
+                                            |
+
+                                            [ 'PUBLIC' | 'PRIVATE' ] 'DECLARE' 'FUNCTION' <Identifier>
+                                              'LIB' <StringLiteral> [ 'ALIAS' <StringLiteral> ] [ '(' [ <ArgList> ] ')' ] [ 'AS' <QualifiedTypeIdentifier> ];
+
+<ArgList>                               ::= <Argument> [ ',' <Argument> ];
+
+<Argument>                              ::= [ 'BYVAL' | 'BYREF' ] <Identifier> [ '(' ')' ] [ 'AS' <QualifiedTypeIdentifier> ];
+
+<Functions>                             ::= [ 'PUBLIC' | 'PRIVATE' | 'FRIEND' ] [ 'STATIC' ] 'FUNCTION' <Identifier> [ '(' <ArgList> ')' ] [ 'AS' <QualifiedTypeIdentifier> ] <LineTerminator>
+                                            <Block>
+                                            'END' 'FUNCTION'  <LineTerminator>;
+
+<Subs>                                  ::= [ 'PRIVATE' | 'PUBLIC' | 'FRIEND' ] [ 'STATIC' ] 'SUB' <Identifier> [ ( <ArgList> ) ] <LineTerminator>
+                                            <Block>
+                                            'END' 'SUB' <LineTerminator>;
+
+<Properties>                            ::= <GetProperty> | <LetProperty> | <SetProperty>;
+
+<GetProperty>                           ::= [ 'PUBLIC' | 'PRIVATE' | 'FRIEND' ] [ 'STATIC' ] 'PROPERTY' 'GET' <Identifier> [ ( <ArgList> ) ] [ 'AS' <QualifiedTypeIdentifier> ] <LineTerminator>
+                                            <Block>
+                                            'END' 'PROPERTY' <LineTerminator>;
+
+<LetProperty>                           ::= [ 'PUBLIC' | 'PRIVATE' | 'FRIEND' ] [ 'STATIC' ] 'PROPERTY' 'LET' <Identifier> [ ( <ArgList> ) ',' <Value> ] <LineTerminator>
+                                            <Block>
+                                            'END' 'PROPERTY' <LineTerminator>;
+
+<Value>                                 ::= <Identifier> [ 'AS' <QualifiedTypeIdentifier> ] <LineTerminator>;
+
+<SetProperty>                           ::= [ 'PUBLIC' | 'PRIVATE' | 'FRIEND' ] [ 'STATIC' ] 'PROPERTY' 'SET' <Identifier> [ ( <ArgList> ) ',' <Reference> ] <LineTerminator>
+                                            <Block>
+                                            'END' 'PROPERTY' <LineTerminator>;
+
+<Reference>                             ::= <Identifier> [ 'AS' <QualifiedTypeIdentifier> ] <LineTerminator>;
+
+<Records>                               ::= [ 'PUBLIC' | 'PRIVATE' ] 'TYPE' <Identifier> <LineTerminator>
+                                            <Field>*
+                                            'END' 'TYPE' <LineTerminator>;
+
+<Field>                                 ::= <Identifier> 'AS' <QualifiedTypeIdentifier> <LineTerminator>;
+
+<Enum>                                  ::= [ 'PUBLIC' | 'PRIVATE' ] 'ENUM' <Identifier> <LineTerminator>
+                                            <Enumerate>*
+                                            'END' 'ENUM' <LineTerminator>;
+
+<Enumerate>                             ::= <Identifier> [ '=' <ConstantExpression> ] <LineTerminator>;
+
+<Block>                                 ::= [ <Statements>+ ];
+
+<Statements>                            ::= [ <Statement> ] |
+                                            <Statements> ':' [ <Statement> ];
+
+<Statement>                             ::= <LabelDeclarationStatement> |
+                                            <LocalDeclarationStatement> |
+                                            <WithStatement> |
+                                            <EventStatement> |
+                                            <AssignmentStatement> |
+                                            <InvocationStatement> |
+                                            <ConditionalStatement> |
+                                            <LoopStatement> |
+                                            <ErrorHandlingStatement> |
+                                            <BranchStatement> |
+                                            <ArrayHandlingStatement>;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------
+
+<LabelDeclarationStatement>             ::= <LabelName> ':';
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------
+
+<ArrayHandlingStatement>                ::= <RedimStatement> | <EraseStatement>;
+
+<AssignmentStatement>                   ::= <RegularAssignmentStatement> |
+                                            <MidAssignmentStatement>;
+
+<BranchStatement>                       ::= <GotoStatement> |
+                                            <ExitStatement> |
+                                            <StopStatement> |
+                                            <EndStatement> |
+                                            <ReturnStatement>;
+
+<ConditionalStatement>                  ::= <IfStatement> | <SelectStatement>;
+
+<EndStatement>                          ::= 'End' <StatementTerminator>;
+
+<EraseStatement>                        ::= 'Erase' <EraseExpressions> <StatementTerminator>;
+
+<EraseExpressions>                      ::= <Expression> |
+                                            <EraseExpressions> ',' <Expression>;
+
+<ErrorHandlingStatement>                ::= <UnstructuredErrorStatement>;
+
+<UnstructuredErrorStatement>            ::= <ErrorStatement> |
+                                            <OnErrorStatement> |
+                                            <ResumeStatement>;
+
+<ErrorStatement>                        ::= 'Error' <Expression> <StatementTerminator>;
+
+<EventStatement>                        ::= <RaiseEventStatement>;
+
+<ExitStatement>                         ::= 'Exit' <ExitKind> <StatementTerminator>;
+
+<ExitKind>                              ::= 'Do' | 'For' | 'While' | 'Select' | 'Sub' | 'Function' | 'Property' | 'Try';
+
+<Expression>                            ::= <SimpleExpression> |
+                                            <TypeExpression> |
+                                            <MemberAccessExpression> |
+                                            <IndexExpression> |
+                                            <NewExpression> |
+                                            <CastExpression> |
+                                            <OperatorExpression>;
+
+<CastExpression>                        ::= <CastTarget> '(' <Expression> ')';
+
+<CastTarget>                            ::= 'CBool'  | 'CByte' | 'CChar'  |
+                                            'CDate'  | 'CDec'  | 'CDbl'   | 'CInt' |
+                                            'CLng'   | 'CObj'  | 'CSByte' |
+                                            'CShort' | 'CSng'  | 'CStr'   |
+                                            'CUInt'  | 'CULng' | 'CUShort';
+
+<GotoStatement>                         ::= 'GoTo' <LabelName> <StatementTerminator>;
+
+<IfStatement>                           ::= <BlockIfStatement> | <LineIfThenStatement>;
+
+<BlockIfStatement>                      ::= 'If' <BooleanExpression> [ 'Then' ] <StatementTerminator>
+                                            [ <Block> ]
+                                            [ <ElseIfStatement>+ ]
+                                            [ <ElseStatement> ]
+                                            'End' 'If' <StatementTerminator>;
+
+<ElseIfStatement>                       ::= 'ElseIf' <BooleanExpression> [ 'Then' ] <StatementTerminator>
+                                            [ <Block> ];
+
+<ElseStatement>                         ::= 'Else' <StatementTerminator>
+                                            [ <Block> ];
+
+<LineIfThenStatement>                   ::= 'If' <BooleanExpression> 'Then' <Statements> [ 'Else' <Statements> ] <StatementTerminator>;
+
+<BooleanExpression>                     ::=  <Expression>;
+
+<IndexExpression>                       ::= <Expression> '(' [ <ArgumentList> ] ')';
+
+<ArgumentList>                          ::= <PositionalArgumentList> ',' <NamedArgumentList> |
+                                            <PositionalArgumentList> |
+                                            <NamedArgumentList>;
+
+<InvocationStatement>                   ::= [ 'Call' ] <InvocationExpression> <StatementTerminator>;
+
+<InvocationExpression>                  ::= <Expression> [ '(' [ <ArgumentList> ] ')' ];
+
+<LabelName>                             ::= <Identifier> | <IntLiteral>;
+
+<LocalDeclarationStatement>             ::= <LocalModifier> <VariableDeclarators> <StatementTerminator>;
+
+<LocalModifier>                         ::= 'Static' | 'Dim' | 'Const';
+
+<LoopStatement>                         ::= <WhileStatement> |
+                                            <DoLoopStatement> |
+                                            <ForStatement> |
+                                            <ForEachStatement>;
+
+<DoLoopStatement>                       ::= <DoTopLoopStatement> | <DoBottomLoopStatement>;
+
+<DoTopLoopStatement>                    ::= 'Do' [ <WhileOrUntil> <BooleanExpression> ] <StatementTerminator>
+                                            [ <Block> ]
+                                            'Loop' <StatementTerminator>;
+
+<DoBottomLoopStatement>                 ::= 'Do' <StatementTerminator>
+                                            [ <Block> ]
+                                            'Loop' <WhileOrUntil> <BooleanExpression> <StatementTerminator>;
+
+<ForEachStatement>                      ::= 'For' 'Each' <LoopControlVariable> 'In' <Expression> <StatementTerminator>
+                                            [ <Block> ]
+                                            'Next' [ <Expression> ] <StatementTerminator>;
+
+<ForStatement>                          ::= 'For' <LoopControlVariable> '=' <Expression> 'To' <Expression> [ 'Step' <Expression> ] <StatementTerminator>
+                                            [ <Block> ]
+                                            'Next' [ <NextExpressionList> ] <StatementTerminator>;
+
+<LoopControlVariable>                   ::= <Identifier> [ <ArrayNameModifier> ] 'As' <TypeName> |
+                                            <Expression>;
+
+<ArrayNameModifier>                     ::= <ArrayTypeModifiers> |
+                                            <ArraySizeInitializationModifier>;
+
+<ArraySizeInitializationModifier>       ::= '(' <BoundList> ')' [ <ArrayTypeModifiers> ];
+
+<BoundList>                             ::= <Expression> |
+                                            '0' 'To' <Expression> |
+                                            <UpperBoundList> ',' <Expression>;
+
+<UpperBoundList>                        ::= <Expression> | <UpperBoundList> ',' <Expression>;
+
+<ArrayTypeModifiers>                    ::= <ArrayTypeModifier>+;
+
+<ArrayTypeModifier>                     ::=  '(' [ <RankList> ] ')';
+
+<RankList>                              ::= ',' | <RankList> ',';
+
+<MemberAccessExpression>                ::= [ [ <MemberAccessBase> ] '.' ] <IdentifierOrKeyword>;
+
+<MemberAccessBase>                      ::= <Expression> |
+                                            <BuiltInTypeName> |
+                                            'Global' |
+                                            'MyClass' |
+                                            'MyBase';
+
+<BuiltInTypeName>                       ::= 'Object' | <PrimitiveTypeName>;
+
+<IdentifierOrKeyword>                   ::= <Identifier> | <Keyword>;
+
+<MidAssignmentStatement>                ::= 'Mid' [ '$' ] '(' <Expression> ',' <Expression> [ ',' <Expression> ] ')' '=' <Expression> <StatementTerminator>;
+
+<NamedArgumentList>                     ::= <IdentifierOrKeyword> ':=' <Expression> |
+                                            <NamedArgumentList> ',' <IdentifierOrKeyword> ':=' <Expression>;
+
+<NewExpression>                         ::= <ObjectCreationExpression> |
+                                            <ArrayCreationExpression> |
+                                            <DelegateCreationExpression>;
+
+<ArrayCreationExpression>               ::= 'New' <NonArrayTypeName> <ArraySizeInitializationModifier> <ArrayElementInitializer>;
+
+<ArrayElementInitializer>               ::= '{' [ <VariableInitializerList> ] '}';
+
+<VariableInitializerList>               ::= <VariableInitializer> |
+                                            <VariableInitializerList> ',' <VariableInitializer>;
+
+<VariableInitializer>                   ::= <Expression> | <ArrayElementInitializer>;
+
+<DelegateCreationExpression>            ::= 'New' <NonArrayTypeName> '(' <Expression> ')';
+
+<NextExpressionList>                    ::= <Expression> |
+                                            <NextExpressionList> ',' <Expression>;
+
+<NonArrayTypeName>                      ::= <SimpleTypeName> | <ConstructedTypeName>;
+
+<SimpleTypeName>                        ::= <QualifiedIdentifier> | <BuiltInTypeName>;
+
+<ConstructedTypeName>                   ::= <QualifiedIdentifier> '(' 'Of' <TypeArgumentList> ')';
+
+<NonEscapedIdentifier>                  ::= ? IdentifierName but not Keyword ?;
+
+<ObjectCreationExpression>              ::= 'New' <NonArrayTypeName> [ '(' [ <ArgumentList> ] ')' ];
+
+<OnErrorStatement>                      ::= 'On' 'Error' <ErrorClause> <StatementTerminator>;
+
+<ErrorClause>                           ::= 'GoTo' '-' '1' |
+                                            'GoTo' '0' |
+                                            <GotoStatement> |
+                                            'Resume' 'Next';
+
+<OperatorExpression>                    ::= <ArithmeticOperatorExpression> |
+                                            <RelationalOperatorExpression> |
+                                            <LikeOperatorExpression> |
+                                            <ConcatenationOperatorExpression> |
+                                            <LogicalOperatorExpression> |
+                                            <ShiftOperatorExpression>;
+
+<ArithmeticOperatorExpression>          ::= <UnaryPlusExpression> |
+                                            <UnaryMinusExpression> |
+                                            <AdditionOperatorExpression> |
+                                            <SubtractionOperatorExpression> |
+                                            <MultiplicationOperatorExpression> |
+                                            <DivisionOperatorExpression> |
+                                            <ModuloOperatorExpression> |
+                                            <ExponentOperatorExpression>;
+
+<UnaryPlusExpression>                   ::= '+' <Expression>;
+
+<UnaryMinusExpression>                  ::= '-' <Expression>;
+
+<AdditionOperatorExpression>            ::= <Expression> '+' <Expression>;
+
+<SubtractionOperatorExpression>         ::= <Expression> '-' <Expression>;
+
+<MultiplicationOperatorExpression>      ::= <Expression> '*' <Expression>;
+
+<DivisionOperatorExpression>            ::= <FPDivisionOperatorExpression> |
+                                            <IntegerDivisionOperatorExpression>;
+
+<FPDivisionOperatorExpression>          ::= <Expression> '/' <Expression>;
+
+<IntegerDivisionOperatorExpression>     ::= <Expression> '\' <Expression>;
+
+<ModuloOperatorExpression>              ::= <Expression> 'Mod' <Expression>;
+
+<ExponentOperatorExpression>            ::= <Expression> '^' <Expression>;
+
+<ConcatenationOperatorExpression>       ::= <Expression> '&' <Expression>;
+
+<LikeOperatorExpression>                ::= <Expression> 'Like' <Expression>;
+
+<LogicalOperatorExpression>             ::= 'Not' <Expression> |
+                                            <Expression> 'And' <Expression> |
+                                            <Expression> 'Or' <Expression> |
+                                            <Expression> 'Xor' <Expression>;
+
+<PositionalArgumentList>                ::= <Expression> |
+                                             <PositionalArgumentList> ',' [ <Expression> ];
+
+<PrimitiveTypeName>                     ::= <NumericTypeName> | 'Boolean' | 'Date' | 'Char' | 'String';
+
+<NumericTypeName>                       ::= <IntegralTypeName> | <FloatingPointTypeName> | 'Decimal';
+
+<IntegralTypeName>                      ::= 'Byte' | 'SByte' | 'UShort' | 'Short' | 'UInteger' | 'Integer' | 'ULong' | 'Long';
+
+<FloatingPointTypeName>                 ::= 'Single' | 'Double';
+
+<QualifiedIdentifier>                   ::= <Identifier> | 'Global' '.' <IdentifierOrKeyword> |
+                                            <QualifiedIdentifier> '.' <IdentifierOrKeyword>;
+
+<RaiseEventStatement>                   ::= 'RaiseEvent' <IdentifierOrKeyword> [ '(' [ <ArgumentList> ] ')' ]
+                                            <StatementTerminator>;
+
+<RedimStatement>                        ::= 'ReDim' [ 'Preserve' ] <RedimClauses> <StatementTerminator>;
+
+<RedimClauses>                          ::= <RedimClause> |
+                                            <RedimClauses> ',' <RedimClause>;
+
+<RedimClause>                           ::= <Expression> <ArraySizeInitializationModifier>;
+
+<RegularAssignmentStatement>            ::= <Expression> '=' <Expression> <StatementTerminator>;
+
+<RelationalOperatorExpression>          ::= <Expression> '=' <Expression> |
+                                            <Expression> '<>' <Expression> |
+                                            <Expression> '<' <Expression> |
+                                            <Expression> '>' <Expression> |
+                                            <Expression> '<=' <Expression> |
+                                            <Expression> '>=' <Expression>;
+
+<ResumeStatement>                       ::= 'Resume' [ <ResumeClause> ] <StatementTerminator>;
+
+<ResumeClause>                          ::= 'Next' | <LabelName>;
+
+<ReturnStatement>                       ::= 'Return' [ <Expression> ];
+
+<SelectStatement>                       ::= 'Select' [ 'Case' ] <Expression> <StatementTerminator>
+                                            [ <CaseStatement>+ ]
+                                            [ <CaseElseStatement> ]
+                                            'End' 'Select' <StatementTerminator>;
+
+<CaseStatement>                         ::= 'Case' <CaseClauses> <StatementTerminator>
+                                            [ <Block> ];
+
+<CaseClauses>                           ::= <CaseClause> |
+                                            <CaseClauses> ',' <CaseClause>;
+
+<CaseClause>                            ::= [ 'Is' ] <ComparisonOperator> <Expression> |
+                                            <Expression> [ 'To' <Expression> ];
+
+<ComparisonOperator>                    ::= '=' | '<>' | '<' | '>' | '=>' | '=<';
+
+<CaseElseStatement>                     ::= 'Case' 'Else' <StatementTerminator>
+                                            [ <Block> ];
+
+<ShiftOperatorExpression>               ::= <Expression> '<<' <Expression> |
+                                            <Expression> '>>' <Expression>;
+
+<SimpleExpression>                      ::= <LiteralExpression> |
+                                            <ParenthesizedExpression> |
+                                            <InstanceExpression> |
+                                            <SimpleNameExpression> |
+                                            <AddressOfExpression>;
+
+<LiteralExpression>                     ::= <Literal>;
+
+<ParenthesizedExpression>               ::= '(' <Expression> ')';
+
+<InstanceExpression>                    ::= 'Me';
+
+<SimpleNameExpression>                  ::= <Identifier> [ '(' 'Of' <TypeArgumentList> ')' ];
+
+<AddressOfExpression>                   ::= 'AddressOf' <Expression>;
+
+<StopStatement>                         ::= 'Stop' <StatementTerminator>;
+
+<TypeArgumentList>                      ::= <TypeName> | <TypeArgumentList> ',' <TypeName>;
+
+<TypeExpression>                        ::= <GetTypeExpression>;
+
+<GetTypeExpression>                     ::= 'GetType' '(' <GetTypeTypeName> ')';
+
+<GetTypeTypeName>                       ::= <TypeName> |
+                                            <QualifiedIdentifier> '(' 'Of' [ <TypeArityList> ] ')';
+
+<TypeArityList>                         ::= ',' | <TypeParameterList> ',';
+
+<TypeName>                              ::= <ArrayTypeName> | <NonArrayTypeName>;
+
+<ArrayTypeName>                         ::= <NonArrayTypeName> <ArrayTypeModifiers>;
+
+<TypeParameterList>                     ::= '(' 'Of' <TypeParameters> ')';
+
+<TypeParameters>                        ::= <TypeParameter> | <TypeParameters> ',' <TypeParameter>;
+
+<TypeParameter>                         ::= <Identifier> [ <TypeParameterConstraints> ];
+
+<TypeParameterConstraints>              ::= 'As' <Constraint> | 'As' '{' <ConstraintList> '}';
+
+<ConstraintList>                        ::= <ConstraintList> ',' <Constraint> | <Constraint>;
+
+<Constraint>                            ::= <TypeName> | 'New';
+
+<VariableDeclarators>                   ::= <VariableDeclarator> |
+                                            <VariableDeclarators> ',' <VariableDeclarator>;
+
+<VariableDeclarator>                    ::= <VariableIdentifiers> [ 'As' [ 'New' ] <TypeName> [ '(' <ArgumentList> ')' ] ] |
+                                            <VariableIdentifier> [ 'As' <TypeName> ] [ '=' <VariableInitializer> ];
+
+<VariableIdentifiers>                   ::= <VariableIdentifier> |
+                                            <VariableIdentifiers> ',' <VariableIdentifier>;
+
+<VariableIdentifier>                    ::= <Identifier> [ <ArrayNameModifier> ];
+
+<WhileOrUntil>                          ::= 'While' | 'Until';
+
+<WhileStatement>                        ::= 'While' <BooleanExpression> <StatementTerminator>
+                                            [ <Block> ]
+                                            'End' 'While' <StatementTerminator>;
+
+<WithStatement>                         ::= 'With' <Expression> <StatementTerminator>
+                                            [ <Block> ]
+                                            'End' 'With' <StatementTerminator>;
+
+<ConstantExpression>                    ::= <Expression>;
+
+// Tokenizing elements
+
+<Identifier>                            ::= <NonEscapedIdentifier> [ <TypeCharacter> ] |
+                                            <Keyword> <TypeCharacter> |
+                                            <EscapedIdentifier>;
+
+<EscapedIdentifier>                     ::= [ <IdentifierName> ];
+
+<IdentifierName>                        ::= <IdentifierStart> [ <IdentifierCharacter>+ ];
+
+<IdentifierStart>                       ::= <AlphaCharacter> | <UnderscoreCharacter> <IdentifierCharacter>;
+
+<IdentifierCharacter>                   ::= <UnderscoreCharacter> | <AlphaCharacter> | <NumericCharacter> | <CombiningCharacter> | <FormattingCharacter>;
+
+<AlphaCharacter>                        ::= ? Unicode alphabetic character (classes Lu, Ll, Lt, Lm, Lo, Nl) ?;
+
+<NumericCharacter>                      ::= ? Unicode decimal digit character (class Nd) ?;
+
+<CombiningCharacter>                    ::= ? Unicode combining character (classes Mn, Mc) ?;
+
+<FormattingCharacter>                   ::= ? Unicode formatting character (class Cf) ?;
+
+<Keyword>                               ::= ? member of keyword table in 2.3 ?;
+
+<Literal>                               ::= <BooleanLiteral> | <IntegerLiteral> | <FloatingPointLiteral> |
+                                            <StringLiteral> | <CharacterLiteral> | <DateLiteral> | <Nothing>;
+
+<BooleanLiteral>                        ::= 'True'| 'False';
+
+<IntegerLiteral>                        ::= <IntegralLiteralValue> [ <IntegralTypeCharacter> ];
+
+<IntegralLiteralValue>                  ::= <IntLiteral> | <HexLiteral> | <OctalLiteral>;
+
+<IntegralTypeCharacter>                 ::= <ShortCharacter> | <UnsignedShortCharacter> |
+                                            <IntegerCharacter> | <UnsignedIntegerCharacter> |
+                                            <LongCharacter> | <UnsignedLongCharacter> |
+                                            <IntegerTypeCharacter> | <LongTypeCharacter>;
+
+<ShortCharacter>                        ::= 'S';
+
+<UnsignedShortCharacter>                ::= 'US';
+
+<IntegerCharacter>                      ::= 'I';
+
+<UnsignedIntegerCharacter>              ::= 'UI';
+
+<LongCharacter>                         ::= 'L';
+
+<UnsignedLongCharacter>                 ::= 'UL';
+
+<IntLiteral>                            ::= <Digit>+;
+
+<HexLiteral>                            ::= '&' 'H' <HexDigit>+;
+
+<OctalLiteral>                          ::= '&' 'O' <OctalDigit>+;
+
+<Digit>                                 ::= '0'..'9';
+
+<HexDigit>                              ::= '0'..'9' | 'A'..'F';
+
+<OctalDigit>                            ::= '0'..'7';
+
+<FloatingPointLiteral>                  ::= <FloatingPointLiteralValue> [ <FloatingPointTypeCharacter> ] |
+                                            <IntLiteral> <FloatingPointTypeCharacter>;
+
+<FloatingPointTypeCharacter>            ::= <SingleCharacter> | <DoubleCharacter> |
+                                            <DecimalCharacter> | <SingleTypeCharacter> |
+                                            <DoubleTypeCharacter> | <DecimalTypeCharacter>;
+
+<SingleCharacter>                       ::= 'F';
+
+<DoubleCharacter>                       ::= 'R';
+
+<DecimalCharacter>                      ::= 'D';
+
+<FloatingPointLiteralValue>             ::= <IntLiteral> '.' <IntLiteral> [ <Exponent> ] |
+                                            '.' <IntLiteral> [ <Exponent> ] |
+                                            <IntLiteral> <Exponent>;
+
+<CharacterLiteral>                      ::= <DoubleQuoteCharacter> <StringCharacter> <DoubleQuoteCharacter> 'C';
+
+<DateLiteral>                           ::= '#' [ <WhiteSpace>+ ] <DateOrTime> [ <WhiteSpace>+ ] '#';
+
+<DateOrTime>                            ::= <DateValue> <WhiteSpace>+ <TimeValue> | <DateValue> | <TimeValue>;
+
+<DateValue>                             ::= <MonthValue> '/' <DayValue> '/' <YearValue> '|'
+                                            <MonthValue> '-' <DayValue> '-' <YearValue>;
+
+<TimeValue>                             ::= <HourValue> ':' <MinuteValue> [ ':' <SecondValue> ] [ <WhiteSpace>+ ] [ <AMPM> ];
+
+<MonthValue>                            ::= <IntLiteral>;
+
+<DayValue>                              ::= <IntLiteral>;
+
+<YearValue>                             ::= <IntLiteral>;
+
+<HourValue>                             ::= <IntLiteral>;
+
+<MinuteValue>                           ::= <IntLiteral>;
+
+<SecondValue>                           ::= <IntLiteral>;
+
+<AMPM>                                  ::= 'AM' | 'PM';
+
+<DecimalTypeCharacter>                  ::= '@';
+
+<DoubleQuoteCharacter>                  ::= '"' |
+                                            ? Unicode left double-quote character (0x201C) ? |
+                                            ? Unicode right double-quote character (0x201D) ?;
+
+<DoubleTypeCharacter>                   ::= '#';
+
+<Exponent>                              ::= 'E' [ <Sign> ] <IntLiteral>;
+
+<Sign>                                  ::= '+' | '-';
+
+<IntegerTypeCharacter>                  ::= '%';
+
+<LongTypeCharacter>                     ::= '&';
+
+<Nothing>                               ::= 'Nothing';
+
+<SingleTypeCharacter>                   ::= '!';
+
+<StatementTerminator>                   ::= <LineTerminator> | ':';
+
+<LineTerminator>                        ::= ? Unicode carriage return character (0x000D) ? |
+                                            ? Unicode linefeed character (0x000A) ? |
+                                            ? Unicode carriage return character ? ? Unicode linefeed character ? |
+                                            ? Unicode line separator character (0x2028) ? |
+                                            ? Unicode paragraph separator character (0x2029) ?;
+
+<StringCharacter>                       ::= ? Character except for DoubleQuoteCharacter ? |
+                                            <DoubleQuoteCharacter> <DoubleQuoteCharacter>;
+
+<StringLiteral>                         ::= <DoubleQuoteCharacter> [ <StringCharacter>+ ] <DoubleQuoteCharacter>;
+
+<TypeCharacter>                         ::= <IntegerTypeCharacter> | <LongTypeCharacter> | <DecimalTypeCharacter> |
+                                            <SingleTypeCharacter> | <DoubleTypeCharacter> | <StringTypeCharacter>;
+
+<StringTypeCharacter>                   ::= '$';
+
+<UnderscoreCharacter>                   ::= ? Unicode connection character (class Pc) ?;
+
+<WhiteSpace>                            ::= ? Unicode blank characters (class Zs) ? |
+                                            ? Unicode tab character (0x0009) ?;
+
+<GUID>                                  ::= ? a GUID in the form {####...####} ?;
+
+-----------------------------------------------------------------------------------------------------------------------------------------------*/
+
+<QualifiedTypeIdentifier>               ::= <QualifiedIdentifier>;
+
+
+

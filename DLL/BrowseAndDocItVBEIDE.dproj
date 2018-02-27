@@ -4,9 +4,24 @@
 			<MainSource>BrowseAndDocItVBEIDE.dpr</MainSource>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-			<ProjectVersion>12.0</ProjectVersion>
+			<ProjectVersion>13.4</ProjectVersion>
+			<FrameworkType>None</FrameworkType>
+			<Base>True</Base>
+			<Platform Condition="'$(Platform)'==''">Win32</Platform>
+			<TargetedPlatforms>1</TargetedPlatforms>
+			<AppType>Library</AppType>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+			<Base_Win64>true</Base_Win64>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+			<Base_Win32>true</Base_Win32>
+			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
@@ -19,18 +34,29 @@
 			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+			<Cfg_2_Win32>true</Cfg_2_Win32>
+			<CfgParent>Cfg_2</CfgParent>
+			<Cfg_2>true</Cfg_2>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<VerInfo_Keys>CompanyName=Season&apos;s Fall Music Limited (c) 1989;FileDescription=BrowseAndDocItVBEIDE;FileVersion=1.0.10.2624;InternalName=BrowseAndDocItVBEIDE;LegalCopyright=Season&apos;s Fall Music Limited (c) 1989;LegalTrademarks=Season&apos;s Fall Music Limited (c) 1989;OriginalFilename=BrowseAndDocItVBEIDE;ProductName=Browse And Doc It for the VBE IDE;ProductVersion=1.0;Comments=Browse And Doc It for the VBE IDE</VerInfo_Keys>
+			<VerInfo_Locale>2057</VerInfo_Locale>
+			<VerInfo_Build>2624</VerInfo_Build>
+			<DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;System.Win;Winapi;Vcl;$(DCC_Namespace)</DCC_Namespace>
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<VerInfo_Release>10</VerInfo_Release>
 			<DCC_UnitSearchPath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_ExeOutput>..\</DCC_ExeOutput>
 			<DCC_DependencyCheckOutputName>..\BrowseAndDocItVBEIDE.dll</DCC_DependencyCheckOutputName>
 			<DCC_MapFile>3</DCC_MapFile>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
 			<DCC_Optimize>false</DCC_Optimize>
 			<DCC_Platform>x86</DCC_Platform>
 			<DCC_Define>EUREKALOG;EUREKALOG_VER6;$(DCC_Define)</DCC_Define>
-			<DCC_UsePackage>vcl;rtl;vclx;dbrtl;vcldb;adortl;dbxcds;dbexpress;xmlrtl;vclie;inet;inetdbbde;inetdbxpress;IndyCore;IndySystem;dclOfficeXP;vclactnband;soaprtl;dsnap;bdertl;vcldbx;IDEAutoSave;SynEdit_R2006;vclib;ibxpress;IntrawebDB_80_100;Intraweb_80_100;VclSmp;IndyProtocols;teeui;teedb;tee</DCC_UsePackage>
+			<DCC_UsePackage>vcl;rtl;vclx;dbrtl;vcldb;adortl;dbxcds;dbexpress;xmlrtl;vclie;inet;inetdbbde;inetdbxpress;IndyCore;IndySystem;dclOfficeXP;vclactnband;soaprtl;dsnap;bdertl;vcldbx;IDEAutoSave;SynEdit_R2006;vclib;ibxpress;IntrawebDB_80_100;Intraweb_80_100;VclSmp;IndyProtocols;teeui;teedb;tee;$(DCC_UsePackage)</DCC_UsePackage>
 			<DCC_K>false</DCC_K>
 			<DCC_F>false</DCC_F>
 			<DCC_N>true</DCC_N>
@@ -42,6 +68,17 @@
 			<DCC_E>false</DCC_E>
 			<DCC_DcuOutput>..\2010DCUs\</DCC_DcuOutput>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base_Win64)'!=''">
+			<Icon_MainIcon>BrowseAndDocItVBEIDE_Icon.ico</Icon_MainIcon>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base_Win32)'!=''">
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<Icon_MainIcon>BrowseAndDocItVBEIDE_Icon.ico</Icon_MainIcon>
+			<DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Debugger_HostApplication>C:\Program Files\Microsoft Office\Office10\EXCEL.EXE</Debugger_HostApplication>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
@@ -49,12 +86,24 @@
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<VerInfo_IncludeVerInfo>false</VerInfo_IncludeVerInfo>
+			<Manifest_File>None</Manifest_File>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+			<DCC_RemoteDebug>true</DCC_RemoteDebug>
+			<Debugger_HostApplication>C:\Program Files (x86)\Microsoft Office\Office14\EXCEL.EXE</Debugger_HostApplication>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.10.2624;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="BrowseAndDocItVBEIDE.dpr">
+			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<RcCompile Include="ITHVerInfoBADIVBEIDE.RC">
+				<Form>ITHVerInfoBADIVBEIDE.res</Form>
+			</RcCompile>
 			<DCCReference Include="BrowseAndDocItVBEIDE_TLB.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\VBIDE_TLB.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\AddInDesignerObjects_TLB.pas"/>
@@ -67,22 +116,21 @@
 			<DCCReference Include="..\Source\Functions.pas"/>
 			<DCCReference Include="..\Source\IDETools.pas"/>
 			<DCCReference Include="..\Source\BrowseAndDocItAddin.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEdit.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditHighlighter.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynHighlighterVB.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditMiscClasses.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditKeyConst.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditTypes.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditMiscProcs.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynHighlighterMulti.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditStrConst.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynRegExpr.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditKbdHandler.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditKeyCmds.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditTextBuffer.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynTextDrawer.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditWordWrap.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\PascalModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEdit.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditHighlighter.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynHighlighterVB.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditMiscClasses.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditKeyConst.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditTypes.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditMiscProcs.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynHighlighterMulti.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditStrConst.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynRegExpr.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditKbdHandler.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditKeyCmds.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditTextBuffer.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynTextDrawer.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\SynEdit\Source\SynEditWordWrap.pas"/>
 			<DCCReference Include="..\..\..\Library\Office2000_TLB.pas"/>
 			<DCCReference Include="..\..\..\Library\EventSink.pas"/>
 			<DCCReference Include="..\Source\VBEIDEModuleExplorer.pas">
@@ -96,7 +144,6 @@
 			</DCCReference>
 			<DCCReference Include="..\..\..\Library\BaseLanguageModule.pas"/>
 			<DCCReference Include="..\..\..\Library\dghlibrary.pas"/>
-			<DCCReference Include="..\..\..\Library\ModuleDispatcher.pas"/>
 			<DCCReference Include="..\..\..\Library\VBModule.pas"/>
 			<DCCReference Include="..\..\..\Library\OptionsForm.pas">
 				<Form>frmOptions</Form>
@@ -127,25 +174,23 @@
 			<DCCReference Include="..\..\..\LIBRARY\checkforupdates.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\MSXML2_TLB.pas"/>
 			<DCCReference Include="..\..\..\Components\Source\DGHEllipsisLabel.pas"/>
-			<DCCReference Include="..\..\..\Library\SynEdit\Source\SynUnicode.pas"/>
-			<DCCReference Include="..\..\..\Library\XMLModule.pas"/>
-			<DCCReference Include="..\..\..\Library\BackusNaurModule.pas"/>
-			<DCCReference Include="..\..\..\Library\DFMModule.pas"/>
-			<DCCReference Include="..\..\..\LIBRARY\EidolonModule.pas"/>
-			<DCCReference Include="..\..\..\Library\EidolonTypes.pas"/>
-			<BuildConfiguration Include="Base">
-				<Key>Base</Key>
-			</BuildConfiguration>
+			<DCCReference Include="..\..\..\Library\SynEdit\SynEdit\Source\SynUnicode.pas"/>
+			<DCCReference Include="..\..\..\Library\CheckForUpdatesOptionsForm.pas">
+				<Form>frmCheckForUpdatesOptions</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Debug">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
 			</BuildConfiguration>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_1</Key>
 				<CfgParent>Base</CfgParent>
 			</BuildConfiguration>
 		</ItemGroup>
-		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
 			<Borland.ProjectType/>
@@ -165,8 +210,8 @@
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
-						<VersionInfo Name="Release">9</VersionInfo>
-						<VersionInfo Name="Build">2586</VersionInfo>
+						<VersionInfo Name="Release">10</VersionInfo>
+						<VersionInfo Name="Build">2624</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -178,7 +223,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
 						<VersionInfoKeys Name="FileDescription">BrowseAndDocItVBEIDE</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">1.0.9.2586</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.0.10.2624</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName">BrowseAndDocItVBEIDE</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalCopyright">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
@@ -187,18 +232,34 @@
 						<VersionInfoKeys Name="ProductVersion">1.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments">Browse And Doc It for the VBE IDE</VersionInfoKeys>
 					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclDBXDriversEnt160.bpl">Embarcadero Enterprise Driver Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclDataSnapProviderClient160.bpl">Embarcadero DBExpress DataSnap Provider Client Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\bcboffice2k160.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\bcbofficexp160.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Program Files (x86)\Raize\CS5\Bin\CodeSiteLoggingPkg_Design160.bpl">CodeSite Studio 5.1.1 - Logging Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Program Files (x86)\Raize\CS5\Bin\CodeSiteDBToolsPkg_Design160.bpl">CodeSite Studio 5.1.1 - DB Tools</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 				<ActiveXProjectInfo>
 					<version>1</version>
 				</ActiveXProjectInfo>
+				<Platforms>
+					<Platform value="Win64">False</Platform>
+					<Platform value="OSX32">False</Platform>
+					<Platform value="Win32">True</Platform>
+				</Platforms>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>
+		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
 	</Project>
 
 <!-- EurekaLog First Line
 [Exception Log]
-EurekaLog Version=6101
+EurekaLog Version=6104
 Activate=1
 Activate Handle=1
 Save Log File=1

@@ -1,0 +1,33 @@
+'
+' The FindWindow function retrieves the handle to the top-level window whose
+' class name and window name match the specified strings. This function does not
+' search child windows.
+'
+' HWND FindWindow(
+'   LPCTSTR lpClassName,  // pointer to class name
+'   LPCTSTR lpWindowName  // pointer to window name
+' );
+'
+' @Date    16 Oct 2003
+' @Version 1.0
+'
+' @precon  None.
+' @postcon Retrieves the handle to the top-level window whose class name and window
+'          name match the specified strings.
+'
+' @param   lpClassName as a String - Points to a null-terminated string that specifies
+'          the class name or is an atom that identifies the class-name string. If this
+'          parameter is an atom, it must be a global atom created by a previous call to
+'          the GlobalAddAtom function. The atom, a 16-bit value, must be placed in the
+'          low-order word of lpClassName; the high-order word must be zero.
+' @param   lpWindowName as a String - Points to a null-terminated string that specifies
+'          the window name (the window's title). If this parameter is NULL, all window
+'          names match.
+' @return  a Long - If the function succeeds, the return value is the handle to the window
+'          that has the specified class name and window name. If the function fails, the
+'          return value is NULL. To get extended error information, call GetLastError.
+'
+' @see     EnumWindows , FindWindowEx, GetClassName, GlobalAddAtom
+'
+Private Declare Function FindWindow Lib "user32" Alias "FindWindowA" ( _
+  ByVal lpClassName As String, ByVal lpWindowName As String) As Long

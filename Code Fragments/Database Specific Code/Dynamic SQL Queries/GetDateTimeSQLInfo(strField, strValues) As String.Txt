@@ -1,0 +1,67 @@
+'
+' This routine builds a portion of an SQL statement for inclusion in a WHERE clause
+' from the strValues item for a date / time field. Lists of items are separated using
+' commas (,) and ranges of items are denoted using a hyphen (-)
+'
+' @Version 1.1
+' @Date    26 Sep 2003
+'
+' @precon  None.
+' @postcon Name of the field as a string (You should enclose the name in square
+'          brackets to avoid confusion in the SQL statement, ie. "[My Field Name]")
+'          A string of text depicting the values required.
+'          Returns a section of am SQL WHERE clause as a string
+'
+' @param strField as a string
+' @param strValues as a string
+' @return a string
+'
+Function GetDateTimeSQLInfo(strField As String, strValues As String) As String
+  Const strFormat = "mmm dd, yyyy hh:mm:ss"
+  Dim iChar As Long
+  Dim strToken As String
+  Dim bRange As Boolean
+  Exception.Push "GetDateTimeSQLInfo", strField, strValues
+  On Error GoTo ErrHnd
+  GetDateTimeSQLInfo = ""
+  bRange = False
+  ' Read the string as a stream of characters looking for the (,) and (-).
+  For iChar = 1 To Len(strValues)
+    Select Case Mid$(strValues, iChar, 1)
+      Case ","
+        If Not bRange Then
+          If GetDateTimeSQLInfo <> "" Then GetDateTimeSQLInfo = GetDateTimeSQLInfo + " OR "
+          GetDateTimeSQLInfo = GetDateTimeSQLInfo & "[" & strField & "]" & " = '" & Format(strToken, _
+            strFormat) & "'"
+        Else
+          If GetDateTimeSQLInfo <> "" Then GetDateTimeSQLInfo = GetDateTimeSQLInfo + " AND "
+          GetDateTimeSQLInfo = GetDateTimeSQLInfo & "[" & strField & "]" & " <= '" & Format(strToken, _
+            strFormat) & "')"
+          bRange = False
+        End If
+        strToken = ""
+      Case "-"
+        bRange = True
+        If GetDateTimeSQLInfo <> "" Then GetDateTimeSQLInfo = GetDateTimeSQLInfo + " OR "
+        GetDateTimeSQLInfo = GetDateTimeSQLInfo + "(" & "[" & strField & "]" & " >= '" & Format(strToken, _
+            strFormat) & "'"
+        strToken = ""
+      Case Else
+        strToken = strToken + Mid$(strValues, iChar, 1)
+    End Select
+  Next iChar
+  If strToken <> "" Then
+    If Not bRange Then
+      If GetDateTimeSQLInfo <> "" Then GetDateTimeSQLInfo = GetDateTimeSQLInfo + " OR "
+      GetDateTimeSQLInfo = GetDateTimeSQLInfo & "[" & strField & "]" & " = '" & Format(strToken, _
+            strFormat) & "'"
+    Else
+      If GetDateTimeSQLInfo <> "" Then GetDateTimeSQLInfo = GetDateTimeSQLInfo + " AND "
+      GetDateTimeSQLInfo = GetDateTimeSQLInfo & "[" & strField & "]" & " <= '" & Format(strToken, _
+            strFormat) & "')"
+    End If
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

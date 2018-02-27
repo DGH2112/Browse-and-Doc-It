@@ -1,0 +1,22 @@
+'
+' This is a form after delete event handler.
+'
+' @Version 1.0
+' @Date    11 Sep 2003
+'
+' @precon  None.
+' @postcon Write the deletion to the audit table.
+'
+' @param   Status as an Integer
+'
+Private Sub Form_AfterDelConfirm(Status As Integer)
+  Exception.Push ".Form_AfterDelConfirm", Status
+  On Error GoTo ErrHnd
+  If Status = acDeleteOK Then
+    HasChanged edtCatID.ControlSource, edtCatID, strDeleted
+    HasChanged edtCategory.ControlSource, edtCategory, strDeleted
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

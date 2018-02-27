@@ -1,0 +1,44 @@
+'
+' This procedure check to see if this is the first running of this version of the client and
+' if so displays the Client History and Whats New Web Page.
+'
+' @Version 1.1
+' @Date    26 Sep 2003
+'
+' @precon  None.
+' @postcon Check to see if this is the first running of this version of the client and
+'          if so displays the Client History and Whats New Web Page.
+'
+' @param   strFileName as a String
+'
+Public Sub CheckHistory(strFileName As String)
+  Dim ie As InternetExplorer
+  Dim iHnd As Long
+  Dim R As RECT
+  Exception.Push "Library Functions.CheckHistory", strFileName
+  On Error GoTo ErrHnd
+  If Not CBool(GetSetting(strAppTitle, "History", AppName, "False")) Then
+    ' Create Internet Explorer Window
+    Set ie = New InternetExplorer
+    ie.AddressBar = False
+    ie.StatusBar = False
+    ie.MenuBar = False
+    ie.Toolbar = False
+    ie.Width = 640
+    ie.Height = 480
+    iHnd = GetDesktopWindow
+    If GetWindowRect(iHnd, R) <> 0 Then
+      ie.Left = (R.Right - R.Left) / 2 - 320
+      ie.Top = (R.Bottom - R.Top) / 2 - 240
+    End If
+    ie.Visible = True
+    ie.Navigate Exception.LogPath & "Help\Documentation\" & strFileName
+    SaveSetting strAppTitle, "History", AppName, "True"
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Set ie = Nothing
+  Exception.Pop
+End Sub
+
+

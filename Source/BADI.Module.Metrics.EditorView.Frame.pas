@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    04 Jan 2018
+  @Date    05 Jan 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -38,7 +38,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes;
+  UITypes, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -300,6 +300,7 @@ End;
 Constructor TframeBADIModuleMetricsEditorView.TNodeResultRecord.Create(Const Node: PVirtualNode);
 
 Begin
+  Inherited;
   FNode := Node;
   FChildCount := 0;
   FIssueCount := 0;

@@ -1,0 +1,1643 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>Unit.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MMSystem.html">MMSystem.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Nb30.html">Nb30.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OpenGL.html">OpenGL.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ShlObj.html">ShlObj.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Windows.html">Windows.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Spin.html">Spin.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit.html">Unit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VirtualTrees.html">VirtualTrees.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a href="#Constants2">Constants</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a href="#Errors2">Errors</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a href="#ExportedHeadings2">Exported Headings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedFunctionsLabel.gif" alt=""/>&nbsp;<a href="#Exports2">Exports</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a href="#Finalization2">Finalization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a href="#Initialization2">Initialization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicResourceStringsLabel.gif" alt=""/>&nbsp;<a href="#ResourceStrings2">Resource Strings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicThreadVarsLabel.gif" alt=""/>&nbsp;<a href="#ThreadVariables2">Thread Variables</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a href="#Variables2">Variables</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit Hello -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit Hello</h1>
+        <p class="Comment">This is a description. </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">01/Aug/2008 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1.0 </li>
+        </ul>
+      
+      <!-- Errors -->
+      <h2><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a name="Errors"></a>Errors</h2>
+      <ul>
+        <li class="Error">Method 'TDGHObject.Hello' has an unsatisfied forward reference. [FindUnresolvedObjectAndClassMethods]</li>
+        <li class="Error">Method 'TMyClass.GetAsString' has an unsatisfied forward reference. [FindUnresolvedObjectAndClassMethods]</li>
+        <li class="Error">Method 'TMyObj.Hello' has an unsatisfied forward reference. [FindUnresolvedObjectAndClassMethods]</li>
+        <li class="Error">Method 'TMyObject.DGH' has an unsatisfied forward reference. [FindUnresolvedObjectAndClassMethods]</li>
+        <li class="Error">Method 'TMyObject.Proc1' has an unsatisfied forward reference. [FindUnresolvedObjectAndClassMethods]</li>
+        <li class="Error">Method 'TOopsClass.Goodbye' has an unsatisfied forward reference. [FindUnresolvedObjectAndClassMethods]</li>
+        <li class="Error">Method 'Add' has an unsatisfied forward reference. [FindUnresolvedExportedMethods]</li>
+        <li class="Error">Method 'MyProc' has an unsatisfied forward reference. [FindUnresolvedExportedMethods]</li>
+        <li class="Error">Method 'OutputMessage' has an unsatisfied forward reference. [FindUnresolvedExportedMethods]</li>
+        <li class="Error">Method 'OutputMessage' has an unsatisfied forward reference. [FindUnresolvedExportedMethods]</li>
+      </ul>
+      
+      <!-- Constants -->
+      <h2><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a name="Constants2"></a>Constants</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.dblConstant"></a>dblConstant</td>
+              <td>
+                <pre><span class="Identifier">dblConstant</span> <span class="Symbol">=</span> <span class="Number">1</span><span class="Symbol">.</span><span class="Number">2</span></pre>
+          <!-- dblConstant = 1.2 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.iComma"></a>iComma</td>
+              <td>
+                <pre><span class="Identifier">iComma</span> <span class="Symbol">=</span> <span class="Number">1</span></pre>
+          <!-- iComma = 1 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.iConstant"></a>iConstant</td>
+              <td>
+                <pre><span class="Identifier">iConstant</span> <span class="Symbol">=</span> <span class="Number">1</span></pre>
+              <p class="Comment">Some simple constants. </p>
+          <!-- iConstant = 1 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.q"></a>q</td>
+              <td>
+                <pre><span class="Identifier">q</span> <span class="Symbol">=</span> <span class="StringLiteral">'Hello'</span></pre>
+          <!-- q = 'Hello' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.strConstant"></a>strConstant</td>
+              <td>
+                <pre><span class="Identifier">strConstant</span> <span class="Symbol">=</span> <span class="StringLiteral">'Hello'</span></pre>
+          <!-- strConstant = 'Hello' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Exported Headings -->
+      <h2><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a name="ExportedHeadings2"></a>Exported Headings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.Add"></a>Add</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">Add</span><span class="Symbol">(</span>
+  <span class="Identifier">x</span> <span class="Symbol">:</span> <span class="Identifier">Double</span><span class="Symbol">;</span>
+  <span class="Identifier">y</span> <span class="Symbol">:</span> <span class="Identifier">Double</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Double</span></pre>
+          <!-- Function Add(
+  x : Double;
+  y : Double
+) : Double -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.Hello"></a>Hello</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Hello</span></pre>
+          <!-- Procedure Hello -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.MyProc"></a>MyProc</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MyProc</span><span class="Symbol">;</span> <span class="ReservedWord">StdCall</span></pre>
+          <!-- Procedure MyProc; StdCall -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.OutputMessage"></a>OutputMessage</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">OutputMessage</span><span class="Symbol">(</span>
+  <span class="Identifier">strText</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Overload</span></pre>
+          <!-- Procedure OutputMessage(
+  strText : String
+); Overload -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.OutputMessage"></a>OutputMessage</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">OutputMessage</span><span class="Symbol">(</span>
+  <span class="Identifier">strFileName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">strText</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">strPrefix</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">iLine</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iCol</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Overload</span></pre>
+          <!-- Procedure OutputMessage(
+  strFileName : String;
+  strText : String;
+  strPrefix : String;
+  iLine : Integer;
+  iCol : Integer
+); Overload -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Exports -->
+      <h2><img class="verticallymiddle" src="Images/ExportedFunctionsLabel.gif" alt=""/>&nbsp;<a name="Exports2"></a>Exports</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicExportedFunction.gif" alt=""/>&nbsp;<a name="Exports.MyFunc"></a>MyFunc</td>
+              <td>
+                <pre><span class="Identifier">MyFunc</span> <span class="ReservedWord">Name</span> <span class="StringLiteral">'MyFunction'</span></pre>
+          <!-- MyFunc Name 'MyFunction' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicExportedFunction.gif" alt=""/>&nbsp;<a name="Exports.MyProc"></a>MyProc</td>
+              <td>
+                <pre><span class="Identifier">MyProc</span> <span class="ReservedWord">Name</span> <span class="Identifier">AMyProc</span></pre>
+          <!-- MyProc Name AMyProc -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Finalization -->
+      <h2><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a name="Finalization2"></a>Finalization</h2>
+        <p class="Comment">Goodbye </p>
+      <div class="Indent">
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.Hello"></a>Hello</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Hello</span></pre>
+          <!-- Procedure Hello -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+          <!-- TMyClass -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TMyClass3"></a>TMyClass</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TMyClass.Goodbye"></a>Goodbye</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">Goodbye</span><span class="Symbol">(</span>
+  <span class="Identifier">i</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">j</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">bool</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This method returnss the string addition of i and j. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None. </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Something. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">i as an Integer </li>
+                      <li class="SpecialTag">j as an Integer </li>
+                      <li class="SpecialTag">bool as a Boolean </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a String </li>
+                    </ul>
+              <!-- Function Goodbye(
+  i : Integer;
+  j : Integer;
+  bool : Boolean
+) : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TMyClass.Goodbye2"></a>Goodbye2</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">Goodbye2</span><span class="Symbol">(</span>
+  <span class="Identifier">i</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">j</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">str</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+              <!-- Function Goodbye2(
+  i : Integer;
+  j : Integer;
+  str : String
+) : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Initialization -->
+      <h2><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a name="Initialization2"></a>Initialization</h2>
+      <div class="Indent">
+      </div>
+      
+      <!-- Resource Strings -->
+      <h2><img class="verticallymiddle" src="Images/PublicResourceStringsLabel.gif" alt=""/>&nbsp;<a name="ResourceStrings2"></a>Resource Strings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.iComma"></a>iComma</td>
+              <td>
+                <pre><span class="Identifier">iComma</span> <span class="Symbol">=</span> <span class="StringLiteral">'www'</span></pre>
+          <!-- iComma = 'www' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strText"></a>strText</td>
+              <td>
+                <pre><span class="Identifier">strText</span> <span class="Symbol">=</span> <span class="StringLiteral">'Hello Dave!'</span></pre>
+          <!-- strText = 'Hello Dave!' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Thread Variables -->
+      <h2><img class="verticallymiddle" src="Images/PublicThreadVarsLabel.gif" alt=""/>&nbsp;<a name="ThreadVariables2"></a>Thread Variables</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicThreadVar.gif" alt=""/>&nbsp;<a name="ThreadVariables.strHello"></a>strHello</td>
+              <td>
+                <pre><span class="Identifier">strHello</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+          <!-- strHello : String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+        <p class="Comment">Global Types </p>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateDispInterface.gif" alt=""/>&nbsp;<a name="Types.IMyDispInt"></a>IMyDispInt</td>
+              <td>
+                <pre><span class="Identifier">IMyDispInt</span> <span class="Symbol">=</span> <span class="ReservedWord">DispInterface</span><span class="Symbol">(</span><span class="Identifier">ISomething</span><span class="Symbol">)</span></pre>
+          <!-- IMyDispInt = DispInterface(ISomething) -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.IMyDispInt.Methods.Goodbye"></a>Goodbye</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Goodbye</span></pre>
+                  <!-- Procedure Goodbye -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateInterface.gif" alt=""/>&nbsp;<a name="Types.IMyInt"></a>IMyInt</td>
+              <td>
+                <pre><span class="Identifier">IMyInt</span> <span class="Symbol">=</span> <span class="ReservedWord">Interface</span><span class="Symbol">(</span><span class="Identifier">ISomething</span> <span class="Symbol">,</span><span class="Identifier">IUnknown</span><span class="Symbol">)</span></pre>
+          <!-- IMyInt = Interface(ISomething ,IUnknown) -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.IMyInt.Methods.Goodbye"></a>Goodbye</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Goodbye</span></pre>
+                  <!-- Procedure Goodbye -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicInterface.gif" alt=""/>&nbsp;<a name="Types.IMyInterface"></a>IMyInterface</td>
+              <td>
+                <pre><span class="Identifier">IMyInterface</span> <span class="Symbol">=</span> <span class="ReservedWord">Interface</span><span class="Symbol">(</span><span class="Identifier">IUnknown</span><span class="Symbol">)</span></pre>
+              <p class="Comment">Interface Types </p>
+          <!-- IMyInterface = Interface(IUnknown) -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.IMyInterface.Methods.F"></a>F</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">F</span><span class="Symbol">(</span>
+  <span class="Identifier">x</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function F(
+  x : String
+) : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.IMyInterface.Properties.Name"></a>Name</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FName</span>
+</pre>
+                  <!-- Property Name : String
+   Read FName
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PMyObject"></a>PMyObject</td>
+              <td>
+                <pre><span class="Identifier">PMyObject</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">MyObject</span></pre>
+              <p class="Comment">Pointer Types </p>
+          <!-- PMyObject = ^ MyObject -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TAnsiString"></a>TAnsiString</td>
+              <td>
+                <pre><span class="Identifier">TAnsiString</span> <span class="Symbol">=</span> <span class="Identifier">AnsiString</span></pre>
+          <!-- TAnsiString = AnsiString -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TArray"></a>TArray</td>
+              <td>
+                <pre><span class="Identifier">TArray</span> <span class="Symbol">=</span> <span class="ReservedWord">Array</span> <span class="ReservedWord">Of</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">Array types </p>
+          <!-- TArray = Array Of Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TByte"></a>TByte</td>
+              <td>
+                <pre><span class="Identifier">TByte</span> <span class="Symbol">=</span> <span class="Identifier">Byte</span></pre>
+          <!-- TByte = Byte -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateType.gif" alt=""/>&nbsp;<a name="Types.TCardinal"></a>TCardinal</td>
+              <td>
+                <pre><span class="Identifier">TCardinal</span> <span class="Symbol">=</span> <span class="Identifier">Cardinal</span></pre>
+              <p class="Comment">Integer Types </p>
+          <!-- TCardinal = Cardinal -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TComp"></a>TComp</td>
+              <td>
+                <pre><span class="Identifier">TComp</span> <span class="Symbol">=</span> <span class="Identifier">Comp</span></pre>
+          <!-- TComp = Comp -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TCurrency"></a>TCurrency</td>
+              <td>
+                <pre><span class="Identifier">TCurrency</span> <span class="Symbol">=</span> <span class="Identifier">Currency</span></pre>
+          <!-- TCurrency = Currency -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateObject.gif" alt=""/>&nbsp;<a name="Types.TDGHObject"></a>TDGHObject</td>
+              <td>
+                <pre><span class="Identifier">TDGHObject</span> <span class="Symbol">=</span> <span class="ReservedWord">Object</span></pre>
+          <!-- TDGHObject = Object -->
+          <div class="Indent">
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHObject.Methods.Hello"></a>Hello</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Hello</span></pre>
+                  <!-- Procedure Hello -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TDouble"></a>TDouble</td>
+              <td>
+                <pre><span class="Identifier">TDouble</span> <span class="Symbol">=</span> <span class="Identifier">Double</span></pre>
+          <!-- TDouble = Double -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TEmployee"></a>TEmployee</td>
+              <td>
+                <pre><span class="Identifier">TEmployee</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+              <p class="Comment">variant record type </p>
+          <!-- TEmployee = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TEmployee.AnnualSalary"></a>AnnualSalary</td>
+                  <td>
+                    <pre><span class="Identifier">AnnualSalary</span> <span class="Symbol">=</span> <span class="Identifier">Currency</span></pre>
+              <!-- AnnualSalary = Currency -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TEmployee.BirthDate"></a>BirthDate</td>
+                  <td>
+                    <pre><span class="Identifier">BirthDate</span> <span class="Symbol">=</span> <span class="Identifier">TDate</span></pre>
+              <!-- BirthDate = TDate -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TEmployee.FirstName"></a>FirstName</td>
+                  <td>
+                    <pre><span class="Identifier">FirstName</span> <span class="Symbol">=</span> <span class="ReservedWord">string</span> <span class="Symbol">[</span> <span class="Number">40</span> <span class="Symbol">]</span></pre>
+              <!-- FirstName = string [ 40 ] -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TEmployee.HourlyWage"></a>HourlyWage</td>
+                  <td>
+                    <pre><span class="Identifier">HourlyWage</span> <span class="Symbol">=</span> <span class="Identifier">Currency</span></pre>
+              <!-- HourlyWage = Currency -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TEmployee.LastName"></a>LastName</td>
+                  <td>
+                    <pre><span class="Identifier">LastName</span> <span class="Symbol">=</span> <span class="ReservedWord">string</span> <span class="Symbol">[</span> <span class="Number">40</span> <span class="Symbol">]</span></pre>
+              <!-- LastName = string [ 40 ] -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateType.gif" alt=""/>&nbsp;<a name="Types.TExtended"></a>TExtended</td>
+              <td>
+                <pre><span class="Identifier">TExtended</span> <span class="Symbol">=</span> <span class="Identifier">Extended</span></pre>
+              <p class="Comment">Real Types </p>
+          <!-- TExtended = Extended -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TFile1"></a>TFile1</td>
+              <td>
+                <pre><span class="Identifier">TFile1</span> <span class="Symbol">=</span> <span class="ReservedWord">File</span> <span class="ReservedWord">Of</span> <span class="Identifier">TRecord</span></pre>
+              <p class="Comment">File types </p>
+          <!-- TFile1 = File Of TRecord -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TFile2"></a>TFile2</td>
+              <td>
+                <pre><span class="Identifier">TFile2</span> <span class="Symbol">=</span> <span class="ReservedWord">File</span> <span class="ReservedWord">Of</span> <span class="Identifier">Integer</span></pre>
+          <!-- TFile2 = File Of Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TIndexedArray"></a>TIndexedArray</td>
+              <td>
+                <pre><span class="Identifier">TIndexedArray</span> <span class="Symbol">=</span> <span class="ReservedWord">Array</span><span class="Symbol">[</span><span class="Number">1</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Number">9</span><span class="Symbol">]</span> <span class="ReservedWord">Of</span> <span class="ReservedWord">String</span></pre>
+          <!-- TIndexedArray = Array[1..9] Of String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateType.gif" alt=""/>&nbsp;<a name="Types.TInt64"></a>TInt64</td>
+              <td>
+                <pre><span class="Identifier">TInt64</span> <span class="Symbol">=</span> <span class="Identifier">Int64</span></pre>
+          <!-- TInt64 = Int64 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TInteger"></a>TInteger</td>
+              <td>
+                <pre><span class="Identifier">TInteger</span> <span class="Symbol">=</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">Integer Types </p>
+          <!-- TInteger = Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TInteger2"></a>TInteger2</td>
+              <td>
+                <pre><span class="Identifier">TInteger2</span> <span class="Symbol">=</span> <span class="Identifier">Double</span></pre>
+          <!-- TInteger2 = Double -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TIntSet"></a>TIntSet</td>
+              <td>
+                <pre><span class="Identifier">TIntSet</span> <span class="Symbol">=</span> <span class="ReservedWord">Set</span> <span class="ReservedWord">Of</span> <span class="Identifier">TEnum</span></pre>
+          <!-- TIntSet = Set Of TEnum -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TLongInt"></a>TLongInt</td>
+              <td>
+                <pre><span class="Identifier">TLongInt</span> <span class="Symbol">=</span> <span class="Identifier">LongInt</span></pre>
+          <!-- TLongInt = LongInt -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TLongWord"></a>TLongWord</td>
+              <td>
+                <pre><span class="Identifier">TLongWord</span> <span class="Symbol">=</span> <span class="Identifier">LongWord</span></pre>
+          <!-- TLongWord = LongWord -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TMultiArray"></a>TMultiArray</td>
+              <td>
+                <pre><span class="Identifier">TMultiArray</span> <span class="Symbol">=</span> <span class="ReservedWord">Array</span><span class="Symbol">[</span><span class="Number">1</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Number">9</span><span class="Symbol">,</span> <span class="Number">1</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Number">2</span><span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Double</span></pre>
+          <!-- TMultiArray = Array[1..9, 1..2] of Double -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TMyClass"></a>TMyClass</td>
+              <td>
+                <pre><span class="Identifier">TMyClass</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">IInterface</span> <span class="Symbol">,</span><span class="Identifier">TObject</span><span class="Symbol">)</span></pre>
+              <p class="Comment">Class Types </p>
+          <!-- TMyClass = Class(IInterface ,TObject) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TMyClass.Fields.FName"></a>FName</td>
+                      <td>
+                        <pre><span class="Identifier">FName</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FName = String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TMyClass.Methods.GetAsString"></a>GetAsString</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetAsString</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">iIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span> <span class="ReservedWord">Override</span></pre>
+                  <!-- Function GetAsString(
+  const iIndex : Integer
+) : String; Override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TMyClass.Methods.Goodbye"></a>Goodbye</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">Goodbye</span><span class="Symbol">(</span>
+  <span class="Identifier">i</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">j</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">bool</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function Goodbye(
+  i : Integer;
+  j : Integer;
+  bool : Boolean
+) : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TMyClass.Methods.Goodbye2"></a>Goodbye2</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">Goodbye2</span><span class="Symbol">(</span>
+  <span class="Identifier">i</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">j</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">str</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function Goodbye2(
+  i : Integer;
+  j : Integer;
+  str : String
+) : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TMyClass.Properties.Ident"></a>Ident</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Ident</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FIdent</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FIdent</span>
+</pre>
+                  <!-- Property Ident : String
+   Read FIdent
+   Write FIdent
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TMyClass.Properties.Items"></a>Items</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Items</span><span class="Symbol">[</span>
+  <span class="Identifier">iIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">]</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">GetItems</span>
+</pre>
+                          <p class="Comment">This property returns sub items. </p>
+                          <p class="TagHeader">Pre-Conditions</p>
+                          <ul>
+                            <li class="SpecialTag">None. </li>
+                          </ul>
+                          <p class="TagHeader">Post-Conditions</p>
+                          <ul>
+                            <li class="SpecialTag">Something. </li>
+                          </ul>
+                          <p class="TagHeader">Parameters</p>
+                          <ul>
+                            <li class="SpecialTag">iIndex as an Integer </li>
+                          </ul>
+                          <p class="TagHeader">Returns</p>
+                          <ul>
+                            <li class="SpecialTag">a String </li>
+                          </ul>
+                  <!-- Property Items[
+  iIndex : Integer
+] : String
+   Read GetItems
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TMyClassRef"></a>TMyClassRef</td>
+              <td>
+                <pre><span class="Identifier">TMyClassRef</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span> <span class="ReservedWord">Of</span> <span class="Identifier">TObject</span></pre>
+              <p class="Comment">Class Ref </p>
+          <!-- TMyClassRef = Class Of TObject -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TMyEnum"></a>TMyEnum</td>
+              <td>
+                <pre><span class="Identifier">TMyEnum</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="Identifier">meLow</span><span class="Symbol">,</span> <span class="Identifier">meHigh</span><span class="Symbol">)</span></pre>
+              <p class="Comment">Enumerates </p>
+          <!-- TMyEnum = (meLow, meHigh) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TMyInts"></a>TMyInts</td>
+              <td>
+                <pre><span class="Identifier">TMyInts</span> <span class="Symbol">=</span> <span class="Number">1</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Number">9</span></pre>
+              <p class="Comment">Sub Range </p>
+          <!-- TMyInts = 1..9 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicObject.gif" alt=""/>&nbsp;<a name="Types.TMyObj"></a>TMyObj</td>
+              <td>
+                <pre><span class="Identifier">TMyObj</span> <span class="Symbol">=</span> <span class="ReservedWord">Object</span></pre>
+              <p class="Comment">Object types </p>
+          <!-- TMyObj = Object -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TMyObj.Fields.FInt"></a>FInt</td>
+                      <td>
+                        <pre><span class="Identifier">FInt</span> <span class="Symbol">=</span> <span class="Identifier">Integer</span></pre>
+                  <!-- FInt = Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TMyObj.Fields.FName"></a>FName</td>
+                      <td>
+                        <pre><span class="Identifier">FName</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FName = String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TMyObj.Methods.Hello"></a>Hello</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Hello</span><span class="Symbol">(</span>
+  <span class="Identifier">i</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure Hello(
+  i : Integer
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicObject.gif" alt=""/>&nbsp;<a name="Types.TMyObject"></a>TMyObject</td>
+              <td>
+                <pre><span class="Identifier">TMyObject</span> <span class="Symbol">=</span> <span class="ReservedWord">Object</span><span class="Symbol">(</span><span class="Identifier">TMyOtherClass</span><span class="Symbol">)</span></pre>
+          <!-- TMyObject = Object(TMyOtherClass) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TMyObject.Fields.FInt64"></a>FInt64</td>
+                      <td>
+                        <pre><span class="Identifier">FInt64</span> <span class="Symbol">=</span> <span class="Identifier">Int64</span></pre>
+                  <!-- FInt64 = Int64 -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TMyObject.Fields.FName"></a>FName</td>
+                      <td>
+                        <pre><span class="Identifier">FName</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+                          <p class="Comment">A name field </p>
+                  <!-- FName = String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TMyObject.Methods.DGH"></a>DGH</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">DGH</span><span class="Symbol">(</span>
+  <span class="Identifier">x</span> <span class="Symbol">:</span> <span class="Identifier">Double</span><span class="Symbol">;</span>
+  <span class="Identifier">y</span> <span class="Symbol">:</span> <span class="Identifier">Double</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Double</span></pre>
+                  <!-- Function DGH(
+  x : Double;
+  y : Double
+) : Double -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TMyObject.Methods.Proc1"></a>Proc1</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Proc1</span><span class="Symbol">(</span>
+  <span class="Identifier">iFirst</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure Proc1(
+  iFirst : String
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateRecord.gif" alt=""/>&nbsp;<a name="Types.TMyRecord"></a>TMyRecord</td>
+              <td>
+                <pre><span class="Identifier">TMyRecord</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TMyRecord = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TMyRecord.FOoops"></a>FOoops</td>
+                  <td>
+                    <pre><span class="Identifier">FOoops</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+              <!-- FOoops = String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TMyString"></a>TMyString</td>
+              <td>
+                <pre><span class="Identifier">TMyString</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span><span class="Symbol">[</span><span class="Number">10</span><span class="Symbol">]</span></pre>
+          <!-- TMyString = String[10] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateType.gif" alt=""/>&nbsp;<a name="Types.TOLEVariant"></a>TOLEVariant</td>
+              <td>
+                <pre><span class="Identifier">TOLEVariant</span> <span class="Symbol">=</span> <span class="Identifier">OLEVariant</span></pre>
+              <p class="Comment">Variants </p>
+          <!-- TOLEVariant = OLEVariant -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateClass.gif" alt=""/>&nbsp;<a name="Types.TOopsClass"></a>TOopsClass</td>
+              <td>
+                <pre><span class="Identifier">TOopsClass</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span></pre>
+          <!-- TOopsClass = Class -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TOopsClass.Fields.FName"></a>FName</td>
+                      <td>
+                        <pre><span class="Identifier">FName</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FName = String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TOopsClass.Methods.Goodbye"></a>Goodbye</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">Goodbye</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function Goodbye : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TReal48"></a>TReal48</td>
+              <td>
+                <pre><span class="Identifier">TReal48</span> <span class="Symbol">=</span> <span class="Identifier">Real48</span></pre>
+              <p class="Comment">Real Types </p>
+          <!-- TReal48 = Real48 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TRecord"></a>TRecord</td>
+              <td>
+                <pre><span class="Identifier">TRecord</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TRecord = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TRecord.FIndex"></a>FIndex</td>
+                  <td>
+                    <pre><span class="Identifier">FIndex</span> <span class="Symbol">=</span> <span class="Identifier">Integer</span></pre>
+              <!-- FIndex = Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TRecord.FName"></a>FName</td>
+                  <td>
+                    <pre><span class="Identifier">FName</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">Name </p>
+              <!-- FName = String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSet"></a>TSet</td>
+              <td>
+                <pre><span class="Identifier">TSet</span> <span class="Symbol">=</span> <span class="ReservedWord">Set</span> <span class="ReservedWord">Of</span> <span class="Identifier">Integers</span></pre>
+              <p class="Comment">Set types </p>
+          <!-- TSet = Set Of Integers -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TShortInt"></a>TShortInt</td>
+              <td>
+                <pre><span class="Identifier">TShortInt</span> <span class="Symbol">=</span> <span class="Identifier">ShortInt</span></pre>
+          <!-- TShortInt = ShortInt -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TShortString"></a>TShortString</td>
+              <td>
+                <pre><span class="Identifier">TShortString</span> <span class="Symbol">=</span> <span class="Identifier">ShortString</span></pre>
+          <!-- TShortString = ShortString -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSimpleFunc"></a>TSimpleFunc</td>
+              <td>
+                <pre><span class="Identifier">TSimpleFunc</span> <span class="Symbol">=</span> <span class="ReservedWord">Function</span> <span class="Symbol">(</span><span class="Identifier">iFirst</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span> <span class="Identifier">strSecond</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+          <!-- TSimpleFunc = Function (iFirst : Integer; strSecond : String) : Boolean -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSimpleProc"></a>TSimpleProc</td>
+              <td>
+                <pre><span class="Identifier">TSimpleProc</span> <span class="Symbol">=</span> <span class="ReservedWord">Procedure</span> <span class="Symbol">(</span><span class="Identifier">iFirst</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">)</span></pre>
+              <p class="Comment">Procedure types </p>
+          <!-- TSimpleProc = Procedure (iFirst : Integer) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSingle"></a>TSingle</td>
+              <td>
+                <pre><span class="Identifier">TSingle</span> <span class="Symbol">=</span> <span class="Identifier">Single</span></pre>
+          <!-- TSingle = Single -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSmallInt"></a>TSmallInt</td>
+              <td>
+                <pre><span class="Identifier">TSmallInt</span> <span class="Symbol">=</span> <span class="Identifier">SmallInt</span></pre>
+          <!-- TSmallInt = SmallInt -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TString"></a>TString</td>
+              <td>
+                <pre><span class="Identifier">TString</span> <span class="Symbol">=</span> <span class="ReservedWord">String</span></pre>
+              <p class="Comment">String Types </p>
+          <!-- TString = String -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TVariant"></a>TVariant</td>
+              <td>
+                <pre><span class="Identifier">TVariant</span> <span class="Symbol">=</span> <span class="Identifier">Variant</span></pre>
+              <p class="Comment">Variants </p>
+          <!-- TVariant = Variant -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TWideString"></a>TWideString</td>
+              <td>
+                <pre><span class="Identifier">TWideString</span> <span class="Symbol">=</span> <span class="Identifier">WideString</span></pre>
+          <!-- TWideString = WideString -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TWord"></a>TWord</td>
+              <td>
+                <pre><span class="Identifier">TWord</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+          <!-- TWord = Word -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+        <p class="Comment">First Uses Clause Second Uses Clause </p>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Variables -->
+      <h2><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a name="Variables2"></a>Variables</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicVariable.gif" alt=""/>&nbsp;<a name="Variables.i"></a>i</td>
+              <td>
+                <pre><span class="Identifier">i</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+          <!-- i : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.j"></a>j</td>
+              <td>
+                <pre><span class="Identifier">j</span> <span class="Symbol">:</span> <span class="Identifier">Double</span></pre>
+          <!-- j : Double -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

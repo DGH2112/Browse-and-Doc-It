@@ -1,0 +1,27 @@
+[Setup]
+IncBuild=0
+CopyVersionInfoFrom=
+ExcludedResExts=.dcr
+EnabledVersionInfo=0
+IncludeInProject=1
+CompileWithBRCC32=0
+MajorVer=1
+MinorVer=1
+ReleaseVer=0
+BuildVer=4776
+ResourceName=BADIAppITHVerInfo
+WarnBefore=0
+WarnAfter=0
+
+[VersionInfo]
+CompanyName=Season's Fall Music
+FileDescription=Test application for Browse and Doc It
+FileVersion=1.1.0.4776
+InternalName=BrowseAndDocItApp
+LegalCopyright=Season's Fall Music
+LegalTrademarks=Season's Fall Music
+OriginalFilename=BrowseAndDocItApp
+ProductName=BrowseAndDocItApp
+ProductVersion=1.0
+Comments=Test application for Browse and Doc It
+

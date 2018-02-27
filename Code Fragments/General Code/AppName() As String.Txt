@@ -1,0 +1,21 @@
+'
+' A property to build a long name for the application.
+'
+' @Version 1.1
+' @Date    25 Sep 2003
+'
+' @precon  None
+' @postcon Returns the full name of the application.
+'
+' @return  a String
+'
+Public Property Get AppName() As String
+  Const strRevisions = " abcdefghijklmnopqrstuvwxyz"
+  Exception.Push "####.AppName"
+  On Error Goto ErrHnd
+  AppName = "############ " & iMajor & "." & iMinor & Mid$(strRevisions, iBugFix + 1, 1) & _
+    " on SQL Server (Build " & iMajor & "." & iMinor & "." & iBugFix & "." & iBuild & ")"
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property

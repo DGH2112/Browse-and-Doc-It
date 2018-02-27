@@ -1,0 +1,30 @@
+'
+' This method checks the control for changes or deletions and write and audit
+' record accordingly.
+'
+' @Version 1.0
+' @Date    11 Sep 2003
+'
+' @precon  None.
+' @postcon Writes an audit record for changes and deletions.
+'
+' @param   strFieldName as a string
+' @param   OldValue as a Variant
+' @param   NewValue as a Variant
+'
+Private Sub HasChanged(strFieldName As String, OldValue As Variant, NewValue As Variant)
+  Exception.Push ".HasChanged", strFieldName, OldValue, NewValue
+  On Error GoTo ErrHnd
+  If GetChanges(OldValue, NewValue) Then
+    If Not boolNew Then
+      CurrentProject.Connection.Execute _
+        FormatString(strAuditSQL, edtCatID.Value, strFieldName, N(OldValue), N(NewValue))
+    Else
+      CurrentProject.Connection.Execute _
+        FormatString(strAuditSQL, edtCatID.Value, strFieldName, "<NEW>", N(NewValue))
+    End If
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err, False
+  Exception.Pop
+End Sub

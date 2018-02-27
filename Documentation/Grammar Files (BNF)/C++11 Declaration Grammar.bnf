@@ -1,0 +1,556 @@
+﻿/**
+
+  This is a bachus naur grammar file for C++ 14 declarations for use with
+  Browse and Doc It.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    05 May 2017
+
+  @usesemicolon
+
+**/
+
+/******************************* Declarations *********************************/
+
+<Goal>                       ::= <TranslationUnit>;
+
+<TranslationUnit>            ::= <DeclarationSeq>;
+
+<DeclarationSeq>             ::= <Declaration>;
+
+<Declaration>                ::= <BlockDeclaration>       |
+                                 <FunctionDefinition>     |
+                                 <TemplateDeclaration>    |
+                                 <ExplicitInstantiation>  |
+                                 <ExplicitSpecialization> |
+                                 <LinkageSpecification>   |
+                                 <NamespaceDefinition>    |
+                                 <EmptyDeclaration>       |
+                                 <AttributeDeclaration>;
+
+<BlockDeclaration>           ::= <SimpleDeclaration>        |
+                                 <AsmDefinition>            |
+                                 <NamespaceAliasDefinition> |
+                                 <UsingDeclaration>         |
+                                 <UsingDirective>           |
+                                 <StaticAssertDeclaration>  |
+                                 <AliasDeclaration>         |
+                                 <OpaqueEnumDeclaration>;
+
+<SimpleDeclaration>          ::= [ <DeclSpecifierSeq> ] [ <InitDeclaratorList> ] ';'
+                                 <AttributeSpecifierSeq> [ <DeclSpecifierSeq> ] <InitDeclaratorList> ';';
+
+<DeclSpecifierSeq>           ::= <DeclSpecifier> [ <AttributeSpecifierSeq> ]
+                                 ( <DeclSpecifier> [ <AttributeSpecifierSeq> ] )*;
+
+<FunctionDefinition>         ::= [ <AttributeSpecifierSeq>]
+                                 [ <DeclSpecifierSeq>]
+                                   <Declarator>
+                                 [ <VirtSpecifierSeq>]
+                                   <FunctionBody>;
+
+<AliasDeclaration>           ::= 'using' <Identifier> [ <AttributeSpecifierSeq> ] '=' <TypeID>;
+
+<StaticAssertDeclaration>    ::= 'static_assert' '(' <ConstantExpression> [ ',' <StringLiteral> ] ')';
+
+<DeclSpecifier>              ::= <StorageClassSpecifier> |
+                                 <TypeSpecifier>         |
+                                 <FunctionSpecifier>     |
+                                 'friend'                |
+                                 'typedef'               |
+                                 'constexpr';
+
+<StorageClassSpecifier>      ::= 'register' | 'static' | 'thread_local' | 'extern' | 'mutable';
+
+<FunctionSpecifier>          ::= 'inline' | 'virtual' | 'explicit';
+
+<TrailingTypeSpecifierSeq>   ::= <TrailingTypeSpecifier> <AttributeSpecifierSeq> |
+                                 <TrailingTypeSpecifier> <TrailingTypeSpecifierSeq>;
+
+<EnumHead>                   ::= <EnumKey> [ <AttributeSpecifierSeq> ] [ <Identifier> ] [ <EnumBase> ] |
+                                 <EnumKey> [ <AttributeSpecifierSeq> ] <NestedNameSpecifier>
+                                   <Identifier> [ <EnumBase> ];
+
+<OpaqueEnumDeclaration>      ::= <EnumKey> [ <AttributeSpecifierSeq> ] <Identifier> [ <EnumBase> ];
+
+<EnumKey>                    ::= 'enum' | 'enum' 'class' | 'enum' 'struct';
+
+<EnumBase>                   ::= ':' <TypeSpecifierSeq>;
+
+<EnumeratorList>             ::= <EnumeratorDefinition> | <EnumeratorList> ',' <EnumeratorDefinition>;
+
+<EnumeratorDefinition>       ::= <Enumerator> | <Enumerator> '=' <ConstantExpression>;
+
+<Enumerator>                 ::= <Identifier> [ <AttributeSpecifierSeq> ];
+
+<EnclosingNamespaceSpecifier> ::= <Identifier> <EnclosingNamespaceSpecifier> '::' <Identifier>;
+
+<NamespaceAliasDefinition>   ::= 'namespace' <Identifier> '=' <QualifiedNamespaceSpecifier>;
+
+<QualifiedNamespaceSpecifier> ::= [ <NestedNameSpecifier> ] <NamespaceName>;
+
+<UsingDeclaration>           ::= 'using' [ 'typename' ] <NestedNameSpecifier> <UnqualifiedID>;
+
+<UsingDirective>             ::= [ <AttributeSpecifierSeq> ] 'using' 'namespace'
+                                   [ <NestedNameSpecifier> ] <NamespaceName>;
+
+<AsmDefinition>              ::= 'asm' '(' <StringLiteral> ')' ';';
+
+<AlignmentSpecifier>         ::= 'alignas' '(' ( <TypeID> | <ConstantExpression> ) [ '...' ] ')';
+
+/******************************** Declarators *********************************/
+
+<InitDeclaratorList>         ::= <InitDeclarator> | <InitDeclaratorList> ',' <InitDeclarator>;
+
+<InitDeclarator>             ::= <Declarator> [ <Initializer> ];
+
+<Declarator>                 ::= <PtrDeclarator> |
+                                 <NoPtrDeclarator> <ParameterAndQualifiers> <TrailingReturnType>;
+
+<PtrDeclarator>              ::= <NoPtrDeclarator> | <PtrOperator> <PtrDeclarator>;
+
+<NoPtrDeclarator>            ::= <DeclaratorID> [ <AttributeSpecifierSeq> ] |
+                                 <NoPtrDeclarator> <ParameterAndQualifiers> |
+                                 <NoPtrDeclarator> '[' [ <ConstantExpression> ] ']'[ <AttributeSpecifierSeq> ] |
+                                 '(' <PtrDeclarator> ')';
+
+<ParameterAndQualifiers>     ::= '(' <ParameterDeclarationClause> ')' [ <CVQualifierSeq> ]
+                                   [ <RefQualifier> ] [ <ExceptionSpecification> ] [ <AttributeSpecifierSeq> ];
+
+<TrailingReturnType>         ::= '->' <TrailingTypeSpecifierSeq> [ <AbstractDeclarator> ];
+
+<PtrOperator>                ::= '*' [ <AttributeSpecifierSeq> ] [ <CVQualifierSeq> ] |
+                                 '&' [ <AttributeSpecifierSeq> ] |
+                                 '&&' [ <AttributeSpecifierSeq> ] |
+                                 <NestedNameSpecifier> '*' [ <AttributeSpecifierSeq> ] [ <CVQualifierSeq> ];
+
+<CVQuanlifierSeq>            ::= <CVQualifier> [ <CVQualifierSeq> ];
+
+<RefQualifier>               ::= '&' | '&&';
+
+<DeclaratorID>               ::= [ '...' ] <IDExpression>;
+
+<PtrAbstractDeclarator>      ::= <NoPtrAbstractDeclarator> | <PtrOperator> [ <PtrAbstractDeclarator> ];
+
+<NoPtrAbstractDeclarator>    ::= [ <NoPtrAbstractDeclarator> ] <ParameterAndQualifiers> |
+                                  [ <NoPtrAbstractDeclarator> ] '[' <ConstantExpression> ']' [ <AttributeSpecifierSeq> ] |
+                                 '(' <PtrAbstractDeclarator> ')';
+
+<NoPtrAbstractPackDeclarator> ::= <NoPtrAbstractPackDeclarator> <ParameterAndQualifiers> |
+                                 <NoPtrAbstractPackDeclarator> '[' <ConstantExpression> ']' [ <AttributeSpecifierSeq> ];
+
+<ParameterDeclarationClause> ::= ( <ParameterDeclarationList> )* |
+                                 <ParameterDeclarationList> ( ',' <ParameterDeclarationList>)*;
+
+<ParameterDeclarationList>   ::= <ParameterDeclaration> |
+                                 <ParameterDeclarationList> ',' <ParameterDeclaration>;
+
+<FunctionBody>               ::= [ <CTorInitializer> ] <CompoundStatement> |
+                                 <FunctionTryBlock> |
+                                 '=' 'default' |
+                                 '=' 'delete';
+
+<Initializer>                ::= <BraceOrEqualsInitializer> | '(' <Expression> ')';
+
+<BraceOrEqualsInitializer>   ::= '=' <InitializerClause> | <BracedInitList>;
+
+<InitializerClause>          ::= <AssignmentExpression> | <BracedInitList>;
+
+<InitializerList>            ::= <InitializerClause> [ '...' ] |
+                                 <InitializerList> ',' <InitializerClause> [ '...' ];
+
+<BracedInitList>             ::= '{' [ <InitializerList> [ ',' ] ] '}';
+
+/******************************** Classes *************************************/
+
+<ClassHead>                  ::= <ClassKey> [ <AttributeSpecifierSeq> ] [ <ClassHeadName>
+                                   [ <ClassVirtSpecifier> ] ] [ <BaseClause> ];
+
+<ClassHeadName>              ::= [ <NestedNameSpecifier> ] <ClassName>;
+
+<ClassVirtSpecifier>         ::= 'final';
+
+<ClassKey>                   ::= 'class' | 'struct' | 'union';
+
+<MemberSpecification>        ::= <MemberDeclaration> [ <MemberSpecification> ] |
+                                 <AccessSpecifier> ':' [ <MemberSpecification> ];
+
+<MemberDeclaration>          ::= [ <AttributeSpecifierSeq> ] [ <DeclSpecifierSeq> ] [ <MemberDeclarationList> ] ';'
+                                 <FunctionDefinition> |
+                                 <UsingDeclaration> |
+                                 <StaticAssertDeclaration> |
+                                 <TemplateDexlaration> |
+                                 <AliasDeclaration> |
+                                 <EmptyDeclaration>;
+
+<MemberDeclarationList>      ::= <MemberDeclaration> |
+                                 <MemberDeclarationList> ',' <MemberDeclaration>;
+
+<VirtSpecifierSeq>           ::= <VirtSpecifier> | <VirtSpecifierSeq> <VirtSpecifier>;
+
+<VirtSpecifier>              ::= 'override' | 'final';
+
+<PureSpecifier>              ::= '=' '0';
+
+/******************************** Derived Class *******************************/
+
+<BaseClause>                 ::= ':' <BaseSpecifierList>;
+
+<BaseSpecifierList>          ::= <BaseSpecifier> [ '...' ] |
+                                 <BaseSpecifierList> ',' <BaseSpecifier> [ '...' ];
+
+<BaseSpecifier>              ::= [ <AttributeSpecifierSeq> ] <BaseTypeSpecifier> |
+                                 [ <AttributeSpecifierSeq> ] 'virtual' [ <AccessSpecifier> ] <BaseTypeSpecifier> |
+                                 [ <AttributeSpecifierSeq> ] <AccessSpecifier> [ 'virtual' ] <BaseTypeSpecifier>;
+
+<ClassOrDeclType>            ::= [ <NestedNameSpecifier> ] <ClassName> |
+                                 <DeclTypeSpecifier>;
+
+<BaseTypeSpecifier>          ::= <ClassOrDeclType>;
+
+<AccessSpecifier>            ::= 'private' | 'protected' | 'public';
+
+/************************** Special Member Functions **************************/
+
+<ConversionFunctionID>       ::= 'operator' <ConversionTypeID>;
+
+<ConversionTypeID>           ::= <TypeSpecifierSeq> [ <ConversionDeclarator> ];
+
+<ConversionDeclarator>       ::= <PtrOperator> [ <ConversionDeclarator> ];
+
+<CTorInitializer>            ::= ':' <MemInitializerList>;
+
+<MemInitializerList>         ::= <MemInitializer> [ '...' ] |
+                                 <MemInitializerList> ',' <MemInitializer> [ '...' ];
+
+<MemInitializer>             ::= <MemInitializerID> '(' [ <ExpressionList> ] ')' |
+                                 <MemInitializerID> <BracedInitList>;
+
+<MemInitializerID>           ::= <ClassOrDeclType> | <Identifier>;
+
+/******************************* Overloading **********************************/
+
+<OperatorFunctionID>         ::= 'operator' <Operator>;
+
+<Operator>                   ::= 'new' | 'delete' | 'new[]' | 'delete[]' |
+                                 '+' | '-' | '*' | '/' | '%' | '^' | '&' | '|' | '~' |
+                                 '!' | '=' | '<' | '>' | '+=' | '-=' | '*=' | '/=' | '%=' |
+                                 '^=' | '&=' | '|=' | '<<' | '>>' | '>>=' | '<<=' | '==' | '!=' |
+                                 '<=' | '>=' | '&&' | '||' | '++' | '--' | ',' | '->*' | '->' |
+                                 '()' | '[]';
+
+<LiteralOperatorID>           ::= 'operator' <StringLiteral> <Identifier>  |
+                                  'operator' <UserDefinedStringLiteral>;
+
+
+/******************************** Templates ***********************************/
+
+<TemplateDeclaration>        ::= 'template' '<' <TemplateParameterList> '>' <Declaration>;
+
+<TemplateParameterList>      ::= <TemplateParameter> ( ',' <TemplateParameter> )*;
+
+<TemplateParameter>          ::= <TypeParameter> | <ParameterDeclaration>;
+
+<TypeParameter>              ::= <TypeParameterKey> [ '...' ] [ <Identifier> ]    |
+                                 <TypeParameterKey> [ <Identifier> ] '=' <TypeID> |
+                                  'template' '<' <TemplateParameterList> '>'
+                                    <TypeParameterKey> [ '...' ] [ <Identifier> ] |
+                                  'template' '<' <TemplateParameterList> '>'
+                                    <TypeParameterKey> [ <Identifier> ] '=' <IDExpression>;
+
+<TypeParameterKey>           ::= 'class' | 'typename';
+
+<TemplateID>                 ::= <SimpleTemplateID> |
+                                 <OperatorFunctionID> '<' [ <TemplateArgumentList> ] '>' |
+                                 <LiteralOperatorID> '<' [ <TemplateArgumentList> ] '>';
+
+<TemplateName>               ::= <Identifier>;
+
+<TemplateArgumentList>       ::= <TemplateArgument> [ '...' ] |
+                                 <TemplateArgumentList> ',' <TemplateArgument> [ '...' ];
+
+<TemplateArgument>           ::= <ConstantExpression> | <TypeID> | <IDExpression>;
+
+/******************************** Exception handling **************************/
+
+<TryBlock>                   ::= 'try' <CompoundStatement> <HandlerSeq>;
+
+<FunctionTryBlock>           ::= 'try' [ <CTtorInitializer> ] <CompoundStatement> <HandlerSeq>;
+
+<HandlerSeq>                 ::= <Handler> [ <HandlerSeq> ];
+
+<Handler>                    ::= 'catch' '(' <ExceptionDeclaration> ')' <CompoundStatement>;
+
+<ExceptionDeclaration>       ::= [ <AttributeSpecifierSeq> ] <TypeSpecifierSeq> <Declarator> |
+                                 [ <AttributeSpecifierSeq> ] <TypeSpecifierSeq> [ <AbstractDeclarator> ] |
+                                 '...';
+
+<ExceptionSpecification>     ::= <DynamicExceptionSpecification> |
+                                 <NoExceptSpecification>;
+
+<DynamicExceptionSpecification> ::= 'throw' '(' [ <TypeIDList> ] ')';
+
+<TypeIDList>                  ::= <TypeID> [ '...' ] |
+                                  <TypeIDList> ',' <TypeID> [ '...' ];
+
+<NoExceptSpecification>       ::= 'noexcept' '(' <ConstantExpression> ')' | 'noexcept';
+
+/************************************* Types **********************************/
+
+<TypeID>                     ::= <TypeSpecifierSeq> [ <AbstractDeclarator> ];
+
+<TypeSpecifierSeq>           ::= <TypeSpecifier> [ <AttributeSpecifierSeq> ]
+                                 ( <TypeSpecifier> [ <AttributeSpecifierSeq> ] )*;
+
+<TypeSpecifier>              ::= <TrailingTypeSpecifier> | <ClassSpecifier> | <EnumSpecifier>;
+
+<TrailingTypeSpecifier>      ::= <SimpleTypeSpecifier>     |
+                                 <ElaboratedTypeSpecifier> |
+                                 <TypenameSpecifier>       |
+                                 <CVQualifier>;
+
+<SimpleTypeSpecifier>        ::= [ <NestedNameSpecifier> ] <TypeName>                |
+                                 <NestedNameSpecifier> 'template' <SimpleTemplateID> |
+                                 'char'                                              |
+                                 'char16_t'                                          |
+                                 'char32_t'                                          |
+                                 'wchar_t'                                           |
+                                 'bool'                                              |
+                                 'short'                                             |
+                                 'int'                                               |
+                                 'long'                                              |
+                                 'signed'                                            |
+                                 'unsigned'                                          |
+                                 'float'                                             |
+                                 'double'                                            |
+                                 'void'                                              |
+                                 'auto'                                              |
+                                 <DecltypeSpecifier>;
+
+<NestedNameSpecifier>        ::= '::' |
+                                  <TypeName> '::' |
+                                  <NamespaceName> '::' |
+                                  <DecltypeSpecifier> '::' |
+                                  <NestedNameSpecifier> <Identifier> '::' |
+                                  <NestedNameSpecifier> [ 'template' ] <SimpleTemplateID> '::';
+
+<TypeName>                   ::= <ClassName> | <EnumName> | <TypedefName> | <SimpleTemplateID>;
+
+<ClassName>                  ::= <Identifier> | <SimpleTemplateID>;
+
+<EnumName>                   ::= <Identifier>;
+
+<TypedefName>                ::= <Identifier>;
+
+<NamespaceName>              ::= <Identifier> | <NamespaceAlias>;
+
+<NamespaceAlias>             ::= <Identifier>;
+
+<DecltypeSpecifier>          ::= 'decltype' '(' ( 'auto' | <Expression> ) ')';
+
+<SimpleTemplateID>           ::= <TemplateName> '<' [ <TemplateArgumentList> ] '>';
+
+<ElaboratedTypeSpecifier>    ::= <ClassKey> [ <AttributeSpecifierSeq> ] [ <NestedNameSpecifier> ] <Identifier> |
+                                 <ClassKey> <SimpleTemplateID> |
+                                 <ClassKey> <NestedNameSpecifier> [ 'template' ] <SimpleTemplateID> |
+                                 'enum' [ <NestedNameSpecifier> ] <Identifier>;
+
+<TypenameSpecifier>          ::= 'typename' <NestedNameSpecifier> <Identifier>  |
+                                 'typename' <NestedNameSpecifier> [ 'template' ] <SimpleTemplateID>;
+
+<CVQualifier>                ::= 'const' | 'volatile';
+
+<ClassSpecifier>             ::= <ClassHead> '{' [ <MemberSpecification> ] '}';
+
+<EnumSpecifier>              ::= <EnumHead> '{' [ <EnumeratorList> ] '}'
+                                 <EnumHead> '{' <EnumeratorList> ',' '}';
+
+<AbstractDeclarator>         ::=   <PtrAbstractDeclarator> |
+                                 [ <NoptrAbstractDeclarator> ] <ParameterAndQualifiers> <TrailingReturnType> |
+                                   <AbstractPackDeclarator>;
+
+<AbstractPackDeclarator>     ::= <NoptrAbstractPackDeclarator> |
+                                 <PtrOperatorAbstractPackDeclarator>;
+
+<IDExpression>               ::= <UnqualifiedID> | <QualifiedID>;
+
+<ParameterDeclaration>       ::= [ <AttributeSpecifierSeq> ] <DeclSpecifierSeq> <Declarator> |
+                                 [ <AttributeSpecifierSeq> ] <DeclSpecifierSeq> <Declarator> '=' <InitializerClause> |
+                                 [ <AttributeSpecifierSeq> ] <DeclSpecifierSeq> [ <AbstractDeclarator> ] |
+                                 [ <AttributeSpecifierSeq> ] <DeclSpecifierSeq> [ <AbstractDeclarator> ] '=' <InitializerClause>;
+
+<ExplicitInstantiation>      ::= ['externopt'] 'template' <Declaration>;
+
+<ExplicitSpecialization>     ::= 'template' '<' '>' <Declaration>;
+
+<LinkageSpecification>       ::= 'extern' <StringLiteral> ( '{' [<DeclarationSeq>] '}' | <Declaration> );
+
+/************************************ Expression ******************************/
+
+<Expression>                 ::= <AssignmentExpression> | <Expression> ',' <AssignmentExpression>;
+
+<AssignmentExpression>       ::= <ConditionalExpression> |
+                                 <LogicalOrExpression> <AssignmentOperator> <InitializerClause> |
+                                 <ThrowExpression>;
+
+<ConditionalExpression>      ::= <LogicalOrExpression> |
+                                 <LogicalOrExpression> '?' <Expression> ':' <AssignmentExpression>;
+
+<LogicalOrExpression>        ::= <LogicalAndExpression> |
+                                 <LogicalOrExpression> '||' <LogicalAndExpression>;
+
+<LogicalAndExpression>       ::= <InclusiveOrExpression> |
+                                 <LogicalAndExpression> '&&' <InclusiveOrExpression>;
+
+<InclusiveOrExpression>      ::= <ExclusiveOrExpression> |
+                                 <InclusiveOrExpression> | <ExclusiveOrExpression>;
+
+<ExclusiveOrExpression>      ::= <AndExpression> |
+                                 <ExclusiveOrExpression> 'ˆ' <AndExpression>;
+
+<AndExpression>              ::= <EqualityExpression> |
+                                 <AndExpression> '&' <EqualityExpression>;
+
+<EqualityExpression>         ::= <RelationalExpression> |
+                                 <EqualityExpression> '==' <RelationalExpression> |
+                                 <EqualityExpression> '!=' <RelationalExpression>;
+
+<RelationalExpression>       ::= <ShiftExpression> |
+                                 <RelationalExpression> '<' <ShiftExpression> |
+                                 <RelationalExpression> '>' <ShiftExpression> |
+                                 <RelationalExpression> '<=' <ShiftExpression> |
+                                 <RelationalExpression> '>=' <ShiftExpression>;
+
+<ShiftExpression>            ::= <AdditiveExpression> |
+                                 <ShiftExpression> '<<' <AdditiveExpression> |
+                                 <ShiftExpression> '>>' <AdditiveExpression>;
+
+<AdditiveExpression>         ::= <MultiplicativeExpression> |
+                                 <AdditiveExpression> '+' <MultiplicativeExpression> |
+                                 <AdditiveExpression> '-' <MultiplicativeExpression>;
+
+<MultiplicativeExpression>   ::= <PMExpression> |
+                                 <MultiplicativeExpression> '*' <PMExpression> |
+                                 <MultiplicativeExpression> '/' <PMExpression> |
+                                 <MultiplicativeExpression> '%' <PMExpression>;
+
+<PMExpression>               ::= <CastExpression> |
+                                 <PMExpression> '.*' <CastExpression> |
+                                 <PMExpression> '->*' <CastExpression>;
+
+<CastExpression>             ::= <UnaryExpression> |
+                                 '(' <TypeID> ')' <CastExpression>;
+
+<AssignmentOperator>         ::= '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '>>=' | '<<=' | '&=' |
+                                 'ˆ=' | '|=';
+
+<ThrowExpression>            ::= 'throw' [ <AssignmentExpression> ];
+
+/*********************************** Namespaces *******************************/
+
+<NamespaceDefinition>        ::= <NamedNamespaceDefinition> |
+                                 <UnnamedNamespaceDefinition> <NestedNamespaceDefinition>;
+
+<NamedNamespaceDefinition>   ::= [ 'inline' ] 'namespace' [ <AttributeSpecifierSeq> ] <Identifier>
+                                 '{' <NamespaceBody> '}';
+
+<UnnamedNamespaceDefinition> ::= [ 'inline' ] 'namespace' [ <AttributeSpecifierSeq> ]
+                                 '{' <NamespaceBody> '}';
+
+<NestedNamespaceDefinition>  ::= 'namespace' ( <Identifier> '::' )+ <Identifier>
+                                 '{' <NamespaceBody> '}';
+
+<NamespaceBody>              ::= [ <DeclarationSeq> ];
+
+<EmptyDeclaration>           ::= ';';
+
+/********************************** Attributes ********************************/
+
+<AttributeDeclaration>       ::= <AttributeSpecifierSeq> ';';
+
+<AttributeSpecifierSeq>      ::= ( <AttributeSpecifier> )+;
+
+<AttributeSpecifier>         ::= ( '[' '[' <AttributeList> ']' ']' )+;
+
+<AttributeList>              ::= [ <Attribute> ] ( ',' <Attribute> )* |
+                                 [ <Attribute> '...' ] ( ',' <Attribute> '...' )*;
+
+<Attribute>                  ::= <AttributeToken> [ <AttributeArgumentClause> ];
+
+<AttributeArgumentClause>    ::= '(' <BalancedTokenSeq> ')';
+
+<BalancedTokenSeq>           ::= [ <BalancedToken> ] ( <BalancedToken> )*;
+
+<BalancedToken>              ::= '(' <BalancedTokenSeq> ')' |
+                                 '[' <BalancedTokenSeq> ']' |
+                                 '{' <BalancedTokenSeq> '}';
+
+<AttributeToken>             ::= <Identifier> | <AttributeScopedToken>;
+
+<AttributeScopedToken>       ::= <AttributeNamespace> '::' <Identifier>;
+
+<AttributeNamespace>         ::= <Identifier>;
+
+/************************* Preprocessing directives ***************************/
+
+<PreprocessingFile>          ::= [ <Group> ];
+
+<Group>                      ::= <GroupPart> | <Group> <GroupPart>;
+
+<GroupPart>                  ::= <IfSection> | <ControlLine> | <TextLine> | '#' <NonDirective>;
+
+<IfSection>                  ::= <ifGroup> [ <ElIfGroups> ] [ <ElseGroup> ] <EndFfLine>;
+
+<IfGroup>                    ::= '#' 'if' <ConstantExpression> <NewLine> [ <Group> ] |
+                                 '#' 'ifdef' <Identifier> <NewLine> [ <Group> ] |
+                                 '#' 'ifndef' <Identifier> <NewLine> [ <Group> ];
+
+<ElIfGroups>                 ::= <ElIfGroup> | <ElIfGroups> <ElIfGroup>;
+
+<ElIfGroup>                  ::= '#' 'elif' <ConstantExpression> <NewLine> [ <Group> ];
+
+<ElseGroup>                  ::= '#' 'else' <NewLine> [ <Group> ];
+
+<EndIfLine>                  ::= '#' 'endif' <NewLine>;
+
+<ControlLine>                ::= '#' 'include' <PPTokens> <NewLine> |
+                                 '#' 'define' <Identifier> <ReplacementList> <NewLine> |
+                                 '#' 'define' <Identifier> <LParen> [ <IdentifierList> ]')' <ReplacementList> <NewLine> |
+                                 '#' 'define' <Identifier> <LParen> '...' ')' <ReplacementList> <NewLine> |
+                                 '#' 'define' <Identifier> <LParen> <IdentifierList> ',' '...' ')' <ReplacementList> <NewLine> |
+                                 '#' 'undef' <Identifier> <NewLine> |
+                                 '#' 'line' <PPTokens> <NewLine> |
+                                 '#' 'error' [ <PPTokens> ] <NewLine> |
+                                 '#' 'pragma' [ <PPTokens> ] <NewLine> |
+                                 '#' <NewLine>;
+
+<TextLine>                   ::= [ <PPTokens> ] <NewLine>;
+
+<NonDirective>               ::= <PPTokens> <NewLine>;
+
+<LParen>                     ::= ? a ( character not immediately preceded by white-space ?
+
+<IdentifierList>             ::= <Identifier> | <IdentifierList> ',' <Identifier>;
+
+<ReplacementList>            ::= [ <PPTokens> ];
+
+pp-tokens:
+preprocessing-token
+pp-tokens preprocessing-token
+
+new-line:
+the new-line character
+
+/********************************* Basic rules ********************************/
+
+<Identifier>                 ::= ( '_' | 'a'..'z' | 'A'..'Z' )
+                                 ( '_' | 'a'..'z' | 'A'..'Z' | '0'..'9' )*;
+
+<StringLiteral>              ::= [ <EncodingPrefix> ] [ 'R' ] '"' <CharacterSequence> '"';
+
+<EncodingPrefix>             ::= 'u8' | 'u' | 'U' | 'L';
+
+<CharacterSequence>          ::= ? any character except double quote unless escaped ?;
+
+<CompoundStatement>          ::= '{' ? eat characters counting { and } pairs ? '}';

@@ -1,0 +1,21 @@
+'
+' This adds a token to the end of a comma separated list
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon Adds the token to the end of the list.
+'
+' @param strList as a string by reference
+' @param strToken as a string
+'
+Private Sub AddTokenToList(ByRef strList As String, ByVal strToken As String)
+  Exception.Push "AddTokentoList", strList, strToken
+  On Error GoTo ErrHnd
+  If strList <> "" Then strList = strList & ","
+  strList = strList & "'" & strToken & "'"
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

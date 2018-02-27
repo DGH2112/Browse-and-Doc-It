@@ -1,0 +1,30 @@
+LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
+
+1 VERSIONINFO LOADONCALL MOVEABLE DISCARDABLE IMPURE
+FILEVERSION 1, 1, 0, 4777
+PRODUCTVERSION 1, 1, 0, 4777
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+FILEOS VOS__WINDOWS32
+FILETYPE VFT_APP
+{
+  BLOCK "StringFileInfo"
+  {
+    BLOCK "040904E4"
+    {
+     VALUE "CompanyName", "Season's Fall Music\000"
+     VALUE "FileDescription", "BrowseAndDocItTests\000"
+     VALUE "FileVersion", "1.1.0.4777\000"
+     VALUE "InternalName", "BrowseAndDocItTests\000"
+     VALUE "LegalCopyright", "Season's Fall Music\000"
+     VALUE "LegalTrademarks", "Season's Fall Music\000"
+     VALUE "OriginalFilename", "BrowseAndDocItTests\000"
+     VALUE "ProductName", "BrowseAndDocItTests\000"
+     VALUE "ProductVersion", "1.1\000"
+     VALUE "Comments", "DUnit Tests\000"
+    }
+  }
+  BLOCK "VarFileInfo"
+  {
+    VALUE "Translation", 1033, 1252
+  }
+}

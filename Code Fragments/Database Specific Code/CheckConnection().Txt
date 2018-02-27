@@ -1,0 +1,40 @@
+'
+' This method checks the connection to the server and database. If there is no
+' connection then tries to open the connection dialogue and allow a change of
+' connection. If a connection can not be established the application quits.
+'
+' @precon  None.
+' @postcon Checks the connection to the server and database. If there is no
+'          connection then tries to open the connection dialogue and allow a change of
+'          connection. If a connection can not be established the application quits.
+'
+' @Date    04 May 2004
+' @Version 1.0
+'
+Public Sub CheckConnection()
+  Dim MainMenu As Variant
+  Dim MenuItem As Variant
+  Exception.Push "Library Functions.CheckConnection"
+  On Error GoTo ErrHnd
+  DoCmd.OpenForm "frmProgress"
+  Form_frmProgress.Init 0, 1, AppName
+  Form_frmProgress.UpdateInfo "Connecting to SQL Server..."
+  If Not CurrentProject.IsConnected Then
+    For Each MainMenu In CommandBars.ActiveMenuBar.Controls
+      If Replace(MainMenu.Caption, "&", "") Like "*file*" Then
+        For Each MenuItem In MainMenu.Controls
+          If Replace(MenuItem.Caption, "&", "") Like "*connection*" Then MenuItem.Execute
+        Next MenuItem
+      End If
+    Next MainMenu
+    If Not CurrentProject.IsConnected Then
+      MsgBox "Quiting application as a connection can not be made!", , AppName
+      Quit
+    End If
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  DoCmd.Close acForm, "frmProgress"
+  Exception.Pop
+End Sub
+

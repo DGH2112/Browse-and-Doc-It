@@ -1,0 +1,186 @@
+'
+' This class represents an interface between the application and the SQL Server.
+'
+' @Version 1.2
+' @Date    17 Aug 2004
+' @Author  David Hoyle
+'
+Option Explicit
+Option Compare Text
+
+' Connection variable to the SQL Server
+Private con As ADODB.Connection
+' A internal recordset variable to opena dn close the datasets with
+Private rs As ADODB.Recordset
+' A private variable to determine if their is a connection to the sql server
+Private FConnected As Boolean
+
+' A connection string to connect with the SQL Server
+Private Const strConnection = "Provider=SQLOLEDB;Data Source=%param%;" & _
+  "Initial Catalog=%param%;Trusted_Connection=Yes;"
+
+'
+' This method open a record set based on a the passed SQL query.
+'
+' @precon  None.
+' @postcon Open a record set based on a the passed SQL query.
+'
+' @Date    19 Sep 2003
+' @Version 1.1
+'
+' @param   strSQL as a String
+' @param   boolReadOnly as a Boolean
+' @return  a ADODB.Recordset
+'
+Public Function OpenRecordSet(strSQL As String, _
+  Optional boolReadOnly As Boolean = True) As ADODB.Recordset
+  Exception.Push "TDataSet.OpenRecordSet", strSQL, boolReadOnly
+  On Error GoTo ErrHnd
+  Set rs = New ADODB.Recordset
+  If boolReadOnly Then
+    rs.Open strSQL, con, adOpenStatic, adLockReadOnly
+  Else
+    rs.Open strSQL, con, adOpenDynamic, adLockOptimistic
+  End If
+  Set OpenRecordSet = rs
+ErrHnd:
+  If Err.Number <> 0 Then
+    If MsgBox(Err.Description & vbCrLf & vbCrLf & "Press YES to Retry.", _
+      vbYesNoCancel, AppName) = vbYes Then Resume
+    Exception.DisplayErrorMessage Err
+  End If
+  Exception.Pop
+End Function
+
+'
+' This method closes the previously open record set and deletes the query.
+'
+' @precon  None.
+' @postcon Closes the previously open record set and deletes the query.
+'
+' @Date    19 Sep 2003
+' @Version 1.1
+'
+Public Sub CloseRecordSet()
+  Exception.Push "TDataSet.CloseRecordSet"
+  On Error GoTo ErrHnd
+  If Not rs Is Nothing Then If rs.State = adStateOpen Then rs.Close
+  Set rs = Nothing
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This is the classes constructor.
+'
+' @precon  None.
+' @postcon It initialises a connection with the database.
+'
+' @Date    27 Sep 2004
+' @Version 1.2
+'
+Private Sub Class_Initialize()
+  Exception.Push "TDataSet.Class_Initialize"
+  On Error GoTo ErrHnd
+  Set con = New ADODB.Connection
+  FConnected = False
+  con.Open FormatString(strConnection, SQLServer, Database)
+  FConnected = True
+ErrHnd:
+  If Err.Number <> 0 Then
+    MsgBox "ADO Connection failure.", , AppName
+    Err.Clear
+  End If
+  Exception.Pop
+End Sub
+
+'
+' This is the classes destructor. It close all connections.
+'
+' @precon  None.
+' @postcon It close all connections.
+'
+' @Date    19 Sep 2003
+' @Version 1.1
+'
+Private Sub Class_Terminate()
+  Exception.Push "TDataSet.Class_Terminate"
+  On Error GoTo ErrHnd
+  If Not rs Is Nothing Then If rs.State = adStateOpen Then rs.Close
+  Set rs = Nothing
+  If Not con Is Nothing Then If con.State = adStateOpen Then con.Close
+  Set con = Nothing
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This propert return a boolean value determining whether there is a connection to the
+' SQL server.
+'
+' @precon  None.
+' @postcon Return a boolean value determining whether there is a connection to the
+'          SQL server.
+'
+' @Date    17 Aug 2003
+' @Version 1.0
+'
+' @return  a Boolean
+'
+Public Property Get Connected() As Boolean
+  Exception.Push "TDataset.Connected"
+  On Error GoTo ErrHnd
+  Connected = FConnected
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property
+
+'
+' This method executes the SQL string passed on the curreent connection.
+'
+' @precon  None.
+' @postcon Executes the SQL string passed on the curreent connection.
+'
+' @Date    21 Apr 2005
+' @Version 1.2
+'
+' @param   strSQL as a String
+' @param   objErrors as a ADODB.Errors as a reference
+' @return  a Boolean
+'
+Public Function ExecuteSQL(strSQL As String, ByRef objErrors As ADODB.Errors) As Boolean
+  Dim i As Long
+  Exception.Push "TDataset.ExecuteSQL", strSQL, objErrors
+  On Error GoTo ErrHnd
+  ExecuteSQL = False
+  con.Execute strSQL
+  ExecuteSQL = True
+  Set objErrors = con.Errors
+ErrHnd:
+  If Err.Number <> 0 Then Err.Clear
+  Exception.Pop
+End Function
+
+'
+' This property returns the underlying datasets connection.
+'
+' @precon  None.
+' @postcon Returns the underlying datasets connection.
+'
+' @Date    20 Oct 2005
+' @Version 1.0
+'
+' @return  a Connection
+'
+Public Property Get DatasetConnection() As Connection
+  Exception.Push "TDataSet.DatasetConnection"
+  On Error GoTo ErrHnd
+  Set DatasetConnection = con
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property
+

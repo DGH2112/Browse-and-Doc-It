@@ -1,0 +1,80 @@
+'
+' The SetWindowLong function changes an attribute of the specified window. The function
+' also sets a 32-bit (long) value at the specified offset into the extra window memory
+' of a window.
+'
+' LONG SetWindowLong(
+'   HWND hWnd,  // handle of window
+'   int nIndex, // offset of value to set
+'   LONG dwNewLong  // new value
+' );
+'
+' @Date    16 Oct 2003
+' @Version 1.0
+'
+' @precon  None.
+' @postcon Changes an attribute of the specified window
+'
+' @param   hwnd as a Long - Identifies the window and, indirectly, the class to which
+'          the window belongs.
+' @param   nIndex as a Long - Specifies the zero-based offset to the value to be set.
+'          Valid values are in the range zero through the number of bytes of extra
+'          window memory, minus 4; for example, if you specified 12 or more bytes of
+'          extra memory, a value of 8 would be an index to the third 32-bit integer.
+'          To set any other value, specify one of the following values:
+'
+'          Value Action
+'          GWL_EXSTYLE    Sets a new extended window style.
+'          GWL_STYLE      Sets a new window style.
+'          GWL_WNDPROC    Sets a new address for the window procedure.
+'          GWL_HINSTANCE  Sets a new application instance handle.
+'          GWL_ID         Sets a new identifier of the window.
+'          GWL_USERDATA   Sets the 32-bit value associated with the window. Each window
+'                         has a corresponding 32-bit value intended for use by the
+'                         application that created the window.
+'
+'          The following values are also available when the hWnd parameter identifies a dialog box:
+'
+'          Value Action
+'          DWL_DLGPROC    Sets the new address of the dialog box procedure.
+'          DWL_MSGRESULT  Sets the return value of a message processed in the dialog box
+'                         procedure.
+'          DWL_USER       Sets new extra information that is private to the application,
+'                         such as handles or pointers.
+'
+' @param   dwNewLong as a Long - Specifies the replacement value.
+' @return  a Long - If the function succeeds, the return value is the previous value of
+'          the specified 32-bit integer. If the function fails, the return value is zero.
+'          To get extended error information, call GetLastError. If the previous value of
+'          the specified 32-bit integer is zero, and the function succeeds, the return
+'          value is zero, but the function does not clear the last error information. This
+'          makes it difficult to determine success or failure. To deal with this, you
+'          should clear the last error information by calling SetLastError(0) before
+'          calling SetWindowLong. Then, function failure will be indicated by a return
+'          value of zero and a GetLastError result that is nonzero.
+'
+' @remark  The SetWindowLong function fails if the window specified by the hWnd parameter
+'          does not belong to the same process as the calling thread. If you use the
+'          SetWindowLong function and the GWL_WNDPROC index to replace the window procedure,
+'          the window procedure must conform to the guidelines specified in the description
+'          of the WindowProc callback function. Calling SetWindowLong with the GWL_WNDPROC
+'          index creates a subclass of the window class used to create the window. An
+'          application should not subclass a window created by another process. The
+'          SetWindowLong function creates the window subclass by changing the window
+'          procedure associated with a particular window, causing Windows to call the new
+'          window procedure instead of the previous one. An application must pass any
+'          messages not processed by the new window procedure to the previous window
+'          procedure by calling CallWindowProc. This allows the application to create a
+'          chain of window procedures.
+'
+'          Reserve extra window memory by specifying a nonzero value in the cbWndExtra
+'          member of the WNDCLASS structure used with the RegisterClass function. You
+'          must not call SetWindowLong with the GWL_HWNDPARENT index to change the parent
+'          of a child window. Instead, use the SetParent function.
+'
+' @see     CallWindowProc , GetWindowLong, GetWindowWord, RegisterClass, SetParent,
+'          SetWindowWord, WindowProc, WNDCLASS
+'
+Private Declare Function SetWindowLong Lib "user32" Alias "SetWindowLongA" ( _
+  ByVal hwnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+  

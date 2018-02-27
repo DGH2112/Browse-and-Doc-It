@@ -1,0 +1,53 @@
+'
+' This procedure check the current application version against the version in
+' the database store and informs the user to new versions.
+'
+' @Version 1.1
+' @Date    26 Sep 2003
+'
+' @precon  None.
+' @postcon Check the current application version against the version in the
+'          database store and informs the user to new versions.
+'
+' @param   strAppID as a String
+'
+Public Sub CheckVersionNumber(strAppID As String)
+  Const strSQL = "SELECT * FROM globalApplications WHERE ApplicationID = '%param%';"
+  Const strNewerMsg = "For some reason you are using a newer version of this %param% than " & _
+    "is currently supposed to be available. Please contact the system adminstrator."
+  Dim rs As Recordset
+  Dim iThisVer As Long
+  Dim iServerVer As Long
+  Exception.Push "TDataSet.CheckVersionNumber", strAppID
+  On Error GoTo ErrHnd
+  Set rs = DataSet.OpenRecordSet(FormatString(strSQL, strAppID))
+  If rs.RecordCount = 0 Then
+    MsgBox "Missing Application Information.", , AppName
+  Else
+    Exception.LogPath = rs.Fields("SourceURL")
+    iThisVer = iMajor * 1000000 + iMinor * 100000 + iBugFix * 1000 + iBuild
+    iServerVer = _
+      rs.Fields("Major").Value * 1000000 + _
+      rs.Fields("Minor").Value * 100000 + _
+      rs.Fields("BugFix").Value * 1000 + _
+      rs.Fields("Build").Value
+    If iThisVer > iServerVer Then
+      MsgBox FormatString(strNewerMsg, AppName)
+    Else
+      If iMajor < rs.Fields("Major") Or iMinor < rs.Fields("Minor") Or _
+        iBugFix < rs.Fields("BugFix") Or iBuild < rs.Fields("Build") Then
+        MsgBox FormatString("There is a newer version of the %param% Build " & _
+          "(%param%.%param%.%param%.%param%) available " & _
+          "from:%param%%param%%param%%param%", rs.Fields("Description"), _
+          rs.Fields("Major"), rs.Fields("Minor"), rs.Fields("BugFix"), _
+          rs.Fields("Build"), vbLf & vbLf, rs.Fields("SourceURL"), vbLf & vbLf, _
+          rs.Fields("Instructions"))
+      End If
+    End If
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  DataSet.CloseRecordSet
+  Exception.Pop
+End Sub
+

@@ -1,0 +1,40 @@
+[Setup]
+WarnBefore=0
+WarnAfter=0
+IncBuild=0
+CopyVersionInfoFrom=
+ExcludedResExts=.dcr
+EnabledVersionInfo=0
+IncludeInProject=1
+CompileWithBRCC32=0
+MajorVer=1
+MinorVer=1
+ReleaseVer=0
+BuildVer=4776
+ResourceName=BADIVerInfo
+
+[Zipping]
+Enabled=1
+ZipFile=D:\HoylD\Web Page\Zips\BrowseAndDocIt.zip
+BasePath=D:\HoylD\RAD Studio\
+ExclusionFiles=
+
+[VersionInfo]
+CompanyName=Season's Fall Music Limited (c) 1989
+FileDescription=A Delphi IDE adding for browsing and documenting code
+FileVersion=1.1.0.4776
+InternalName=Season's Fall Music Limited (c) 1989
+LegalCopyright=Season's Fall Music Limited (c) 1989
+LegalTrademarks=Season's Fall Music Limited (c) 1989
+OriginalFilename=BrowseAndDocIt
+ProductName=BrowseAndDocIt
+ProductVersion=1.0j
+Comments=
+
+[Pre-Compilation]
+D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Test\BrowseAndDocItTestsXE101.exe||D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Test\|BrowseAndDocItTestsXE101.exe=0
+
+[Additional Zip Files]
+Item0=D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\*.bmp
+Item1=D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Icons\
+

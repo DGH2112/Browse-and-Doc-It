@@ -1,0 +1,28 @@
+'
+' This function returns a string representing percentage complete, remainnig time and
+' expected finish time based on the timer start time StTimer and the percentage complete.
+'
+' @precon  None.
+' @postcon Returns a string representing percentage complete, remaining time and expected
+'          finish time based on the timer start time StTimer and the percentage complete.
+'
+' @param   dblStTimer as a Double
+' @param   dblPercentComp as a Double
+' @return  a String
+'
+Function GetRemTime(dblStTimer As Double, dblPercentComp As Double) As String
+  Dim r As Double
+  Exception.Push "PrivateFunctions.GetRemTime", dblStTimer, dblPercentComp
+  On Error GoTo ErrHnd
+  If dblPercentComp > 0 Then
+    r = (Now - dblStTimer) / dblPercentComp * (1 - dblPercentComp)
+    GetRemTime = Format(dblPercentComp, "0.00%") & ", Remaining " & CInt(r) & " day(s) " & _
+      Format(r, "hh:mm:ss") & ", Expected " & _
+      Format(Now + r, "ddd hh:mm:ss")
+  Else
+    GetRemTime = "Please wait... calculating..."
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

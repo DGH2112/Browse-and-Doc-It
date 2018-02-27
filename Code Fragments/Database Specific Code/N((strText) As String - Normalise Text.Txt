@@ -1,0 +1,22 @@
+'
+' This function doubles up the single quotes to make sure the string passed to a SQL
+' query is valid.
+'
+' @Version 1.0
+' @Date    29 Aug 2003
+'
+' @precon  None.
+' @postcon Doubles up the single quotes to make sure the string passed to a SQL
+'          query is valid.
+'
+' @param   varText as a Variant
+' @return  a String
+'
+Public Function N(varText As Variant) As String
+  Exception.Push "Library Functions.N", varText
+  On Error GoTo ErrHnd
+  If Not IsNull(varText) Then N = Replace(CStr(varText), "'", "''")
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

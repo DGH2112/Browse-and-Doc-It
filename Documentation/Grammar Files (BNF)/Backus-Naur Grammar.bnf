@@ -1,0 +1,66 @@
+/**
+
+  Backus-Naur Language Grammar.
+
+  This grammar has been extended to allow greater definition on character data
+  rather than using the "? text description ?". These changes have come from
+  translations of various language grammar where the basic definition of
+  Backus-Naur grammar does not contain enough syntax to be used without
+  modification.
+
+  Modifications:#
+  1) "-" (minus) Exception operator (from Extended Backus-Naur);#
+  2) Decimal character references, i.e. ##13 (Pound + decimal integer);#
+  3) hexidecimal character references, i.e. $20 (Dollar + hexidecimal);#
+  4) Character ranges ##65..##95 or $32..$40.
+
+  @Version 1.0
+  @Date    24 Jul 2009
+  @Author  David Hoyle   
+  
+  @Goal    syntax         
+
+**/
+<syntax>           ::= <rule>* /* | <rule> <syntax> */
+
+<rule>             ::= "<" <rule-name> ">" "::=" <expression> <terminator>
+
+<expression>       ::= <list> | <list> "|" <expression>
+
+<list>             ::= '(' <expression> ')' <RepeatOperator> <list> | '[' <expression> ']' <RepeatOperator> <list> | ( <SimpleExpression> | <SimpleExpression> <list> )
+
+<RepeatOperator>   ::= '*' | '+'
+
+<SimpleExpression> ::= <term> [ '-' <term> ]
+
+<term>             ::= <literal> | "<" <rule-name> ">"
+
+<literal>          ::= '"' <text> '"' | "'" <text> "'" | <CharRef> [ '..' <CharRef> ]
+
+<CharRef>          ::= <LiteralChar> | <DecChar> | <HexChar>
+
+<LiteralChar>      ::= "'" <TextChar> "'" /* Single character ONLY */
+
+<DecChar>          ::= '#' <Digit> [ <Digit> ]*
+
+<HexChar>          ::= '$' <HexDigit> [ <HexDigit> ]*
+
+<rule-name>        ::= <text>
+
+<Digit>            ::= '0'..'9'
+
+<HexDigit>         ::= <Digit> | 'A'..'F'
+
+<text>             ::= <TextChar> [ <TextChar> ]*
+
+<TextChar>         ::= #32..#128 | $20..$80 | ? ASCII Characters between 32 and 128 ?
+
+<EOL>              ::= #13 | #10 // ASCII carriage return and line feed.
+
+/** General terminator is <EOL> except if the module header contains a tag
+    @@usesemicolon where upon the end of line is ignored and a semi-colon is
+    used. **/
+<terminator>       ::= ';' | <EOL>
+
+
+

@@ -1,0 +1,212 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{0E3CAE10-7862-4D25-9855-B58D5CF0D467}</ProjectGuid>
+			<MainSource>BrowseAndDocIt2006.dpr</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_DependencyCheckOutputName>..\BrowseAndDocIt2009.dll</DCC_DependencyCheckOutputName>
+			<DCC_ExeOutput>..\</DCC_ExeOutput>
+			<DCC_MapFile>3</DCC_MapFile>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_Platform>x86</DCC_Platform>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
+			<DCC_Define>EUREKALOG;EUREKALOG_VER6;$(DCC_Define)</DCC_Define>
+			<UsePackages>true</UsePackages>
+			<DCC_UsePackage>designide</DCC_UsePackage>
+			<DCC_N>true</DCC_N>
+			<DCC_K>false</DCC_K>
+			<GenDll>true</GenDll>
+			<DCC_S>false</DCC_S>
+			<DCC_F>false</DCC_F>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+			<DCC_E>false</DCC_E>
+			<DCC_DcuOutput>..\2006DCUs\</DCC_DcuOutput>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="BrowseAndDocIt2006.dpr">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<RcCompile Include="..\ExplorerImages.RC">
+				<ModuleName>ExplorerImages.RC</ModuleName>
+				<ContainerId>RC</ContainerId>
+				<Form>..\ExplorerImages.res</Form>
+			</RcCompile>
+			<RcCompile Include="..\SplashScreenIcon.RC">
+				<ModuleName>SplashScreenIcon.RC</ModuleName>
+				<ContainerId>RC</ContainerId>
+				<Form>..\SplashScreenIcon.res</Form>
+			</RcCompile>
+			<RcCompile Include="..\..\..\Library\BrowseAndDocItHTMLResources.RC">
+				<ModuleName>BrowseAndDocItHTMLResources.RC</ModuleName>
+				<ContainerId>RC</ContainerId>
+				<Form>..\..\..\Library\BrowseAndDocItHTMLResources.res</Form>
+			</RcCompile>
+			<RcCompile Include="..\DUnitTemplateResources.RC">
+				<ModuleName>DUnitTemplateResources.RC</ModuleName>
+				<ContainerId>RC</ContainerId>
+				<Form>..\DUnitTemplateResources.res</Form>
+			</RcCompile>
+			<None Include="..\..\..\Library\HTML Files\BrowseAndDocItScreen.css">
+				<ContainerId>File</ContainerId>
+			</None>
+			<None Include="..\..\..\Library\HTML Files\BrowseAndDocItPrint.css">
+				<ContainerId>File</ContainerId>
+			</None>
+			<None Include="..\..\..\Library\HTML Files\BrowseAndDocItHTMLTemplate.html"/>
+			<None Include="ModelSupport_BrowseAndDocIt\default.txaPackage"/>
+			<None Include="..\..\..\LIBRARY\HTML Files\xhtml1-strict.dtd">
+				<ContainerId>File</ContainerId>
+			</None>
+			<None Include="..\..\..\LIBRARY\HTML Files\xhtml-lat1.ent">
+				<ContainerId>File</ContainerId>
+			</None>
+			<None Include="..\..\..\LIBRARY\HTML Files\xhtml-special.ent">
+				<ContainerId>File</ContainerId>
+			</None>
+			<None Include="..\..\..\LIBRARY\HTML Files\xhtml-symbol.ent">
+				<ContainerId>File</ContainerId>
+			</None>
+			<None Include="ModelSupport_BrowseAndDocIt2006\default.txaPackage"/>
+			<None Include="..\..\..\LIBRARY\CompilerDefinitions.inc">
+				<ContainerId>File</ContainerId>
+			</None>
+			<None Include="..\Source\DUnit Templates\DUnitProjectTemplate.txt">
+				<ContainerId>File</ContainerId>
+			</None>
+			<None Include="ModelSupport_BrowseAndDocIt2006\DUnitCreator\default.txaPackage"/>
+			<None Include="ModelSupport_BrowseAndDocIt2006\DUnitForm\default.txaPackage"/>
+			<None Include="..\Source\DUnit Templates\DUnitUnitTemplate.txt">
+				<ContainerId>File</ContainerId>
+			</None>
+			<DCCReference Include="..\..\..\Library\DGHLibrary.pas"/>
+			<DCCReference Include="..\..\..\Library\BaseLanguageModule.pas"/>
+			<DCCReference Include="..\Source\BrowseAndDocItWizard.pas"/>
+			<DCCReference Include="..\Source\DockableModuleExplorer.pas">
+				<Form>frmDockableModuleExplorer</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Library\ModuleExplorerFrame.pas">
+				<Form>frameModuleExplorer</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Library\OptionsForm.pas">
+				<Form>frmOptions</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\LIBRARY\PascalModule.pas"/>
+			<DCCReference Include="..\..\..\Library\ProgressForm.pas">
+				<Form>frmProgress</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Library\SpecialTagForm.pas">
+				<Form>frmSpecialTag</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Library\TokenForm.pas">
+				<Form>frmTokenForm</Form>
+			</DCCReference>
+			<DCCReference Include="..\Source\ToolsAPIUtils.pas"/>
+			<DCCReference Include="..\..\..\Library\ModuleDispatcher.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\MethodDescriptionForm.pas">
+				<Form>frmMethodDescriptions</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Library\DocumentationDispatcher.pas"/>
+			<DCCReference Include="..\..\..\Library\HTMLDocumentation.pas"/>
+			<DCCReference Include="..\..\..\Library\BaseDocumentation.pas"/>
+			<DCCReference Include="..\..\..\Library\TGIFImage\GIFImage.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\DocumentationOptionsForm.pas">
+				<Form>frmDocumentationOptions</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\LIBRARY\GenericTokenizer.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\checkforupdates.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\CheckForUpdatesForm.pas">
+				<Form>frmCheckForUpdates</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\..\LIBRARY\MSXML2_TLB.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\VBModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Virtual Treeview\Source\MSAAIntf.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Virtual Treeview\Source\VirtualTrees.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibility.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibilityFactory.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Virtual Treeview\Source\VTHeaderPopup.pas"/>
+			<DCCReference Include="..\Source\DUnitForm.pas">
+				<Form>frmDUnit</Form>
+			</DCCReference>
+			<DCCReference Include="..\Source\DUnitCreator.pas"/>
+			<DCCReference Include="..\Source\CommonIDEFunctions.pas"/>
+			<DCCReference Include="..\..\..\Components\Source\DGHEllipsisLabel.pas"/>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">BrowseAndDocIt2006.dpr</Source>
+					</Source>
+					<Parameters>
+						<Parameters Name="RunParams">-pDelphi -rBrowseAndDocItDPR</Parameters>
+						<Parameters Name="HostApplication">C:\Program Files\Borland\BDS\4.0\Bin\bds.exe</Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="Debug Symbols Search Path">\\elrukbonfap0001\Users$\hoyld\Documents\Browse And Doc It</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">True</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">5</VersionInfo>
+						<VersionInfo Name="Build">1566</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">2057</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName">Season&apos;s Fall Music Limit (c) 1989</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription">BrowseAndDocIt2006.DLL</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.0.5.1566</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName">BrowseAndDocIt2006.DLL</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalCopyright">Season&apos;s Fall Music Limit (c) 1989</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalTrademarks">Season&apos;s Fall Music Limit (c) 1989</VersionInfoKeys>
+						<VersionInfoKeys Name="OriginalFilename">BrowseAndDocIt2006.DLL</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductName">Browse and Doc It</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments">IDE tool to help browse and document source code.</VersionInfoKeys>
+					</VersionInfoKeys>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

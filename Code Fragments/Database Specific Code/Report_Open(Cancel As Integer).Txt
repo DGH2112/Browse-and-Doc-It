@@ -1,0 +1,16 @@
+'
+' This is the reports on open event handler.
+'
+' @precon  None.
+' @postcon Changes the reports title to the value in the global variable
+'
+' @param   Cancel as an Integer
+'
+Private Sub Report_Open(Cancel As Integer)
+  Exception.Push "Report_Construction Report (A4 Landscape).Report_Open", Cancel
+  On Error GoTo ErrHnd
+  lblRptTitle.Caption = strReportTitle
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

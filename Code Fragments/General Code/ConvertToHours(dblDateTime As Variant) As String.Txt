@@ -1,0 +1,32 @@
+'
+' This function converts a DateTime Double value into pure Hours : Minutes
+'
+' @Version 1.1
+' @Date    22 Sep 2003
+'
+' @precon  None.
+' @postcon Date and Time
+'          Returns a string representing Hours : Minutes
+'
+'  @noexception
+'
+' @param dbldateTime as a variant
+' @return a string
+'
+Function ConvertToHours(dblDateTime As Variant) As String
+  Dim iHours As Long
+  Dim iMinutes As Long
+  On Error GoTo ErrHnd
+  ConvertToHours = "0:00"
+  If Not IsNull(dblDateTime) Then
+    iHours = Int(dblDateTime * 24)
+    iMinutes = (dblDateTime * 24 - iHours) * 60
+    If iMinutes >= 60 Then
+      iMinutes = iMinutes - 60
+      iHours = iHours + 1
+    End If
+    ConvertToHours = iHours & ":" & Format(iMinutes, "00")
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Err.Clear ' Do not report errors here
+End Function

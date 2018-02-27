@@ -1,0 +1,113 @@
+'
+' This routine builds a portion of an SQL statement for inclusion in a WHERE clause
+' from the strValues item for a text field. The rules for this are based on the
+' AltaVista search engine rules, i.e. (+) in front of a word includes and (-)
+' excludes otherwise the words are OR'ed together. Words can contain the wildcard (*)
+' at either the start or end.
+'
+' Additional the use of ranges separated using a colon (:) can now be used.
+'
+' +david* -*hoyle* +*lifeson *blackmore*... g123:g129
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon Name of the field as a string (You should enclose the name in square
+'          brackets to avoid confusion in the SQL statement, ie. "[My Field Name]")
+'          A string of text depicting the values required
+'          Returns a section of an SQL WHERE clause as a string
+'
+' @param  strField as a string
+' @param  strValues as a string
+' @return a string
+'
+Function GetTextSQLInfo(strField As String, strValues As String) As String
+  Dim iChar As Long
+  Dim strToken As String
+  Dim iTokenType As Integer    ' 0 = <null>, 1 = (+), 2 = (-), 3 = (:)
+  Dim strLastToken As String
+  Dim strInOr As String
+  Dim strInAnd As String
+  Dim strInNotAnd As String
+  Exception.Push "GetTextSQLInfo", strField, strValues
+  On Error GoTo ErrHnd
+  GetTextSQLInfo = ""
+  strLastToken = ""
+  iTokenType = 0
+  strInOr = ""
+  strInAnd = ""
+  strInNotAnd = ""
+  strValues = Replace(strValues, "*", "%")
+  ' Read the string as a stream of characters looking for the (-) and (+).
+  For iChar = 1 To Len(strValues)
+    Select Case Mid$(strValues, iChar, 1)
+      Case " "
+        Select Case iTokenType
+          Case 1:
+            If ContainsWildCards(strToken) Then AddToken GetTextSQLInfo, strField, iTokenType, strToken, "LIKE" _
+            Else: AddTokenToList strInAnd, strToken
+          Case 2:
+            If ContainsWildCards(strToken) Then AddToken GetTextSQLInfo, strField, iTokenType, strToken, "NOT LIKE" _
+            Else AddTokenToList strInNotAnd, strToken
+          Case 3:
+            If iTokenType = 0 Then GetTextSQLInfo = GetTextSQLInfo + " OR " Else GetTextSQLInfo = GetTextSQLInfo + " AND "
+            GetTextSQLInfo = GetTextSQLInfo & "[" & strField & "]" & " <= '" & strToken & "')"
+          Case Else
+            If ContainsWildCards(strToken) Then AddToken GetTextSQLInfo, strField, iTokenType, strToken, "LIKE" _
+            Else AddTokenToList strInOr, strToken
+        End Select
+        strToken = ""
+        iTokenType = 0
+      Case "-"
+        If strLastToken = " " Or strLastToken = "" Then iTokenType = 2 Else strToken = strToken + Mid$(strValues, iChar, 1)
+      Case "+"
+        If strLastToken = " " Or strLastToken = "" Then iTokenType = 1 Else strToken = strToken + Mid$(strValues, iChar, 1)
+      Case ":"
+        If iTokenType = 0 Then GetTextSQLInfo = GetTextSQLInfo + " OR " Else GetTextSQLInfo = GetTextSQLInfo + " AND "
+        If iTokenType = 2 Then GetTextSQLInfo = GetTextSQLInfo + "Not "
+        iTokenType = 3
+        GetTextSQLInfo = GetTextSQLInfo & "(" & "[" & strField & "]" & " >= '" & strToken & "'"
+        strToken = ""
+      Case Else
+        strToken = strToken + Mid$(strValues, iChar, 1)
+    End Select
+    strLastToken = strToken
+  Next iChar
+  If strToken <> "" Then
+    Select Case iTokenType
+      Case 1:
+        If ContainsWildCards(strToken) Then AddToken GetTextSQLInfo, strField, iTokenType, strToken, "LIKE" _
+        Else AddTokenToList strInAnd, strToken
+      Case 2:
+        If ContainsWildCards(strToken) Then AddToken GetTextSQLInfo, strField, iTokenType, strToken, "NOT LIKE" _
+        Else AddTokenToList strInNotAnd, strToken
+      Case 3:
+        If iTokenType = 0 Then GetTextSQLInfo = GetTextSQLInfo + " OR " Else GetTextSQLInfo = GetTextSQLInfo + " AND "
+        GetTextSQLInfo = GetTextSQLInfo & "[" & strField & "]" & " <= '" & strToken & "')"
+      Case Else
+        If ContainsWildCards(strToken) Then AddToken GetTextSQLInfo, strField, iTokenType, strToken, "LIKE" _
+        Else AddTokenToList strInOr, strToken
+    End Select
+  End If
+  
+  If strInOr <> "" Then strInOr = "[" & strField & "] IN (" & strInOr & ")"
+  If strInAnd <> "" Then
+    If strInOr <> "" Then strInOr = strInOr & " AND "
+    strInOr = strInOr & "[" & strField & "] IN (" & strInAnd & ")"
+  End If
+  If strInNotAnd <> "" Then
+    If strInOr <> "" Then strInOr = strInOr & " AND "
+    strInOr = strInOr & "NOT [" & strField & "] IN (" & strInNotAnd & ")"
+  End If
+  If GetTextSQLInfo = "" Then
+    GetTextSQLInfo = strInOr
+  Else
+    GetTextSQLInfo = strInOr & GetTextSQLInfo
+  End If
+  If Left$(GetTextSQLInfo, 4) = " OR " Then GetTextSQLInfo = Right$(GetTextSQLInfo, Len(GetTextSQLInfo) - 4)
+  If Left$(GetTextSQLInfo, 5) = " AND " Then GetTextSQLInfo = Right$(GetTextSQLInfo, Len(GetTextSQLInfo) - 5)
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

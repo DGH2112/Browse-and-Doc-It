@@ -1,0 +1,18 @@
+'
+' This property returns the handle of this window.
+'
+' @precon  None.
+' @postcon Returns the handle of this window.
+'
+' @return  a Long
+'
+Private Property Get hWndForm() As Long
+  Dim strClassName As String
+  Exception.Push "frmSQL.hWndForm"
+  On Error GoTo ErrHnd
+  If Val(Application.Version) < 9 Then strClassName = "X" Else strClassName = "D"
+  hWndForm = FindWindow("Thunder" & strClassName & "Frame", Caption)
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property

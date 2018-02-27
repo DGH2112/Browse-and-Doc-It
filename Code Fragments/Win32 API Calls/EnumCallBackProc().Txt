@@ -1,0 +1,21 @@
+'
+' This is a call back function for the EnumWindows API call.
+'
+' @precon  None.
+' @postcon Returns the handle of the application window (Match by Process ID in iParam) via the global variable wndHandle.
+'
+' @param   hwnd as a Long
+' @param   lParam as a Long
+' @return  a Long
+'
+Public Function EnumCallBackProc(ByVal hwnd As Long, ByVal lParam As Long) As Long
+  Dim iID As Long
+  On Error Resume Next
+  GetWindowThreadProcessId hwnd, iID
+  If lParam = iID Then
+    wndHandle = hwnd
+    EnumCallBackProc = False
+  Else
+    EnumCallBackProc = True
+  End If
+End Function

@@ -1,0 +1,615 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>Eidolon Map File Grammar.bnf</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Backus-Naur Grammar.html">Backus-Naur Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Eidolon Map File Grammar.html">Eidolon Map File Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Extensible Markup Language (XML) 1.0.html">Extensible Markup Language (XML) 1.0.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Object Pascal Grammar.html">Object Pascal Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Rules2">Rules</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Eidolon Map File Grammar.bnf -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Eidolon Map File Grammar.bnf</h1>
+        <p class="Comment">Browse   and   Doc   It   Eidolon   Map   Files   Grammar </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">21   Jul   2009 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David   Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1 . 0 </li>
+        </ul>
+      
+      <!-- Rules -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Rules2"></a>Rules</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<AlphaCharacters>"></a><AlphaCharacters></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">AlphaCharacters</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? All alphabeta characters = ['A'..'Z', 'a'..'z', '_'] ?</span></pre>
+          <!-- &#60;AlphaCharacters&#62; ::= ? All alphabeta characters = ['A'..'Z', 'a'..'z', '_'] ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Bar>"></a><Bar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Bar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'BAR'</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">InteriorDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BarWidth</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Bar&#62; ::= 'BAR' ',' &#60;BorderDef&#62; ',' &#60;InteriorDef&#62; ',' &#60;BarWidth&#62; &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<BarWidth>"></a><BarWidth></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">BarWidth</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">PositiveSingle</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;BarWidth&#62; ::= &#60;PositiveSingle&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<BorderColour>"></a><BorderColour></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">BorderColour</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ColourName</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;BorderColour&#62; ::= &#60;ColourName&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<BorderDef>"></a><BorderDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">BorderDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderColour</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderLineStyle</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderWeight</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;BorderDef&#62; ::= &#60;BorderColour&#62; ',' &#60;BorderLineStyle&#62; ',' &#60;BorderWeight&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<BorderLineStyle>"></a><BorderLineStyle></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">BorderLineStyle</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'SOLID'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ROUNDDOT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SQUAREDOT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DASH'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DASHDOT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LONGDASH'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'LONGDASHDOT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DASHDOTDOT'</span></pre>
+          <!-- &#60;BorderLineStyle&#62; ::= 'SOLID' | 'ROUNDDOT' | 'SQUAREDOT' | 'DASH' | 'DASHDOT' | 'LONGDASH' |
+  'LONGDASHDOT' | 'DASHDOTDOT' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<BorderWeight>"></a><BorderWeight></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">BorderWeight</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'0.25'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'0.5'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'1'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'1.5'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'2.25'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'3'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'4.5'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'6'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DOUBLE'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'DOUBLETHINTHICK'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DOUBLETHICKTHIN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'TRIPLETHICKBETWEENTHIN'</span></pre>
+          <!-- &#60;BorderWeight&#62; ::= '0.25' | '0.5' | '1' | '1.5' | '2.25' | '3' | '4.5' | '6' | 'DOUBLE' |
+  'DOUBLETHINTHICK' | 'DOUBLETHICKTHIN' | 'TRIPLETHICKBETWEENTHIN' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ByteNumber>"></a><ByteNumber></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ByteNumber</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? An integer number between 1 and 255 ?</span></pre>
+          <!-- &#60;ByteNumber&#62; ::= ? An integer number between 1 and 255 ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ColourName>"></a><ColourName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ColourName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'BLACK'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'BROWN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'OLIVEGREEN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DARKGREEN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DARKTEAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DARKBLUE'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'INDIGO'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'GRAY-80%'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DARKRED'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ORANGE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DARKYELLOW'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'GREEN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'TEAL'</span>
+  <span class="Symbol">|</span> <span class="SingleLiteral">'BLUE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'BLUE-GRAY'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'GRAY-50%'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'RED'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIGHTORANGE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIME'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'SEAGREEN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'AQUA'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIGHTBLUE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'VIOLET'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'GRAY-40%'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'PINK'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'GOLD'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'YELLOW'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'BRIGHTGREEN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'TURQUOISE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SKYBLUE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'PLUM'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'GRAY-25%'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'ROSE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'TAN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIGHTYELLOW'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIGHTGREEN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIGHTTURQUOISE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'PALEBLUE'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'LAVENDER'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'WHITE'</span></pre>
+          <!-- &#60;ColourName&#62; ::= 'BLACK' | 'BROWN' | 'OLIVEGREEN' | 'DARKGREEN' | 'DARKTEAL' | 'DARKBLUE' |
+  'INDIGO' | 'GRAY-80%' | 'DARKRED' | 'ORANGE' | 'DARKYELLOW' | 'GREEN' | 'TEAL'
+  | 'BLUE' | 'BLUE-GRAY' | 'GRAY-50%' | 'RED' | 'LIGHTORANGE' | 'LIME' |
+  'SEAGREEN' | 'AQUA' | 'LIGHTBLUE' | 'VIOLET' | 'GRAY-40%' | 'PINK' | 'GOLD' |
+  'YELLOW' | 'BRIGHTGREEN' | 'TURQUOISE' | 'SKYBLUE' | 'PLUM' | 'GRAY-25%' |
+  'ROSE' | 'TAN' | 'LIGHTYELLOW' | 'LIGHTGREEN' | 'LIGHTTURQUOISE' | 'PALEBLUE' |
+  'LAVENDER' | 'WHITE' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ColumnWidth>"></a><ColumnWidth></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ColumnWidth</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ByteNumber</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ColumnWidth&#62; ::= &#60;ByteNumber&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ConnectionDef>"></a><ConnectionDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ConnectionDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'#CONNECTION'</span> <span class="SingleLiteral">'='</span> <span class="Symbol">&#60;</span><span class="Identifier">ConnectionString</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ConnectionDef&#62; ::= '#CONNECTION' '=' &#60;ConnectionString&#62; &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ConnectionString>"></a><ConnectionString></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ConnectionString</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">''</span> <span class="Symbol">|</span> <span class="SingleLiteral">'dBASE IV;'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'Paradox 4.x;'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'FoxPro 2.6;'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'Text;'</span></pre>
+              <p class="Comment">MS   Aceess   =   "";   dBASE   =   " dBASE   IV ;";   Paradox   =   " Paradox   4 . x ;";   FoxPro   =   " FoxPro   2 . 6 ;"   and   Text   =   " Text ;". </p>
+          <!-- &#60;ConnectionString&#62; ::= '' | 'dBASE IV;' | 'Paradox 4.x;' | 'FoxPro 2.6;' | 'Text;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DatabaseDef>"></a><DatabaseDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DatabaseDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'#DATABASE'</span> <span class="SingleLiteral">'='</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">FileName</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Directory</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+              <p class="Comment">Use   &#60;FileName&#62;   for   MS   Access   database   with   a   NULL   &#60;Connectiondef&#62; ,   else   use   &#60;Directory&#62;   and   a   non - NULL   &#60;ConnectionDef&#62; . </p>
+          <!-- &#60;DatabaseDef&#62; ::= '#DATABASE' '=' ( &#60;FileName&#62; | &#60;Directory&#62; ) &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DBTable>"></a><DBTable></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DBTable</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">DefinitionName</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'='</span> <span class="SingleLiteral">'CLASS'</span> <span class="SingleLiteral">'('</span> <span class="SingleLiteral">'TEXTTABLE'</span> <span class="SingleLiteral">')'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'{'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">DatabaseDef</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">ConnectionDef</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">TableNameDef</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">FieldDef</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">+</span> <span class="SingleLiteral">'}'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;DBTable&#62; ::= &#60;DefinitionName&#62; '=' 'CLASS' '(' 'TEXTTABLE' ')' &#60;LineEnd&#62; '{' &#60;LineEnd&#62; [
+  &#60;DatabaseDef&#62; &#60;ConnectionDef&#62; &#60;TableNameDef&#62; ] ( &#60;FieldDef&#62; )+ '}' &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DefinitionName>"></a><DefinitionName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DefinitionName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;DefinitionName&#62; ::= &#60;Name&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Diamond>"></a><Diamond></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Diamond</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'DIAMOND'</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">InteriorDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">DiamondSize</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Diamond&#62; ::= 'DIAMOND' ',' &#60;BorderDef&#62; ',' &#60;InteriorDef&#62; ',' &#60;DiamondSize&#62; &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DiamondSize>"></a><DiamondSize></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DiamondSize</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">PositiveSingle</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;DiamondSize&#62; ::= &#60;PositiveSingle&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Directory>"></a><Directory></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Directory</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? Drive:\Path\ with no quotes ?</span></pre>
+          <!-- &#60;Directory&#62; ::= ? Drive:\Path\ with no quotes ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Ellipse>"></a><Ellipse></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Ellipse</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'ELLIPSE'</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">InteriorDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">EllipseRadius</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Ellipse&#62; ::= 'ELLIPSE' ',' &#60;BorderDef&#62; ',' &#60;InteriorDef&#62; ',' &#60;EllipseRadius&#62; &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EllipseRadius>"></a><EllipseRadius></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EllipseRadius</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">PositiveSingle</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;EllipseRadius&#62; ::= &#60;PositiveSingle&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FieldDef>"></a><FieldDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FieldDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="SingleLiteral">'*'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">InputName</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">TTypeInfo</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'='</span> <span class="Symbol">&#60;</span><span class="Identifier">OutputName</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+              <p class="Comment">FieldDefs   starting   with   an   asterisk   are   the   Primary   Index . </p>
+          <!-- &#60;FieldDef&#62; ::= [ '*' ] &#60;InputName&#62; ':' &#60;TTypeInfo&#62; [ '=' &#60;OutputName&#62; ] &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FileName>"></a><FileName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FileName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? Drive:\Path\FileName.Extension with no quotes ?</span></pre>
+          <!-- &#60;FileName&#62; ::= ? Drive:\Path\FileName.Extension with no quotes ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<GeneralSymbols>"></a><GeneralSymbols></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">GeneralSymbols</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? General Symbols = [#33..#128] - ['=', ':', '*', '(', ')', '#', '&#38;', '@', '{', '}'] ?</span></pre>
+          <!-- &#38;#60;GeneralSymbols&#38;#62; ::= ? General Symbols = [#33..#128] - ['=', ':', '*', '(', ')', '#', '&#38;', '@', '{', '}'] ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Goal>"></a><Goal></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Goal</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">TextTable</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">DBTable</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">TimeLocationTable</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+              <p class="Comment">Browse   and   Doc   It   Eidolon   Map   Files   Grammar </p>
+              <p class="TagHeader">Date Code Last Updated</p>
+              <ul>
+                <li class="SpecialTag">21   Jul   2009 </li>
+              </ul>
+              <p class="TagHeader">Code Author</p>
+              <ul>
+                <li class="SpecialTag">David   Hoyle </li>
+              </ul>
+              <p class="TagHeader">Code Version</p>
+              <ul>
+                <li class="SpecialTag">1 . 0 </li>
+              </ul>
+          <!-- &#60;Goal&#62; ::= ( &#60;TextTable&#62; | &#60;DBTable&#62; | &#60;TimeLocationTable&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Identifier>"></a><Identifier></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">AlphaCharacters</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">AlphaCharacters</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">NumericCharacters</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Identifier&#62; ::= &#60;AlphaCharacters&#62; | ( &#60;AlphaCharacters&#62; | &#60;NumericCharacters&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InputName>"></a><InputName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InputName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span></pre>
+              <p class="Comment">InputName   =   Excel   Worksheet   Column   Name . </p>
+          <!-- &#60;InputName&#62; ::= &#60;Name&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InteriorColour>"></a><InteriorColour></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InteriorColour</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ColourName</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;InteriorColour&#62; ::= &#60;ColourName&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InteriorDef>"></a><InteriorDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InteriorDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">InteriorColour</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">InteriorPattern</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">InteriorPatternColour</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;InteriorDef&#62; ::= &#60;InteriorColour&#62; ',' &#60;InteriorPattern&#62; ',' &#60;InteriorPatternColour&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InteriorPattern>"></a><InteriorPattern></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InteriorPattern</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'NONE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'10PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'20PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'25PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'30PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'40PERCENT'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'50PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'5PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'60PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'70PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'75PERCENT'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'80PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'90PERCENT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DARKDOWNWARDDIAGONAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DARKHORIZONTAL'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'DARKUPWARDDIAGONAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DARKVERTICAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DASHEDDOWNWARDDIAGONAL'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'DASHEDHORIZONTAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DASHEDUPWARDDIAGONAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DASHEDVERTICAL'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'DIAGONALBRICK'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DIVOT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DOTTEDGRID'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'HORIZONTALBRICK'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'LARGECHECKERBOARD'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LARGECONFETTI'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LARGEGRID'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIGHTDOWNWARDDIAGONAL'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'LIGHTHORIZONTAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIGHTUPWARDDIAGONAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIGHTVERTICAL'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'NARROWHORIZONTAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'NARROWVERTICAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'OUTLINEDDIAMOND'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'PLAID'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SHINGLE'</span>
+  <span class="Symbol">|</span> <span class="SingleLiteral">'SMALLCHECKERBOARD'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SMALLCONFETTI'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SMALLGRID'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SOLIDDIAMOND'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'SPHERE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'TRELLIS'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'WAVE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'WEAVE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'WIDEDOWNWARDDIAGONAL'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'WIDEUPWARDDIAGONAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ZIGZAG'</span></pre>
+          <!-- &#60;InteriorPattern&#62; ::= 'NONE' | '10PERCENT' | '20PERCENT' | '25PERCENT' | '30PERCENT' | '40PERCENT' |
+  '50PERCENT' | '5PERCENT' | '60PERCENT' | '70PERCENT' | '75PERCENT' |
+  '80PERCENT' | '90PERCENT' | 'DARKDOWNWARDDIAGONAL' | 'DARKHORIZONTAL' |
+  'DARKUPWARDDIAGONAL' | 'DARKVERTICAL' | 'DASHEDDOWNWARDDIAGONAL' |
+  'DASHEDHORIZONTAL' | 'DASHEDUPWARDDIAGONAL' | 'DASHEDVERTICAL' |
+  'DIAGONALBRICK' | 'DIVOT' | 'DOTTEDGRID' | 'HORIZONTALBRICK' |
+  'LARGECHECKERBOARD' | 'LARGECONFETTI' | 'LARGEGRID' | 'LIGHTDOWNWARDDIAGONAL' |
+  'LIGHTHORIZONTAL' | 'LIGHTUPWARDDIAGONAL' | 'LIGHTVERTICAL' |
+  'NARROWHORIZONTAL' | 'NARROWVERTICAL' | 'OUTLINEDDIAMOND' | 'PLAID' | 'SHINGLE'
+  | 'SMALLCHECKERBOARD' | 'SMALLCONFETTI' | 'SMALLGRID' | 'SOLIDDIAMOND' |
+  'SPHERE' | 'TRELLIS' | 'WAVE' | 'WEAVE' | 'WIDEDOWNWARDDIAGONAL' |
+  'WIDEUPWARDDIAGONAL' | 'ZIGZAG' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InteriorPatternColour>"></a><InteriorPatternColour></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InteriorPatternColour</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ColourName</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;InteriorPatternColour&#62; ::= &#60;ColourName&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Line>"></a><Line></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Line</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'LINE'</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderDef</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Line&#62; ::= 'LINE' ',' &#60;BorderDef&#62; &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<LineEnd>"></a><LineEnd></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? Line feed and or carriage return ?</span></pre>
+          <!-- &#60;LineEnd&#62; ::= ? Line feed and or carriage return ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Name>"></a><Name></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">WhiteSpace</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">GeneralSymbols</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Name&#62; ::= ( &#60;Identifier&#62; | &#60;WhiteSpace&#62; | &#60;GeneralSymbols&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<NumericCharacters>"></a><NumericCharacters></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">NumericCharacters</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? All Numeric Characters = ['0'..'9'] ?</span></pre>
+          <!-- &#60;NumericCharacters&#62; ::= ? All Numeric Characters = ['0'..'9'] ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<OutputName>"></a><OutputName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">OutputName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span></pre>
+              <p class="Comment">OutputName   =   Text   File   /   Database   Field   Name . </p>
+          <!-- &#60;OutputName&#62; ::= &#60;Name&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PositiveSingle>"></a><PositiveSingle></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PositiveSingle</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? A positive single precision number ?</span></pre>
+          <!-- &#60;PositiveSingle&#62; ::= ? A positive single precision number ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Rectangle>"></a><Rectangle></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Rectangle</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'RECTANGLE'</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">InteriorDef</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Rectangle&#62; ::= 'RECTANGLE' ',' &#60;BorderDef&#62; ',' &#60;InteriorDef&#62; &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SymbolName>"></a><SymbolName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SymbolName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">WhiteSpace</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">+</span></pre>
+          <!-- &#60;SymbolName&#62; ::= ( &#60;Identifier&#62; | &#60;WhiteSpace&#62; )+ -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TableName>"></a><TableName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TableName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span></pre>
+              <p class="Comment">Some   databases   will   note   allow   tables   names   with   spaces   and   anyother   characters   outside   the   ' a '..' z '   +   ' 0 '..' 9 '. </p>
+          <!-- &#60;TableName&#62; ::= &#60;Name&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TableNameDef>"></a><TableNameDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TableNameDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'#TABLENAME'</span> <span class="SingleLiteral">'='</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">TableName</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">FileName</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;TableNameDef&#62; ::= '#TABLENAME' '=' ( &#60;TableName&#62; | &#60;FileName&#62; ) &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TextTable>"></a><TextTable></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TextTable</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">DefinitionName</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'='</span> <span class="SingleLiteral">'CLASS'</span> <span class="SingleLiteral">'('</span> <span class="SingleLiteral">'TEXTTABLE'</span> <span class="SingleLiteral">')'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'{'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">TextTableDef</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">FieldDef</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">+</span> <span class="SingleLiteral">'}'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;TextTable&#62; ::= &#60;DefinitionName&#62; '=' 'CLASS' '(' 'TEXTTABLE' ')' &#60;LineEnd&#62; '{' &#60;LineEnd&#62; [
+  &#60;TextTableDef&#62; ] ( &#60;FieldDef&#62; )+ '}' &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TextTableDef>"></a><TextTableDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TextTableDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'#TABLENAME'</span> <span class="SingleLiteral">'='</span> <span class="Symbol">&#60;</span><span class="Identifier">FileName</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;TextTableDef&#62; ::= '#TABLENAME' '=' &#60;FileName&#62; &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TimeLocationDef>"></a><TimeLocationDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TimeLocationDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#38;'</span> <span class="Symbol">&#60;</span><span class="Identifier">SymbolName</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'='</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Rectangle</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Bar</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Line</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Triangle</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Ellipse</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">Diamond</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span></pre>
+          <!-- &#38;#60;TimeLocationDef&#38;#62; ::= '&#38;' &#38;#60;SymbolName&#38;#62; '=' ( &#38;#60;Rectangle&#38;#62; | &#38;#60;Bar&#38;#62; | &#38;#60;Line&#38;#62; | &#38;#60;Triangle&#38;#62; | &#38;#60;Ellipse&#38;#62; |
+  &#38;#60;Diamond&#38;#62; ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TimeLocationTable>"></a><TimeLocationTable></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TimeLocationTable</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">DefinitionName</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'='</span> <span class="SingleLiteral">'CLASS'</span> <span class="SingleLiteral">'('</span> <span class="SingleLiteral">'TIMELOCATIONTABLE'</span> <span class="SingleLiteral">')'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'{'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span>
+  <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">FieldDef</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">+</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">TimeLocationDef</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">+</span> <span class="SingleLiteral">'}'</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;TimeLocationTable&#62; ::= &#60;DefinitionName&#62; '=' 'CLASS' '(' 'TIMELOCATIONTABLE' ')' &#60;LineEnd&#62; '{' &#60;LineEnd&#62;
+  ( &#60;FieldDef&#62; )+ ( &#60;TimeLocationDef&#62; )+ '}' &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Triangle>"></a><Triangle></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Triangle</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'TRIANGLE'</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">BorderDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">InteriorDef</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">TriangleType</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">LineEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Triangle&#62; ::= 'TRIANGLE' ',' &#60;BorderDef&#62; ',' &#60;InteriorDef&#62; ',' &#60;TriangleType&#62; &#60;LineEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TriangleType>"></a><TriangleType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TriangleType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'STARTANDEARLY'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'STARTANDLATE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ENDANDEARLY'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ENDANDLATE'</span></pre>
+          <!-- &#60;TriangleType&#62; ::= 'STARTANDEARLY' | 'STARTANDLATE' | 'ENDANDEARLY' | 'ENDANDLATE' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TTypeInfo>"></a><TTypeInfo></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TTypeInfo</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'B'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'Y'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'I'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'L'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'U'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'S'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'F'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'D'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'C'</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">ColumnWidth</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'O'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'M'</span></pre>
+              <p class="Comment">Type   Info : #   B   =   Boolean #   Y   =   Byte #   I   =   Integer #   L   =   Long #   U   =   Currency #   S   =   Single #   F   =   Double #   D   =   Date #   C ( n )   =   Text ,   n   =   1 .. 255 #   O   =   Long   Binary #   M   =   Memo </p>
+          <!-- &#60;TTypeInfo&#62; ::= 'B' | 'Y' | 'I' | 'L' | 'U' | 'S' | 'F' | 'D' | 'C' '(' &#60;ColumnWidth&#62; ')' | 'O' |
+  'M' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<WhiteSpace>"></a><WhiteSpace></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">WhiteSpace</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? Whitespace = [#32, #9] {Space and Tab} ?</span></pre>
+          <!-- &#60;WhiteSpace&#62; ::= ? Whitespace = [#32, #9] {Space and Tab} ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

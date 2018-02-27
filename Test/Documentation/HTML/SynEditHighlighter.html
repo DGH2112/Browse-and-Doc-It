@@ -1,0 +1,3376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>SynEditHighlighter.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHEllipsisLabel.html">DGHEllipsisLabel.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CommonIDEFunctions.html">CommonIDEFunctions.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestApp2006.html">BrowseAndDocItTestApp2006.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestForm.html">BrowseAndDocItTestForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ExclusionsForm.html">ExclusionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BackusNaurModule.html">BackusNaurModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseDocumentation.html">BaseDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseLanguageModule.html">BaseLanguageModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="dghlibrary.html">dghlibrary.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationDispatcher.html">DocumentationDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationOptionsForm.html">DocumentationOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GenericTokenizer.html">GenericTokenizer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="HTMLDocumentation.html">HTMLDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MethodDescriptionForm.html">MethodDescriptionForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleDispatcher.html">ModuleDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleExplorerFrame.html">ModuleExplorerFrame.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OptionsForm.html">OptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PascalModule.html">PascalModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SpecialTagForm.html">SpecialTagForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEdit.html">SynEdit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditHighlighter.html">SynEditHighlighter.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditKbdHandler.html">SynEditKbdHandler.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditKeyCmds.html">SynEditKeyCmds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditKeyConst.html">SynEditKeyConst.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditMiscClasses.html">SynEditMiscClasses.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditMiscProcs.html">SynEditMiscProcs.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditStrConst.html">SynEditStrConst.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditTextBuffer.html">SynEditTextBuffer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditTypes.html">SynEditTypes.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditWordWrap.html">SynEditWordWrap.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynHighlighterCpp.html">SynHighlighterCpp.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynHighlighterMulti.html">SynHighlighterMulti.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynHighlighterPas.html">SynHighlighterPas.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynHighlighterVB.html">SynHighlighterVB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynRegExpr.html">SynRegExpr.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynTextDrawer.html">SynTextDrawer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynUnicode.html">SynUnicode.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GIFImage.html">GIFImage.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TokenForm.html">TokenForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBModule.html">VBModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MSAAIntf.html">MSAAIntf.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VirtualTrees.html">VirtualTrees.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VTAccessibilityFactory.html">VTAccessibilityFactory.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a href="#Constants2">Constants</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a href="#ExportedHeadings2">Exported Headings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a href="#finalization2">finalization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/HintFolder.gif" alt=""/>&nbsp;<a href="#Hints2">Hints</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a href="#initialization2">initialization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a href="#Variables2">Variables</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit SynEditHighlighter -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit SynEditHighlighter</h1>
+      
+      <!-- Hints -->
+      <h2><img class="verticallymiddle" src="Images/HintFolder.gif" alt=""/>&nbsp;<a name="Hints"></a>Hints</h2>
+      <ul>
+        <li class="Hint">The symbol 'GetBackgroundColorStored' has not been referenced in the code. [CheckReferences]</li>
+        <li class="Hint">The symbol 'GetFontStyleStored' has not been referenced in the code. [CheckReferences]</li>
+        <li class="Hint">The symbol 'GetForegroundColorStored' has not been referenced in the code. [CheckReferences]</li>
+      </ul>
+      
+      <!-- Constants -->
+      <h2><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a name="Constants2"></a>Constants</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.SYN_ATTR_COMMENT"></a>SYN_ATTR_COMMENT</td>
+              <td>
+                <pre><span class="Identifier">SYN_ATTR_COMMENT</span> <span class="Symbol">=</span> <span class="Number">0</span></pre>
+          <!-- SYN_ATTR_COMMENT = 0 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.SYN_ATTR_IDENTIFIER"></a>SYN_ATTR_IDENTIFIER</td>
+              <td>
+                <pre><span class="Identifier">SYN_ATTR_IDENTIFIER</span> <span class="Symbol">=</span> <span class="Number">1</span></pre>
+          <!-- SYN_ATTR_IDENTIFIER = 1 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.SYN_ATTR_KEYWORD"></a>SYN_ATTR_KEYWORD</td>
+              <td>
+                <pre><span class="Identifier">SYN_ATTR_KEYWORD</span> <span class="Symbol">=</span> <span class="Number">2</span></pre>
+          <!-- SYN_ATTR_KEYWORD = 2 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.SYN_ATTR_STRING"></a>SYN_ATTR_STRING</td>
+              <td>
+                <pre><span class="Identifier">SYN_ATTR_STRING</span> <span class="Symbol">=</span> <span class="Number">3</span></pre>
+          <!-- SYN_ATTR_STRING = 3 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.SYN_ATTR_SYMBOL"></a>SYN_ATTR_SYMBOL</td>
+              <td>
+                <pre><span class="Identifier">SYN_ATTR_SYMBOL</span> <span class="Symbol">=</span> <span class="Number">5</span></pre>
+          <!-- SYN_ATTR_SYMBOL = 5 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.SYN_ATTR_WHITESPACE"></a>SYN_ATTR_WHITESPACE</td>
+              <td>
+                <pre><span class="Identifier">SYN_ATTR_WHITESPACE</span> <span class="Symbol">=</span> <span class="Number">4</span></pre>
+          <!-- SYN_ATTR_WHITESPACE = 4 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Exported Headings -->
+      <h2><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a name="ExportedHeadings2"></a>Exported Headings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.GetPlaceableHighlighters"></a>GetPlaceableHighlighters</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetPlaceableHighlighters</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterList</span></pre>
+          <!-- Function GetPlaceableHighlighters : TSynHighlighterList -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.RegisterPlaceableHighlighter"></a>RegisterPlaceableHighlighter</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">RegisterPlaceableHighlighter</span><span class="Symbol">(</span>
+  <span class="Identifier">highlighter</span> <span class="Symbol">:</span> <span class="Identifier">TSynCustomHighlighterClass</span>
+<span class="Symbol">)</span></pre>
+          <!-- Procedure RegisterPlaceableHighlighter(
+  highlighter : TSynCustomHighlighterClass
+) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- finalization -->
+      <div class="Indent">
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.GetPlaceableHighlighters"></a>GetPlaceableHighlighters</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetPlaceableHighlighters</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterList</span></pre>
+          <!-- Function GetPlaceableHighlighters : TSynHighlighterList -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.RegisterPlaceableHighlighter"></a>RegisterPlaceableHighlighter</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">RegisterPlaceableHighlighter</span><span class="Symbol">(</span>
+  <span class="Identifier">highlighter</span> <span class="Symbol">:</span> <span class="Identifier">TSynCustomHighlighterClass</span>
+<span class="Symbol">)</span></pre>
+          <!-- Procedure RegisterPlaceableHighlighter(
+  highlighter : TSynCustomHighlighterClass
+) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+          <!-- TSynCustomHighlighter -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TSynCustomHighlighter3"></a>TSynCustomHighlighter</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.AddAttribute"></a>AddAttribute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">AddAttribute</span><span class="Symbol">(</span>
+  <span class="Identifier">Attri</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure AddAttribute(
+  Attri : TSynHighlighterAttributes
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.Assign"></a>Assign</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Assign</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure Assign(
+  Source : TPersistent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.BeginUpdate"></a>BeginUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BeginUpdate</span></pre>
+              <!-- Procedure BeginUpdate -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Constructor Create(
+  AOwner : TComponent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.DefHighlightChange"></a>DefHighlightChange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DefHighlightChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure DefHighlightChange(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.DefineProperties"></a>DefineProperties</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DefineProperties</span><span class="Symbol">(</span>
+  <span class="Identifier">Filer</span> <span class="Symbol">:</span> <span class="Identifier">TFiler</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure DefineProperties(
+  Filer : TFiler
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span></pre>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.DoSetLine"></a>DoSetLine</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DoSetLine</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span>
+  <span class="Identifier">LineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure DoSetLine(
+  const Value : UnicodeString;
+  LineNumber : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.EndUpdate"></a>EndUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">EndUpdate</span></pre>
+              <!-- Procedure EndUpdate -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.EnumUserSettings"></a>EnumUserSettings</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">EnumUserSettings</span><span class="Symbol">(</span>
+  <span class="Identifier">Settings</span> <span class="Symbol">:</span> <span class="Identifier">TStrings</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure EnumUserSettings(
+  Settings : TStrings
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.FreeHighlighterAttributes"></a>FreeHighlighterAttributes</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FreeHighlighterAttributes</span></pre>
+              <!-- Procedure FreeHighlighterAttributes -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetAttribCount"></a>GetAttribCount</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetAttribCount</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function GetAttribCount : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetAttribute"></a>GetAttribute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetAttribute</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span></pre>
+              <!-- Function GetAttribute(
+  Index : Integer
+) : TSynHighlighterAttributes -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetCapabilities"></a>GetCapabilities</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetCapabilities</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterCapabilities</span></pre>
+              <!-- Function GetCapabilities : TSynHighlighterCapabilities -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetCapabilitiesProp"></a>GetCapabilitiesProp</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetCapabilitiesProp</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterCapabilities</span></pre>
+              <!-- Function GetCapabilitiesProp : TSynHighlighterCapabilities -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetDefaultFilter"></a>GetDefaultFilter</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDefaultFilter</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+              <!-- Function GetDefaultFilter : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetExpandedToken"></a>GetExpandedToken</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetExpandedToken</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+              <!-- Function GetExpandedToken : UnicodeString -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetExpandedTokenPos"></a>GetExpandedTokenPos</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetExpandedTokenPos</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function GetExpandedTokenPos : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetFriendlyLanguageName"></a>GetFriendlyLanguageName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetFriendlyLanguageName</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+              <!-- Function GetFriendlyLanguageName : UnicodeString -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetFriendlyLanguageNameProp"></a>GetFriendlyLanguageNameProp</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetFriendlyLanguageNameProp</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+              <!-- Function GetFriendlyLanguageNameProp : UnicodeString -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetKeyWords"></a>GetKeyWords</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetKeyWords</span><span class="Symbol">(</span>
+  <span class="Identifier">TokenKind</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+              <!-- Function GetKeyWords(
+  TokenKind : Integer
+) : UnicodeString -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetLanguageName"></a>GetLanguageName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetLanguageName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+              <!-- Function GetLanguageName : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetLanguageNameProp"></a>GetLanguageNameProp</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetLanguageNameProp</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+              <!-- Function GetLanguageNameProp : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetRange"></a>GetRange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetRange</span> <span class="Symbol">:</span> <span class="Identifier">Pointer</span></pre>
+              <!-- Function GetRange : Pointer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetSampleSource"></a>GetSampleSource</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetSampleSource</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+              <!-- Function GetSampleSource : UnicodeString -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetToken"></a>GetToken</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetToken</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+              <!-- Function GetToken : UnicodeString -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.GetTokenPos"></a>GetTokenPos</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetTokenPos</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function GetTokenPos : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.HookAttrChangeEvent"></a>HookAttrChangeEvent</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">HookAttrChangeEvent</span><span class="Symbol">(</span>
+  <span class="Identifier">ANotifyEvent</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure HookAttrChangeEvent(
+  ANotifyEvent : TNotifyEvent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.IsCurrentToken"></a>IsCurrentToken</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsCurrentToken</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Token</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsCurrentToken(
+  const Token : UnicodeString
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.IsFilterStored"></a>IsFilterStored</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsFilterStored</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsFilterStored : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.IsIdentChar"></a>IsIdentChar</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsIdentChar</span><span class="Symbol">(</span>
+  <span class="Identifier">AChar</span> <span class="Symbol">:</span> <span class="Identifier">WideChar</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsIdentChar(
+  AChar : WideChar
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.IsKeyword"></a>IsKeyword</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsKeyword</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">AKeyword</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsKeyword(
+  const AKeyword : UnicodeString
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.IsLineEnd"></a>IsLineEnd</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsLineEnd</span><span class="Symbol">(</span>
+  <span class="Identifier">Run</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsLineEnd(
+  Run : Integer
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.IsWhiteChar"></a>IsWhiteChar</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsWhiteChar</span><span class="Symbol">(</span>
+  <span class="Identifier">AChar</span> <span class="Symbol">:</span> <span class="Identifier">WideChar</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsWhiteChar(
+  AChar : WideChar
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.IsWordBreakChar"></a>IsWordBreakChar</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsWordBreakChar</span><span class="Symbol">(</span>
+  <span class="Identifier">AChar</span> <span class="Symbol">:</span> <span class="Identifier">WideChar</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsWordBreakChar(
+  AChar : WideChar
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.Loaded"></a>Loaded</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Loaded</span></pre>
+              <!-- Procedure Loaded -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.LoadFromFile"></a>LoadFromFile</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromFile</span><span class="Symbol">(</span>
+  <span class="Identifier">AFileName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">boolean</span></pre>
+              <!-- Function LoadFromFile(
+  AFileName : String
+) : boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.LoadFromRegistry"></a>LoadFromRegistry</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">RootKey</span> <span class="Symbol">:</span> <span class="Identifier">HKEY</span><span class="Symbol">;</span>
+  <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function LoadFromRegistry(
+  RootKey : HKEY;
+  Key : string
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.Next"></a>Next</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Next</span></pre>
+              <!-- Procedure Next -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.NextToEol"></a>NextToEol</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">NextToEol</span></pre>
+              <!-- Procedure NextToEol -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.PosToExpandedPos"></a>PosToExpandedPos</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">PosToExpandedPos</span><span class="Symbol">(</span>
+  <span class="Identifier">Pos</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function PosToExpandedPos(
+  Pos : Integer
+) : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.ResetRange"></a>ResetRange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetRange</span></pre>
+              <!-- Procedure ResetRange -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SaveToFile"></a>SaveToFile</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">SaveToFile</span><span class="Symbol">(</span>
+  <span class="Identifier">AFileName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">boolean</span></pre>
+              <!-- Function SaveToFile(
+  AFileName : String
+) : boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SaveToRegistry"></a>SaveToRegistry</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">SaveToRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">RootKey</span> <span class="Symbol">:</span> <span class="Identifier">HKEY</span><span class="Symbol">;</span>
+  <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function SaveToRegistry(
+  RootKey : HKEY;
+  Key : string
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SetAttributesOnChange"></a>SetAttributesOnChange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetAttributesOnChange</span><span class="Symbol">(</span>
+  <span class="Identifier">AEvent</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetAttributesOnChange(
+  AEvent : TNotifyEvent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SetDefaultFilter"></a>SetDefaultFilter</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetDefaultFilter</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetDefaultFilter(
+  Value : string
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SetEnabled"></a>SetEnabled</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetEnabled</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetEnabled(
+  const Value : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SetLine"></a>SetLine</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetLine</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span>
+  <span class="Identifier">LineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetLine(
+  const Value : UnicodeString;
+  LineNumber : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SetLineExpandedAtWideGlyphs"></a>SetLineExpandedAtWideGlyphs</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetLineExpandedAtWideGlyphs</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Line</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">ExpandedLine</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span>
+  <span class="Identifier">LineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetLineExpandedAtWideGlyphs(
+  const Line : UnicodeString;
+  const ExpandedLine : UnicodeString;
+  LineNumber : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SetRange"></a>SetRange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetRange</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">Pointer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetRange(
+  Value : Pointer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.SetSampleSource"></a>SetSampleSource</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetSampleSource</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetSampleSource(
+  Value : UnicodeString
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.UnhookAttrChangeEvent"></a>UnhookAttrChangeEvent</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">UnhookAttrChangeEvent</span><span class="Symbol">(</span>
+  <span class="Identifier">ANotifyEvent</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure UnhookAttrChangeEvent(
+  ANotifyEvent : TNotifyEvent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynCustomHighlighter.UseUserSettings"></a>UseUserSettings</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">UseUserSettings</span><span class="Symbol">(</span>
+  <span class="Identifier">settingIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function UseUserSettings(
+  settingIndex : Integer
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TSynHighlighterAttributes -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TSynHighlighterAttributes3"></a>TSynHighlighterAttributes</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.Assign"></a>Assign</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Assign</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure Assign(
+  Source : TPersistent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.AssignColorAndStyle"></a>AssignColorAndStyle</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">AssignColorAndStyle</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure AssignColorAndStyle(
+  Source : TSynHighlighterAttributes
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.Changed"></a>Changed</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Changed</span></pre>
+              <!-- Procedure Changed -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span>
+  <span class="Identifier">AFriendlyName</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+<span class="Symbol">)</span></pre>
+              <!-- Constructor Create(
+  AName : string;
+  AFriendlyName : UnicodeString
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.GetBackgroundColorStored"></a>GetBackgroundColorStored</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetBackgroundColorStored</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function GetBackgroundColorStored : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.GetFontStyleStored"></a>GetFontStyleStored</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetFontStyleStored</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function GetFontStyleStored : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.GetForegroundColorStored"></a>GetForegroundColorStored</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetForegroundColorStored</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function GetForegroundColorStored : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.GetStyleFromInt"></a>GetStyleFromInt</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetStyleFromInt</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function GetStyleFromInt : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.InternalSaveDefaultValues"></a>InternalSaveDefaultValues</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InternalSaveDefaultValues</span></pre>
+              <!-- Procedure InternalSaveDefaultValues -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.LoadFromBorlandRegistry"></a>LoadFromBorlandRegistry</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromBorlandRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">RootKey</span> <span class="Symbol">:</span> <span class="Identifier">HKEY</span><span class="Symbol">;</span>
+  <span class="Identifier">AttrKey</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span>
+  <span class="Identifier">AttrName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span>
+  <span class="Identifier">OldStyle</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function LoadFromBorlandRegistry(
+  RootKey : HKEY;
+  AttrKey : string;
+  AttrName : string;
+  OldStyle : Boolean
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.LoadFromFile"></a>LoadFromFile</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromFile</span><span class="Symbol">(</span>
+  <span class="Identifier">Ini</span> <span class="Symbol">:</span> <span class="Identifier">TIniFile</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">boolean</span></pre>
+              <!-- Function LoadFromFile(
+  Ini : TIniFile
+) : boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.LoadFromRegistry"></a>LoadFromRegistry</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">Reg</span> <span class="Symbol">:</span> <span class="Identifier">TBetterRegistry</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function LoadFromRegistry(
+  Reg : TBetterRegistry
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.SaveToFile"></a>SaveToFile</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">SaveToFile</span><span class="Symbol">(</span>
+  <span class="Identifier">Ini</span> <span class="Symbol">:</span> <span class="Identifier">TIniFile</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">boolean</span></pre>
+              <!-- Function SaveToFile(
+  Ini : TIniFile
+) : boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.SaveToRegistry"></a>SaveToRegistry</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">SaveToRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">Reg</span> <span class="Symbol">:</span> <span class="Identifier">TBetterRegistry</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function SaveToRegistry(
+  Reg : TBetterRegistry
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.SetBackground"></a>SetBackground</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetBackground</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetBackground(
+  Value : TColor
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.SetForeground"></a>SetForeground</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetForeground</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetForeground(
+  Value : TColor
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.SetStyle"></a>SetStyle</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetStyle</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetStyle(
+  Value : TFontStyles
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterAttributes.SetStyleFromInt"></a>SetStyleFromInt</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetStyleFromInt</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetStyleFromInt(
+  const Value : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TSynHighlighterList -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TSynHighlighterList3"></a>TSynHighlighterList</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterList.Count"></a>Count</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">Count</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function Count : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterList.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span></pre>
+              <!-- Constructor Create -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterList.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span></pre>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterList.FindByClass"></a>FindByClass</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindByClass</span><span class="Symbol">(</span>
+  <span class="Identifier">Comp</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function FindByClass(
+  Comp : TComponent
+) : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterList.FindByFriendlyName"></a>FindByFriendlyName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindByFriendlyName</span><span class="Symbol">(</span>
+  <span class="Identifier">FriendlyName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function FindByFriendlyName(
+  FriendlyName : string
+) : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterList.FindByName"></a>FindByName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindByName</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function FindByName(
+  Name : string
+) : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSynHighlighterList.GetItem"></a>GetItem</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetItem</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynCustomHighlighterClass</span></pre>
+              <!-- Function GetItem(
+  Index : Integer
+) : TSynCustomHighlighterClass -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- initialization -->
+      <div class="Indent">
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TBetterRegistry"></a>TBetterRegistry</td>
+              <td>
+                <pre><span class="Identifier">TBetterRegistry</span> <span class="Symbol">=</span> <span class="Identifier">SynEditMiscClasses</span><span class="Symbol">.</span><span class="Identifier">TBetterRegistry</span></pre>
+          <!-- TBetterRegistry = SynEditMiscClasses.TBetterRegistry -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter"></a>TSynCustomHighlighter</td>
+              <td>
+                <pre><span class="Identifier">TSynCustomHighlighter</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TComponent</span><span class="Symbol">)</span></pre>
+          <!-- TSynCustomHighlighter = Class(TComponent) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.ExpandedRun"></a>ExpandedRun</td>
+                      <td>
+                        <pre><span class="Identifier">ExpandedRun</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- ExpandedRun : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fAttrChangeHooks"></a>fAttrChangeHooks</td>
+                      <td>
+                        <pre><span class="Identifier">fAttrChangeHooks</span> <span class="Symbol">:</span> <span class="Identifier">TSynNotifyEventChain</span></pre>
+                  <!-- fAttrChangeHooks : TSynNotifyEventChain -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fAttributes"></a>fAttributes</td>
+                      <td>
+                        <pre><span class="Identifier">fAttributes</span> <span class="Symbol">:</span> <span class="Identifier">TStringList</span></pre>
+                  <!-- fAttributes : TStringList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fCasedLine"></a>fCasedLine</td>
+                      <td>
+                        <pre><span class="Identifier">fCasedLine</span> <span class="Symbol">:</span> <span class="Identifier">PWideChar</span></pre>
+                  <!-- fCasedLine : PWideChar -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fCasedLineStr"></a>fCasedLineStr</td>
+                      <td>
+                        <pre><span class="Identifier">fCasedLineStr</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+                  <!-- fCasedLineStr : UnicodeString -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fCaseSensitive"></a>fCaseSensitive</td>
+                      <td>
+                        <pre><span class="Identifier">fCaseSensitive</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- fCaseSensitive : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fDefaultFilter"></a>fDefaultFilter</td>
+                      <td>
+                        <pre><span class="Identifier">fDefaultFilter</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- fDefaultFilter : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fEnabled"></a>fEnabled</td>
+                      <td>
+                        <pre><span class="Identifier">fEnabled</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- fEnabled : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fExpandedLine"></a>fExpandedLine</td>
+                      <td>
+                        <pre><span class="Identifier">fExpandedLine</span> <span class="Symbol">:</span> <span class="Identifier">PWideChar</span></pre>
+                  <!-- fExpandedLine : PWideChar -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fExpandedLineLen"></a>fExpandedLineLen</td>
+                      <td>
+                        <pre><span class="Identifier">fExpandedLineLen</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- fExpandedLineLen : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fExpandedLineStr"></a>fExpandedLineStr</td>
+                      <td>
+                        <pre><span class="Identifier">fExpandedLineStr</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+                  <!-- fExpandedLineStr : UnicodeString -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fExpandedTokenPos"></a>fExpandedTokenPos</td>
+                      <td>
+                        <pre><span class="Identifier">fExpandedTokenPos</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- fExpandedTokenPos : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fLine"></a>fLine</td>
+                      <td>
+                        <pre><span class="Identifier">fLine</span> <span class="Symbol">:</span> <span class="Identifier">PWideChar</span></pre>
+                  <!-- fLine : PWideChar -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fLineLen"></a>fLineLen</td>
+                      <td>
+                        <pre><span class="Identifier">fLineLen</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- fLineLen : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fLineNumber"></a>fLineNumber</td>
+                      <td>
+                        <pre><span class="Identifier">fLineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- fLineNumber : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fLineStr"></a>fLineStr</td>
+                      <td>
+                        <pre><span class="Identifier">fLineStr</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+                  <!-- fLineStr : UnicodeString -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fOldRun"></a>fOldRun</td>
+                      <td>
+                        <pre><span class="Identifier">fOldRun</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- fOldRun : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fStringLen"></a>fStringLen</td>
+                      <td>
+                        <pre><span class="Identifier">fStringLen</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- fStringLen : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fToIdent"></a>fToIdent</td>
+                      <td>
+                        <pre><span class="Identifier">fToIdent</span> <span class="Symbol">:</span> <span class="Identifier">PWideChar</span></pre>
+                  <!-- fToIdent : PWideChar -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fTokenPos"></a>fTokenPos</td>
+                      <td>
+                        <pre><span class="Identifier">fTokenPos</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- fTokenPos : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fUpdateChange"></a>fUpdateChange</td>
+                      <td>
+                        <pre><span class="Identifier">fUpdateChange</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- fUpdateChange : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.fUpdateCount"></a>fUpdateCount</td>
+                      <td>
+                        <pre><span class="Identifier">fUpdateCount</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- fUpdateCount : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedField.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Fields.Run"></a>Run</td>
+                      <td>
+                        <pre><span class="Identifier">Run</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Run : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.AddAttribute"></a>AddAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">AddAttribute</span><span class="Symbol">(</span>
+  <span class="Identifier">Attri</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure AddAttribute(
+  Attri : TSynHighlighterAttributes
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.Assign"></a>Assign</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Assign</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Assign(
+  Source : TPersistent
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.BeginUpdate"></a>BeginUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BeginUpdate</span></pre>
+                  <!-- Procedure BeginUpdate -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Constructor Create(
+  AOwner : TComponent
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.DefHighlightChange"></a>DefHighlightChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DefHighlightChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure DefHighlightChange(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.DefineProperties"></a>DefineProperties</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DefineProperties</span><span class="Symbol">(</span>
+  <span class="Identifier">Filer</span> <span class="Symbol">:</span> <span class="Identifier">TFiler</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure DefineProperties(
+  Filer : TFiler
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Destructor Destroy; override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.DoSetLine"></a>DoSetLine</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DoSetLine</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span>
+  <span class="Identifier">LineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure DoSetLine(
+  const Value : UnicodeString;
+  LineNumber : Integer
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.EndUpdate"></a>EndUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">EndUpdate</span></pre>
+                  <!-- Procedure EndUpdate -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.EnumUserSettings"></a>EnumUserSettings</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">EnumUserSettings</span><span class="Symbol">(</span>
+  <span class="Identifier">Settings</span> <span class="Symbol">:</span> <span class="Identifier">TStrings</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure EnumUserSettings(
+  Settings : TStrings
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.FreeHighlighterAttributes"></a>FreeHighlighterAttributes</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FreeHighlighterAttributes</span></pre>
+                  <!-- Procedure FreeHighlighterAttributes -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetAttribCount"></a>GetAttribCount</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetAttribCount</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetAttribCount : Integer; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetAttribute"></a>GetAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetAttribute</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetAttribute(
+  Index : Integer
+) : TSynHighlighterAttributes; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetCapabilities"></a>GetCapabilities</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetCapabilities</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterCapabilities</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetCapabilities : TSynHighlighterCapabilities; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetCapabilitiesProp"></a>GetCapabilitiesProp</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetCapabilitiesProp</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterCapabilities</span></pre>
+                  <!-- Function GetCapabilitiesProp : TSynHighlighterCapabilities -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetDefaultAttribute"></a>GetDefaultAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDefaultAttribute</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span><span class="Symbol">;</span> <span class="ReservedWord">abstract</span></pre>
+                  <!-- Function GetDefaultAttribute(
+  Index : Integer
+) : TSynHighlighterAttributes; virtual; abstract -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetDefaultFilter"></a>GetDefaultFilter</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDefaultFilter</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetDefaultFilter : string; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetEol"></a>GetEol</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetEol</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span><span class="Symbol">;</span> <span class="ReservedWord">abstract</span></pre>
+                  <!-- Function GetEol : Boolean; virtual; abstract -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetExpandedToken"></a>GetExpandedToken</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetExpandedToken</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetExpandedToken : UnicodeString; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetExpandedTokenPos"></a>GetExpandedTokenPos</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetExpandedTokenPos</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetExpandedTokenPos : Integer; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetFriendlyLanguageName"></a>GetFriendlyLanguageName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetFriendlyLanguageName</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetFriendlyLanguageName : UnicodeString; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetFriendlyLanguageNameProp"></a>GetFriendlyLanguageNameProp</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetFriendlyLanguageNameProp</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+                  <!-- Function GetFriendlyLanguageNameProp : UnicodeString -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetKeyWords"></a>GetKeyWords</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetKeyWords</span><span class="Symbol">(</span>
+  <span class="Identifier">TokenKind</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetKeyWords(
+  TokenKind : Integer
+) : UnicodeString; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetLanguageName"></a>GetLanguageName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetLanguageName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetLanguageName : string; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetLanguageNameProp"></a>GetLanguageNameProp</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetLanguageNameProp</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function GetLanguageNameProp : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetRange"></a>GetRange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetRange</span> <span class="Symbol">:</span> <span class="Identifier">Pointer</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetRange : Pointer; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetSampleSource"></a>GetSampleSource</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetSampleSource</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetSampleSource : UnicodeString; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetToken"></a>GetToken</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetToken</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetToken : UnicodeString; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetTokenAttribute"></a>GetTokenAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetTokenAttribute</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span><span class="Symbol">;</span> <span class="ReservedWord">abstract</span></pre>
+                  <!-- Function GetTokenAttribute : TSynHighlighterAttributes; virtual; abstract -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetTokenKind"></a>GetTokenKind</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetTokenKind</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span><span class="Symbol">;</span> <span class="ReservedWord">abstract</span></pre>
+                  <!-- Function GetTokenKind : Integer; virtual; abstract -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.GetTokenPos"></a>GetTokenPos</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetTokenPos</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function GetTokenPos : Integer; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.HookAttrChangeEvent"></a>HookAttrChangeEvent</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">HookAttrChangeEvent</span><span class="Symbol">(</span>
+  <span class="Identifier">ANotifyEvent</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure HookAttrChangeEvent(
+  ANotifyEvent : TNotifyEvent
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.IsCurrentToken"></a>IsCurrentToken</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsCurrentToken</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Token</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function IsCurrentToken(
+  const Token : UnicodeString
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.IsFilterStored"></a>IsFilterStored</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsFilterStored</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function IsFilterStored : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.IsIdentChar"></a>IsIdentChar</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsIdentChar</span><span class="Symbol">(</span>
+  <span class="Identifier">AChar</span> <span class="Symbol">:</span> <span class="Identifier">WideChar</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function IsIdentChar(
+  AChar : WideChar
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.IsKeyword"></a>IsKeyword</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsKeyword</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">AKeyword</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function IsKeyword(
+  const AKeyword : UnicodeString
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.IsLineEnd"></a>IsLineEnd</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsLineEnd</span><span class="Symbol">(</span>
+  <span class="Identifier">Run</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function IsLineEnd(
+  Run : Integer
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.IsWhiteChar"></a>IsWhiteChar</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsWhiteChar</span><span class="Symbol">(</span>
+  <span class="Identifier">AChar</span> <span class="Symbol">:</span> <span class="Identifier">WideChar</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function IsWhiteChar(
+  AChar : WideChar
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.IsWordBreakChar"></a>IsWordBreakChar</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsWordBreakChar</span><span class="Symbol">(</span>
+  <span class="Identifier">AChar</span> <span class="Symbol">:</span> <span class="Identifier">WideChar</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function IsWordBreakChar(
+  AChar : WideChar
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.Loaded"></a>Loaded</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Loaded</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Loaded; override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.LoadFromFile"></a>LoadFromFile</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromFile</span><span class="Symbol">(</span>
+  <span class="Identifier">AFileName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function LoadFromFile(
+  AFileName : string
+) : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.LoadFromRegistry"></a>LoadFromRegistry</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">RootKey</span> <span class="Symbol">:</span> <span class="Identifier">HKEY</span><span class="Symbol">;</span>
+  <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function LoadFromRegistry(
+  RootKey : HKEY;
+  Key : string
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.Next"></a>Next</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Next</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure Next; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.NextToEol"></a>NextToEol</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">NextToEol</span></pre>
+                  <!-- Procedure NextToEol -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.PosToExpandedPos"></a>PosToExpandedPos</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">PosToExpandedPos</span><span class="Symbol">(</span>
+  <span class="Identifier">Pos</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function PosToExpandedPos(
+  Pos : Integer
+) : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.ResetRange"></a>ResetRange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetRange</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure ResetRange; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SaveToFile"></a>SaveToFile</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">SaveToFile</span><span class="Symbol">(</span>
+  <span class="Identifier">AFileName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function SaveToFile(
+  AFileName : string
+) : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SaveToRegistry"></a>SaveToRegistry</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">SaveToRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">RootKey</span> <span class="Symbol">:</span> <span class="Identifier">HKEY</span><span class="Symbol">;</span>
+  <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function SaveToRegistry(
+  RootKey : HKEY;
+  Key : string
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SetAttributesOnChange"></a>SetAttributesOnChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetAttributesOnChange</span><span class="Symbol">(</span>
+  <span class="Identifier">AEvent</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetAttributesOnChange(
+  AEvent : TNotifyEvent
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SetDefaultFilter"></a>SetDefaultFilter</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetDefaultFilter</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure SetDefaultFilter(
+  Value : string
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SetEnabled"></a>SetEnabled</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetEnabled</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetEnabled(
+  const Value : Boolean
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SetLine"></a>SetLine</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetLine</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span>
+  <span class="Identifier">LineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure SetLine(
+  const Value : UnicodeString;
+  LineNumber : Integer
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SetLineExpandedAtWideGlyphs"></a>SetLineExpandedAtWideGlyphs</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetLineExpandedAtWideGlyphs</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Line</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">ExpandedLine</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span><span class="Symbol">;</span>
+  <span class="Identifier">LineNumber</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure SetLineExpandedAtWideGlyphs(
+  const Line : UnicodeString;
+  const ExpandedLine : UnicodeString;
+  LineNumber : Integer
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SetRange"></a>SetRange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetRange</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">Pointer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure SetRange(
+  Value : Pointer
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.SetSampleSource"></a>SetSampleSource</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetSampleSource</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure SetSampleSource(
+  Value : UnicodeString
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.UnhookAttrChangeEvent"></a>UnhookAttrChangeEvent</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">UnhookAttrChangeEvent</span><span class="Symbol">(</span>
+  <span class="Identifier">ANotifyEvent</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure UnhookAttrChangeEvent(
+  ANotifyEvent : TNotifyEvent
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Methods.UseUserSettings"></a>UseUserSettings</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">UseUserSettings</span><span class="Symbol">(</span>
+  <span class="Identifier">settingIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function UseUserSettings(
+  settingIndex : Integer
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.AttrCount"></a>AttrCount</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">AttrCount</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetAttribCount</span>
+</pre>
+                  <!-- Property AttrCount : Integer
+  Read GetAttribCount
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.Attribute"></a>Attribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Attribute</span><span class="Symbol">[</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">]</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetAttribute</span>
+</pre>
+                  <!-- Property Attribute[
+  Index : Integer
+] : TSynHighlighterAttributes
+  Read GetAttribute
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.Capabilities"></a>Capabilities</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Capabilities</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterCapabilities</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetCapabilitiesProp</span>
+</pre>
+                  <!-- Property Capabilities : TSynHighlighterCapabilities
+  Read GetCapabilitiesProp
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.CommentAttribute"></a>CommentAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">CommentAttribute</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+  <span class="ReservedWord">Index</span> <span class="Identifier">SYN_ATTR_COMMENT</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetDefaultAttribute</span>
+</pre>
+                  <!-- Property CommentAttribute : TSynHighlighterAttributes
+  Index SYN_ATTR_COMMENT
+  Read GetDefaultAttribute
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.DefaultFilter"></a>DefaultFilter</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">DefaultFilter</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetDefaultFilter</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetDefaultFilter</span>
+  <span class="ReservedWord">Stored</span> <span class="Identifier">IsFilterStored</span>
+</pre>
+                  <!-- Property DefaultFilter : string
+  Read GetDefaultFilter
+  Write SetDefaultFilter
+  Stored IsFilterStored
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.Enabled"></a>Enabled</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Enabled</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">fEnabled</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetEnabled</span>
+  <span class="ReservedWord">Default</span> <span class="Identifier">True</span>
+</pre>
+                  <!-- Property Enabled : Boolean
+  Read fEnabled
+  Write SetEnabled
+  Default True
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.FriendlyLanguageName"></a>FriendlyLanguageName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">FriendlyLanguageName</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetFriendlyLanguageNameProp</span>
+</pre>
+                  <!-- Property FriendlyLanguageName : UnicodeString
+  Read GetFriendlyLanguageNameProp
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.IdentifierAttribute"></a>IdentifierAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">IdentifierAttribute</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+  <span class="ReservedWord">Index</span> <span class="Identifier">SYN_ATTR_IDENTIFIER</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetDefaultAttribute</span>
+</pre>
+                  <!-- Property IdentifierAttribute : TSynHighlighterAttributes
+  Index SYN_ATTR_IDENTIFIER
+  Read GetDefaultAttribute
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.KeywordAttribute"></a>KeywordAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">KeywordAttribute</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+  <span class="ReservedWord">Index</span> <span class="Identifier">SYN_ATTR_KEYWORD</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetDefaultAttribute</span>
+</pre>
+                  <!-- Property KeywordAttribute : TSynHighlighterAttributes
+  Index SYN_ATTR_KEYWORD
+  Read GetDefaultAttribute
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.LanguageName"></a>LanguageName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">LanguageName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetLanguageNameProp</span>
+</pre>
+                  <!-- Property LanguageName : string
+  Read GetLanguageNameProp
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.SampleSource"></a>SampleSource</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">SampleSource</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetSampleSource</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetSampleSource</span>
+</pre>
+                  <!-- Property SampleSource : UnicodeString
+  Read GetSampleSource
+  Write SetSampleSource
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.StringAttribute"></a>StringAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">StringAttribute</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+  <span class="ReservedWord">Index</span> <span class="Identifier">SYN_ATTR_STRING</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetDefaultAttribute</span>
+</pre>
+                  <!-- Property StringAttribute : TSynHighlighterAttributes
+  Index SYN_ATTR_STRING
+  Read GetDefaultAttribute
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.SymbolAttribute"></a>SymbolAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">SymbolAttribute</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+  <span class="ReservedWord">Index</span> <span class="Identifier">SYN_ATTR_SYMBOL</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetDefaultAttribute</span>
+</pre>
+                  <!-- Property SymbolAttribute : TSynHighlighterAttributes
+  Index SYN_ATTR_SYMBOL
+  Read GetDefaultAttribute
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighter.Properties.WhitespaceAttribute"></a>WhitespaceAttribute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">WhitespaceAttribute</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+  <span class="ReservedWord">Index</span> <span class="Identifier">SYN_ATTR_WHITESPACE</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetDefaultAttribute</span>
+</pre>
+                  <!-- Property WhitespaceAttribute : TSynHighlighterAttributes
+  Index SYN_ATTR_WHITESPACE
+  Read GetDefaultAttribute
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSynCustomHighlighterClass"></a>TSynCustomHighlighterClass</td>
+              <td>
+                <pre><span class="Identifier">TSynCustomHighlighterClass</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span> <span class="ReservedWord">Of</span> <span class="Identifier">TSynCustomHighlighter</span></pre>
+          <!-- TSynCustomHighlighterClass = Class Of TSynCustomHighlighter -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes"></a>TSynHighlighterAttributes</td>
+              <td>
+                <pre><span class="Identifier">TSynHighlighterAttributes</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TPersistent</span><span class="Symbol">)</span></pre>
+          <!-- TSynHighlighterAttributes = Class(TPersistent) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fBackground"></a>fBackground</td>
+                      <td>
+                        <pre><span class="Identifier">fBackground</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- fBackground : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fBackgroundDefault"></a>fBackgroundDefault</td>
+                      <td>
+                        <pre><span class="Identifier">fBackgroundDefault</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- fBackgroundDefault : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fForeground"></a>fForeground</td>
+                      <td>
+                        <pre><span class="Identifier">fForeground</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- fForeground : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fForegroundDefault"></a>fForegroundDefault</td>
+                      <td>
+                        <pre><span class="Identifier">fForegroundDefault</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- fForegroundDefault : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fFriendlyName"></a>fFriendlyName</td>
+                      <td>
+                        <pre><span class="Identifier">fFriendlyName</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span></pre>
+                  <!-- fFriendlyName : UnicodeString -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fName"></a>fName</td>
+                      <td>
+                        <pre><span class="Identifier">fName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- fName : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fOnChange"></a>fOnChange</td>
+                      <td>
+                        <pre><span class="Identifier">fOnChange</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span></pre>
+                  <!-- fOnChange : TNotifyEvent -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fStyle"></a>fStyle</td>
+                      <td>
+                        <pre><span class="Identifier">fStyle</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span></pre>
+                  <!-- fStyle : TFontStyles -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Fields.fStyleDefault"></a>fStyleDefault</td>
+                      <td>
+                        <pre><span class="Identifier">fStyleDefault</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span></pre>
+                  <!-- fStyleDefault : TFontStyles -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.Assign"></a>Assign</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Assign</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TPersistent</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Assign(
+  Source : TPersistent
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.AssignColorAndStyle"></a>AssignColorAndStyle</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">AssignColorAndStyle</span><span class="Symbol">(</span>
+  <span class="Identifier">Source</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterAttributes</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure AssignColorAndStyle(
+  Source : TSynHighlighterAttributes
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.Changed"></a>Changed</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Changed</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure Changed; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span>
+  <span class="Identifier">AFriendlyName</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Constructor Create(
+  AName : string;
+  AFriendlyName : UnicodeString
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.GetBackgroundColorStored"></a>GetBackgroundColorStored</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetBackgroundColorStored</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function GetBackgroundColorStored : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.GetFontStyleStored"></a>GetFontStyleStored</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetFontStyleStored</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function GetFontStyleStored : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.GetForegroundColorStored"></a>GetForegroundColorStored</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetForegroundColorStored</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function GetForegroundColorStored : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.GetStyleFromInt"></a>GetStyleFromInt</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetStyleFromInt</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function GetStyleFromInt : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.InternalSaveDefaultValues"></a>InternalSaveDefaultValues</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">InternalSaveDefaultValues</span></pre>
+                  <!-- Procedure InternalSaveDefaultValues -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.LoadFromBorlandRegistry"></a>LoadFromBorlandRegistry</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromBorlandRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">RootKey</span> <span class="Symbol">:</span> <span class="Identifier">HKEY</span><span class="Symbol">;</span>
+  <span class="Identifier">AttrKey</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span>
+  <span class="Identifier">AttrName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span><span class="Symbol">;</span>
+  <span class="Identifier">OldStyle</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function LoadFromBorlandRegistry(
+  RootKey : HKEY;
+  AttrKey : string;
+  AttrName : string;
+  OldStyle : Boolean
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.LoadFromFile"></a>LoadFromFile</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromFile</span><span class="Symbol">(</span>
+  <span class="Identifier">Ini</span> <span class="Symbol">:</span> <span class="Identifier">TIniFile</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function LoadFromFile(
+  Ini : TIniFile
+) : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.LoadFromRegistry"></a>LoadFromRegistry</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">LoadFromRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">Reg</span> <span class="Symbol">:</span> <span class="Identifier">TBetterRegistry</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function LoadFromRegistry(
+  Reg : TBetterRegistry
+) : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.SaveToFile"></a>SaveToFile</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">SaveToFile</span><span class="Symbol">(</span>
+  <span class="Identifier">Ini</span> <span class="Symbol">:</span> <span class="Identifier">TIniFile</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function SaveToFile(
+  Ini : TIniFile
+) : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.SaveToRegistry"></a>SaveToRegistry</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">SaveToRegistry</span><span class="Symbol">(</span>
+  <span class="Identifier">Reg</span> <span class="Symbol">:</span> <span class="Identifier">TBetterRegistry</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function SaveToRegistry(
+  Reg : TBetterRegistry
+) : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.SetBackground"></a>SetBackground</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetBackground</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetBackground(
+  Value : TColor
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.SetForeground"></a>SetForeground</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetForeground</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetForeground(
+  Value : TColor
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.SetStyle"></a>SetStyle</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetStyle</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetStyle(
+  Value : TFontStyles
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Methods.SetStyleFromInt"></a>SetStyleFromInt</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetStyleFromInt</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetStyleFromInt(
+  const Value : Integer
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Properties.Background"></a>Background</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Background</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">fBackground</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetBackground</span>
+  <span class="ReservedWord">Stored</span> <span class="Identifier">GetBackgroundColorStored</span>
+</pre>
+                  <!-- Property Background : TColor
+  Read fBackground
+  Write SetBackground
+  Stored GetBackgroundColorStored
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Properties.Foreground"></a>Foreground</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Foreground</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">fForeground</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetForeground</span>
+  <span class="ReservedWord">Stored</span> <span class="Identifier">GetForegroundColorStored</span>
+</pre>
+                  <!-- Property Foreground : TColor
+  Read fForeground
+  Write SetForeground
+  Stored GetForegroundColorStored
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Properties.FriendlyName"></a>FriendlyName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">FriendlyName</span> <span class="Symbol">:</span> <span class="Identifier">UnicodeString</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">fFriendlyName</span>
+</pre>
+                  <!-- Property FriendlyName : UnicodeString
+  Read fFriendlyName
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Properties.IntegerStyle"></a>IntegerStyle</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">IntegerStyle</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetStyleFromInt</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetStyleFromInt</span>
+</pre>
+                  <!-- Property IntegerStyle : Integer
+  Read GetStyleFromInt
+  Write SetStyleFromInt
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Properties.Name"></a>Name</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">fName</span>
+</pre>
+                  <!-- Property Name : string
+  Read fName
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Properties.OnChange"></a>OnChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnChange</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">fOnChange</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">fOnChange</span>
+</pre>
+                  <!-- Property OnChange : TNotifyEvent
+  Read fOnChange
+  Write fOnChange
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterAttributes.Properties.Style"></a>Style</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Style</span> <span class="Symbol">:</span> <span class="Identifier">TFontStyles</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">fStyle</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetStyle</span>
+  <span class="ReservedWord">Stored</span> <span class="Identifier">GetFontStyleStored</span>
+</pre>
+                  <!-- Property Style : TFontStyles
+  Read fStyle
+  Write SetStyle
+  Stored GetFontStyleStored
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterCapabilities"></a>TSynHighlighterCapabilities</td>
+              <td>
+                <pre><span class="Identifier">TSynHighlighterCapabilities</span> <span class="Symbol">=</span> <span class="ReservedWord">set</span> <span class="ReservedWord">of</span> <span class="Identifier">TSynHighlighterCapability</span></pre>
+          <!-- TSynHighlighterCapabilities = set of TSynHighlighterCapability -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterCapability"></a>TSynHighlighterCapability</td>
+              <td>
+                <pre><span class="Identifier">TSynHighlighterCapability</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="Identifier">hcUserSettings</span><span class="Symbol">,</span> <span class="Identifier">hcRegistry</span><span class="Symbol">)</span></pre>
+          <!-- TSynHighlighterCapability = (hcUserSettings, hcRegistry) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList"></a>TSynHighlighterList</td>
+              <td>
+                <pre><span class="Identifier">TSynHighlighterList</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TList</span><span class="Symbol">)</span></pre>
+          <!-- TSynHighlighterList = Class(TList) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Fields.hlList"></a>hlList</td>
+                      <td>
+                        <pre><span class="Identifier">hlList</span> <span class="Symbol">:</span> <span class="Identifier">TList</span></pre>
+                  <!-- hlList : TList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Methods.Count"></a>Count</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">Count</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function Count : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span></pre>
+                  <!-- Constructor Create -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Destructor Destroy; override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Methods.FindByClass"></a>FindByClass</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindByClass</span><span class="Symbol">(</span>
+  <span class="Identifier">Comp</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function FindByClass(
+  Comp : TComponent
+) : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Methods.FindByFriendlyName"></a>FindByFriendlyName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindByFriendlyName</span><span class="Symbol">(</span>
+  <span class="Identifier">FriendlyName</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function FindByFriendlyName(
+  FriendlyName : string
+) : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Methods.FindByName"></a>FindByName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindByName</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Name</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function FindByName(
+  Name : string
+) : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Methods.GetItem"></a>GetItem</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetItem</span><span class="Symbol">(</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">TSynCustomHighlighterClass</span></pre>
+                  <!-- Function GetItem(
+  Index : Integer
+) : TSynCustomHighlighterClass -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSynHighlighterList.Properties.Items"></a>Items</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Items</span><span class="Symbol">[</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">]</span> <span class="Symbol">:</span> <span class="Identifier">TSynCustomHighlighterClass</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">GetItem</span>
+   <span class="ReservedWord">Default</span>
+</pre>
+                  <!-- Property Items[
+  Index : Integer
+] : TSynCustomHighlighterClass
+  Read GetItem
+   Default
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Graphics"></a>Graphics</td>
+              <td>
+                <pre><span class="Identifier">Graphics</span></pre>
+          <!-- Graphics -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.IniFiles"></a>IniFiles</td>
+              <td>
+                <pre><span class="Identifier">IniFiles</span></pre>
+          <!-- IniFiles -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Registry"></a>Registry</td>
+              <td>
+                <pre><span class="Identifier">Registry</span></pre>
+          <!-- Registry -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEditMiscClasses"></a>SynEditMiscClasses</td>
+              <td>
+                <pre><span class="Identifier">SynEditMiscClasses</span></pre>
+          <!-- SynEditMiscClasses -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEditStrConst"></a>SynEditStrConst</td>
+              <td>
+                <pre><span class="Identifier">SynEditStrConst</span></pre>
+          <!-- SynEditStrConst -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEditTypes"></a>SynEditTypes</td>
+              <td>
+                <pre><span class="Identifier">SynEditTypes</span></pre>
+          <!-- SynEditTypes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynUnicode"></a>SynUnicode</td>
+              <td>
+                <pre><span class="Identifier">SynUnicode</span></pre>
+          <!-- SynUnicode -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Variables -->
+      <h2><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a name="Variables2"></a>Variables</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.G_PlaceableHighlighters"></a>G_PlaceableHighlighters</td>
+              <td>
+                <pre><span class="Identifier">G_PlaceableHighlighters</span> <span class="Symbol">:</span> <span class="Identifier">TSynHighlighterList</span></pre>
+          <!-- G_PlaceableHighlighters : TSynHighlighterList -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

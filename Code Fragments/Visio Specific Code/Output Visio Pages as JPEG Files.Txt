@@ -1,0 +1,34 @@
+'
+' This module defines a routine to export pages as JPEG files.
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+' @Author  David Hoyle.
+'
+Option Explicit
+Option Compare Text
+
+'
+' This method exports all the drawing pages in the current file to a
+' directory as JPEG files for use in a HTML system when the document is
+' saved.
+'
+' @precon  None.
+' @postcon Exports all the drawing pages in the current file to a
+'          directory as JPEG files for use in a HTML system.
+'
+' @param   doc as a IVDocument
+'
+' @noexception
+' @noerror
+'
+Private Sub Document_DocumentSaved(ByVal doc As IVDocument)
+  Const strPath = "H:\Documents\WCRM OLE Alliance Database" & _
+    "\Help\Documentation\Possession Database Design\"
+  Dim P As Page
+  For Each P In doc.Pages
+    P.Export strPath + P.Name + ".jpg"
+  Next P
+End Sub
+
+

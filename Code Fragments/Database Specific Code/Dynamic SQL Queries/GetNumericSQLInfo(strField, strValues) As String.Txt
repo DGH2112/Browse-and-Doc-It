@@ -1,0 +1,69 @@
+'
+' This routine builds a portion of an SQL statement for inclusion in a WHERE clause
+' from the strValues item for a numeric field. Lists of items are separated using
+' commas (1,2,3,7...) and ranges of items are denoted using a colon (12:23)
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon Name of the field as a string (You should enclose the name in square
+'          brackets to avoid confusion in the SQL statement, ie. "[My Field Name]")
+'          A string of text depicting the values required.
+'          Returns a section of am SQL WHERE clause as a string
+'
+' @param  strField as a string
+' @param  strValues as a string
+' @return a string
+'
+Function GetNumericSQLInfo(strField As String, strValues As String) As String
+  Dim iChar As Long
+  Dim strToken As String
+  Dim bRange As Boolean
+  Dim strIN As String
+  Exception.Push "GetNumericSQLInfo", strField, strValues
+  On Error GoTo ErrHnd
+  GetNumericSQLInfo = ""
+  strIN = ""
+  bRange = False
+  ' Read the string as a stream of characters looking for (,) and (:)
+  For iChar = 1 To Len(strValues)
+    If Mid$(strValues, iChar, 1) = "," Then
+      If Not bRange Then
+        If strIN <> "" Then strIN = strIN + ","
+        strIN = strIN + strToken
+      Else
+        If GetNumericSQLInfo <> "" Then GetNumericSQLInfo = GetNumericSQLInfo + " AND "
+        GetNumericSQLInfo = GetNumericSQLInfo + "[" & strField & "]" & " <= " & strToken & ")"
+        bRange = False
+      End If
+      strToken = ""
+    End If
+    If Mid$(strValues, iChar, 1) = ":" Then
+      bRange = True
+      If GetNumericSQLInfo <> "" Then GetNumericSQLInfo = GetNumericSQLInfo + " OR "
+      GetNumericSQLInfo = GetNumericSQLInfo + "(" & "[" & strField & "]" & " >= " & strToken
+      strToken = ""
+    End If
+    If Mid$(strValues, iChar, 1) Like "[0-9.-]" Then
+      strToken = strToken + Mid$(strValues, iChar, 1)
+    End If
+  Next iChar
+  If strToken <> "" Then
+    If Not bRange Then
+      If strIN <> "" Then strIN = strIN + ","
+      strIN = strIN + strToken
+    Else
+      If GetNumericSQLInfo <> "" Then GetNumericSQLInfo = GetNumericSQLInfo + " AND "
+      GetNumericSQLInfo = GetNumericSQLInfo + "[" & strField & "]" & " <= " & strToken & ")"
+    End If
+  End If
+  If GetNumericSQLInfo = "" Then
+    GetNumericSQLInfo = "[" & strField & "] IN (" & strIN & ")"
+  Else
+    If strIN <> "" Then GetNumericSQLInfo = "[" & strField & "] IN (" & strIN & ") OR " & GetNumericSQLInfo
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

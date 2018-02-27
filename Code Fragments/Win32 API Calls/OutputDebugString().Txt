@@ -1,0 +1,13 @@
+'
+' The OutputDebugString function sends a string to the debugger for the current application.
+'
+' VOID OutputDebugString(
+'   LPCTSTR lpOutputString  // pointer to string to be displayed
+' );
+'
+' If the application has no debugger, the system debugger displays the string. If the application has no
+' debugger and the system debugger is not active, OutputDebugString does nothing.
+'
+' @param  lpOutputString as a LPCTSTR - Points to the null-terminated string to be displayed.
+'
+Private Declare Sub OutputDebugString Lib "kernel32" Alias "OutputDebugStringA" (ByVal lpOutputString As String)

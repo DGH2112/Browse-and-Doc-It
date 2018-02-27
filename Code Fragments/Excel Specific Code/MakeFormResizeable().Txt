@@ -1,0 +1,25 @@
+'
+' This method makes the user form resizeable.
+'
+' @Date    16 Oct 2003
+' @Version 1.0
+'
+' @precon  None.
+' @postcon Makes the user form resizeable.
+'
+Private Sub MakeFormResizeable()
+  Const GWL_STYLE As Long = -16
+  Const WS_THICKFRAME As Long = &H40000
+  Dim iStyle As Long
+  Dim hwnd As Long
+  Exception.Push "frmSQL.MakeFormResizeable"
+  On Error GoTo ErrHnd
+  hwnd = hWndForm
+  If hwnd = 0 Then GoTo ErrHnd
+  iStyle = GetWindowLong(hwnd, GWL_STYLE)
+  iStyle = iStyle Or WS_THICKFRAME
+  SetWindowLong hwnd, GWL_STYLE, iStyle
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

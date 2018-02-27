@@ -1,0 +1,30 @@
+'
+' This check the passed token for wildcards and returns true if there are any
+' present else false
+'
+' @Version 1.1
+' @Date    09 Jul 2004
+'
+' @precon  None.
+' @postcon Determines if the token passed contains a wildcard.
+'
+' @param strToken as a string
+' @return a boolean
+'
+Private Function ContainsWildCards(strToken As String) As Boolean
+  Dim i As Long
+  Dim C As String * 1
+  Exception.Push "ContainsWildCards", strToken
+  On Error GoTo ErrHnd
+  ContainsWildCards = False
+  For i = 1 To Len(strToken)
+    C = Mid$(strToken, i, 1)
+    If C = "%" Or C = "_" Or C = "[" Then
+      ContainsWildCards = True
+      GoTo ErrHnd
+    End If
+  Next
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

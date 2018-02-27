@@ -1,0 +1,2722 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>Spin.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MMSystem.html">MMSystem.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Nb30.html">Nb30.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OpenGL.html">OpenGL.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ShlObj.html">ShlObj.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Windows.html">Windows.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Spin.html">Spin.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit.html">Unit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VirtualTrees.html">VirtualTrees.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a href="#Constants2">Constants</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a href="#Errors2">Errors</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit Spin -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit Spin</h1>
+      
+      <!-- Errors -->
+      <h2><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a name="Errors"></a>Errors</h2>
+      <ul>
+        <li class="Error">Method 'TSpinEdit.WMCut' has an unsatisfied forward reference. [FindUnresolvedObjectAndClassMethods]</li>
+        <li class="Error">Method 'TSpinEdit.WMCut' has not been declared. [FindUnresolvedImplementedClassMethods]</li>
+      </ul>
+      
+      <!-- Constants -->
+      <h2><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a name="Constants2"></a>Constants</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.InitRepeatPause"></a>InitRepeatPause</td>
+              <td>
+                <pre><span class="Identifier">InitRepeatPause</span> <span class="Symbol">=</span> <span class="Number">400</span></pre>
+          <!-- InitRepeatPause = 400 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.RepeatPause"></a>RepeatPause</td>
+              <td>
+                <pre><span class="Identifier">RepeatPause</span> <span class="Symbol">=</span> <span class="Number">100</span></pre>
+          <!-- RepeatPause = 100 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+          <!-- TSpinButton -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TSpinButton3"></a>TSpinButton</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.AdjustSize"></a>AdjustSize</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">AdjustSize</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">W</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">H</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure AdjustSize(
+  var W : Integer;
+  var H : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.BtnClick"></a>BtnClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BtnClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure BtnClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.BtnMouseDown"></a>BtnMouseDown</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BtnMouseDown</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="Identifier">Button</span> <span class="Symbol">:</span> <span class="Identifier">TMouseButton</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span><span class="Symbol">;</span>
+  <span class="Identifier">X</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Y</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure BtnMouseDown(
+  Sender : TObject;
+  Button : TMouseButton;
+  Shift : TShiftState;
+  X : Integer;
+  Y : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Constructor Create(
+  AOwner : TComponent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.CreateButton"></a>CreateButton</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">CreateButton</span> <span class="Symbol">:</span> <span class="Identifier">TTimerSpeedButton</span></pre>
+              <!-- Function CreateButton : TTimerSpeedButton -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.GetDownGlyph"></a>GetDownGlyph</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDownGlyph</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span></pre>
+              <!-- Function GetDownGlyph : TBitmap -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.GetDownNumGlyphs"></a>GetDownNumGlyphs</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDownNumGlyphs</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span></pre>
+              <!-- Function GetDownNumGlyphs : TNumGlyphs -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.GetUpGlyph"></a>GetUpGlyph</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetUpGlyph</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span></pre>
+              <!-- Function GetUpGlyph : TBitmap -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.GetUpNumGlyphs"></a>GetUpNumGlyphs</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetUpNumGlyphs</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span></pre>
+              <!-- Function GetUpNumGlyphs : TNumGlyphs -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.KeyDown"></a>KeyDown</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">KeyDown</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Word</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure KeyDown(
+  var Key : Word;
+  Shift : TShiftState
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.Loaded"></a>Loaded</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Loaded</span></pre>
+              <!-- Procedure Loaded -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.Notification"></a>Notification</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Notification</span><span class="Symbol">(</span>
+  <span class="Identifier">AComponent</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span><span class="Symbol">;</span>
+  <span class="Identifier">Operation</span> <span class="Symbol">:</span> <span class="Identifier">TOperation</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure Notification(
+  AComponent : TComponent;
+  Operation : TOperation
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.SetBounds"></a>SetBounds</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetBounds</span><span class="Symbol">(</span>
+  <span class="Identifier">ALeft</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">ATop</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">AWidth</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">AHeight</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetBounds(
+  ALeft : Integer;
+  ATop : Integer;
+  AWidth : Integer;
+  AHeight : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.SetDownGlyph"></a>SetDownGlyph</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetDownGlyph</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetDownGlyph(
+  Value : TBitmap
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.SetDownNumGlyphs"></a>SetDownNumGlyphs</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetDownNumGlyphs</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetDownNumGlyphs(
+  Value : TNumGlyphs
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.SetFocusBtn"></a>SetFocusBtn</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetFocusBtn</span><span class="Symbol">(</span>
+  <span class="Identifier">Btn</span> <span class="Symbol">:</span> <span class="Identifier">TTimerSpeedButton</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetFocusBtn(
+  Btn : TTimerSpeedButton
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.SetUpGlyph"></a>SetUpGlyph</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetUpGlyph</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetUpGlyph(
+  Value : TBitmap
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.SetUpNumGlyphs"></a>SetUpNumGlyphs</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetUpNumGlyphs</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetUpNumGlyphs(
+  Value : TNumGlyphs
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.WMGetDlgCode"></a>WMGetDlgCode</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMGetDlgCode</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMGetDlgCode</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure WMGetDlgCode(
+  var Message : TWMGetDlgCode
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.WMKillFocus"></a>WMKillFocus</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMKillFocus</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMKillFocus</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure WMKillFocus(
+  var Message : TWMKillFocus
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.WMSetFocus"></a>WMSetFocus</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMSetFocus</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMSetFocus</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure WMSetFocus(
+  var Message : TWMSetFocus
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinButton.WMSize"></a>WMSize</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMSize</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMSize</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure WMSize(
+  var Message : TWMSize
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TSpinEdit -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TSpinEdit3"></a>TSpinEdit</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.CheckValue"></a>CheckValue</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">CheckValue</span><span class="Symbol">(</span>
+  <span class="Identifier">NewValue</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span></pre>
+              <!-- Function CheckValue(
+  NewValue : LongInt
+) : LongInt -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.CMEnter"></a>CMEnter</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CMEnter</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TCMGotFocus</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure CMEnter(
+  var Message : TCMGotFocus
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.CMExit"></a>CMExit</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CMExit</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TCMExit</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure CMExit(
+  var Message : TCMExit
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Constructor Create(
+  AOwner : TComponent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.CreateParams"></a>CreateParams</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CreateParams</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Params</span> <span class="Symbol">:</span> <span class="Identifier">TCreateParams</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure CreateParams(
+  var Params : TCreateParams
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.CreateWnd"></a>CreateWnd</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CreateWnd</span></pre>
+              <!-- Procedure CreateWnd -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span></pre>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.DownClick"></a>DownClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DownClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure DownClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.GetChildren"></a>GetChildren</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">GetChildren</span><span class="Symbol">(</span>
+  <span class="Identifier">Proc</span> <span class="Symbol">:</span> <span class="Identifier">TGetChildProc</span><span class="Symbol">;</span>
+  <span class="Identifier">Root</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure GetChildren(
+  Proc : TGetChildProc;
+  Root : TComponent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.GetMinHeight"></a>GetMinHeight</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetMinHeight</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- Function GetMinHeight : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.GetValue"></a>GetValue</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetValue</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span></pre>
+              <!-- Function GetValue : LongInt -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.IsValidChar"></a>IsValidChar</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsValidChar</span><span class="Symbol">(</span>
+  <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Char</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsValidChar(
+  Key : Char
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.KeyDown"></a>KeyDown</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">KeyDown</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Word</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure KeyDown(
+  var Key : Word;
+  Shift : TShiftState
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.KeyPress"></a>KeyPress</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">KeyPress</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Char</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure KeyPress(
+  var Key : Char
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.SetEditRect"></a>SetEditRect</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetEditRect</span></pre>
+              <!-- Procedure SetEditRect -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.SetValue"></a>SetValue</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetValue</span><span class="Symbol">(</span>
+  <span class="Identifier">NewValue</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetValue(
+  NewValue : LongInt
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.UpClick"></a>UpClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">UpClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure UpClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.WMCut"></a>WMCut</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMCut</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMPaste</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure WMCut(
+  var Message : TWMPaste
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.WMPaste"></a>WMPaste</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMPaste</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMPaste</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure WMPaste(
+  var Message : TWMPaste
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TSpinEdit.WMSize"></a>WMSize</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMSize</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMSize</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure WMSize(
+  var Message : TWMSize
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TTimerSpeedButton -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TTimerSpeedButton3"></a>TTimerSpeedButton</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TTimerSpeedButton.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span></pre>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TTimerSpeedButton.MouseDown"></a>MouseDown</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MouseDown</span><span class="Symbol">(</span>
+  <span class="Identifier">Button</span> <span class="Symbol">:</span> <span class="Identifier">TMouseButton</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span><span class="Symbol">;</span>
+  <span class="Identifier">X</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Y</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure MouseDown(
+  Button : TMouseButton;
+  Shift : TShiftState;
+  X : Integer;
+  Y : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TTimerSpeedButton.MouseUp"></a>MouseUp</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MouseUp</span><span class="Symbol">(</span>
+  <span class="Identifier">Button</span> <span class="Symbol">:</span> <span class="Identifier">TMouseButton</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span><span class="Symbol">;</span>
+  <span class="Identifier">X</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Y</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure MouseUp(
+  Button : TMouseButton;
+  Shift : TShiftState;
+  X : Integer;
+  Y : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TTimerSpeedButton.Paint"></a>Paint</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Paint</span></pre>
+              <!-- Procedure Paint -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TTimerSpeedButton.TimerExpired"></a>TimerExpired</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">TimerExpired</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure TimerExpired(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TNumGlyphs"></a>TNumGlyphs</td>
+              <td>
+                <pre><span class="Identifier">TNumGlyphs</span> <span class="Symbol">=</span> <span class="Identifier">Buttons</span><span class="Symbol">.</span><span class="Identifier">TNumGlyphs</span></pre>
+          <!-- TNumGlyphs = Buttons.TNumGlyphs -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TSpinButton"></a>TSpinButton</td>
+              <td>
+                <pre><span class="Identifier">TSpinButton</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TWinControl</span><span class="Symbol">)</span></pre>
+          <!-- TSpinButton = Class(TWinControl) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Fields.FDownButton"></a>FDownButton</td>
+                      <td>
+                        <pre><span class="Identifier">FDownButton</span> <span class="Symbol">=</span> <span class="Identifier">TTimerSpeedButton</span></pre>
+                  <!-- FDownButton = TTimerSpeedButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Fields.FFocusControl"></a>FFocusControl</td>
+                      <td>
+                        <pre><span class="Identifier">FFocusControl</span> <span class="Symbol">=</span> <span class="Identifier">TWinControl</span></pre>
+                  <!-- FFocusControl = TWinControl -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Fields.FFocusedButton"></a>FFocusedButton</td>
+                      <td>
+                        <pre><span class="Identifier">FFocusedButton</span> <span class="Symbol">=</span> <span class="Identifier">TTimerSpeedButton</span></pre>
+                  <!-- FFocusedButton = TTimerSpeedButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Fields.FOnDownClick"></a>FOnDownClick</td>
+                      <td>
+                        <pre><span class="Identifier">FOnDownClick</span> <span class="Symbol">=</span> <span class="Identifier">TNotifyEvent</span></pre>
+                  <!-- FOnDownClick = TNotifyEvent -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Fields.FOnUpClick"></a>FOnUpClick</td>
+                      <td>
+                        <pre><span class="Identifier">FOnUpClick</span> <span class="Symbol">=</span> <span class="Identifier">TNotifyEvent</span></pre>
+                  <!-- FOnUpClick = TNotifyEvent -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Fields.FUpButton"></a>FUpButton</td>
+                      <td>
+                        <pre><span class="Identifier">FUpButton</span> <span class="Symbol">=</span> <span class="Identifier">TTimerSpeedButton</span></pre>
+                  <!-- FUpButton = TTimerSpeedButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.AdjustSize"></a>AdjustSize</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">AdjustSize</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">W</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">H</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">reintroduce</span></pre>
+                  <!-- Procedure AdjustSize(
+  var W : Integer;
+  var H : Integer
+); reintroduce -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.BtnClick"></a>BtnClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BtnClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure BtnClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.BtnMouseDown"></a>BtnMouseDown</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">BtnMouseDown</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="Identifier">Button</span> <span class="Symbol">:</span> <span class="Identifier">TMouseButton</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span><span class="Symbol">;</span>
+  <span class="Identifier">X</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Y</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure BtnMouseDown(
+  Sender : TObject;
+  Button : TMouseButton;
+  Shift : TShiftState;
+  X : Integer;
+  Y : Integer
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Constructor Create(
+  AOwner : TComponent
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.CreateButton"></a>CreateButton</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">CreateButton</span> <span class="Symbol">:</span> <span class="Identifier">TTimerSpeedButton</span></pre>
+                  <!-- Function CreateButton : TTimerSpeedButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.GetDownGlyph"></a>GetDownGlyph</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDownGlyph</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span></pre>
+                  <!-- Function GetDownGlyph : TBitmap -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.GetDownNumGlyphs"></a>GetDownNumGlyphs</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetDownNumGlyphs</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span></pre>
+                  <!-- Function GetDownNumGlyphs : TNumGlyphs -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.GetUpGlyph"></a>GetUpGlyph</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetUpGlyph</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span></pre>
+                  <!-- Function GetUpGlyph : TBitmap -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.GetUpNumGlyphs"></a>GetUpNumGlyphs</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetUpNumGlyphs</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span></pre>
+                  <!-- Function GetUpNumGlyphs : TNumGlyphs -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.KeyDown"></a>KeyDown</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">KeyDown</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Word</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure KeyDown(
+  var Key : Word;
+  Shift : TShiftState
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.Loaded"></a>Loaded</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Loaded</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Loaded; override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.Notification"></a>Notification</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Notification</span><span class="Symbol">(</span>
+  <span class="Identifier">AComponent</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span><span class="Symbol">;</span>
+  <span class="Identifier">Operation</span> <span class="Symbol">:</span> <span class="Identifier">TOperation</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Notification(
+  AComponent : TComponent;
+  Operation : TOperation
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.SetBounds"></a>SetBounds</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetBounds</span><span class="Symbol">(</span>
+  <span class="Identifier">ALeft</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">ATop</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">AWidth</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">AHeight</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure SetBounds(
+  ALeft : Integer;
+  ATop : Integer;
+  AWidth : Integer;
+  AHeight : Integer
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.SetDownGlyph"></a>SetDownGlyph</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetDownGlyph</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetDownGlyph(
+  Value : TBitmap
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.SetDownNumGlyphs"></a>SetDownNumGlyphs</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetDownNumGlyphs</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetDownNumGlyphs(
+  Value : TNumGlyphs
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.SetFocusBtn"></a>SetFocusBtn</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetFocusBtn</span><span class="Symbol">(</span>
+  <span class="Identifier">Btn</span> <span class="Symbol">:</span> <span class="Identifier">TTimerSpeedButton</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetFocusBtn(
+  Btn : TTimerSpeedButton
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.SetUpGlyph"></a>SetUpGlyph</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetUpGlyph</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetUpGlyph(
+  Value : TBitmap
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.SetUpNumGlyphs"></a>SetUpNumGlyphs</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetUpNumGlyphs</span><span class="Symbol">(</span>
+  <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetUpNumGlyphs(
+  Value : TNumGlyphs
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.WMGetDlgCode"></a>WMGetDlgCode</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMGetDlgCode</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMGetDlgCode</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure WMGetDlgCode(
+  var Message : TWMGetDlgCode
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.WMKillFocus"></a>WMKillFocus</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMKillFocus</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMKillFocus</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure WMKillFocus(
+  var Message : TWMKillFocus
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.WMSetFocus"></a>WMSetFocus</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMSetFocus</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMSetFocus</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure WMSetFocus(
+  var Message : TWMSetFocus
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Methods.WMSize"></a>WMSize</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMSize</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMSize</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure WMSize(
+  var Message : TWMSize
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.Align"></a>Align</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Align</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Align :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.Anchors"></a>Anchors</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Anchors</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Anchors :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.Constraints"></a>Constraints</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Constraints</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Constraints :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.Ctl3D"></a>Ctl3D</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Ctl3D</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Ctl3D :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.DownGlyph"></a>DownGlyph</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">DownGlyph</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">GetDownGlyph</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">SetDownGlyph</span>
+</pre>
+                  <!-- Property DownGlyph : TBitmap
+   Read GetDownGlyph
+   Write SetDownGlyph
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.DownNumGlyphs"></a>DownNumGlyphs</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">DownNumGlyphs</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">GetDownNumGlyphs</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">SetDownNumGlyphs</span>
+   <span class="ReservedWord">Default</span> <span class="Number">1</span>
+</pre>
+                  <!-- Property DownNumGlyphs : TNumGlyphs
+   Read GetDownNumGlyphs
+   Write SetDownNumGlyphs
+   Default 1
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.DragCursor"></a>DragCursor</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">DragCursor</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property DragCursor :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.DragKind"></a>DragKind</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">DragKind</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property DragKind :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.DragMode"></a>DragMode</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">DragMode</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property DragMode :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.Enabled"></a>Enabled</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Enabled</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Enabled :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.FocusControl"></a>FocusControl</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">FocusControl</span> <span class="Symbol">:</span> <span class="Identifier">TWinControl</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FFocusControl</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FFocusControl</span>
+</pre>
+                  <!-- Property FocusControl : TWinControl
+   Read FFocusControl
+   Write FFocusControl
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnDownClick"></a>OnDownClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnDownClick</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FOnDownClick</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FOnDownClick</span>
+</pre>
+                  <!-- Property OnDownClick : TNotifyEvent
+   Read FOnDownClick
+   Write FOnDownClick
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnDragDrop"></a>OnDragDrop</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnDragDrop</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnDragDrop :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnDragOver"></a>OnDragOver</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnDragOver</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnDragOver :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnEndDock"></a>OnEndDock</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnEndDock</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnEndDock :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnEndDrag"></a>OnEndDrag</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnEndDrag</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnEndDrag :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnEnter"></a>OnEnter</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnEnter</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnEnter :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnExit"></a>OnExit</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnExit</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnExit :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnStartDock"></a>OnStartDock</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnStartDock</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnStartDock :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnStartDrag"></a>OnStartDrag</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnStartDrag</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnStartDrag :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.OnUpClick"></a>OnUpClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnUpClick</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FOnUpClick</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FOnUpClick</span>
+</pre>
+                  <!-- Property OnUpClick : TNotifyEvent
+   Read FOnUpClick
+   Write FOnUpClick
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.ParentCtl3D"></a>ParentCtl3D</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ParentCtl3D</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ParentCtl3D :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.ParentShowHint"></a>ParentShowHint</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ParentShowHint</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ParentShowHint :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.PopupMenu"></a>PopupMenu</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">PopupMenu</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property PopupMenu :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.ShowHint"></a>ShowHint</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ShowHint</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ShowHint :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.TabOrder"></a>TabOrder</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">TabOrder</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property TabOrder :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.TabStop"></a>TabStop</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">TabStop</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property TabStop :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.UpGlyph"></a>UpGlyph</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">UpGlyph</span> <span class="Symbol">:</span> <span class="Identifier">TBitmap</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">GetUpGlyph</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">SetUpGlyph</span>
+</pre>
+                  <!-- Property UpGlyph : TBitmap
+   Read GetUpGlyph
+   Write SetUpGlyph
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.UpNumGlyphs"></a>UpNumGlyphs</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">UpNumGlyphs</span> <span class="Symbol">:</span> <span class="Identifier">TNumGlyphs</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">GetUpNumGlyphs</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">SetUpNumGlyphs</span>
+   <span class="ReservedWord">Default</span> <span class="Number">1</span>
+</pre>
+                  <!-- Property UpNumGlyphs : TNumGlyphs
+   Read GetUpNumGlyphs
+   Write SetUpNumGlyphs
+   Default 1
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinButton.Properties.Visible"></a>Visible</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Visible</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Visible :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit"></a>TSpinEdit</td>
+              <td>
+                <pre><span class="Identifier">TSpinEdit</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TCustomEdit</span><span class="Symbol">)</span></pre>
+          <!-- TSpinEdit = Class(TCustomEdit) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Fields.FButton"></a>FButton</td>
+                      <td>
+                        <pre><span class="Identifier">FButton</span> <span class="Symbol">=</span> <span class="Identifier">TSpinButton</span></pre>
+                  <!-- FButton = TSpinButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Fields.FEditorEnabled"></a>FEditorEnabled</td>
+                      <td>
+                        <pre><span class="Identifier">FEditorEnabled</span> <span class="Symbol">=</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- FEditorEnabled = Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Fields.FIncrement"></a>FIncrement</td>
+                      <td>
+                        <pre><span class="Identifier">FIncrement</span> <span class="Symbol">=</span> <span class="Identifier">LongInt</span></pre>
+                  <!-- FIncrement = LongInt -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Fields.FMaxValue"></a>FMaxValue</td>
+                      <td>
+                        <pre><span class="Identifier">FMaxValue</span> <span class="Symbol">=</span> <span class="Identifier">LongInt</span></pre>
+                  <!-- FMaxValue = LongInt -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Fields.FMinValue"></a>FMinValue</td>
+                      <td>
+                        <pre><span class="Identifier">FMinValue</span> <span class="Symbol">=</span> <span class="Identifier">LongInt</span></pre>
+                  <!-- FMinValue = LongInt -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.CheckValue"></a>CheckValue</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">CheckValue</span><span class="Symbol">(</span>
+  <span class="Identifier">NewValue</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span></pre>
+                  <!-- Function CheckValue(
+  NewValue : LongInt
+) : LongInt -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.CMEnter"></a>CMEnter</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CMEnter</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TCMGotFocus</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure CMEnter(
+  var Message : TCMGotFocus
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.CMExit"></a>CMExit</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CMExit</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TCMExit</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure CMExit(
+  var Message : TCMExit
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Constructor Create(
+  AOwner : TComponent
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.CreateParams"></a>CreateParams</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CreateParams</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Params</span> <span class="Symbol">:</span> <span class="Identifier">TCreateParams</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure CreateParams(
+  var Params : TCreateParams
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.CreateWnd"></a>CreateWnd</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CreateWnd</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure CreateWnd; override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Destructor Destroy; override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.DownClick"></a>DownClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">DownClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure DownClick(
+  Sender : TObject
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.GetChildren"></a>GetChildren</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">GetChildren</span><span class="Symbol">(</span>
+  <span class="Identifier">Proc</span> <span class="Symbol">:</span> <span class="Identifier">TGetChildProc</span><span class="Symbol">;</span>
+  <span class="Identifier">Root</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure GetChildren(
+  Proc : TGetChildProc;
+  Root : TComponent
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.GetMinHeight"></a>GetMinHeight</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetMinHeight</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function GetMinHeight : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.GetValue"></a>GetValue</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetValue</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span></pre>
+                  <!-- Function GetValue : LongInt -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.IsValidChar"></a>IsValidChar</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsValidChar</span><span class="Symbol">(</span>
+  <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Char</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Function IsValidChar(
+  Key : Char
+) : Boolean; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.KeyDown"></a>KeyDown</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">KeyDown</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Word</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure KeyDown(
+  var Key : Word;
+  Shift : TShiftState
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.KeyPress"></a>KeyPress</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">KeyPress</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Char</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure KeyPress(
+  var Key : Char
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.SetEditRect"></a>SetEditRect</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetEditRect</span></pre>
+                  <!-- Procedure SetEditRect -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.SetValue"></a>SetValue</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetValue</span><span class="Symbol">(</span>
+  <span class="Identifier">NewValue</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetValue(
+  NewValue : LongInt
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.UpClick"></a>UpClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">UpClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure UpClick(
+  Sender : TObject
+); virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.WMCut"></a>WMCut</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMCut</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMCut</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure WMCut(
+  var Message : TWMCut
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.WMPaste"></a>WMPaste</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMPaste</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMPaste</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure WMPaste(
+  var Message : TWMPaste
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Methods.WMSize"></a>WMSize</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WMSize</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TWMSize</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> </pre>
+                  <!-- Procedure WMSize(
+  var Message : TWMSize
+); Message  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Anchors"></a>Anchors</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Anchors</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Anchors :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.AutoSelect"></a>AutoSelect</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">AutoSelect</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property AutoSelect :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.AutoSize"></a>AutoSize</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">AutoSize</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property AutoSize :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Button"></a>Button</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Button</span> <span class="Symbol">:</span> <span class="Identifier">TSpinButton</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FButton</span>
+</pre>
+                  <!-- Property Button : TSpinButton
+   Read FButton
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Color"></a>Color</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Color</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Color :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Constraints"></a>Constraints</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Constraints</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Constraints :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Ctl3D"></a>Ctl3D</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Ctl3D</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Ctl3D :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.DragCursor"></a>DragCursor</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">DragCursor</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property DragCursor :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.DragMode"></a>DragMode</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">DragMode</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property DragMode :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.EditorEnabled"></a>EditorEnabled</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">EditorEnabled</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FEditorEnabled</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FEditorEnabled</span>
+   <span class="ReservedWord">Default</span> <span class="Identifier">True</span>
+</pre>
+                  <!-- Property EditorEnabled : Boolean
+   Read FEditorEnabled
+   Write FEditorEnabled
+   Default True
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Enabled"></a>Enabled</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Enabled</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Enabled :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Font"></a>Font</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Font</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Font :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Increment"></a>Increment</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Increment</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FIncrement</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FIncrement</span>
+   <span class="ReservedWord">Default</span> <span class="Number">1</span>
+</pre>
+                  <!-- Property Increment : LongInt
+   Read FIncrement
+   Write FIncrement
+   Default 1
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.MaxLength"></a>MaxLength</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">MaxLength</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property MaxLength :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.MaxValue"></a>MaxValue</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">MaxValue</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FMaxValue</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FMaxValue</span>
+</pre>
+                  <!-- Property MaxValue : LongInt
+   Read FMaxValue
+   Write FMaxValue
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.MinValue"></a>MinValue</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">MinValue</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FMinValue</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FMinValue</span>
+</pre>
+                  <!-- Property MinValue : LongInt
+   Read FMinValue
+   Write FMinValue
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnChange"></a>OnChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnChange</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnChange :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnClick"></a>OnClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnClick</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnClick :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnDblClick"></a>OnDblClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnDblClick</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnDblClick :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnDragDrop"></a>OnDragDrop</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnDragDrop</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnDragDrop :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnDragOver"></a>OnDragOver</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnDragOver</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnDragOver :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnEndDrag"></a>OnEndDrag</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnEndDrag</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnEndDrag :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnEnter"></a>OnEnter</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnEnter</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnEnter :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnExit"></a>OnExit</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnExit</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnExit :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnKeyDown"></a>OnKeyDown</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnKeyDown</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnKeyDown :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnKeyPress"></a>OnKeyPress</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnKeyPress</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnKeyPress :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnKeyUp"></a>OnKeyUp</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnKeyUp</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnKeyUp :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnMouseDown"></a>OnMouseDown</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnMouseDown</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnMouseDown :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnMouseMove"></a>OnMouseMove</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnMouseMove</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnMouseMove :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnMouseUp"></a>OnMouseUp</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnMouseUp</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnMouseUp :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.OnStartDrag"></a>OnStartDrag</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnStartDrag</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property OnStartDrag :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.ParentColor"></a>ParentColor</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ParentColor</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ParentColor :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.ParentCtl3D"></a>ParentCtl3D</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ParentCtl3D</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ParentCtl3D :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.ParentFont"></a>ParentFont</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ParentFont</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ParentFont :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.ParentShowHint"></a>ParentShowHint</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ParentShowHint</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ParentShowHint :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.PopupMenu"></a>PopupMenu</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">PopupMenu</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property PopupMenu :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.ReadOnly"></a>ReadOnly</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="ReservedWord">ReadOnly</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ReadOnly :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.ShowHint"></a>ShowHint</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ShowHint</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property ShowHint :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.TabOrder"></a>TabOrder</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">TabOrder</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property TabOrder :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.TabStop"></a>TabStop</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">TabStop</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property TabStop :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Value"></a>Value</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">LongInt</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">GetValue</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">SetValue</span>
+</pre>
+                  <!-- Property Value : LongInt
+   Read GetValue
+   Write SetValue
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TSpinEdit.Properties.Visible"></a>Visible</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Visible</span> <span class="Symbol">:</span> </pre>
+                  <!-- Property Visible :  -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TTimeBtnState"></a>TTimeBtnState</td>
+              <td>
+                <pre><span class="Identifier">TTimeBtnState</span> <span class="Symbol">=</span> <span class="ReservedWord">set</span> <span class="ReservedWord">of</span><span class="Symbol">(</span><span class="Identifier">tbFocusRect</span><span class="Symbol">,</span> <span class="Identifier">tbAllowTimer</span><span class="Symbol">)</span></pre>
+          <!-- TTimeBtnState = set of(tbFocusRect, tbAllowTimer) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton"></a>TTimerSpeedButton</td>
+              <td>
+                <pre><span class="Identifier">TTimerSpeedButton</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TSpeedButton</span><span class="Symbol">)</span></pre>
+          <!-- TTimerSpeedButton = Class(TSpeedButton) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton.Fields.FRepeatTimer"></a>FRepeatTimer</td>
+                      <td>
+                        <pre><span class="Identifier">FRepeatTimer</span> <span class="Symbol">=</span> <span class="Identifier">TTimer</span></pre>
+                  <!-- FRepeatTimer = TTimer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton.Fields.FTimeBtnState"></a>FTimeBtnState</td>
+                      <td>
+                        <pre><span class="Identifier">FTimeBtnState</span> <span class="Symbol">=</span> <span class="Identifier">TTimeBtnState</span></pre>
+                  <!-- FTimeBtnState = TTimeBtnState -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Destructor Destroy; override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton.Methods.MouseDown"></a>MouseDown</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MouseDown</span><span class="Symbol">(</span>
+  <span class="Identifier">Button</span> <span class="Symbol">:</span> <span class="Identifier">TMouseButton</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span><span class="Symbol">;</span>
+  <span class="Identifier">X</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Y</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure MouseDown(
+  Button : TMouseButton;
+  Shift : TShiftState;
+  X : Integer;
+  Y : Integer
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton.Methods.MouseUp"></a>MouseUp</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MouseUp</span><span class="Symbol">(</span>
+  <span class="Identifier">Button</span> <span class="Symbol">:</span> <span class="Identifier">TMouseButton</span><span class="Symbol">;</span>
+  <span class="Identifier">Shift</span> <span class="Symbol">:</span> <span class="Identifier">TShiftState</span><span class="Symbol">;</span>
+  <span class="Identifier">X</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Y</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure MouseUp(
+  Button : TMouseButton;
+  Shift : TShiftState;
+  X : Integer;
+  Y : Integer
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton.Methods.Paint"></a>Paint</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Paint</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Paint; override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton.Methods.TimerExpired"></a>TimerExpired</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">TimerExpired</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure TimerExpired(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TTimerSpeedButton.Properties.TimeBtnState"></a>TimeBtnState</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">TimeBtnState</span> <span class="Symbol">:</span> <span class="Identifier">TTimeBtnState</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FTimeBtnState</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FTimeBtnState</span>
+</pre>
+                  <!-- Property TimeBtnState : TTimeBtnState
+   Read FTimeBtnState
+   Write FTimeBtnState
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Buttons"></a>Buttons</td>
+              <td>
+                <pre><span class="Identifier">Buttons</span></pre>
+          <!-- Buttons -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Controls"></a>Controls</td>
+              <td>
+                <pre><span class="Identifier">Controls</span></pre>
+          <!-- Controls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ExtCtrls"></a>ExtCtrls</td>
+              <td>
+                <pre><span class="Identifier">ExtCtrls</span></pre>
+          <!-- ExtCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Forms"></a>Forms</td>
+              <td>
+                <pre><span class="Identifier">Forms</span></pre>
+          <!-- Forms -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Graphics"></a>Graphics</td>
+              <td>
+                <pre><span class="Identifier">Graphics</span></pre>
+          <!-- Graphics -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Menus"></a>Menus</td>
+              <td>
+                <pre><span class="Identifier">Menus</span></pre>
+          <!-- Menus -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Messages"></a>Messages</td>
+              <td>
+                <pre><span class="Identifier">Messages</span></pre>
+          <!-- Messages -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.StdCtrls"></a>StdCtrls</td>
+              <td>
+                <pre><span class="Identifier">StdCtrls</span></pre>
+          <!-- StdCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Themes"></a>Themes</td>
+              <td>
+                <pre><span class="Identifier">Themes</span></pre>
+          <!-- Themes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

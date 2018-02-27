@@ -1,0 +1,36 @@
+[Setup]
+WarnBefore=0
+WarnAfter=0
+IncBuild=1
+CopyVersionInfoFrom=
+ExcludedResExts=.dcr
+EnabledVersionInfo=1
+IncludeInProject=0
+CompileWithBRCC32=0
+MajorVer=1
+MinorVer=2
+ReleaseVer=0
+BuildVer=4861
+ResourceName=..\BADIVerInfo
+
+[Zipping]
+Enabled=0
+ZipFile=
+BasePath=
+ExclusionFiles=
+
+[VersionInfo]
+CompanyName=Season's Fall Music
+FileDescription=Browse and Doc It: A RAD Studio IDE plug-in to help you browse and document your code.
+FileVersion=1.2.0.4861
+InternalName=BrowseAndDocItTests
+LegalCopyright=Season's Fall Music
+LegalTrademarks=Season's Fall Music
+OriginalFilename=BrowseAndDocItTests
+ProductName=BrowseAndDocItTests
+ProductVersion=1.2
+Comments=Browse and Doc It: A RAD Studio IDE plug-in to help you browse and document your code.
+
+[Post-Compilation]
+D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Test\BrowseAndDocItTestsXE102.exe||D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Test\|BrowseAndDocItTestsXE102.exe=0
+

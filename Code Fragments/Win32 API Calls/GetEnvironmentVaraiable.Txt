@@ -1,0 +1,37 @@
+'
+' The GetEnvironmentVariable function retrieves the value of the specified
+' variable from the environment block of the calling process. The value is
+' in the form of a null-terminated string of characters.
+'
+' DWORD GetEnvironmentVariable(
+'    LPCTSTR lpName, // address of environment variable name
+'    LPTSTR lpBuffer,  // address of buffer for variable value
+'    DWORD nSize   // size of buffer, in characters
+'   );
+'
+' @precon  nBufferLength must be set to the length of a valid lpBuffer.
+' @postcon Function retrieves the value of the specified
+'          variable from the environment block of the calling process.
+'
+' @param   lpName as a String - Points to a null-terminated string that
+'          specifies the environment variable.
+' @param   lpBuffer as a String - Points to a buffer to receive the value of
+'          the specified environment variable.
+' @param   nSize as a Long - Specifies the size, in characters, of the buffer
+'          pointed to by the lpBuffer parameter.
+'
+' @return  a Long - If the function succeeds, the return value is the number of
+'                   characters stored into the buffer pointed to by lpBuffer,
+'                   not including the terminating null character.
+'                   If the specified environment variable name was not found in
+'                   the environment block for the current process, the return
+'                   value is zero.
+'                   If the buffer pointed to by lpBuffer is not large enough, the
+'                   return value is the buffer size, in characters, required to
+'                   hold the value string and its terminating null character.
+'
+' @see     GetEnvironmentStrings , SetEnvironmentVariable
+'
+Private Declare Function GetEnvironmentVariable Lib "kernel32" _
+  Alias "GetEnvironmentVariableA" (ByVal lpName As String, _
+  ByVal lpBuffer As String, ByVal nSize As Long) As Long

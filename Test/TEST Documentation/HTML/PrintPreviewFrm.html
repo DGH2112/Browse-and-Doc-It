@@ -1,0 +1,1609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>PrintPreviewFrm.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="About.html">About.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AddInDesignerObjects_TLB.html">AddInDesignerObjects_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ADODB_TLB.html">ADODB_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseDocumentation.html">BaseDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseLanguageModule.html">BaseLanguageModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="checkforupdates.html">checkforupdates.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CheckForUpdatesForm.html">CheckForUpdatesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConfirmationDlgForm.html">ConfirmationDlgForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CustomizeDlg.html">CustomizeDlg.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="dghlibrary.html">dghlibrary.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationDispatcher.html">DocumentationDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationOptionsForm.html">DocumentationOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EditorOptionsForm.html">EditorOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EventSink.html">EventSink.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Excel_TLB.html">Excel_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ExternalProcessInfo.html">ExternalProcessInfo.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GenericTokenizer.html">GenericTokenizer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="HTMLDocumentation.html">HTMLDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MethodDescriptionForm.html">MethodDescriptionForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleDispatcher.html">ModuleDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleExplorerFrame.html">ModuleExplorerFrame.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MSXML2_TLB.html">MSXML2_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Office_TLB.html">Office_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OptionsForm.html">OptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PascalModule.html">PascalModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintingFrm.html">PrintingFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintPreviewFrm.html">PrintPreviewFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintPreviewOptions.html">PrintPreviewOptions.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Profiler.html">Profiler.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgrammeInfoForm.html">ProgrammeInfoForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SearchReplaceForm.html">SearchReplaceForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SHDocVw_TLB.html">SHDocVw_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SingleInstanceAppUsingDDE.html">SingleInstanceAppUsingDDE.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SndKey32.html">SndKey32.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SpecialTagForm.html">SpecialTagForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditHeaderFooterItemForm.html">SynEditHeaderFooterItemForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TokenForm.html">TokenForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBIDE_TLB.html">VBIDE_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBModule.html">VBModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Word_TLB.html">Word_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit PrintPreviewFrm -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit PrintPreviewFrm</h1>
+        <p class="Comment">This   module   contains   a   class   that   represents   a   print   preview   form   for   the   selected   document   to   be   printed . </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">20   Jan   2008 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David   Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1 . 0 </li>
+        </ul>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+          <!-- TfrmPrintPreview -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TfrmPrintPreview3"></a>TfrmPrintPreview</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actCloseExecute"></a>actCloseExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actCloseExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   execute   event   handler   for   the   close   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Closes   the   form . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actCloseExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actFirstExecute"></a>actFirstExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actFirstExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   execute   event   handler   for   the   first   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays   first   next   page . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actFirstExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actFirstUpdate"></a>actFirstUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actFirstUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   update   event   handler   for   the   First   action </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Update   the   enabled   status   of   the   First   action   based   on   page   position . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actFirstUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actLastExecute"></a>actLastExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actLastExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   execute   event   handler   for   the   Last   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays   the   last   page . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actLastExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actLastUpdate"></a>actLastUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actLastUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   update   event   handler   for   the   Last   action </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Update   the   enabled   status   of   the   Last   action   based   on   page   position . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actLastUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actNextExecute"></a>actNextExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actNextExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   execute   event   handler   for   the   Next   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays   the   next   page . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actNextExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actNextUpdate"></a>actNextUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actNextUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   update   event   handler   for   the   Next   action </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Update   the   enabled   status   of   the   Next   action   based   on   page   position . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actNextUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actPageSetupExecute"></a>actPageSetupExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actPageSetupExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   execute   event   handler   for   the   PageSetup   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays   a   dialogue   where   the   margins ,   headers   and   footers   can   be   configured . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actPageSetupExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actPreviousExecute"></a>actPreviousExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actPreviousExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   exceute   event   for   the   Previous   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays   the   previous   page . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actPreviousExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actPreviousUpdate"></a>actPreviousUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actPreviousUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   update   event   handler   for   the   Previous   action </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Update   the   enabled   status   of   the   Previous   action   based   on   page   position . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actPreviousUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actPrintExecute"></a>actPrintExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actPrintExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   execute   event   handler   for   the   Print   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sets   up   the   document   to   be   printed   to   the   currently   attached   printing   device . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actPrintExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actSelectedTextExecute"></a>actSelectedTextExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actSelectedTextExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   execute   event   handler   for   the   Select   Text   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Toggles   the   selection   of   the   options   and   updates   the   preview . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actSelectedTextExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.actSelectedTextUpdate"></a>actSelectedTextUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actSelectedTextUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   update   event   handler   for   the   SelectText   action . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Updates   the   action   item   based   on   the   selected   text   only   property . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure actSelectedTextUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.cbZoomChange"></a>cbZoomChange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">cbZoomChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   an   on   change   event   handler   for   the   Zoom   combo   box . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">The   changes   in   the   control   change   the   level   of   zoom   of   the   displayed   print   preview   document . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure cbZoomChange(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.CreatePreview"></a>CreatePreview</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">CreatePreview</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span><span class="Symbol">;</span>
+  <span class="Identifier">strRootKey</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   the   constructor   method   for   the   TfrmPrintPreview   class . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sets   the   interna   reference   for   the   regisry   /   INI   key . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">AOwner   as   a   TComponent </li>
+                      <li class="SpecialTag">strRootKey   as   a   String </li>
+                    </ul>
+              <!-- Constructor CreatePreview(
+  AOwner : TComponent;
+  strRootKey : String
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.Execute"></a>Execute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Execute</span><span class="Symbol">(</span>
+  <span class="Identifier">Editor</span> <span class="Symbol">:</span> <span class="Identifier">TCustomSynEdit</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">recPageSetup</span> <span class="Symbol">:</span> <span class="Identifier">TPageSetupInfo</span><span class="Symbol">;</span>
+  <span class="Identifier">PreviewType</span> <span class="Symbol">:</span> <span class="Identifier">TPreviewType</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   the   forms   main   interface   method   for   invoking   a   print   preview   of   the   passed   TCustomSynEdit   control . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Editor   must   be   a   valid   instance   of   a   TCustomSynEdit   control . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays   a   print   preview   of   the   passed   editor   information . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Editor   as   a   TCustomSynEdit </li>
+                      <li class="SpecialTag">recPageSetup   as   a   TPageSetupInfo   as   a   reference </li>
+                      <li class="SpecialTag">PreviewType   as   a   TPreviewType </li>
+                    </ul>
+              <!-- Procedure Execute(
+  Editor : TCustomSynEdit;
+  var recPageSetup : TPageSetupInfo;
+  PreviewType : TPreviewType
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.FormCreate"></a>FormCreate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormCreate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   a   form   on   create   event   handler   for   the   form . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Initialises   the   Zoom   level   of   the   form   to   100 % </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure FormCreate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.FormDestroy"></a>FormDestroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormDestroy</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   a   form   on   destroy   event   handler . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Save   the   Print   Preview   settings   to   the   passed   INI   File   key . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure FormDestroy(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.FormKeyPress"></a>FormKeyPress</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormKeyPress</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Char</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   a   key   press   event   handler   for   the   form . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Closes   the   form   if   the   Escape   key   is   pressed . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                      <li class="SpecialTag">Key   as   a   Char   as   a   reference </li>
+                    </ul>
+              <!-- Procedure FormKeyPress(
+  Sender : TObject;
+  var Key : Char
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TfrmPrintPreview.FormShow"></a>FormShow</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormShow</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   a   form   on   show   event   handler   for   the   form   class . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sets   up   the   page   header   and   footer . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender   as   a   TObject </li>
+                    </ul>
+              <!-- Procedure FormShow(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview"></a>TfrmPrintPreview</td>
+              <td>
+                <pre><span class="Identifier">TfrmPrintPreview</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TForm</span><span class="Symbol">)</span></pre>
+              <p class="Comment">This   class   represents   the   print   preview   form   for   displaying   the   document </p>
+          <!-- TfrmPrintPreview = Class(TForm) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.actClose"></a>actClose</td>
+                      <td>
+                        <pre><span class="Identifier">actClose</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- actClose : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.actFirst"></a>actFirst</td>
+                      <td>
+                        <pre><span class="Identifier">actFirst</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- actFirst : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.actLast"></a>actLast</td>
+                      <td>
+                        <pre><span class="Identifier">actLast</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- actLast : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.actNext"></a>actNext</td>
+                      <td>
+                        <pre><span class="Identifier">actNext</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- actNext : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.actPageSetup"></a>actPageSetup</td>
+                      <td>
+                        <pre><span class="Identifier">actPageSetup</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- actPageSetup : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.actPrevious"></a>actPrevious</td>
+                      <td>
+                        <pre><span class="Identifier">actPrevious</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- actPrevious : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.actPrint"></a>actPrint</td>
+                      <td>
+                        <pre><span class="Identifier">actPrint</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- actPrint : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.actSelectedText"></a>actSelectedText</td>
+                      <td>
+                        <pre><span class="Identifier">actSelectedText</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- actSelectedText : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.alActionList1"></a>alActionList1</td>
+                      <td>
+                        <pre><span class="Identifier">alActionList1</span> <span class="Symbol">:</span> <span class="Identifier">TActionList</span></pre>
+                  <!-- alActionList1 : TActionList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.cbZoom"></a>cbZoom</td>
+                      <td>
+                        <pre><span class="Identifier">cbZoom</span> <span class="Symbol">:</span> <span class="Identifier">TComboBox</span></pre>
+                  <!-- cbZoom : TComboBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.dlgPrint"></a>dlgPrint</td>
+                      <td>
+                        <pre><span class="Identifier">dlgPrint</span> <span class="Symbol">:</span> <span class="Identifier">TPrintDialog</span></pre>
+                  <!-- dlgPrint : TPrintDialog -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.EditPrint"></a>EditPrint</td>
+                      <td>
+                        <pre><span class="Identifier">EditPrint</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditPrint</span></pre>
+                  <!-- EditPrint : TSynEditPrint -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.FRootKey"></a>FRootKey</td>
+                      <td>
+                        <pre><span class="Identifier">FRootKey</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FRootKey : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.ilImages"></a>ilImages</td>
+                      <td>
+                        <pre><span class="Identifier">ilImages</span> <span class="Symbol">:</span> <span class="Identifier">TImageList</span></pre>
+                  <!-- ilImages : TImageList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.lblLabel3"></a>lblLabel3</td>
+                      <td>
+                        <pre><span class="Identifier">lblLabel3</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- lblLabel3 : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.PrintPreview"></a>PrintPreview</td>
+                      <td>
+                        <pre><span class="Identifier">PrintPreview</span> <span class="Symbol">:</span> <span class="Identifier">TSynEditPrintPreview</span></pre>
+                  <!-- PrintPreview : TSynEditPrintPreview -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnFirst"></a>tbtnFirst</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnFirst</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnFirst : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnLast"></a>tbtnLast</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnLast</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnLast : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnSelectedOnly"></a>tbtnSelectedOnly</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnSelectedOnly</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnSelectedOnly : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnSep"></a>tbtnSep</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnSep</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnSep : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnToolButton1"></a>tbtnToolButton1</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnToolButton1</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnToolButton1 : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnToolButton10"></a>tbtnToolButton10</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnToolButton10</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnToolButton10 : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnToolButton2"></a>tbtnToolButton2</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnToolButton2</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnToolButton2 : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnToolButton4"></a>tbtnToolButton4</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnToolButton4</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnToolButton4 : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnToolButton6"></a>tbtnToolButton6</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnToolButton6</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnToolButton6 : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnToolButton7"></a>tbtnToolButton7</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnToolButton7</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnToolButton7 : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tbtnToolButton9"></a>tbtnToolButton9</td>
+                      <td>
+                        <pre><span class="Identifier">tbtnToolButton9</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- tbtnToolButton9 : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.tlbToolBar1"></a>tlbToolBar1</td>
+                      <td>
+                        <pre><span class="Identifier">tlbToolBar1</span> <span class="Symbol">:</span> <span class="Identifier">TToolBar</span></pre>
+                  <!-- tlbToolBar1 : TToolBar -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Fields.ToolButton1"></a>ToolButton1</td>
+                      <td>
+                        <pre><span class="Identifier">ToolButton1</span> <span class="Symbol">:</span> <span class="Identifier">TToolButton</span></pre>
+                  <!-- ToolButton1 : TToolButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actCloseExecute"></a>actCloseExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actCloseExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actCloseExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actFirstExecute"></a>actFirstExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actFirstExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actFirstExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actFirstUpdate"></a>actFirstUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actFirstUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actFirstUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actLastExecute"></a>actLastExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actLastExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actLastExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actLastUpdate"></a>actLastUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actLastUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actLastUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actNextExecute"></a>actNextExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actNextExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actNextExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actNextUpdate"></a>actNextUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actNextUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actNextUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actPageSetupExecute"></a>actPageSetupExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actPageSetupExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actPageSetupExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actPreviousExecute"></a>actPreviousExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actPreviousExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actPreviousExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actPreviousUpdate"></a>actPreviousUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actPreviousUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actPreviousUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actPrintExecute"></a>actPrintExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actPrintExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actPrintExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actSelectedTextExecute"></a>actSelectedTextExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actSelectedTextExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actSelectedTextExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.actSelectedTextUpdate"></a>actSelectedTextUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">actSelectedTextUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure actSelectedTextUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.cbZoomChange"></a>cbZoomChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">cbZoomChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure cbZoomChange(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.CreatePreview"></a>CreatePreview</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">CreatePreview</span><span class="Symbol">(</span>
+  <span class="Identifier">AOwner</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span><span class="Symbol">;</span>
+  <span class="Identifier">strRootKey</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Constructor CreatePreview(
+  AOwner : TComponent;
+  strRootKey : String
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.Execute"></a>Execute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Execute</span><span class="Symbol">(</span>
+  <span class="Identifier">Editor</span> <span class="Symbol">:</span> <span class="Identifier">TCustomSynEdit</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">recPageSetup</span> <span class="Symbol">:</span> <span class="Identifier">TPageSetupInfo</span><span class="Symbol">;</span>
+  <span class="Identifier">PreviewType</span> <span class="Symbol">:</span> <span class="Identifier">TPreviewType</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure Execute(
+  Editor : TCustomSynEdit;
+  var recPageSetup : TPageSetupInfo;
+  PreviewType : TPreviewType
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.FormCreate"></a>FormCreate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormCreate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormCreate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.FormDestroy"></a>FormDestroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormDestroy</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormDestroy(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.FormKeyPress"></a>FormKeyPress</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormKeyPress</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Key</span> <span class="Symbol">:</span> <span class="Identifier">Char</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormKeyPress(
+  Sender : TObject;
+  var Key : Char
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TfrmPrintPreview.Methods.FormShow"></a>FormShow</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormShow</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormShow(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TPageSetupInfo"></a>TPageSetupInfo</td>
+              <td>
+                <pre><span class="Identifier">TPageSetupInfo</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+              <p class="Comment">A   record   to   describe   all   the   preview   /   printing   attributes   that   can   be   loaded   and   saved   to   the   INI   File . </p>
+          <!-- TPageSetupInfo = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TPageSetupInfo.PreviewHeight"></a>PreviewHeight</td>
+                  <td>
+                    <pre><span class="Identifier">PreviewHeight</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- PreviewHeight : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TPageSetupInfo.PreviewIndex"></a>PreviewIndex</td>
+                  <td>
+                    <pre><span class="Identifier">PreviewIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- PreviewIndex : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TPageSetupInfo.PreviewLeft"></a>PreviewLeft</td>
+                  <td>
+                    <pre><span class="Identifier">PreviewLeft</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- PreviewLeft : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TPageSetupInfo.PreviewTop"></a>PreviewTop</td>
+                  <td>
+                    <pre><span class="Identifier">PreviewTop</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- PreviewTop : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TPageSetupInfo.PreviewWidth"></a>PreviewWidth</td>
+                  <td>
+                    <pre><span class="Identifier">PreviewWidth</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <!-- PreviewWidth : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TPageSetupInfo.RootKey"></a>RootKey</td>
+                  <td>
+                    <pre><span class="Identifier">RootKey</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+              <!-- RootKey : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TPageSetupInfo.Title"></a>Title</td>
+                  <td>
+                    <pre><span class="Identifier">Title</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+              <!-- Title : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TPreviewType"></a>TPreviewType</td>
+              <td>
+                <pre><span class="Identifier">TPreviewType</span> <span class="Symbol">=</span> <span class="Symbol">(</span><span class="Identifier">ptPreview</span><span class="Symbol">,</span> <span class="Identifier">ptPrint</span><span class="Symbol">,</span> <span class="Identifier">ptPageSetup</span><span class="Symbol">)</span></pre>
+              <p class="Comment">An   enumerate   to   define   the   behaviour   of   the   Preview   Form . </p>
+          <!-- TPreviewType = (ptPreview, ptPrint, ptPageSetup) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ActnList"></a>ActnList</td>
+              <td>
+                <pre><span class="Identifier">ActnList</span></pre>
+          <!-- ActnList -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ComCtrls"></a>ComCtrls</td>
+              <td>
+                <pre><span class="Identifier">ComCtrls</span></pre>
+          <!-- ComCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Controls"></a>Controls</td>
+              <td>
+                <pre><span class="Identifier">Controls</span></pre>
+          <!-- Controls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Dialogs"></a>Dialogs</td>
+              <td>
+                <pre><span class="Identifier">Dialogs</span></pre>
+          <!-- Dialogs -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Forms"></a>Forms</td>
+              <td>
+                <pre><span class="Identifier">Forms</span></pre>
+          <!-- Forms -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Graphics"></a>Graphics</td>
+              <td>
+                <pre><span class="Identifier">Graphics</span></pre>
+          <!-- Graphics -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ImgList"></a>ImgList</td>
+              <td>
+                <pre><span class="Identifier">ImgList</span></pre>
+          <!-- ImgList -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Messages"></a>Messages</td>
+              <td>
+                <pre><span class="Identifier">Messages</span></pre>
+          <!-- Messages -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.PrintingFrm"></a>PrintingFrm</td>
+              <td>
+                <pre><span class="Identifier">PrintingFrm</span></pre>
+          <!-- PrintingFrm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.PrintPreviewOptions"></a>PrintPreviewOptions</td>
+              <td>
+                <pre><span class="Identifier">PrintPreviewOptions</span></pre>
+          <!-- PrintPreviewOptions -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.StdCtrls"></a>StdCtrls</td>
+              <td>
+                <pre><span class="Identifier">StdCtrls</span></pre>
+          <!-- StdCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEdit"></a>SynEdit</td>
+              <td>
+                <pre><span class="Identifier">SynEdit</span></pre>
+          <!-- SynEdit -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEditPrint"></a>SynEditPrint</td>
+              <td>
+                <pre><span class="Identifier">SynEditPrint</span></pre>
+          <!-- SynEditPrint -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEditPrintPreview"></a>SynEditPrintPreview</td>
+              <td>
+                <pre><span class="Identifier">SynEditPrintPreview</span></pre>
+          <!-- SynEditPrintPreview -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SynEditPrintTypes"></a>SynEditPrintTypes</td>
+              <td>
+                <pre><span class="Identifier">SynEditPrintTypes</span></pre>
+          <!-- SynEditPrintTypes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ToolWin"></a>ToolWin</td>
+              <td>
+                <pre><span class="Identifier">ToolWin</span></pre>
+          <!-- ToolWin -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

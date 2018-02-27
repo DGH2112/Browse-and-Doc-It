@@ -1,0 +1,1091 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>checkforupdates.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="About.html">About.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AddInDesignerObjects_TLB.html">AddInDesignerObjects_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ADODB_TLB.html">ADODB_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseDocumentation.html">BaseDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseLanguageModule.html">BaseLanguageModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="checkforupdates.html">checkforupdates.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CheckForUpdatesForm.html">CheckForUpdatesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConfirmationDlgForm.html">ConfirmationDlgForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CustomizeDlg.html">CustomizeDlg.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="dghlibrary.html">dghlibrary.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationDispatcher.html">DocumentationDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationOptionsForm.html">DocumentationOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EditorOptionsForm.html">EditorOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EventSink.html">EventSink.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Excel_TLB.html">Excel_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ExternalProcessInfo.html">ExternalProcessInfo.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GenericTokenizer.html">GenericTokenizer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="HTMLDocumentation.html">HTMLDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MethodDescriptionForm.html">MethodDescriptionForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleDispatcher.html">ModuleDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleExplorerFrame.html">ModuleExplorerFrame.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MSXML2_TLB.html">MSXML2_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Office_TLB.html">Office_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OptionsForm.html">OptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PascalModule.html">PascalModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintingFrm.html">PrintingFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintPreviewFrm.html">PrintPreviewFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintPreviewOptions.html">PrintPreviewOptions.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Profiler.html">Profiler.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgrammeInfoForm.html">ProgrammeInfoForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SearchReplaceForm.html">SearchReplaceForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SHDocVw_TLB.html">SHDocVw_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SingleInstanceAppUsingDDE.html">SingleInstanceAppUsingDDE.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SndKey32.html">SndKey32.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SpecialTagForm.html">SpecialTagForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditHeaderFooterItemForm.html">SynEditHeaderFooterItemForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TokenForm.html">TokenForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBIDE_TLB.html">VBIDE_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBModule.html">VBModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Word_TLB.html">Word_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;<a href="#DocumentationConflicts2">Documentation Conflicts</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicResourceStringsLabel.gif" alt=""/>&nbsp;<a href="#ResourceStrings2">Resource Strings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit CheckForUpdates -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit CheckForUpdates</h1>
+        <p class="Comment">This   module   contains   a   class   which   handles   the   checking   of   updates   from   the   Internet   for   console   applications . </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">06   Feb   2009 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David   Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1 . 0 </li>
+        </ul>
+      
+      <h2><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;<a name="DocumentationConflicts"></a>Documentation Conflicts</h2>
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Method Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">The parameter type for 'strAppVerNum' in method 'TCheckForUpdates.CheckVersionNumber' is incorrect ('String as a reference').</li>
+        </ul>
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+          <!-- TCheckForUpdates -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TCheckForUpdates3"></a>TCheckForUpdates</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.BuildVersionNumber"></a>BuildVersionNumber</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">BuildVersionNumber</span><span class="Symbol">(</span>
+  <span class="Identifier">iMajor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iMinor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iBugFix</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iBuild</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This   method   builds   a   string   representation   of   the   build   information . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Builds   a   string   representation   of   the   build   information . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">iMajor   as   an   Integer </li>
+                      <li class="SpecialTag">iMinor   as   an   Integer </li>
+                      <li class="SpecialTag">iBugFix   as   an   Integer </li>
+                      <li class="SpecialTag">iBuild   as   an   Integer </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a   String </li>
+                    </ul>
+              <!-- Function BuildVersionNumber(
+  iMajor : Integer;
+  iMinor : Integer;
+  iBugFix : Integer;
+  iBuild : Integer
+) : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.CheckForUpdates"></a>CheckForUpdates</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">CheckForUpdates</span><span class="Symbol">(</span>
+  <span class="Identifier">strURL</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                    <p class="Comment">This   procedure   checks   the   build   number   of   the   software   against   the   XML   file   at   the   given   URL   to   see   if   there   are   any   updates   available . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Displays   messages   to   the   console   regarding   the   versioning   of   the   software . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">strURL   as   a   String </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a   Boolean </li>
+                    </ul>
+              <!-- Function CheckForUpdates(
+  strURL : String
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.CheckVersionNumber"></a>CheckVersionNumber</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">CheckVersionNumber</span><span class="Symbol">(</span>
+  <span class="Identifier">iMajor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iMinor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iBugFix</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iBuild</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">strAppVerNum</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                    <p class="Comment">This   method   returns   - ve   if   the   software   of   older   than   the   internet   version ,   0   if   the   same   or   + ve   if   it   is   newer   than   the   internet   version . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns   - ve   if   the   software   of   older   than   the   internet   version ,   0   if   the   same   or   + ve   if   it   is .. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">iMajor   as   an   Integer </li>
+                      <li class="SpecialTag">iMinor   as   an   Integer </li>
+                      <li class="SpecialTag">iBugFix   as   an   Integer </li>
+                      <li class="SpecialTag">iBuild   as   an   Integer </li>
+                      <li class="SpecialTag">strAppVerNum   as   a   String </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a   Integer </li>
+                    </ul>
+              <!-- Function CheckVersionNumber(
+  iMajor : Integer;
+  iMinor : Integer;
+  iBugFix : Integer;
+  iBuild : Integer;
+  var strAppVerNum : String
+) : Integer -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">strSoftwareID</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">strRegRoot</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">boolForceUpdate</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   the   constructor   method   for   the   TConsoleCheckForupdates   class . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Initialises   the   class . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">strSoftwareID   as   a   String </li>
+                      <li class="SpecialTag">strRegRoot   as   a   String </li>
+                      <li class="SpecialTag">boolForceUpdate   as   a   Boolean </li>
+                    </ul>
+              <!-- Constructor Create(
+  strSoftwareID : String;
+  strRegRoot : String;
+  boolForceUpdate : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span></pre>
+                    <p class="Comment">This   is   the   destructor   method   for   the   TCheckForUpdates   class . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Saves   the   INI   settings   for   Colours . </li>
+                    </ul>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.Execute"></a>Execute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Execute</span><span class="Symbol">(</span>
+  <span class="Identifier">strSoftwareID</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">strRegRoot</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">boolForceUpdate</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   is   the   main   interface   method   for   checking   the   software   version . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Main   interface   method   for   checking   the   software   version . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">strSoftwareID   as   a   String </li>
+                      <li class="SpecialTag">strRegRoot   as   a   String </li>
+                      <li class="SpecialTag">boolForceUpdate   as   a   Boolean </li>
+                    </ul>
+              <!-- Procedure Execute(
+  strSoftwareID : String;
+  strRegRoot : String;
+  boolForceUpdate : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.FindPackage"></a>FindPackage</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindPackage</span><span class="Symbol">(</span>
+  <span class="Identifier">xmlNodeList</span> <span class="Symbol">:</span> <span class="Identifier">IXMLDOMNodeList</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">IXMLDOMNode</span></pre>
+                    <p class="Comment">This   function   searches   through   the   packages   looking   for   the   packages   with   the   correct   ID . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">xmlNodeList   must   be   a   valid   list   of   nodes   to   search . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Searches   through   the   packages   looking   for   the   packages   with   the   correct   ID . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">xmlNodeList   as   an   IXMLDOMNodeList </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">an   IXMLDOMNode </li>
+                    </ul>
+              <!-- Function FindPackage(
+  xmlNodeList : IXMLDOMNodeList
+) : IXMLDOMNode -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.GetNamedNodeText"></a>GetNamedNodeText</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetNamedNodeText</span><span class="Symbol">(</span>
+  <span class="Identifier">P</span> <span class="Symbol">:</span> <span class="Identifier">IXMLDOMNode</span><span class="Symbol">;</span>
+  <span class="Identifier">strName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This   function   returns   the   text   associated   with   the   named   node . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">P   must   be   a   valid   IXMLDOMNode . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns   the   text   associated   with   the   named   node . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">P   as   an   IXMLDOMNode </li>
+                      <li class="SpecialTag">strName   as   a   String </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a   String </li>
+                    </ul>
+              <!-- Function GetNamedNodeText(
+  P : IXMLDOMNode;
+  strName : String
+) : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.LoadSettings"></a>LoadSettings</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LoadSettings</span></pre>
+                    <p class="Comment">This   method   loads   the   Colours   settings   from   the   INI   file . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Loads   the   Colours   settings   from   the   INI   file . </li>
+                    </ul>
+              <!-- Procedure LoadSettings -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.OutputMsg"></a>OutputMsg</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">OutputMsg</span><span class="Symbol">(</span>
+  <span class="Identifier">strText</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">strURL</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">iColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span> <span class="Symbol">=</span> <span class="Identifier">clNone</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This   procedure   outputs   a   message   to   the   console   IF   boolOutputMsgs   is   true . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Outputs   a   message   to   the   console   IF   boolOutputMsgs   is   true . </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">strText   as   a   String </li>
+                      <li class="SpecialTag">strURL   as   a   String </li>
+                      <li class="SpecialTag">iColour   as   a   TColor </li>
+                    </ul>
+              <!-- Procedure OutputMsg(
+  strText : String;
+  strURL : String;
+  iColour : TColor = clNone
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.ReadLastUpdateDate"></a>ReadLastUpdateDate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ReadLastUpdateDate</span></pre>
+                    <p class="Comment">This   method   reads   the   last   update   date   from   the   INI   File . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Reads   the   last   update   date   from   the   INI   File . </li>
+                    </ul>
+              <!-- Procedure ReadLastUpdateDate -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.SaveSettings"></a>SaveSettings</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveSettings</span></pre>
+                    <p class="Comment">This   method   saves   the   Colour   settings   to   the   INI   file . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Saves   the   Colour   settings   to   the   INI   file . </li>
+                    </ul>
+              <!-- Procedure SaveSettings -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCheckForUpdates.WriteLastUpdateDate"></a>WriteLastUpdateDate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WriteLastUpdateDate</span></pre>
+                    <p class="Comment">This   method   writes   the   last   update   date   to   the   INI   File . </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">None . </li>
+                    </ul>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Writes   the   last   update   date   to   the   INI   File . </li>
+                    </ul>
+              <!-- Procedure WriteLastUpdateDate -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Resource Strings -->
+      <h2><img class="verticallymiddle" src="Images/PublicResourceStringsLabel.gif" alt=""/>&nbsp;<a name="ResourceStrings2"></a>Resource Strings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strCheckingForUpdates"></a>strCheckingForUpdates</td>
+              <td>
+                <pre><span class="Identifier">strCheckingForUpdates</span> <span class="Symbol">=</span> <span class="StringLiteral">'Checking Updates for ''%s''...'</span></pre>
+              <p class="Comment">A   resource   string   of   the   start   of   the   checking   process . </p>
+          <!-- strCheckingForUpdates = 'Checking Updates for ''%s''...' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strCheckingSoftwareVerNum"></a>strCheckingSoftwareVerNum</td>
+              <td>
+                <pre><span class="Identifier">strCheckingSoftwareVerNum</span> <span class="Symbol">=</span> <span class="StringLiteral">'  Checking software version number...'</span></pre>
+              <p class="Comment">A   resource   string   to   note   the   checking   of   the   software   version . </p>
+          <!-- strCheckingSoftwareVerNum = '  Checking software version number...' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strExceptionS"></a>strExceptionS</td>
+              <td>
+                <pre><span class="Identifier">strExceptionS</span> <span class="Symbol">=</span> <span class="StringLiteral">'  Exception: %s'</span></pre>
+              <p class="Comment">A   resource   string   for   an   exception   message . </p>
+          <!-- strExceptionS = '  Exception: %s' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strFoundPackage"></a>strFoundPackage</td>
+              <td>
+                <pre><span class="Identifier">strFoundPackage</span> <span class="Symbol">=</span> <span class="StringLiteral">'  Found "</span><span class="Symbol">%</span><span class="Identifier">s</span><span class="StringLiteral">"...'</span></pre>
+              <p class="Comment">A   resource   string   to   note   the   package   was   found . </p>
+          <!-- strFoundPackage = '  Found "%s"...' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strGettingPackages"></a>strGettingPackages</td>
+              <td>
+                <pre><span class="Identifier">strGettingPackages</span> <span class="Symbol">=</span> <span class="StringLiteral">'  Getting packages...'</span></pre>
+              <p class="Comment">A   resource   string   to   note   the   searching   for   packages . </p>
+          <!-- strGettingPackages = '  Getting packages...' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strLoadingMSXML"></a>strLoadingMSXML</td>
+              <td>
+                <pre><span class="Identifier">strLoadingMSXML</span> <span class="Symbol">=</span> <span class="StringLiteral">'  Loading MS XML...'</span></pre>
+              <p class="Comment">A   resource   string   to   note   the   loading   of   MS   XML . </p>
+          <!-- strLoadingMSXML = '  Loading MS XML...' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strLoadingURL"></a>strLoadingURL</td>
+              <td>
+                <pre><span class="Identifier">strLoadingURL</span> <span class="Symbol">=</span> <span class="StringLiteral">'  Loading "</span><span class="Symbol">%</span><span class="Identifier">s</span><span class="StringLiteral">"...'</span></pre>
+              <p class="Comment">A   resource   string   to   note   the   lading   of   the   URL </p>
+          <!-- strLoadingURL = '  Loading "%s"...' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strPackageNotFound"></a>strPackageNotFound</td>
+              <td>
+                <pre><span class="Identifier">strPackageNotFound</span> <span class="Symbol">=</span> <span class="StringLiteral">'  Package "</span><span class="Symbol">%</span><span class="Identifier">s</span><span class="StringLiteral">" not found!'</span></pre>
+              <p class="Comment">A   resource   string   to   define   that   the   package   was   not   found . </p>
+          <!-- strPackageNotFound = '  Package "%s" not found!' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strThereIsASoftwareUpdate"></a>strThereIsASoftwareUpdate</td>
+              <td>
+                <pre><span class="Identifier">strThereIsASoftwareUpdate</span> <span class="Symbol">=</span> <span class="StringLiteral">'  There is a software update available '</span> <span class="Symbol">+</span>
+  <span class="StringLiteral">'[New %s, Old %s] @ %s! See the description below for update details...'</span></pre>
+              <p class="Comment">A   resource   string   to   note   that   there   is   an   update   available . </p>
+          <!-- strThereIsASoftwareUpdate = '  There is a software update available ' +
+  '[New %s, Old %s] @ %s! See the description below for update details...' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strYouAreUsingANewerVersion"></a>strYouAreUsingANewerVersion</td>
+              <td>
+                <pre><span class="Identifier">strYouAreUsingANewerVersion</span> <span class="Symbol">=</span> <span class="StringLiteral">'  You are using a newer version of the '</span> <span class="Symbol">+</span>
+  <span class="StringLiteral">'software [%s] than is available from the internet [%s] @ %s.'</span></pre>
+              <p class="Comment">A   resource   string   to   prompt   that   you   are   using   a   newer   version   of   software . </p>
+          <!-- strYouAreUsingANewerVersion = '  You are using a newer version of the ' +
+  'software [%s] than is available from the internet [%s] @ %s.' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateResourceString.gif" alt=""/>&nbsp;<a name="ResourceStrings.strYourSoftwareIsUpToDate"></a>strYourSoftwareIsUpToDate</td>
+              <td>
+                <pre><span class="Identifier">strYourSoftwareIsUpToDate</span> <span class="Symbol">=</span> <span class="StringLiteral">'  Your software is up to date!'</span></pre>
+              <p class="Comment">A   resource   string   to   note   that   the   software   is   up   to   date . </p>
+          <!-- strYourSoftwareIsUpToDate = '  Your software is up to date!' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates"></a>TCheckForUpdates</td>
+              <td>
+                <pre><span class="Identifier">TCheckForUpdates</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span></pre>
+              <p class="Comment">This   class   handles   the   checking   of   software   vesions   against   the   internet . </p>
+          <!-- TCheckForUpdates = Class -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FConHnd"></a>FConHnd</td>
+                      <td>
+                        <pre><span class="Identifier">FConHnd</span> <span class="Symbol">:</span> <span class="Identifier">THandle</span></pre>
+                  <!-- FConHnd : THandle -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FLastUpdateDate"></a>FLastUpdateDate</td>
+                      <td>
+                        <pre><span class="Identifier">FLastUpdateDate</span> <span class="Symbol">:</span> <span class="Identifier">TDateTime</span></pre>
+                  <!-- FLastUpdateDate : TDateTime -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FMessageConfirmColour"></a>FMessageConfirmColour</td>
+                      <td>
+                        <pre><span class="Identifier">FMessageConfirmColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- FMessageConfirmColour : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FMessageDescriptionColour"></a>FMessageDescriptionColour</td>
+                      <td>
+                        <pre><span class="Identifier">FMessageDescriptionColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- FMessageDescriptionColour : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FMessageHeaderColour"></a>FMessageHeaderColour</td>
+                      <td>
+                        <pre><span class="Identifier">FMessageHeaderColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- FMessageHeaderColour : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FMessageNoteColour"></a>FMessageNoteColour</td>
+                      <td>
+                        <pre><span class="Identifier">FMessageNoteColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- FMessageNoteColour : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FMessageTextColour"></a>FMessageTextColour</td>
+                      <td>
+                        <pre><span class="Identifier">FMessageTextColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- FMessageTextColour : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FMessageWarningColour"></a>FMessageWarningColour</td>
+                      <td>
+                        <pre><span class="Identifier">FMessageWarningColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span></pre>
+                  <!-- FMessageWarningColour : TColor -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FRegRoot"></a>FRegRoot</td>
+                      <td>
+                        <pre><span class="Identifier">FRegRoot</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FRegRoot : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FSoftwareID"></a>FSoftwareID</td>
+                      <td>
+                        <pre><span class="Identifier">FSoftwareID</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FSoftwareID : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FUpdateInterval"></a>FUpdateInterval</td>
+                      <td>
+                        <pre><span class="Identifier">FUpdateInterval</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- FUpdateInterval : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Fields.FURLs"></a>FURLs</td>
+                      <td>
+                        <pre><span class="Identifier">FURLs</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- FURLs : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.BuildVersionNumber"></a>BuildVersionNumber</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">BuildVersionNumber</span><span class="Symbol">(</span>
+  <span class="Identifier">iMajor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iMinor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iBugFix</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iBuild</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function BuildVersionNumber(
+  iMajor : Integer;
+  iMinor : Integer;
+  iBugFix : Integer;
+  iBuild : Integer
+) : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.CheckForUpdates"></a>CheckForUpdates</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">CheckForUpdates</span><span class="Symbol">(</span>
+  <span class="Identifier">strURL</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function CheckForUpdates(
+  strURL : String
+) : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.CheckVersionNumber"></a>CheckVersionNumber</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">CheckVersionNumber</span><span class="Symbol">(</span>
+  <span class="Identifier">iMajor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iMinor</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iBugFix</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">iBuild</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">strAppVerNum</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+                  <!-- Function CheckVersionNumber(
+  iMajor : Integer;
+  iMinor : Integer;
+  iBugFix : Integer;
+  iBuild : Integer;
+  var strAppVerNum : String
+) : Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">strSoftwareID</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">strRegRoot</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">boolForceUpdate</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Constructor Create(
+  strSoftwareID : String;
+  strRegRoot : String;
+  boolForceUpdate : Boolean
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span><span class="Symbol">;</span> <span class="ReservedWord">Override</span></pre>
+                  <!-- Destructor Destroy; Override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.Execute"></a>Execute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Execute</span><span class="Symbol">(</span>
+  <span class="Identifier">strSoftwareID</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">strRegRoot</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">boolForceUpdate</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure Execute(
+  strSoftwareID : String;
+  strRegRoot : String;
+  boolForceUpdate : Boolean
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.FindPackage"></a>FindPackage</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">FindPackage</span><span class="Symbol">(</span>
+  <span class="Identifier">xmlNodeList</span> <span class="Symbol">:</span> <span class="Identifier">IXMLDOMNodeList</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">IXMLDOMNode</span></pre>
+                  <!-- Function FindPackage(
+  xmlNodeList : IXMLDOMNodeList
+) : IXMLDOMNode -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.GetNamedNodeText"></a>GetNamedNodeText</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetNamedNodeText</span><span class="Symbol">(</span>
+  <span class="Identifier">P</span> <span class="Symbol">:</span> <span class="Identifier">IXMLDOMNode</span><span class="Symbol">;</span>
+  <span class="Identifier">strName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function GetNamedNodeText(
+  P : IXMLDOMNode;
+  strName : String
+) : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.LoadSettings"></a>LoadSettings</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LoadSettings</span></pre>
+                  <!-- Procedure LoadSettings -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.OutputMsg"></a>OutputMsg</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">OutputMsg</span><span class="Symbol">(</span>
+  <span class="Identifier">strText</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">strURL</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span><span class="Symbol">;</span>
+  <span class="Identifier">iColour</span> <span class="Symbol">:</span> <span class="Identifier">TColor</span> <span class="Symbol">=</span> <span class="Identifier">clNone</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure OutputMsg(
+  strText : String;
+  strURL : String;
+  iColour : TColor = clNone
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.ReadLastUpdateDate"></a>ReadLastUpdateDate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ReadLastUpdateDate</span></pre>
+                  <!-- Procedure ReadLastUpdateDate -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.SaveSettings"></a>SaveSettings</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveSettings</span></pre>
+                  <!-- Procedure SaveSettings -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCheckForUpdates.Methods.WriteLastUpdateDate"></a>WriteLastUpdateDate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">WriteLastUpdateDate</span></pre>
+                  <!-- Procedure WriteLastUpdateDate -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.CheckForUpdatesForm"></a>CheckForUpdatesForm</td>
+              <td>
+                <pre><span class="Identifier">CheckForUpdatesForm</span></pre>
+          <!-- CheckForUpdatesForm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.DGHLibrary"></a>DGHLibrary</td>
+              <td>
+                <pre><span class="Identifier">DGHLibrary</span></pre>
+          <!-- DGHLibrary -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Graphics"></a>Graphics</td>
+              <td>
+                <pre><span class="Identifier">Graphics</span></pre>
+          <!-- Graphics -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.IniFiles"></a>IniFiles</td>
+              <td>
+                <pre><span class="Identifier">IniFiles</span></pre>
+          <!-- IniFiles -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.MSXML2_TLB"></a>MSXML2_TLB</td>
+              <td>
+                <pre><span class="Identifier">MSXML2_TLB</span></pre>
+          <!-- MSXML2_TLB -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

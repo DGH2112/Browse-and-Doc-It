@@ -1,0 +1,25 @@
+'
+' This method addes the token to the end of the token list
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon Adds the token to the end of the list.
+'
+' @param strList as a string by reference
+' @param strField as a string
+' @param iTokenType as a long
+' @param strToken as a string by reference
+' @param strOperator as a string by reference
+'
+Private Sub AddToken(ByRef strList As String, ByVal strField As String, ByVal iTokenType As Long, _
+  ByVal strToken As String, ByVal strOperator As String)
+  Exception.Push "AddToken", strList, strField, iTokenType, strToken, strOperator
+  On Error GoTo ErrHnd
+  If iTokenType = 0 Then strList = strList + " OR " Else strList = strList + " AND "
+  strList = strList & "[" & strField & "]" & " " & strOperator & " '" & strToken & "'"
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>Backus-Naur Grammar.bnf</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Backus-Naur Grammar.html">Backus-Naur Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Eidolon Map File Grammar.html">Eidolon Map File Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Extensible Markup Language (XML) 1.0.html">Extensible Markup Language (XML) 1.0.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Object Pascal Grammar.html">Object Pascal Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a href="#Errors2">Errors</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Rules2">Rules</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/WarningFolder.gif" alt=""/>&nbsp;<a href="#Warnings2">Warnings</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Backus-Naur Grammar.bnf -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Backus-Naur Grammar.bnf</h1>
+        <p class="Comment">Backus - Naur   Language   Grammar .   This   grammar   has   been   extended   to   allow   greater   definition   on   character   data   rather   than   using   the   "?   text   description   ?".   These   changes   have   come   from   translations   of   various   language   grammar   where   the   basic   definition   of   Backus - Naur   grammar   does   not   contain   enough   syntax   to   be   used   without   modification .   Modifications : #   1 )   "-"   ( minus )   Exception   operator   ( from   Extended   Backus - Naur ); #   2 )   Decimal   character   references ,   i . e .   ## 13   ( Pound   +   decimal   integer ); #   3 )   hexidecimal   character   references ,   i . e .   $ 20   ( Dollar   +   hexidecimal ); #   4 )   Character   ranges   ## 65 .. ## 95   or   $ 32 ..$ 40 . </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">22   Jul   2009 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David   Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1 . 0 </li>
+        </ul>
+      
+      <!-- Errors -->
+      <h2><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a name="Errors"></a>Errors</h2>
+      <ul>
+        <li class="Error">Expected '&#60;end-of-line&#62;' but '#32' found at line 54 column 24. [LineEnd]</li>
+        <li class="Error">Expected '&#60;end-of-line&#62;' but '#13' found at line 56 column 24. [LineEnd]</li>
+      </ul>
+      
+      <!-- Warnings -->
+      <h2><img class="verticallymiddle" src="Images/WarningFolder.gif" alt=""/>&nbsp;<a name="Warnings"></a>Warnings</h2>
+      <ul>
+        <li class="Warning">The rule '&#60;TextChar&#62;' has no definition at line 54 column 1. [Rule]</li>
+        <li class="Warning">The rule '&#60;EOL&#62;' has no definition at line 56 column 1. [Rule]</li>
+      </ul>
+      
+      <!-- Rules -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Rules2"></a>Rules</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CharRef>"></a><CharRef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CharRef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">LiteralChar</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">DecChar</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">HexChar</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;CharRef&#62; ::= &#60;LiteralChar&#62; | &#60;DecChar&#62; | &#60;HexChar&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DecChar>"></a><DecChar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DecChar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'#'</span> <span class="Symbol">&#60;</span><span class="Identifier">Digit</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Digit</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;DecChar&#62; ::= '#' &#60;Digit&#62; ( &#60;Digit&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Digit>"></a><Digit></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Digit</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'0'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'1'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'2'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'3'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'4'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'5'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'6'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'7'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'8'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'9'</span></pre>
+          <!-- &#60;Digit&#62; ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EOL>"></a><EOL></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EOL</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> </pre>
+          <!-- &#60;EOL&#62; ::=  -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<expression>"></a><expression></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">expression</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">list</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">list</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"|"</span> <span class="Symbol">&#60;</span><span class="Identifier">expression</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;expression&#62; ::= &#60;list&#62; | &#60;list&#62; "|" &#60;expression&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<HexChar>"></a><HexChar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">HexChar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'$'</span> <span class="Symbol">&#60;</span><span class="Identifier">HexDigit</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">HexDigit</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;HexChar&#62; ::= '$' &#60;HexDigit&#62; ( &#60;HexDigit&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<HexDigit>"></a><HexDigit></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">HexDigit</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Digit</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'A'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'B'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'C'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'D'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'E'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'F'</span></pre>
+          <!-- &#60;HexDigit&#62; ::= &#60;Digit&#62; | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<list>"></a><list></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">list</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span> <span class="Symbol">&#60;</span><span class="Identifier">RepeatOperator</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'['</span> <span class="Symbol">&#60;</span><span class="Identifier">expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">']'</span> <span class="Symbol">&#60;</span><span class="Identifier">RepeatOperator</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">(</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">SimpleExpression</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">SimpleExpression</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">list</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;list&#62; ::= '(' &#60;expression&#62; ')' &#60;RepeatOperator&#62; | '[' &#60;expression&#62; ']' &#60;RepeatOperator&#62; | (
+  &#60;SimpleExpression&#62; | &#60;SimpleExpression&#62; &#60;list&#62; ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<literal>"></a><literal></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">literal</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">&#60;</span><span class="Identifier">text</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">|</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">&#60;</span><span class="Identifier">text</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">CharRef</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'..'</span> <span class="Symbol">&#60;</span><span class="Identifier">CharRef</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;literal&#62; ::= '"' &#60;text&#62; '"' | "'" &#60;text&#62; "'" | &#60;CharRef&#62; [ '..' &#60;CharRef&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<LiteralChar>"></a><LiteralChar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">LiteralChar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">&#60;</span><span class="Identifier">TextChar</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"'"</span></pre>
+          <!-- &#60;LiteralChar&#62; ::= "'" &#60;TextChar&#62; "'" -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RepeatOperator>"></a><RepeatOperator></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RepeatOperator</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'*'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'+'</span></pre>
+          <!-- &#60;RepeatOperator&#62; ::= '*' | '+' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<rule>"></a><rule></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">rule</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="DoubleLiteral">"&#60;"</span> <span class="Symbol">&#60;</span><span class="Identifier">rule</span><span class="Symbol">-</span><span class="Identifier">name</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"&#62;"</span> <span class="DoubleLiteral">"::="</span> <span class="Symbol">&#60;</span><span class="Identifier">expression</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">terminator</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;rule&#62; ::= "&#60;" &#60;rule-name&#62; "&#62;" "::=" &#60;expression&#62; &#60;terminator&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<rule-name>"></a><rule-name></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">rule</span><span class="Symbol">-</span><span class="Identifier">name</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">text</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;rule-name&#62; ::= &#60;text&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SimpleExpression>"></a><SimpleExpression></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SimpleExpression</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">term</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'-'</span> <span class="Symbol">&#60;</span><span class="Identifier">term</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;SimpleExpression&#62; ::= &#60;term&#62; [ '-' &#60;term&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<syntax>"></a><syntax></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">syntax</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">rule</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">rule</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">syntax</span><span class="Symbol">&#62;</span></pre>
+              <p class="Comment">Backus - Naur   Language   Grammar .   This   grammar   has   been   extended   to   allow   greater   definition   on   character   data   rather   than   using   the   "?   text   description   ?".   These   changes   have   come   from   translations   of   various   language   grammar   where   the   basic   definition   of   Backus - Naur   grammar   does   not   contain   enough   syntax   to   be   used   without   modification .   Modifications : #   1 )   "-"   ( minus )   Exception   operator   ( from   Extended   Backus - Naur ); #   2 )   Decimal   character   references ,   i . e .   ## 13   ( Pound   +   decimal   integer ); #   3 )   hexidecimal   character   references ,   i . e .   $ 20   ( Dollar   +   hexidecimal ); #   4 )   Character   ranges   ## 65 .. ## 95   or   $ 32 ..$ 40 . </p>
+              <p class="TagHeader">Date Code Last Updated</p>
+              <ul>
+                <li class="SpecialTag">22   Jul   2009 </li>
+              </ul>
+              <p class="TagHeader">Code Author</p>
+              <ul>
+                <li class="SpecialTag">David   Hoyle </li>
+              </ul>
+              <p class="TagHeader">Code Version</p>
+              <ul>
+                <li class="SpecialTag">1 . 0 </li>
+              </ul>
+          <!-- &#60;syntax&#62; ::= &#60;rule&#62; | &#60;rule&#62; &#60;syntax&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<term>"></a><term></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">term</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">literal</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="DoubleLiteral">"&#60;"</span> <span class="Symbol">&#60;</span><span class="Identifier">rule</span><span class="Symbol">-</span><span class="Identifier">name</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"&#62;"</span></pre>
+          <!-- &#60;term&#62; ::= &#60;literal&#62; | "&#60;" &#60;rule-name&#62; "&#62;" -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<terminator>"></a><terminator></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">terminator</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">';'</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">EOL</span><span class="Symbol">&#62;</span></pre>
+              <p class="Comment">General   termiantor   is   &#60;EOL&#62;   except   if   the   module   header   contains   a   tag   @@usesemicolon   where   upon   the   end   of   line   is   ignored   and   a   semi - colon   is   used . </p>
+          <!-- &#60;terminator&#62; ::= ';' | &#60;EOL&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<text>"></a><text></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">text</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">TextChar</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">TextChar</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;text&#62; ::= &#60;TextChar&#62; ( &#60;TextChar&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TextChar>"></a><TextChar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TextChar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> </pre>
+          <!-- &#60;TextChar&#62; ::=  -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

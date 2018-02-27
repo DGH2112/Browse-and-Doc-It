@@ -1,0 +1,25 @@
+'
+' This function counts the number of times the character occurrs in the text
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @precon  None.
+' @postcon Counts the number of times the character occurs in the text.
+'
+' @param   strText as a String
+' @param   iChar as a Long
+' @return  a Long
+'
+Public Function CharCount(strText As String, iChar As Long) As Long
+  Dim i As Long
+  Exception.Push "PrivateFunctions.CharCount", strText, iChar
+  On Error GoTo ErrHnd
+  CharCount = 0
+  For i = 1 To Len(strText)
+    If Mid$(strText, i, 1) = Chr$(iChar) Then CharCount = CharCount + 1
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

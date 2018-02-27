@@ -1,0 +1,35 @@
+'
+' This function returns the position of the Nth (iPos) character in the given string. If the position is
+' not found then 0 is returned.
+'
+' @precon  None.
+' @postcon Returns the position of the Nth (iPos) character in the given string. If the position is
+'          not found then 0 is returned.
+'
+' @Date     23 Oct 2008
+' @Version  1.1
+'
+' @param   strText as a String
+' @param   Ch as a String
+' @param   iPos as a Long
+' @return  a Long
+'
+Public Function PosOfNthChar(strText As String, Ch As String, iPos As Long) As Long
+  Dim i As Long
+  Dim j As Long
+  Exception.Push "PrivateFunctions.PosOfNthChar", strText, Ch, iPos
+  On Error GoTo ErrHnd
+  PosOfNthChar = 0
+  j = 0
+  For i = 1 To Len(strText)
+    If Mid$(strText, i, 1) = Ch Then j = j + 1
+    If iPos > 0 And j = iPos Then
+      PosOfNthChar = i
+      Exit For
+    End If
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function
+

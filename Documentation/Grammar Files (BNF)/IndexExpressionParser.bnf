@@ -1,0 +1,27 @@
+/**
+
+  This is a grammar for the index expression parser.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    04 Jun 2012
+
+**/
+
+<Goal>                      ::= <SimpleExpression> ';'
+
+<SimpleExpression>          ::= <Term> [ <AddOp> <Term> ]*
+
+<Term>                      ::= <Factor> [ <Factor> ]*
+
+<Factor>                    ::= '(' <SimpleExpression> ')' | <Pattern>
+
+<AddOp>                     ::= '+' | '-'
+
+<Pattern>                   ::= <Word> [ '*' ]
+
+<Word>                      ::= '"' <AllCharsExceptDoubleQuote> '"' | <AlphaNumericChar>+
+
+<AlphaNumericChar>          ::= 'a'..'z' | 'A'..'Z' | '0'..'9'
+
+<AllCharsExceptDoubleQuote> ::= #32..#128

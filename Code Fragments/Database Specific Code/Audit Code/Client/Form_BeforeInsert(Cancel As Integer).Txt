@@ -1,0 +1,19 @@
+'
+' Form before insert event handler
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None
+' @postcon Sets the new record variable to true
+'
+' @param   Cancel as an Integer
+'
+Private Sub Form_BeforeInsert(Cancel As Integer)
+  Exception.Push ".Form_BeforeInsert", Cancel
+  On Error GoTo ErrHnd
+  boolNew = True
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

@@ -1,0 +1,806 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>AutoSaveModule.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AutoSaveModule.html">AutoSaveModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AutoSaveOptionsForm.html">AutoSaveOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="IDEAutoSave.html">IDEAutoSave.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocIt.html">BrowseAndDocIt.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocIt.html">BrowseAndDocIt.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CopyofBrowseAndDocIt.html">Copy of BrowseAndDocIt.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItWizard.html">BrowseAndDocItWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DockableModuleExplorer.html">DockableModuleExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ToolsAPIUtils.html">ToolsAPIUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestApp.html">BrowseAndDocItTestApp.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTests.html">BrowseAndDocItTests.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConsoleSort.html">ConsoleSort.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestForm.html">BrowseAndDocItTestForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Library.html">Library.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Package.html">Package.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Program.html">Program.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit2.html">Unit 2.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit.html">Unit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Delphi7HelpForBdsExpert.html">Delphi7HelpForBdsExpert.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="u_Delphi7HelpForBds.html">u_Delphi7HelpForBds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="w_Delphi7HelpForBds.html">w_Delphi7HelpForBds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHExplFrm.html">DGHExplFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHIDEExplorer.html">DGHIDEExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="IDEExplorer.html">IDEExplorer.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelper.html">ITHelper.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelper.html">ITHelper.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AdditionalZipFilesForm.html">AdditionalZipFilesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConfigurationForm.html">ConfigurationForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProcessingForm.html">ProcessingForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestingHelperUtils.html">TestingHelperUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestingHelperWizard.html">TestingHelperWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelperTests.html">ITHelperTests.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestTestingHelperUtils.html">TestTestingHelperUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a href="#Constants2">Constants</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;<a href="#DocumentationConflicts2">Documentation Conflicts</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a href="#ExportedHeadings2">Exported Headings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a href="#Finalization2">Finalization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a href="#Initialization2">Initialization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a href="#Variables2">Variables</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit AutoSaveModule -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit AutoSaveModule</h1>
+        <p class="Comment">This method contains a Delphi IDE wizard that auto saves the modules at a specified interval. </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">26 May 2002 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1.0 </li>
+        </ul>
+      
+      <h2><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;<a name="DocumentationConflicts"></a>Documentation Conflicts</h2>
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Method Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Method 'Register' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'Register' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.Create' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.Create' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.Destroy' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.Destroy' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.Execute' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.Execute' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.GetIDString' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.GetName' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.GetState' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.LoadSettings' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.LoadSettings' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.MenuClick' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutosave.SaveModifiedFiles' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutosave.SaveModifiedFiles' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.SaveSettings' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.SaveSettings' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TDGHAutoSave.TimerEvent' has a missing post-condition tag.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Module Documentation</h3>
+        <ul>
+          <li class="DocConflictIncorrect">The module documentation date '26 May 2002 ' is incorrect ('03/Jul/2002').</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Property Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Property 'AutoSaveInt' has not been documented.</li>
+          <li class="DocConflictMissing">Property 'Prompt' has not been documented.</li>
+        </ul>
+      </div>
+      
+      <!-- Constants -->
+      <h2><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a name="Constants2"></a>Constants</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateConst.gif" alt=""/>&nbsp;<a name="Constants.strRegistryKey"></a>strRegistryKey</td>
+              <td>
+                <pre><span class="Identifier">strRegistryKey</span> <span class="Symbol">=</span> <span class="StringLiteral">'Software\Season''s Fall\Auto Save\'</span></pre>
+              <p class="Comment">This constant represents the registry key the auto save settings are stored under. </p>
+          <!-- strRegistryKey = 'Software\Season''s Fall\Auto Save\' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Exported Headings -->
+      <h2><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a name="ExportedHeadings2"></a>Exported Headings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ExportedHeadings.Register"></a>Register</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="ReservedWord">Register</span></pre>
+          <!-- Procedure Register -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Finalization -->
+      <h2><img class="verticallymiddle" src="Images/FinalizationLabel.gif" alt=""/>&nbsp;<a name="Finalization2"></a>Finalization</h2>
+      <div class="Indent">
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.Register"></a>Register</td>
+              <td>
+                <pre><span class="ReservedWord">Procedure</span> <span class="ReservedWord">Register</span></pre>
+              <p class="Comment">This method registers this wizard with the Delphi IDE when the package is loaded. </p>
+          <!-- Procedure Register -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+          <!-- TDGHAutoSave -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TDGHAutoSave3"></a>TDGHAutoSave</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span></pre>
+                    <p class="Comment">This is the constructor method for the TDGHAutoSave class. </p>
+              <!-- Constructor Create -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.Destroy"></a>Destroy</td>
+                  <td>
+                    <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span></pre>
+                    <p class="Comment">This is the destructor method for the TDGHAutoSave class. </p>
+              <!-- Destructor Destroy -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.Execute"></a>Execute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Execute</span></pre>
+                    <p class="Comment">This method is not called but must be implemented for the IOTAWIzard interface. </p>
+              <!-- Procedure Execute -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.GetIDString"></a>GetIDString</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetIDString</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This is a getter method for the IDString property. </p>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns a string ID for the wizard. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a String </li>
+                    </ul>
+              <!-- Function GetIDString : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.GetName"></a>GetName</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                    <p class="Comment">This is a getter method for the Name property. </p>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns a name for the wizard. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a String </li>
+                    </ul>
+              <!-- Function GetName : String -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.GetState"></a>GetState</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetState</span> <span class="Symbol">:</span> <span class="Identifier">TWizardState</span></pre>
+                    <p class="Comment">This is a getter method for the State property. </p>
+                    <p class="TagHeader">Post-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Returns a state for the wizard. </li>
+                    </ul>
+                    <p class="TagHeader">Returns</p>
+                    <ul>
+                      <li class="SpecialTag">a TWizardState </li>
+                    </ul>
+              <!-- Function GetState : TWizardState -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.LoadSettings"></a>LoadSettings</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LoadSettings</span></pre>
+                    <p class="Comment">This method loads all the wizards settings from the registry. </p>
+              <!-- Procedure LoadSettings -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.MenuClick"></a>MenuClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MenuClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is menu item on click event. It invokes the options dialogue. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sender is the control that initiated the event. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure MenuClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.SaveModifiedFiles"></a>SaveModifiedFiles</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveModifiedFiles</span></pre>
+                    <p class="Comment">This method iterators the editor buffer checking for modified files. If one is modified it save the file. If Prompt is true then you are prompted to save the file else it is automatically saved. </p>
+              <!-- Procedure SaveModifiedFiles -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.SaveSettings"></a>SaveSettings</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveSettings</span></pre>
+                    <p class="Comment">This method saves all the wizards settings to the registry. </p>
+              <!-- Procedure SaveSettings -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TDGHAutoSave.TimerEvent"></a>TimerEvent</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">TimerEvent</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is the timer event handler. If saves all the files if the appropriate time has elapsed. </p>
+                    <p class="TagHeader">Pre-Conditions</p>
+                    <ul>
+                      <li class="SpecialTag">Sender is the control that initiated the event. </li>
+                    </ul>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure TimerEvent(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Initialization -->
+      <h2><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a name="Initialization2"></a>Initialization</h2>
+      <div class="Indent">
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave"></a>TDGHAutoSave</td>
+              <td>
+                <pre><span class="Identifier">TDGHAutoSave</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">IOTAWizard</span> <span class="Symbol">,</span><span class="Identifier">TNotifierObject</span><span class="Symbol">)</span></pre>
+              <p class="Comment">This class represents a the open tools API wizard for the IDE auto save. </p>
+          <!-- TDGHAutoSave = Class(IOTAWizard ,TNotifierObject) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Fields.FAutoSaveInt"></a>FAutoSaveInt</td>
+                      <td>
+                        <pre><span class="Identifier">FAutoSaveInt</span> <span class="Symbol">=</span> <span class="Identifier">Integer</span></pre>
+                  <!-- FAutoSaveInt = Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Fields.FCounter"></a>FCounter</td>
+                      <td>
+                        <pre><span class="Identifier">FCounter</span> <span class="Symbol">=</span> <span class="Identifier">Integer</span></pre>
+                  <!-- FCounter = Integer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Fields.FMenuItem"></a>FMenuItem</td>
+                      <td>
+                        <pre><span class="Identifier">FMenuItem</span> <span class="Symbol">=</span> <span class="Identifier">TMenuItem</span></pre>
+                  <!-- FMenuItem = TMenuItem -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Fields.FPrompt"></a>FPrompt</td>
+                      <td>
+                        <pre><span class="Identifier">FPrompt</span> <span class="Symbol">=</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- FPrompt = Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Fields.FTimer"></a>FTimer</td>
+                      <td>
+                        <pre><span class="Identifier">FTimer</span> <span class="Symbol">=</span> <span class="Identifier">TTimer</span></pre>
+                  <!-- FTimer = TTimer -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicConstructor.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span></pre>
+                  <!-- Constructor Create -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicDestructor.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.Destroy"></a>Destroy</td>
+                      <td>
+                        <pre><span class="ReservedWord">Destructor</span> <span class="Identifier">Destroy</span><span class="Symbol">;</span> <span class="ReservedWord">Override</span></pre>
+                  <!-- Destructor Destroy; Override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.Execute"></a>Execute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Execute</span></pre>
+                  <!-- Procedure Execute -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.GetIDString"></a>GetIDString</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetIDString</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function GetIDString : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.GetName"></a>GetName</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetName</span> <span class="Symbol">:</span> <span class="ReservedWord">String</span></pre>
+                  <!-- Function GetName : String -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.GetState"></a>GetState</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">GetState</span> <span class="Symbol">:</span> <span class="Identifier">TWizardState</span></pre>
+                  <!-- Function GetState : TWizardState -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.LoadSettings"></a>LoadSettings</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LoadSettings</span></pre>
+                  <!-- Procedure LoadSettings -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.MenuClick"></a>MenuClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MenuClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure MenuClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.SaveModifiedFiles"></a>SaveModifiedFiles</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveModifiedFiles</span></pre>
+                  <!-- Procedure SaveModifiedFiles -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.SaveSettings"></a>SaveSettings</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SaveSettings</span></pre>
+                  <!-- Procedure SaveSettings -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Methods.TimerEvent"></a>TimerEvent</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">TimerEvent</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure TimerEvent(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Properties.AutoSaveInt"></a>AutoSaveInt</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">AutoSaveInt</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FAutoSaveInt</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FAutoSaveInt</span>
+</pre>
+                  <!-- Property AutoSaveInt : Integer
+   Read FAutoSaveInt
+   Write FAutoSaveInt
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TDGHAutoSave.Properties.Prompt"></a>Prompt</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">Prompt</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+   <span class="ReservedWord">Read</span> <span class="Identifier">FPrompt</span>
+   <span class="ReservedWord">Write</span> <span class="Identifier">FPrompt</span>
+</pre>
+                  <!-- Property Prompt : Boolean
+   Read FPrompt
+   Write FPrompt
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.AutoSaveOptionsForm"></a>AutoSaveOptionsForm</td>
+              <td>
+                <pre><span class="Identifier">AutoSaveOptionsForm</span></pre>
+          <!-- AutoSaveOptionsForm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Controls"></a>Controls</td>
+              <td>
+                <pre><span class="Identifier">Controls</span></pre>
+          <!-- Controls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Dialogs"></a>Dialogs</td>
+              <td>
+                <pre><span class="Identifier">Dialogs</span></pre>
+          <!-- Dialogs -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Extctrls"></a>Extctrls</td>
+              <td>
+                <pre><span class="Identifier">Extctrls</span></pre>
+          <!-- Extctrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Menus"></a>Menus</td>
+              <td>
+                <pre><span class="Identifier">Menus</span></pre>
+          <!-- Menus -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Registry"></a>Registry</td>
+              <td>
+                <pre><span class="Identifier">Registry</span></pre>
+          <!-- Registry -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ToolsAPI"></a>ToolsAPI</td>
+              <td>
+                <pre><span class="Identifier">ToolsAPI</span></pre>
+          <!-- ToolsAPI -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Variables -->
+      <h2><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a name="Variables2"></a>Variables</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.iWizardIndex"></a>iWizardIndex</td>
+              <td>
+                <pre><span class="Identifier">iWizardIndex</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span></pre>
+              <p class="Comment">This is an integer passed back by the IDE want the wizard is installed. it is needed when the wizard is uninstalled. </p>
+          <!-- iWizardIndex : Integer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

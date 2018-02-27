@@ -1,0 +1,709 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>DGHExplFrm.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AutoSaveModule.html">AutoSaveModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AutoSaveOptionsForm.html">AutoSaveOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="IDEAutoSave.html">IDEAutoSave.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocIt.html">BrowseAndDocIt.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocIt.html">BrowseAndDocIt.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CopyofBrowseAndDocIt.html">Copy of BrowseAndDocIt.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItWizard.html">BrowseAndDocItWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DockableModuleExplorer.html">DockableModuleExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ToolsAPIUtils.html">ToolsAPIUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestApp.html">BrowseAndDocItTestApp.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTests.html">BrowseAndDocItTests.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConsoleSort.html">ConsoleSort.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BrowseAndDocItTestForm.html">BrowseAndDocItTestForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Library.html">Library.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Package.html">Package.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Program.html">Program.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit2.html">Unit 2.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit.html">Unit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Delphi7HelpForBdsExpert.html">Delphi7HelpForBdsExpert.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="u_Delphi7HelpForBds.html">u_Delphi7HelpForBds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="w_Delphi7HelpForBds.html">w_Delphi7HelpForBds.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHExplFrm.html">DGHExplFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DGHIDEExplorer.html">DGHIDEExplorer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="IDEExplorer.html">IDEExplorer.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelper.html">ITHelper.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelper.html">ITHelper.dpk</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AdditionalZipFilesForm.html">AdditionalZipFilesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConfigurationForm.html">ConfigurationForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProcessingForm.html">ProcessingForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestingHelperUtils.html">TestingHelperUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestingHelperWizard.html">TestingHelperWizard.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ITHelperTests.html">ITHelperTests.dpr</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TestTestingHelperUtils.html">TestTestingHelperUtils.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a href="#Constants2">Constants</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;<a href="#DocumentationConflicts2">Documentation Conflicts</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a href="#Variables2">Variables</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit DGHExplFrm -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit DGHExplFrm</h1>
+        <p class="Comment">This module contains the explorer form interface. </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">26 May 2002 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1.0 </li>
+        </ul>
+      
+      <h2><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;<a name="DocumentationConflicts"></a>Documentation Conflicts</h2>
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Class Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Class type 'TExplorerForm' is undocumented.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Constant Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Constant 'RegKey' is undocumented.</li>
+          <li class="DocConflictMissing">Constant 'SectionName' is undocumented.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Method Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Method 'TExplorerForm.FormClose' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TExplorerForm.FormClose' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TExplorerForm.FormShow' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TExplorerForm.FormShow' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TExplorerForm.GetComponents' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TExplorerForm.GetComponents' has a missing post-condition tag.</li>
+          <li class="DocConflictMissing">Method 'TExplorerForm.tvTreeView1Change' has missing pre-condition tags.</li>
+          <li class="DocConflictMissing">Method 'TExplorerForm.tvTreeView1Change' has a missing post-condition tag.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Type Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Type 'TIntegerSet' is undocumented.</li>
+        </ul>
+      </div>
+      
+      <!-- Documentation Conflicts -->
+      <div class="Indent">
+        <h3><img class="verticallymiddle" src="Images/DocConflictFolder.gif" alt=""/>&nbsp;Variable Documentation</h3>
+        <ul>
+          <li class="DocConflictMissing">Variable 'ExplorerForm' is undocumented.</li>
+        </ul>
+      </div>
+      
+      <!-- Constants -->
+      <h2><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a name="Constants2"></a>Constants</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateConst.gif" alt=""/>&nbsp;<a name="Constants.RegKey"></a>RegKey</td>
+              <td>
+                <pre><span class="Identifier">RegKey</span> <span class="Symbol">=</span> <span class="StringLiteral">'\Software\Seasons Fall'</span></pre>
+          <!-- RegKey = '\Software\Seasons Fall' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateConst.gif" alt=""/>&nbsp;<a name="Constants.SectionName"></a>SectionName</td>
+              <td>
+                <pre><span class="Identifier">SectionName</span> <span class="Symbol">=</span> <span class="StringLiteral">'DGH IDE Explorer'</span></pre>
+          <!-- SectionName = 'DGH IDE Explorer' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+          <!-- TExplorerForm -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TExplorerForm3"></a>TExplorerForm</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TExplorerForm.FormClose"></a>FormClose</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormClose</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Action</span> <span class="Symbol">:</span> <span class="Identifier">TCloseAction</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method is the forms on Close event handler. It saves the forms settings to the registry before closing. </p>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                      <li class="SpecialTag">Action as a TCloseAction as a reference </li>
+                    </ul>
+              <!-- Procedure FormClose(
+  Sender : TObject;
+  var Action : TCloseAction
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TExplorerForm.FormShow"></a>FormShow</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormShow</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is the forms on show event. It initialises the tree view. </p>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                    </ul>
+              <!-- Procedure FormShow(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TExplorerForm.GetComponents"></a>GetComponents</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">GetComponents</span><span class="Symbol">(</span>
+  <span class="Identifier">Node</span> <span class="Symbol">:</span> <span class="Identifier">TTreeNode</span><span class="Symbol">;</span>
+  <span class="Identifier">Component</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This method iterates the IDE structure and populates the tree view. </p>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Node as a TTreeNode </li>
+                      <li class="SpecialTag">Component as a TComponent </li>
+                    </ul>
+              <!-- Procedure GetComponents(
+  Node : TTreeNode;
+  Component : TComponent
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TExplorerForm.tvTreeView1Change"></a>tvTreeView1Change</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">tvTreeView1Change</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="Identifier">Node</span> <span class="Symbol">:</span> <span class="Identifier">TTreeNode</span>
+<span class="Symbol">)</span></pre>
+                    <p class="Comment">This is the tree views con change event handler. It gets the item selected's properties and displays them. </p>
+                    <p class="TagHeader">Parameters</p>
+                    <ul>
+                      <li class="SpecialTag">Sender as a TObject </li>
+                      <li class="SpecialTag">Node as a TTreeNode </li>
+                    </ul>
+              <!-- Procedure tvTreeView1Change(
+  Sender : TObject;
+  Node : TTreeNode
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm"></a>TExplorerForm</td>
+              <td>
+                <pre><span class="Identifier">TExplorerForm</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TForm</span><span class="Symbol">)</span></pre>
+          <!-- TExplorerForm = Class(TForm) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.DelphiRoot"></a>DelphiRoot</td>
+                      <td>
+                        <pre><span class="Identifier">DelphiRoot</span> <span class="Symbol">=</span> <span class="Identifier">TTreeNode</span></pre>
+                  <!-- DelphiRoot = TTreeNode -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.ilImageList1"></a>ilImageList1</td>
+                      <td>
+                        <pre><span class="Identifier">ilImageList1</span> <span class="Symbol">=</span> <span class="Identifier">TImageList</span></pre>
+                  <!-- ilImageList1 = TImageList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.ilImageList2"></a>ilImageList2</td>
+                      <td>
+                        <pre><span class="Identifier">ilImageList2</span> <span class="Symbol">=</span> <span class="Identifier">TImageList</span></pre>
+                  <!-- ilImageList2 = TImageList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.lvListView1"></a>lvListView1</td>
+                      <td>
+                        <pre><span class="Identifier">lvListView1</span> <span class="Symbol">=</span> <span class="Identifier">TListView</span></pre>
+                  <!-- lvListView1 = TListView -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.pgcPageControl1"></a>pgcPageControl1</td>
+                      <td>
+                        <pre><span class="Identifier">pgcPageControl1</span> <span class="Symbol">=</span> <span class="Identifier">TPageControl</span></pre>
+                  <!-- pgcPageControl1 = TPageControl -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.Reg"></a>Reg</td>
+                      <td>
+                        <pre><span class="Identifier">Reg</span> <span class="Symbol">=</span> <span class="Identifier">TRegIniFile</span></pre>
+                  <!-- Reg = TRegIniFile -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.splSplitter1"></a>splSplitter1</td>
+                      <td>
+                        <pre><span class="Identifier">splSplitter1</span> <span class="Symbol">=</span> <span class="Identifier">TSplitter</span></pre>
+                  <!-- splSplitter1 = TSplitter -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.TabSheet1"></a>TabSheet1</td>
+                      <td>
+                        <pre><span class="Identifier">TabSheet1</span> <span class="Symbol">=</span> <span class="Identifier">TTabSheet</span></pre>
+                  <!-- TabSheet1 = TTabSheet -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.TabSheet2"></a>TabSheet2</td>
+                      <td>
+                        <pre><span class="Identifier">TabSheet2</span> <span class="Symbol">=</span> <span class="Identifier">TTabSheet</span></pre>
+                  <!-- TabSheet2 = TTabSheet -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.tvTreeView1"></a>tvTreeView1</td>
+                      <td>
+                        <pre><span class="Identifier">tvTreeView1</span> <span class="Symbol">=</span> <span class="Identifier">TTreeView</span></pre>
+                  <!-- tvTreeView1 = TTreeView -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Fields.tvTreeView2"></a>tvTreeView2</td>
+                      <td>
+                        <pre><span class="Identifier">tvTreeView2</span> <span class="Symbol">=</span> <span class="Identifier">TTreeView</span></pre>
+                  <!-- tvTreeView2 = TTreeView -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Methods.FormClose"></a>FormClose</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormClose</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Action</span> <span class="Symbol">:</span> <span class="Identifier">TCloseAction</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormClose(
+  Sender : TObject;
+  var Action : TCloseAction
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Methods.FormShow"></a>FormShow</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormShow</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormShow(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Methods.GetComponents"></a>GetComponents</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">GetComponents</span><span class="Symbol">(</span>
+  <span class="Identifier">Node</span> <span class="Symbol">:</span> <span class="Identifier">TTreeNode</span><span class="Symbol">;</span>
+  <span class="Identifier">Component</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure GetComponents(
+  Node : TTreeNode;
+  Component : TComponent
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TExplorerForm.Methods.tvTreeView1Change"></a>tvTreeView1Change</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">tvTreeView1Change</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="Identifier">Node</span> <span class="Symbol">:</span> <span class="Identifier">TTreeNode</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure tvTreeView1Change(
+  Sender : TObject;
+  Node : TTreeNode
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateType.gif" alt=""/>&nbsp;<a name="Types.TIntegerSet"></a>TIntegerSet</td>
+              <td>
+                <pre><span class="Identifier">TIntegerSet</span> <span class="Symbol">=</span> <span class="ReservedWord">set</span> <span class="ReservedWord">of</span> <span class="Number">0</span><span class="Symbol">.</span><span class="Symbol">.</span><span class="Identifier">SizeOf</span><span class="Symbol">(</span><span class="Identifier">Integer</span><span class="Symbol">)</span> <span class="Symbol">*</span> <span class="Number">8</span> <span class="Symbol">-</span> <span class="Number">1</span></pre>
+          <!-- TIntegerSet = set of 0..SizeOf(Integer) * 8 - 1 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ComCtrls"></a>ComCtrls</td>
+              <td>
+                <pre><span class="Identifier">ComCtrls</span></pre>
+          <!-- ComCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Controls"></a>Controls</td>
+              <td>
+                <pre><span class="Identifier">Controls</span></pre>
+          <!-- Controls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Dialogs"></a>Dialogs</td>
+              <td>
+                <pre><span class="Identifier">Dialogs</span></pre>
+          <!-- Dialogs -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.EditIntf"></a>EditIntf</td>
+              <td>
+                <pre><span class="Identifier">EditIntf</span></pre>
+          <!-- EditIntf -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ExtCtrls"></a>ExtCtrls</td>
+              <td>
+                <pre><span class="Identifier">ExtCtrls</span></pre>
+          <!-- ExtCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Forms"></a>Forms</td>
+              <td>
+                <pre><span class="Identifier">Forms</span></pre>
+          <!-- Forms -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Graphics"></a>Graphics</td>
+              <td>
+                <pre><span class="Identifier">Graphics</span></pre>
+          <!-- Graphics -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ImgList"></a>ImgList</td>
+              <td>
+                <pre><span class="Identifier">ImgList</span></pre>
+          <!-- ImgList -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Messages"></a>Messages</td>
+              <td>
+                <pre><span class="Identifier">Messages</span></pre>
+          <!-- Messages -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Registry"></a>Registry</td>
+              <td>
+                <pre><span class="Identifier">Registry</span></pre>
+          <!-- Registry -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ToolIntf"></a>ToolIntf</td>
+              <td>
+                <pre><span class="Identifier">ToolIntf</span></pre>
+          <!-- ToolIntf -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.TypInfo"></a>TypInfo</td>
+              <td>
+                <pre><span class="Identifier">TypInfo</span></pre>
+          <!-- TypInfo -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Variables -->
+      <h2><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a name="Variables2"></a>Variables</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicVariable.gif" alt=""/>&nbsp;<a name="Variables.ExplorerForm"></a>ExplorerForm</td>
+              <td>
+                <pre><span class="Identifier">ExplorerForm</span> <span class="Symbol">:</span> <span class="Identifier">TExplorerForm</span></pre>
+          <!-- ExplorerForm : TExplorerForm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

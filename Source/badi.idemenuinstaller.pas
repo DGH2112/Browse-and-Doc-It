@@ -146,6 +146,7 @@ Var
   iMenu: TBADIMenu;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AddImagesToIDE', tmoTiming);{$ENDIF}
   NTAS := (BorlandIDEServices As INTAServices);
   ilImages := TImageList.Create(Nil);
   Try
@@ -186,6 +187,7 @@ Var
   SE: IOTASourceEditor;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BlockCommentClick', tmoTiming);{$ENDIF}
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csBlock, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csBlock));
@@ -204,6 +206,7 @@ End;
 Procedure TBADIIDEMenuInstaller.ChecksClick(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ChecksClick', tmoTiming);{$ENDIF}
   TBADIModuleChecksEditorView.CreateEditorView; 
 End;
 
@@ -223,6 +226,7 @@ Var
   iImageIndex: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   NilActions;
   FEditorNotifier := EditorNotifier;
   CreateBADIMainMenu;
@@ -286,6 +290,7 @@ Var
   iMajor, iMinor, iBugFix, iBuild : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CreateBADIMainMenu', tmoTiming);{$ENDIF}
   mmiMainMenu := (BorlandIDEServices As INTAServices).MainMenu;
   FBADIMenu := TMenuItem.Create(mmiMainMenu);
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
@@ -326,6 +331,7 @@ Var
   Actn : TAction;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CreateMenuItem', tmoTiming);{$ENDIF}
   NTAS := (BorlandIDEServices As INTAServices);
   // Create the IDE action (cached for removal later)
   Actn := Nil;
@@ -377,6 +383,7 @@ Var
   iBufferStart, iBufferEnd: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DeleteExistingComment', tmoTiming);{$ENDIF}
   Writer := Source.CreateUndoableWriter;
   Try
     ptStart.Line      := iStartLine;
@@ -413,6 +420,7 @@ Var
   iBufferPos1, iBufferPos2: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DeleteProfileCode', tmoTiming);{$ENDIF}
   Writer := SE.CreateUndoableWriter;
   Try
     C1.Line      := iStartLine;
@@ -439,6 +447,7 @@ End;
 Destructor TBADIIDEMenuInstaller.Destroy;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   If FBADIMenu <> Nil Then
     FBADIMenu.Free;
   RemoveActionsFromToolbars;
@@ -471,6 +480,7 @@ Var
   DD : TBaseDocumentation;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DocumentationClick', tmoTiming);{$ENDIF}
   AProject := ActiveProject;
   If AProject <> Nil Then
     If TfrmDocumentationOptions.Execute(ADocType) Then
@@ -518,6 +528,7 @@ Var
   D: TDUnitCreator;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DUnitClick', tmoTiming);{$ENDIF}
   If ActiveSourceEditor <> Nil Then
     Begin
       If ActiveProject <> Nil Then
@@ -557,6 +568,7 @@ Var
   frm: TCustomForm;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Focus', tmoTiming);{$ENDIF}
   If ActiveSourceEditor <> Nil Then
     Begin
       ActiveSourceEditor.Show;
@@ -586,6 +598,7 @@ Var
   iBADIMenu: TBADIMenu;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FreeActions', tmoTiming);{$ENDIF}
   For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
     If Assigned(FBADIActions[iBADIMenu]) Then
       FBADIActions[iBADIMenu].Free;
@@ -612,6 +625,7 @@ Var
   C         : TOTACharPos;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InsertComment', tmoTiming);{$ENDIF}
   C.Line      := iInsertLine;
   C.CharIndex := 0;
   iBufferPos  := Source.GetEditView(0).CharPosToPos(C);
@@ -647,6 +661,7 @@ Var
   EV : IOTAEditView;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InsertCommentBlock', tmoTiming);{$ENDIF}
   If CommentType = ctNone Then
     Exit;
   SourceEditor := ActiveSourceEditor;
@@ -716,6 +731,7 @@ Var
   C         : TOTACharPos;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InsertProfileCode', tmoTiming);{$ENDIF}
   Writer := SE.CreateUndoableWriter;
   Try
     C.Line      := ProfileJob.EndLine + 1;
@@ -754,6 +770,7 @@ Var
   SE: IOTASourceEditor;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InSituCommentClick', tmoTiming);{$ENDIF}
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csInSitu, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csInSitu));
@@ -776,6 +793,7 @@ Var
   Reader: IOTAEditReader;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'IsTextSelected', tmoTiming);{$ENDIF}
   Result := False;
   SE     := ActiveSourceEditor;
   If SE <> Nil Then
@@ -804,6 +822,7 @@ Var
   SE: IOTASourceEditor;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LineCommentClick', tmoTiming);{$ENDIF}
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csLine, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csLine));
@@ -841,6 +860,7 @@ Var
   iMaxCommentWidth: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MethodCommentClick', tmoTiming);{$ENDIF}
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
@@ -899,6 +919,7 @@ End;
 Procedure TBADIIDEMenuInstaller.MetricsClick(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MetricsClick', tmoTiming);{$ENDIF}
   TBADIModuleMetricsEditorView.CreateEditorView; 
 End;
 
@@ -916,6 +937,7 @@ End;
 Procedure TBADIIDEMenuInstaller.ModuleExplorerClick(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleExplorerClick', tmoTiming);{$ENDIF}
   TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
 End;
 
@@ -933,6 +955,7 @@ Var
   iBADIMenu: TBADIMenu;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'NilActions', tmoTiming);{$ENDIF}
   For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
     If Assigned(FBADIActions[iBADIMenu]) Then
       FBADIActions[iBADIMenu] := Nil;
@@ -952,6 +975,7 @@ End;
 Procedure TBADIIDEMenuInstaller.OptionsChange(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OptionsChange', tmoTiming);{$ENDIF}
   FEditorNotifier.ResetLastupdateTickCount(1);
 End;
 
@@ -971,6 +995,7 @@ Const
   strBADI = 'Browse and Doc It';
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OptionsClick', tmoTiming);{$ENDIF}
   {$IFDEF DXE00}
   (BorlandIDEServices As IOTAServices).GetEnvironmentOptions.EditOptions('', strBADI);
   {$ELSE}
@@ -1006,6 +1031,7 @@ Var
   C : TOTAEditPos;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PositionCursorInFunction', tmoTiming);{$ENDIF}
   SelectionChange(iInsertLine + CharCount(#13, strComment), 1, iInsertLine, 1);
   Pt.Y := iInsertLine;
   Pt.X := 1;
@@ -1041,6 +1067,7 @@ Var
   slProlog, slEpilog: TStringList;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ProcessProfilingCode', tmoTiming);{$ENDIF}
   strTemplate := StringReplace(TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName],
     '|', #13#10, [rfReplaceAll]);
   slProlog := PrologCode(strTemplate, ProfileJob.Method, ProfileJob.Indent + iTabs);
@@ -1092,6 +1119,7 @@ Var
   frm        : TfrmProgress;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ProfilingClick', tmoTiming);{$ENDIF}
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
@@ -1173,6 +1201,7 @@ Var
   iMaxCommentWidth: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PropertyCommentClick', tmoTiming);{$ENDIF}
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
@@ -1239,6 +1268,7 @@ Var
   Cursor: TOTAEditPos;
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RefactorConstantClick', tmoTiming);{$ENDIF}
   If Supports(BorlandIDEServices, IOTAEditorServices, EditSvrs) Then
     If Assigned(EditSvrs.TopView) Then
       Begin
@@ -1276,6 +1306,7 @@ Procedure TBADIIDEMenuInstaller.RemoveActionsFromToolbars;
     iBADIMenu: TBADIMenu;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RemoveActionsFromToolbars/IsCustomAction', tmoTiming);{$ENDIF}
     Result := False;
     For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
       If Action = FBADIActions[iBADIMenu] Then
@@ -1303,6 +1334,7 @@ Procedure TBADIIDEMenuInstaller.RemoveActionsFromToolbars;
     i: Integer;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RemoveActionsFromToolbars/RemoveAction', tmoTiming);{$ENDIF}
     If TB <> Nil Then
       For i := TB.ButtonCount - 1 DownTo 0 Do
         Begin
@@ -1315,6 +1347,7 @@ Var
   NTAS : INTAServices;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RemoveActionsFromToolbars', tmoTiming);{$ENDIF}
   NTAS := (BorlandIDEServices As INTAServices);
   RemoveAction(NTAS.ToolBar[sCustomToolBar]);
   RemoveAction(NTAS.Toolbar[sStandardToolBar]);
@@ -1377,6 +1410,7 @@ Var
   strLine    : String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RemoveProfileCode', tmoTiming);{$ENDIF}
   Reader := SE.CreateReader;
   Try
     For iLine := 0 To slEpilog.Count - 1 Do
@@ -1458,6 +1492,7 @@ Var
   boolVisible                   : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SelectedText', tmoTiming);{$ENDIF}
   Result          := '';
   boolVisible     := False;
   iBufferPosStart := 0;
@@ -1538,6 +1573,7 @@ Procedure TBADIIDEMenuInstaller.SelectionChange(Const iIdentLine, iIdentCol, iCo
     {$ENDIF}
     
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SelectionChange/UnfoldMethod', tmoTiming);{$ENDIF}
     {$IFDEF D2006}
     If Supports(EV, IOTAElideActions, EA) Then
       EA.UnElideNearestBlock;
@@ -1551,6 +1587,7 @@ Var
   iLine : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SelectionChange', tmoTiming);{$ENDIF}
   SourceEditor := ActiveSourceEditor;
   If Assigned(SourceEditor) Then
     Begin
@@ -1623,6 +1660,7 @@ Var
   iIndent        : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ToDoCommentClick', tmoTiming);{$ENDIF}
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
@@ -1667,6 +1705,7 @@ Var
   iBADIMenu: TBADIMenu;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateMenuShortcuts', tmoTiming);{$ENDIF}
   For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
     If Assigned(FBADIActions[iBADIMenu]) Then
       FBADIActions[iBADIMenu].ShortCut :=
@@ -1674,3 +1713,4 @@ Begin
 End;
 
 End.
+

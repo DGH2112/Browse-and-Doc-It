@@ -1,0 +1,18 @@
+'
+' The GetDesktopWindow function returns the handle of the Windows desktop window.
+' The desktop window covers the entire screen. The desktop window is the area on
+' top of which all icons and other windows are painted.
+'
+' hwnd GetDesktopWindow(VOID)
+'
+' @Version 1.0
+' @Date    11 Sep 2003
+'
+' @precon  None.
+' @postcon Function returns the handle of the Windows desktop window
+'
+' @return  a Long - The return value is the handle of the desktop window.
+'
+' @see GetWindow
+'
+Declare Function GetDesktopWindow Lib "user32" () As Long

@@ -1,0 +1,20 @@
+'
+' This is a report on no data event handler.
+'
+' @Version 1.0
+' @Date    19 Aug 2003
+'
+' @precon  None.
+' @postcon If there is no data in the report it displays a message and cancels the report.
+'
+' @param   Cancel as an Integer
+'
+Private Sub Report_NoData(Cancel As Integer)
+  Exception.Push "Report_Allocated Design Details Report (A4 Landscape).Report_NoData", Cancel
+  On Error GoTo ErrHnd
+  MsgBox FormatString(strNoReportData, Name), , strAppTitle
+  Cancel = True
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

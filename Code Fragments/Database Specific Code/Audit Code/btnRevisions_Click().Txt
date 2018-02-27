@@ -1,0 +1,19 @@
+'
+' This is a button on click event handler for the Revisions Button
+'
+' @Version 1.0
+' @Date    18 Aug 2003
+'
+' @precon  None.
+' @postcon Displays the revisions for the selected item.
+'
+Private Sub btnRevisions_Click()
+  Exception.Push ".btnRevisions_Click"
+  On Error GoTo ErrHnd
+  If Not IsNull(edtCatID.Value) And Not Dirty Then
+    DoCmd.OpenForm "frmAuditTrail", acNormal, , , , acDialog, FormatString(strAuditTable, edtCatID.Value)
+  End If
+ErrHnd:
+  If Err.Number <> 0 And Err.Number <> 2501 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

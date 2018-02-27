@@ -1,0 +1,22 @@
+'
+' This procedure attempts to close the named form
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon Closes the name for if found to be open.
+'
+' @param   strFormName as a string
+'
+Public Sub CloseForm(strFormName As String)
+  Dim i As Long
+  Exception.Push "CloseForm", strFormName
+  On Error GoTo ErrHnd
+  For i = Forms.Count - 1 To 0 Step -1
+    If Forms(i).Name = strFormName Then DoCmd.Close acForm, strFormName
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

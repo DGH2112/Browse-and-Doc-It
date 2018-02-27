@@ -1,0 +1,67 @@
+(**
+  
+  This module defined a new package for testing a dockable form for the IDE.
+  This dockable form will eventually become the Module Explorer for a new
+  version of PascalDoc.
+
+  @Author  David Hoyle
+  @Date    27 Dec 2006
+  @Version 1.0
+
+**)
+package BrowseAndDocIt;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'Browse and Doc It'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+{$DEFINE Hello}
+{$DEFINE Goodbye}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocItTestApp\Class Diagram.txvcls'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocItTestApp\BaseLanguageModule\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocItTestApp\default.txvpck'}
+
+requires
+  rtl,
+  designide,
+  vcl,
+  vclactnband,
+  vclx,
+  vcljpg;
+
+contains
+  BrowseAndDocItWizard in 'Source\BrowseAndDocItWizard.pas',
+  DockableModuleExplorer in 'Source\DockableModuleExplorer.pas',
+  PascalDocModule in '..\..\Library\PascalDocModule.pas',
+  PascalDocChecker in '..\..\Library\PascalDocChecker.pas',
+  OptionsForm in 'Source\OptionsForm.pas',
+  ToolsAPIUtils in 'Source\ToolsAPIUtils.pas',
+  SpecialTagForm in 'Source\SpecialTagForm.pas',
+  TokenForm in '..\..\Library\TokenForm.pas',
+  ProgressForm in 'Source\ProgressForm.pas',
+  BaseLanguageModule in '..\..\Library\BaseLanguageModule.pas',
+  ModuleExplorerFrame in '..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame};
+
+end.

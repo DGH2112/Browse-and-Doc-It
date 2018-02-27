@@ -1,0 +1,27 @@
+'
+' This function determines if the user is a member of the passed group or role.
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon Returns true is is a member else false
+'
+' @param   strRole as a string
+'
+Public Function IsMember(strRole As String) As Boolean
+  Dim rs As Recordset
+  Exception.Push "IsMember", strRole
+  On Error GoTo ErrHnd
+  IsMember = False
+  Set rs = New Recordset
+  rs.Open FormatString("SELECT IS_MEMBER(N'%param%') AS Permissions;", strRole), CurrentProject.Connection, _
+    adOpenDynamic, adLockOptimistic
+  If rs.EOF Then GoTo ErrHnd
+  If IsNull(rs.Fields("Permissions")) Then GoTo ErrHnd
+  IsMember = rs.Fields("Permissions") > 0
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  If Not rs Is Nothing Then If rs.State = adStateOpen Then rs.Close
+  Exception.Pop
+End Function

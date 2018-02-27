@@ -1,0 +1,55 @@
+'
+' The RECT structure defines the coordinates of the upper-left and
+' lower-right corners of a rectangle.
+'
+' typedef struct _RECT {    // rc
+'   LONG left;
+'   LONG top;
+'   LONG right;
+'   LONG bottom;
+' } RECT;
+'
+' @remark When RECT is passed to the FillRect function, the rectangle is
+' filled up to, but not including, the right column and bottom row of pixels.
+' This structure is identical to the RECTL structure.
+'
+' @see FillRect, RECTL, SMALL_RECT
+'
+Type RECT
+  'Specifies the x-coordinate of the upper-left corner of the rectangle.
+  Left As Long
+  'Specifies the y-coordinate of the upper-left corner of the rectangle.
+  Top As Long
+  'Specifies the x-coordinate of the lower-right corner of the rectangle.
+  Right As Long
+  'Specifies the y-coordinate of the lower-right corner of the rectangle.
+  Bottom As Long
+End Type
+
+'
+' The GetWindowRect function retrieves the dimensions of the bounding rectangle of the
+' specified window. The dimensions are given in screen coordinates that are relative to
+' the upper-left corner of the screen.
+'
+' @precon  None.
+' @postcon Function retrieves the dimensions of the bounding rectangle of the
+'          specified window
+'
+' BOOL GetWindowRect(
+'   HWND hWnd,  // handle of window
+'   LPRECT lpRect   // address of structure for window coordinates
+' );
+'
+' @Version 1.0
+' @Date    11 Sep 2003
+'
+' @param   hwnd as a Long - Identifies the window.
+' @param   lpRect as a RECT - Points to a RECT structure that receives the screen
+'          coordinates of the upper-left and lower-right corners of the window.
+'
+' @return  a Long - If the function succeeds, the return value is nonzero. If the
+'          function fails, the return value is zero. To get extended error information, call GetLastError.
+'
+' @see GetClientRect, RECT
+'
+Declare Function GetWindowRect Lib "user32" (ByVal hwnd As Long, lpRect As RECT) As Long

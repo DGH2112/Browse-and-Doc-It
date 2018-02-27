@@ -1,0 +1,17 @@
+'
+' Form on current event handler
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None
+' @postcon Sets the new variable to fault
+'
+Private Sub Form_Current()
+  Exception.Push ".Form_Current"
+  On Error GoTo ErrHnd
+  boolNew = False
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

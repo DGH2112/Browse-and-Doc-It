@@ -1,0 +1,1514 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>Object Pascal Grammar.bnf</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Backus-Naur Grammar.html">Backus-Naur Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Eidolon Map File Grammar.html">Eidolon Map File Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Extensible Markup Language (XML) 1.0.html">Extensible Markup Language (XML) 1.0.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Object Pascal Grammar.html">Object Pascal Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Rules2">Rules</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Object Pascal Grammar.bnf -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Object Pascal Grammar.bnf</h1>
+        <p class="Comment">Browse   and   Doc   It   Object   Pascal   Grammar </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">21   Jul   2009 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David   Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1 . 0 </li>
+        </ul>
+      
+      <!-- Rules -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Rules2"></a>Rules</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<AddOp>"></a><AddOp></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">AddOp</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'+'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'-'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'OR'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'XOR'</span></pre>
+          <!-- &#60;AddOp&#62; ::= '+' | '-' | 'OR' | 'XOR' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<address>"></a><address></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">address</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'$'</span> <span class="Symbol">&#60;</span><span class="Identifier">HexNumber</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">HexNumber</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;address&#62; ::= '$' &#60;HexNumber&#62; ( &#60;HexNumber&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<AlphaChar>"></a><AlphaChar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">AlphaChar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'A'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'B'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'C'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'D'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'E'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'F'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'G'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'H'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'I'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'J'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'K'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'L'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'M'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'M'</span>
+  <span class="Symbol">|</span> <span class="SingleLiteral">'O'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'P'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'Q'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'R'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'S'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'T'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'U'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'V'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'W'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'X'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'Y'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'Z'</span></pre>
+          <!-- &#60;AlphaChar&#62; ::= 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'M'
+  | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ArrayConstant>"></a><ArrayConstant></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ArrayConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">TypedConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">TypedConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span> <span class="Symbol">)</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;ArrayConstant&#62; ::= '(' ( &#60;TypedConstant&#62; [ ',' &#60;TypedConstant&#62; ]* ) ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ArrayType>"></a><ArrayType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ArrayType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'ARRAY'</span> <span class="Symbol">[</span> <span class="SingleLiteral">'['</span> <span class="Symbol">&#60;</span><span class="Identifier">OrdinalType</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">OrdinalType</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span> <span class="SingleLiteral">']'</span> <span class="Symbol">]</span> <span class="SingleLiteral">'OF'</span> <span class="Symbol">&#60;</span><span class="Identifier">Type</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ArrayType&#62; ::= 'ARRAY' [ '[' &#60;OrdinalType&#62; [ ',' &#60;OrdinalType&#62; ]* ']' ] 'OF' &#60;Type&#62; [
+  &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<assemblerlanguage>"></a><assemblerlanguage></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">assemblerlanguage</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? 80x86 32bit Assembly Language ?</span></pre>
+          <!-- &#60;assemblerlanguage&#62; ::= ? 80x86 32bit Assembly Language ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<AssemblerStmt>"></a><AssemblerStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">AssemblerStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'ASM'</span> <span class="Symbol">&#60;</span><span class="Identifier">assemblerlanguage</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;AssemblerStmt&#62; ::= 'ASM' &#60;assemblerlanguage&#62; 'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Block>"></a><Block></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Block</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">DeclSection</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ExportsStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">CompoundStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ExportsStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;Block&#62; ::= [ &#60;DeclSection&#62; ] [ &#60;ExportsStmt&#62; ] &#60;CompoundStmt&#62; [ &#60;ExportsStmt&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CaseLabel>"></a><CaseLabel></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CaseLabel</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'..'</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;CaseLabel&#62; ::= &#60;ConstExpr&#62; [ '..' &#60;ConstExpr&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CaseSelector>"></a><CaseSelector></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CaseSelector</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">CaseLabel</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">CaseLabel</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;CaseSelector&#62; ::= &#60;CaseLabel&#62; ( ',' &#60;CaseLabel&#62; )* ':' &#60;Statement&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CaseStmt>"></a><CaseStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CaseStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'CASE'</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'OF'</span> <span class="Symbol">&#60;</span><span class="Identifier">CaseSelector</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">CaseSelector</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">[</span> <span class="SingleLiteral">'ELSE'</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">';'</span> <span class="Symbol">]</span> <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;CaseStmt&#62; ::= 'CASE' &#60;Expression&#62; 'OF' &#60;CaseSelector&#62; ( ';' &#60;CaseSelector&#62; )* [ 'ELSE'
+  &#60;Statement&#62; ] [ ';' ] 'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassFieldList>"></a><ClassFieldList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassFieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassVisibility</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">ObjFieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">ObjFieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;ClassFieldList&#62; ::= ( &#60;ClassVisibility&#62; &#60;ObjFieldList&#62; ( ';' &#60;ObjFieldList&#62; )* ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassHeritage>"></a><ClassHeritage></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassHeritage</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;ClassHeritage&#62; ::= '(' &#60;IdentList&#62; ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassMethodList>"></a><ClassMethodList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassMethodList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassVisibility</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">MethodList</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">MethodList</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;ClassMethodList&#62; ::= ( &#60;ClassVisibility&#62; &#60;MethodList&#62; ( ';' &#60;MethodList&#62; )* ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassPropertyList>"></a><ClassPropertyList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassPropertyList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassVisibility</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">PropertyList</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">PropertyList</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;ClassPropertyList&#62; ::= ( &#60;ClassVisibility&#62; &#60;PropertyList&#62; ( ';' &#60;PropertyList&#62; )* ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassRefType>"></a><ClassRefType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassRefType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'CLASS'</span> <span class="SingleLiteral">'OF'</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ClassRefType&#62; ::= 'CLASS' 'OF' &#60;TypeID&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassType>"></a><ClassType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'CLASS'</span> <span class="Symbol">[</span> <span class="SingleLiteral">'ABSTRACT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SEALED'</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">'HELPER'</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassHeritage</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">'FOR'</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">ClassTypeIdentifierName</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassVisibility</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassFieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">ClassMethodList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassPropertyList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeSection</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstSection</span><span class="Symbol">&#62;</span>
+  <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">VarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassVarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;ClassType&#62; ::= 'CLASS' [ 'ABSTRACT' | 'SEALED' ] [ 'HELPER' ] [ &#60;ClassHeritage&#62; ] [ 'FOR'
+  &#60;ClassTypeIdentifierName&#62; ] [ &#60;ClassVisibility&#62; ] [ &#60;ClassFieldList&#62; ] [
+  &#60;ClassMethodList&#62; ] [ &#60;ClassPropertyList&#62; ] [ &#60;TypeSection&#62; ] [ &#60;ConstSection&#62;
+  ] [ &#60;VarSection&#62; ] [ &#60;ClassVarSection&#62; ] 'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassTypeIdentifierName>"></a><ClassTypeIdentifierName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassTypeIdentifierName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ClassTypeIdentifierName&#62; ::= &#60;Identifier&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassVarSection>"></a><ClassVarSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassVarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'CLASS'</span> <span class="SingleLiteral">'VAR'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">VarDecl</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;ClassVarSection&#62; ::= 'CLASS' 'VAR' ( &#60;VarDecl&#62; ';' )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ClassVisibility>"></a><ClassVisibility></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ClassVisibility</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">[</span> <span class="SingleLiteral">'STRICT'</span> <span class="Symbol">]</span> <span class="SingleLiteral">'PUBLIC'</span> <span class="Symbol">|</span> <span class="Symbol">[</span> <span class="SingleLiteral">'STRICT'</span> <span class="Symbol">]</span> <span class="SingleLiteral">'PROTECTED'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'PRIVATE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'PUBLISHED'</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ClassVisibility&#62; ::= [ [ 'STRICT' ] 'PUBLIC' | [ 'STRICT' ] 'PROTECTED' | 'PRIVATE' | 'PUBLISHED' ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CompoundStmt>"></a><CompoundStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CompoundStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'BEGIN'</span> <span class="Symbol">&#60;</span><span class="Identifier">StmtList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;CompoundStmt&#62; ::= 'BEGIN' &#60;StmtList&#62; 'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ConditionalStmt>"></a><ConditionalStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ConditionalStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">IfStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">CaseStmt</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ConditionalStmt&#62; ::= &#60;IfStmt&#62; | &#60;CaseStmt&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ConstantDecl>"></a><ConstantDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ConstantDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">'='</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'='</span> <span class="Symbol">&#60;</span><span class="Identifier">TypedConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">[</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ConstantDecl&#62; ::= &#60;Ident&#62; ( '=' &#60;ConstExpr&#62; | ':' &#60;TypeID&#62; '=' &#60;TypedConstant&#62; ) [
+  &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ConstExpr>"></a><ConstExpr></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? An expression which evaluates to a constant at compilation time ?</span></pre>
+          <!-- &#60;ConstExpr&#62; ::= ? An expression which evaluates to a constant at compilation time ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ConstructorDecl>"></a><ConstructorDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ConstructorDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstructorHeading</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">Directive</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Block</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#60;ConstructorDecl&#62; ::= &#60;ConstructorHeading&#62; ';' [ &#60;Directive&#62; ] [ &#60;PortabilityDirective&#62; ] &#60;Block&#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ConstructorHeading>"></a><ConstructorHeading></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ConstructorHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'CONSTRUCTOR'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">FormalParameters</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ConstructorHeading&#62; ::= 'CONSTRUCTOR' &#60;Ident&#62; [ &#60;FormalParameters&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ConstSection>"></a><ConstSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ConstSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'CONST'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstantDecl</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;ConstSection&#62; ::= 'CONST' ( &#60;ConstantDecl&#62; ';' )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ContainsClause>"></a><ContainsClause></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ContainsClause</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'CONTAINS'</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#60;ContainsClause&#62; ::= 'CONTAINS' &#60;IdentList&#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DeclSection>"></a><DeclSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DeclSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">LabelDeclSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ResStringSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">VarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ThreadVarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ProcedureDeclSection</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;DeclSection&#62; ::= ( &#60;LabelDeclSection&#62; | &#60;ConstSection&#62; | &#60;ResStringSection&#62; | &#60;TypeSection&#62; |
+  &#60;VarSection&#62; | &#60;ThreadVarSection&#62; | &#60;ProcedureDeclSection&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Designator>"></a><Designator></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Designator</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">QualId</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'.'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'['</span> <span class="Symbol">&#60;</span><span class="Identifier">ExprList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">']'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'^'</span> <span class="Symbol">]</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Designator&#62; ::= &#60;QualId&#62; [ '.' &#60;Ident&#62; | '[' &#60;ExprList&#62; ']' | '^' ]* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DestructorDecl>"></a><DestructorDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DestructorDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">DestructorHeading</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">Directive</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Block</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#60;DestructorDecl&#62; ::= &#60;DestructorHeading&#62; ';' [ &#60;Directive&#62; ] [ &#60;PortabilityDirective&#62; ] &#60;Block&#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DestructorHeading>"></a><DestructorHeading></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DestructorHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'DESTRUCTOR'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">FormalParameters</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;DestructorHeading&#62; ::= 'DESTRUCTOR' &#60;Ident&#62; [ &#60;FormalParameters&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Directive>"></a><Directive></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Directive</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'ABSTRACT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ASSEMBLER'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'CDECL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DISPID'</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DYNAMIC'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'EXPORT'</span>
+  <span class="Symbol">|</span> <span class="SingleLiteral">'EXTERNAL'</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ExportsSpecifier</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">|</span> <span class="SingleLiteral">'FAR'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'FINAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'FORWARD'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'INLINE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LOCAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'MESSAGE'</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'NEAR'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'OVERLOAD'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'OVERRIDE'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'PASCAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'REGISTER'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'REINTRODUCE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SAFECALL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'STDCALL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'VARARGS'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'VIRTUAL'</span></pre>
+          <!-- &#60;Directive&#62; ::= 'ABSTRACT' | 'ASSEMBLER' | 'CDECL' | 'DISPID' &#60;ConstExpr&#62; | 'DYNAMIC' | 'EXPORT'
+  | 'EXTERNAL' &#60;ConstExpr&#62; ( &#60;ExportsSpecifier&#62; ) | 'FAR' | 'FINAL' | 'FORWARD' |
+  'INLINE' | 'LOCAL' | 'MESSAGE' &#60;ConstExpr&#62; | 'NEAR' | 'OVERLOAD' | 'OVERRIDE' |
+  'PASCAL' | 'REGISTER' | 'REINTRODUCE' | 'SAFECALL' | 'STDCALL' | 'VARARGS' |
+  'VIRTUAL' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EnumeratedType>"></a><EnumeratedType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EnumeratedType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">EnumerateTypeElement</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">EnumerateTypeElement</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span> <span class="Symbol">)</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;EnumeratedType&#62; ::= '(' ( &#60;EnumerateTypeElement&#62; [ ',' &#60;EnumerateTypeElement&#62; ]* ) ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EnumerateTypeElement>"></a><EnumerateTypeElement></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EnumerateTypeElement</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'='</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;EnumerateTypeElement&#62; ::= &#60;Ident&#62; [ '=' &#60;ConstExpr&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ExceptionBlock>"></a><ExceptionBlock></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ExceptionBlock</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="SingleLiteral">'ON'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'DO'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span> <span class="Symbol">[</span> <span class="SingleLiteral">'ELSE'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ExceptionBlock&#62; ::= [ 'ON' [ &#60;Ident&#62; ':' ] &#60;TypeID&#62; 'DO' &#60;Statement&#62; ]* [ 'ELSE' &#60;Statement&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ExportedHeading>"></a><ExportedHeading></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ExportedHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ProcedureHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">FunctionHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="SingleLiteral">';'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">Directive</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ExportedHeading&#62; ::= ( &#60;ProcedureHeading&#62; | &#60;FunctionHeading&#62; ) ';' [ &#60;Directive&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ExportsItem>"></a><ExportsItem></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ExportsItem</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'NAME'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'INDEX'</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">'INDEX'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'NAME'</span> <span class="DoubleLiteral">"'"</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ExportsItem&#62; ::= &#60;Ident&#62; [ 'NAME' | 'INDEX' "'" &#60;ConstExpr&#62; "'" ] [ 'INDEX' | 'NAME' "'"
+  &#60;ConstExpr&#62; "'" ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ExportsSpecifier>"></a><ExportsSpecifier></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ExportsSpecifier</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? Unknown ?</span></pre>
+          <!-- &#60;ExportsSpecifier&#62; ::= ? Unknown ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ExportsStmt>"></a><ExportsStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ExportsStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'EXPORTS'</span> <span class="Symbol">&#60;</span><span class="Identifier">ExportsItem</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">ExportsItem</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span></pre>
+          <!-- &#60;ExportsStmt&#62; ::= 'EXPORTS' &#60;ExportsItem&#62; [ ',' &#60;ExportsItem&#62; ]* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Expression>"></a><Expression></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">SimpleExpression</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">RelOp</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">SimpleExpression</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Expression&#62; ::= &#60;SimpleExpression&#62; [ &#60;RelOp&#62; &#60;SimpleExpression&#62; ]* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ExprList>"></a><ExprList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ExprList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;ExprList&#62; ::= &#60;Expression&#62; ( ',' &#60;Expression&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Factor>"></a><Factor></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Factor</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Designator</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">ExprList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span> <span class="Symbol">]</span> <span class="Symbol">|</span> <span class="SingleLiteral">'@'</span> <span class="Symbol">&#60;</span><span class="Identifier">Designator</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Number</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">String</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'NIL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'NOT'</span> <span class="Symbol">&#60;</span><span class="Identifier">Factor</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'INHERITED'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">Designator</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">SetConstructor</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;Factor&#62; ::= &#60;Designator&#62; [ '(' &#60;ExprList&#62; ')' ] | '@' &#60;Designator&#62; | &#60;Number&#62; | &#60;String&#62; |
+  'NIL' | '(' &#60;Expression&#62; ')' | 'NOT' &#60;Factor&#62; | 'INHERITED' [ &#60;Designator&#62; ] |
+  &#60;SetConstructor&#62; | &#60;TypeID&#62; '(' &#60;Expression&#62; ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FieldDecl>"></a><FieldDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FieldDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">Type</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;FieldDecl&#62; ::= &#60;IdentList&#62; ':' &#60;Type&#62; [ &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FieldList>"></a><FieldList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">FieldDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">FieldDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span> <span class="Symbol">)</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">VariantSection</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">';'</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;FieldList&#62; ::= ( &#60;FieldDecl&#62; [ ';' &#60;FieldDecl&#62; ]* ) [ &#60;VariantSection&#62; ] [ ';' ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FileType>"></a><FileType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FileType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'FILE'</span> <span class="Symbol">[</span> <span class="SingleLiteral">'OF'</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;FileType&#62; ::= 'FILE' [ 'OF' &#60;TypeID&#62; ] [ &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FormalParam>"></a><FormalParam></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FormalParam</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="SingleLiteral">'VAR'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'CONST'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'OUT'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Parameter</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;FormalParam&#62; ::= [ 'VAR' | 'CONST' | 'OUT' ] &#60;Parameter&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FormalParameters>"></a><FormalParameters></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FormalParameters</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">FormalParam</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">FormalParam</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">]</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;FormalParameters&#62; ::= '(' [ &#60;FormalParam&#62; ( ';' &#60;FormalParam&#62; )* ] ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ForStmt>"></a><ForStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ForStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'FOR'</span> <span class="Symbol">&#60;</span><span class="Identifier">QualId</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':='</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">'TO'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DOWNTO'</span> <span class="Symbol">)</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'DO'</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ForStmt&#62; ::= 'FOR' &#60;QualId&#62; ':=' &#60;Expression&#62; ( 'TO' | 'DOWNTO' ) &#60;Expression&#62; 'DO'
+  &#60;Statement&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FunctionDecl>"></a><FunctionDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FunctionDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">FunctionHeading</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">Directive</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Block</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#60;FunctionDecl&#62; ::= &#60;FunctionHeading&#62; ';' [ &#60;Directive&#62; ] [ &#60;PortabilityDirective&#62; ] &#60;Block&#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<FunctionHeading>"></a><FunctionHeading></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">FunctionHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'FUNCTION'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">FormalParameters</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">':'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">SimpleType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'STRING'</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;FunctionHeading&#62; ::= 'FUNCTION' &#60;Ident&#62; [ &#60;FormalParameters&#62; ] ':' ( &#60;SimpleType&#62; | 'STRING' ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Goal>"></a><Goal></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Goal</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Program</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Package</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Library</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Unit</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span></pre>
+              <p class="Comment">Browse   and   Doc   It   Object   Pascal   Grammar </p>
+              <p class="TagHeader">Date Code Last Updated</p>
+              <ul>
+                <li class="SpecialTag">21   Jul   2009 </li>
+              </ul>
+              <p class="TagHeader">Code Author</p>
+              <ul>
+                <li class="SpecialTag">David   Hoyle </li>
+              </ul>
+              <p class="TagHeader">Code Version</p>
+              <ul>
+                <li class="SpecialTag">1 . 0 </li>
+              </ul>
+          <!-- &#60;Goal&#62; ::= ( &#60;Program&#62; | &#60;Package&#62; | &#60;Library&#62; | &#60;Unit&#62; ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<HexNumber>"></a><HexNumber></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">HexNumber</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">NumericChar</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'A'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'B'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'C'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'D'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'E'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'F'</span></pre>
+          <!-- &#60;HexNumber&#62; ::= &#60;NumericChar&#62; | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Ident>"></a><Ident></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Ident&#62; ::= &#60;Identifier&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Identifier>"></a><Identifier></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">AlphaChar</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">AlphaChar</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">NumericChar</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Identifier&#62; ::= &#60;AlphaChar&#62; ( &#60;AlphaChar&#62; | &#60;NumericChar&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<IdentList>"></a><IdentList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;IdentList&#62; ::= &#60;Ident&#62; ( ',' &#60;Ident&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<IfStmt>"></a><IfStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">IfStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'IF'</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'THEN'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'ELSE'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;IfStmt&#62; ::= 'IF' &#60;Expression&#62; 'THEN' &#60;Statement&#62; [ 'ELSE' &#60;Statement&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ImplementationSection>"></a><ImplementationSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ImplementationSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'IMPLEMENTATION'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">UsesClause</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">(</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">DeclSection</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">|</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ExportsStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;ImplementationSection&#62; ::= 'IMPLEMENTATION' [ &#60;UsesClause&#62; ] ( [ &#60;DeclSection&#62; ] | [ &#60;ExportsStmt&#62; ] )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InitSection>"></a><InitSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InitSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'INITIALIZATION'</span> <span class="Symbol">&#60;</span><span class="Identifier">StmtList</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'FINALIZATION'</span> <span class="Symbol">&#60;</span><span class="Identifier">StmtList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'END'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'BEGIN'</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">StmtList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'END'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;InitSection&#62; ::= 'INITIALIZATION' &#60;StmtList&#62; [ 'FINALIZATION' &#60;StmtList&#62; ] 'END' | 'BEGIN'
+  &#60;StmtList&#62; 'END' | 'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InterfaceDecl>"></a><InterfaceDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InterfaceDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ResStringSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">VarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">ThreadVarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ExportedHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ExportsStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;InterfaceDecl&#62; ::= ( &#60;ConstSection&#62; | &#60;ResStringSection&#62; | &#60;TypeSection&#62; | &#60;VarSection&#62; |
+  &#60;ThreadVarSection&#62; | &#60;ExportedHeading&#62; | &#60;ExportsStmt&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InterfaceHeritage>"></a><InterfaceHeritage></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InterfaceHeritage</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;InterfaceHeritage&#62; ::= '(' &#60;IdentList&#62; ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InterfaceSection>"></a><InterfaceSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InterfaceSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'INTERFACE'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">UsesClause</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">InterfaceDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;InterfaceSection&#62; ::= 'INTERFACE' [ &#60;UsesClause&#62; ] [ &#60;InterfaceDecl&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<InterfaceType>"></a><InterfaceType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">InterfaceType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'INTERFACE'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">InterfaceHeritage</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassMethodList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassPropertyList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span>
+  <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;InterfaceType&#62; ::= 'INTERFACE' [ &#60;InterfaceHeritage&#62; ] [ &#60;ClassMethodList&#62; ] [ &#60;ClassPropertyList&#62; ]
+  'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<LabelDeclSection>"></a><LabelDeclSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">LabelDeclSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'LABEL'</span> <span class="Symbol">&#60;</span><span class="Identifier">LabelId</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;LabelDeclSection&#62; ::= 'LABEL' &#60;LabelId&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<LabelId>"></a><LabelId></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">LabelId</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;LabelId&#62; ::= &#60;Identifier&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Library>"></a><Library></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Library</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'LIBRARY'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">ProgramBlock</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'.'</span></pre>
+          <!-- &#60;Library&#62; ::= 'LIBRARY' &#60;Ident&#62; ';' &#60;ProgramBlock&#62; '.' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<LoopStmt>"></a><LoopStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">LoopStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">RepeatStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">WhileStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ForStmt</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;LoopStmt&#62; ::= &#60;RepeatStmt&#62; | &#60;WhileStmt&#62; | &#60;ForStmt&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<MethodHeading>"></a><MethodHeading></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">MethodHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ProcedureHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">FunctionHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstructorHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">DestructorHeading</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;MethodHeading&#62; ::= &#60;ProcedureHeading&#62; | &#60;FunctionHeading&#62; | &#60;ConstructorHeading&#62; |
+  &#60;DestructorHeading&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<MethodList>"></a><MethodList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">MethodList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">MethodHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">';'</span> <span class="SingleLiteral">'VIRTUAL'</span> <span class="Symbol">]</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">MethodHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">';'</span> <span class="SingleLiteral">'VIRTUAL'</span> <span class="Symbol">]</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;MethodList&#62; ::= ( &#60;MethodHeading&#62; [ ';' 'VIRTUAL' ] ( &#60;MethodHeading&#62; [ ';' 'VIRTUAL' ] ';' )* ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<MulOp>"></a><MulOp></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">MulOp</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'*'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'/'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DIV'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'MOD'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'AND'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SHL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SHR'</span></pre>
+          <!-- &#60;MulOp&#62; ::= '*' | '/' | 'DIV' | 'MOD' | 'AND' | 'SHL' | 'SHR' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Number>"></a><Number></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Number</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? number ?</span></pre>
+          <!-- &#60;Number&#62; ::= ? number ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<NumericChar>"></a><NumericChar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">NumericChar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'0'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'1'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'2'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'3'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'4'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'5'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'6'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'7'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'8'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'9'</span></pre>
+          <!-- &#60;NumericChar&#62; ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<object>"></a><object></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">object</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;object&#62; ::= &#60;Identifier&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ObjectType>"></a><ObjectType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ObjectType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'OBJECT'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ObjHeritage</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ObjFieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">MethodList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;ObjectType&#62; ::= 'OBJECT' [ &#60;ObjHeritage&#62; ] [ &#60;ObjFieldList&#62; ] [ &#60;MethodList&#62; ] 'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ObjFieldList>"></a><ObjFieldList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ObjFieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">Type</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">Type</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;ObjFieldList&#62; ::= ( &#60;IdentList&#62; ':' &#60;Type&#62; ( &#60;IdentList&#62; ':' &#60;Type&#62; ';' )* ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ObjHeritage>"></a><ObjHeritage></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ObjHeritage</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">QualId</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;ObjHeritage&#62; ::= '(' &#60;QualId&#62; ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<OrdIdent>"></a><OrdIdent></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">OrdIdent</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'SHORTINT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SMALLINT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'INTEGER'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'BYTE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LONGINT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'INT64'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'WORD'</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'BOOLEAN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'CHAR'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'WIDECHAR'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LONGWORD'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'PCHAR'</span></pre>
+          <!-- &#60;OrdIdent&#62; ::= 'SHORTINT' | 'SMALLINT' | 'INTEGER' | 'BYTE' | 'LONGINT' | 'INT64' | 'WORD' |
+  'BOOLEAN' | 'CHAR' | 'WIDECHAR' | 'LONGWORD' | 'PCHAR' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<OrdinalType>"></a><OrdinalType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">OrdinalType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">SubrangeType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">EnumeratedType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">OrdIdent</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;OrdinalType&#62; ::= ( &#60;SubrangeType&#62; | &#60;EnumeratedType&#62; | &#60;OrdIdent&#62; ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Package>"></a><Package></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Package</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'PACKAGE'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">RequiresClause</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">ContainsClause</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'END'</span> <span class="SingleLiteral">'.'</span></pre>
+          <!-- &#60;Package&#62; ::= 'PACKAGE' &#60;Ident&#62; ';' [ &#60;RequiresClause&#62; ] [ &#60;ContainsClause&#62; ] 'END' '.' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Parameter>"></a><Parameter></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Parameter</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">':'</span> <span class="Symbol">(</span> <span class="Symbol">[</span> <span class="SingleLiteral">'ARRAY'</span> <span class="SingleLiteral">'OF'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">SimpleType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'STRING'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'FILE'</span> <span class="Symbol">)</span> <span class="Symbol">]</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">SimpleType</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'='</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Parameter&#62; ::= &#60;IdentList&#62; [ ':' ( [ 'ARRAY' 'OF' ] &#60;SimpleType&#62; | 'STRING' | 'FILE' ) ] |
+  &#60;Ident&#62; ':' &#60;SimpleType&#62; '=' &#60;ConstExpr&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PointerType>"></a><PointerType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PointerType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'^'</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;PointerType&#62; ::= '^' &#60;TypeID&#62; [ &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PortabilityDirective>"></a><PortabilityDirective></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'PLATFORM'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DEPRECATED'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'LIBRARY'</span></pre>
+          <!-- &#60;PortabilityDirective&#62; ::= 'PLATFORM' | 'DEPRECATED' | 'LIBRARY' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ProcedureDecl>"></a><ProcedureDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ProcedureDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ProcedureHeading</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">Directive</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Block</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#60;ProcedureDecl&#62; ::= &#60;ProcedureHeading&#62; ';' [ &#60;Directive&#62; ] [ &#60;PortabilityDirective&#62; ] &#60;Block&#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ProcedureDeclSection>"></a><ProcedureDeclSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ProcedureDeclSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ProcedureDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">FunctionDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstructorDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">DestructorDecl</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ProcedureDeclSection&#62; ::= &#60;ProcedureDecl&#62; | &#60;FunctionDecl&#62; | &#60;ConstructorDecl&#62; | &#60;DestructorDecl&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ProcedureHeading>"></a><ProcedureHeading></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ProcedureHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'PROCEDURE'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">FormalParameters</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ProcedureHeading&#62; ::= 'PROCEDURE' &#60;Ident&#62; [ &#60;FormalParameters&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ProcedureType>"></a><ProcedureType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ProcedureType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ProcedureHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">FunctionHeading</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">[</span> <span class="SingleLiteral">'OF'</span> <span class="SingleLiteral">'OBJECT'</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;ProcedureType&#62; ::= ( &#60;ProcedureHeading&#62; | &#60;FunctionHeading&#62; ) [ 'OF' 'OBJECT' ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Program>"></a><Program></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Program</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="SingleLiteral">'PROGRAM'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span> <span class="Symbol">]</span> <span class="SingleLiteral">';'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">ProgramBlock</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'.'</span></pre>
+          <!-- &#60;Program&#62; ::= [ 'PROGRAM' &#60;Ident&#62; [ '(' &#60;IdentList&#62; ')' ] ';' ] &#60;ProgramBlock&#62; '.' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ProgramBlock>"></a><ProgramBlock></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ProgramBlock</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">UsesClause</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Block</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ProgramBlock&#62; ::= [ &#60;UsesClause&#62; ] &#60;Block&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PropertyInterface>"></a><PropertyInterface></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PropertyInterface</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PropertyParameterList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;PropertyInterface&#62; ::= [ &#60;PropertyParameterList&#62; ] ':' &#60;Ident&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PropertyList>"></a><PropertyList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PropertyList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'PROPERTY'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PropertyInterface</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PropertySpecifiers</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;PropertyList&#62; ::= 'PROPERTY' &#60;Ident&#62; [ &#60;PropertyInterface&#62; ] [ &#60;PropertySpecifiers&#62; ] [
+  &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PropertyParameterList>"></a><PropertyParameterList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PropertyParameterList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'['</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span> <span class="Symbol">)</span> <span class="SingleLiteral">']'</span></pre>
+          <!-- &#60;PropertyParameterList&#62; ::= '[' ( &#60;IdentList&#62; ':' &#60;TypeID&#62; [ ';' &#60;IdentList&#62; ':' &#60;TypeID&#62; ]* ) ']' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PropertySpecifiers>"></a><PropertySpecifiers></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PropertySpecifiers</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="SingleLiteral">'INDEX'</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">'READ'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">'WRITE'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">'STORED'</span> <span class="Symbol">(</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">(</span> <span class="SingleLiteral">'DEFAULT'</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">|</span> <span class="SingleLiteral">'NODEFAULT'</span> <span class="Symbol">]</span> <span class="Symbol">[</span>
+  <span class="SingleLiteral">'IMPLEMENTS'</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;PropertySpecifiers&#62; ::= [ 'INDEX' &#60;ConstExpr&#62; ] [ 'READ' &#60;Ident&#62; ] [ 'WRITE' &#60;Ident&#62; ] [ 'STORED' (
+  &#60;Ident&#62; | &#60;ConstExpr&#62; ) ] [ ( 'DEFAULT' &#60;ConstExpr&#62; ) | 'NODEFAULT' ] [
+  'IMPLEMENTS' &#60;TypeID&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<QualId>"></a><QualId></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">QualId</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">UnitId</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'.'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;QualId&#62; ::= [ &#60;UnitId&#62; '.' ] &#60;Ident&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RaiseStmt>"></a><RaiseStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RaiseStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'RAISE'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">object</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">'AT'</span> <span class="Symbol">&#60;</span><span class="Identifier">address</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;RaiseStmt&#62; ::= 'RAISE' [ &#60;object&#62; ] [ 'AT' &#60;address&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RealType>"></a><RealType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RealType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'REAL48'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'REAL'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'SINGLE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'DOUBLE'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'EXTENDED'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'CURRENCY'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'COMP'</span></pre>
+          <!-- &#60;RealType&#62; ::= 'REAL48' | 'REAL' | 'SINGLE' | 'DOUBLE' | 'EXTENDED' | 'CURRENCY' | 'COMP' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RecordConstant>"></a><RecordConstant></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RecordConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">RecordFieldConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">RecordFieldConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span> <span class="Symbol">)</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;RecordConstant&#62; ::= '(' ( &#60;RecordFieldConstant&#62; [ ';' &#60;RecordFieldConstant&#62; ]* ) ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RecordFieldConstant>"></a><RecordFieldConstant></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RecordFieldConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">TypedConstant</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;RecordFieldConstant&#62; ::= &#60;Ident&#62; ':' &#60;TypedConstant&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RecType>"></a><RecType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RecType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'RECORD'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">FieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'END'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;RecType&#62; ::= 'RECORD' [ &#60;FieldList&#62; ] 'END' [ &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RecVariant>"></a><RecVariant></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RecVariant</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">','</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="SingleLiteral">':'</span> <span class="SingleLiteral">'('</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">FieldList</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;RecVariant&#62; ::= ( &#60;ConstExpr&#62; ',' )* ':' '(' [ &#60;FieldList&#62; ] ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RelOp>"></a><RelOp></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RelOp</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#62;'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'&#60;'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'&#60;='</span> <span class="Symbol">|</span> <span class="SingleLiteral">'&#62;='</span> <span class="Symbol">|</span> <span class="SingleLiteral">'&#60;&#62;'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'IN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'IS'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'AS'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'='</span></pre>
+              <p class="Comment">=   not   processed   in   a   Constant   Expression . </p>
+          <!-- &#60;RelOp&#62; ::= '&#62;' | '&#60;' | '&#60;=' | '&#62;=' | '&#60;&#62;' | 'IN' | 'IS' | 'AS' | '=' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RepeatStmt>"></a><RepeatStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RepeatStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'REPEAT'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'UNTIL'</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;RepeatStmt&#62; ::= 'REPEAT' &#60;Statement&#62; 'UNTIL' &#60;Expression&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RequiresClause>"></a><RequiresClause></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RequiresClause</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'REQUIRES'</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#60;RequiresClause&#62; ::= 'REQUIRES' &#60;IdentList&#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ResourceStringDecl>"></a><ResourceStringDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ResourceStringDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'='</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ResourceStringDecl&#62; ::= &#60;Ident&#62; '=' &#60;ConstExpr&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ResStringSection>"></a><ResStringSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ResStringSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'RESOURCESTRING'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ResourceStringDecl</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;ResStringSection&#62; ::= 'RESOURCESTRING' ( &#60;ResourceStringDecl&#62; ';' )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<RestrictedType>"></a><RestrictedType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">RestrictedType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ObjectType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">InterfaceType</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;RestrictedType&#62; ::= &#60;ObjectType&#62; | &#60;ClassType&#62; | &#60;InterfaceType&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SetConstructor>"></a><SetConstructor></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SetConstructor</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'['</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">SetElement</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">SetElement</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">]</span> <span class="SingleLiteral">']'</span></pre>
+          <!-- &#60;SetConstructor&#62; ::= '[' [ &#60;SetElement&#62; ( ',' &#60;SetElement&#62; )* ] ']' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SetElement>"></a><SetElement></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SetElement</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'..'</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;SetElement&#62; ::= &#60;Expression&#62; [ '..' &#60;Expression&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SetType>"></a><SetType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SetType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'SET'</span> <span class="SingleLiteral">'OF'</span> <span class="Symbol">&#60;</span><span class="Identifier">OrdinalType</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;SetType&#62; ::= 'SET' 'OF' &#60;OrdinalType&#62; [ &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SimpleExpression>"></a><SimpleExpression></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SimpleExpression</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="SingleLiteral">'+'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'-'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Term</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">AddOp</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Term</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span></pre>
+          <!-- &#60;SimpleExpression&#62; ::= [ '+' | '-' ] &#60;Term&#62; [ &#60;AddOp&#62; &#60;Term&#62; ]* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SimpleStatement>"></a><SimpleStatement></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SimpleStatement</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Designator</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">ExprList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span> <span class="Symbol">]</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Designator</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':='</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span>
+  <span class="SingleLiteral">'INHERITED'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'GOTO'</span> <span class="Symbol">&#60;</span><span class="Identifier">LabelId</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;SimpleStatement&#62; ::= &#60;Designator&#62; [ '(' &#60;ExprList&#62; ')' ] | &#60;Designator&#62; ':=' &#60;Expression&#62; |
+  'INHERITED' | 'GOTO' &#60;LabelId&#62; | '(' &#60;Expression&#62; ')' | '(' &#60;Expression&#62; ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SimpleType>"></a><SimpleType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SimpleType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">OrdinalType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">RealType</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;SimpleType&#62; ::= ( &#60;OrdinalType&#62; | &#60;RealType&#62; ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Statement>"></a><Statement></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">LabelId</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">SimpleStatement</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">StructStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;Statement&#62; ::= [ &#60;LabelId&#62; ':' ] [ &#60;SimpleStatement&#62; | &#60;StructStmt&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<StmtList>"></a><StmtList></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">StmtList</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;StmtList&#62; ::= &#60;Statement&#62; ( ';' &#60;Statement&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<String>"></a><String></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">String</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? string ?</span></pre>
+          <!-- &#60;String&#62; ::= ? string ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<StringType>"></a><StringType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">StringType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'STRING'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ANSISTRING'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'WIDESTRING'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'STRING'</span> <span class="SingleLiteral">'['</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">']'</span></pre>
+          <!-- &#60;StringType&#62; ::= 'STRING' | 'ANSISTRING' | 'WIDESTRING' | 'STRING' '[' &#60;ConstExpr&#62; ']' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<StructStmt>"></a><StructStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">StructStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">CompoundStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ConditionalStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">LoopStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">WithStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">TryExceptStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">TryFinallyStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">RaiseStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">AssemblerStmt</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;StructStmt&#62; ::= &#60;CompoundStmt&#62; | &#60;ConditionalStmt&#62; | &#60;LoopStmt&#62; | &#60;WithStmt&#62; | &#60;TryExceptStmt&#62; |
+  &#60;TryFinallyStmt&#62; | &#60;RaiseStmt&#62; | &#60;AssemblerStmt&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<StrucType>"></a><StrucType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">StrucType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="SingleLiteral">'PACKED'</span> <span class="Symbol">]</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ArrayType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">SetType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">FileType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">RecType</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="SingleLiteral">'PACKED'</span> <span class="Symbol">]</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;StrucType&#62; ::= [ 'PACKED' ] ( &#60;ArrayType&#62; | &#60;SetType&#62; | &#60;FileType&#62; | &#60;RecType&#62; [ 'PACKED' ] ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SubrangeType>"></a><SubrangeType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SubrangeType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'..'</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;SubrangeType&#62; ::= &#60;ConstExpr&#62; '..' &#60;ConstExpr&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Term>"></a><Term></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Term</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Factor</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">MulOp</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Factor</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Term&#62; ::= &#60;Factor&#62; [ &#60;MulOp&#62; &#60;Factor&#62; ]* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ThreadVarDecl>"></a><ThreadVarDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ThreadVarDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">Type</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">(</span> <span class="SingleLiteral">'ABSOLUTE'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">)</span> <span class="Symbol">|</span> <span class="SingleLiteral">'='</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+              <p class="Comment">This   must   be   a   string   constant   expression . </p>
+          <!-- &#60;ThreadVarDecl&#62; ::= &#60;IdentList&#62; ':' &#60;Type&#62; [ ( 'ABSOLUTE' ( &#60;Ident&#62; | &#60;ConstExpr&#62; ) ) | '='
+  &#60;ConstExpr&#62; ] [ &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ThreadVarSection>"></a><ThreadVarSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ThreadVarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'THREADVAR'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ThreadVarDecl</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;ThreadVarSection&#62; ::= 'THREADVAR' ( &#60;ThreadVarDecl&#62; ';' )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TryExceptStmt>"></a><TryExceptStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TryExceptStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'TRY'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'EXCEPT'</span> <span class="Symbol">&#60;</span><span class="Identifier">ExceptionBlock</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;TryExceptStmt&#62; ::= 'TRY' &#60;Statement&#62; 'EXCEPT' &#60;ExceptionBlock&#62; 'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TryFinallyStmt>"></a><TryFinallyStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TryFinallyStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'TRY'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'FINALLY'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'END'</span></pre>
+          <!-- &#60;TryFinallyStmt&#62; ::= 'TRY' &#60;Statement&#62; 'FINALLY' &#60;Statement&#62; 'END' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Type>"></a><Type></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Type</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">SimpleType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">StrucType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">PointerType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">StringType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">ProcedureType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">VariantType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ClassRefType</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Type&#62; ::= &#60;TypeID&#62; | &#60;SimpleType&#62; | &#60;StrucType&#62; | &#60;PointerType&#62; | &#60;StringType&#62; |
+  &#60;ProcedureType&#62; | &#60;VariantType&#62; | &#60;ClassRefType&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TypedConstant>"></a><TypedConstant></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TypedConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ArrayConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">RecordConstant</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;TypedConstant&#62; ::= ( &#60;ConstExpr&#62; | &#60;ArrayConstant&#62; | &#60;RecordConstant&#62; ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TypeDecl>"></a><TypeDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TypeDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'='</span> <span class="Symbol">[</span> <span class="SingleLiteral">'TYPE'</span> <span class="Symbol">]</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Type</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">RestrictedType</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;TypeDecl&#62; ::= &#60;Ident&#62; '=' [ 'TYPE' ] ( &#60;Type&#62; | &#60;RestrictedType&#62; ) [ &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TypeID>"></a><TypeID></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">UnitId</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'.'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;TypeID&#62; ::= [ &#60;UnitId&#62; '.' ] &#60;Ident&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TypeSection>"></a><TypeSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TypeSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'TYPE'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeDecl</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;TypeSection&#62; ::= 'TYPE' ( &#60;TypeDecl&#62; ';' )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Unit>"></a><Unit></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Unit</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'UNIT'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">';'</span> <span class="Symbol">&#60;</span><span class="Identifier">InterfaceSection</span><span class="Symbol">&#62;</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">ImplementationSection</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">InitSection</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'.'</span></pre>
+          <!-- &#60;Unit&#62; ::= 'UNIT' &#60;Ident&#62; [ &#60;PortabilityDirective&#62; ] ';' &#60;InterfaceSection&#62;
+  &#60;ImplementationSection&#62; &#60;InitSection&#62; '.' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<UnitId>"></a><UnitId></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">UnitId</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Identifier</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;UnitId&#62; ::= &#60;Identifier&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<UsesClause>"></a><UsesClause></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">UsesClause</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'USES'</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#60;UsesClause&#62; ::= 'USES' &#60;IdentList&#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<VarDecl>"></a><VarDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">VarDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">&#60;</span><span class="Identifier">Type</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">(</span> <span class="SingleLiteral">'ABSOLUTE'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">)</span> <span class="Symbol">|</span> <span class="SingleLiteral">'='</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">ConstExpr</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">PortabilityDirective</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;VarDecl&#62; ::= &#60;IdentList&#62; ':' &#60;Type&#62; [ ( 'ABSOLUTE' ( &#60;Ident&#62; | &#60;ConstExpr&#62; ) ) | '='
+  &#60;ConstExpr&#62; ] [ &#60;PortabilityDirective&#62; ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<VariantSection>"></a><VariantSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">VariantSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="SingleLiteral">'CASE'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">Ident</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">':'</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">TypeID</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'OF'</span> <span class="Symbol">&#60;</span><span class="Identifier">RecVariant</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;VariantSection&#62; ::= ( 'CASE' [ &#60;Ident&#62; ':' ] &#60;TypeID&#62; 'OF' &#60;RecVariant&#62; ';' )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<VariantType>"></a><VariantType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">VariantType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'VARIANT'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'OLEVARIANT'</span></pre>
+          <!-- &#60;VariantType&#62; ::= 'VARIANT' | 'OLEVARIANT' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<VarSection>"></a><VarSection></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">VarSection</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'VAR'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">VarDecl</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;VarSection&#62; ::= 'VAR' ( &#60;VarDecl&#62; ';' )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<WhileStmt>"></a><WhileStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">WhileStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'WHILE'</span> <span class="Symbol">&#60;</span><span class="Identifier">Expression</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'DO'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;WhileStmt&#62; ::= 'WHILE' &#60;Expression&#62; 'DO' &#60;Statement&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<WithStmt>"></a><WithStmt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">WithStmt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'WITH'</span> <span class="Symbol">&#60;</span><span class="Identifier">IdentList</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'DO'</span> <span class="Symbol">&#60;</span><span class="Identifier">Statement</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;WithStmt&#62; ::= 'WITH' &#60;IdentList&#62; 'DO' &#60;Statement&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

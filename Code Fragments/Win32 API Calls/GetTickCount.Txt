@@ -1,0 +1,21 @@
+'
+' The GetTickCount function retrieves the number of milliseconds that have elapsed
+' since Windows was started.
+'
+' @precon  None.
+' @postcon Function retrieves the number of milliseconds that have elapsed
+'          since Windows was started.
+'
+' @Date    15 Dec 2005
+' @version 1.0
+'
+' @return  a Long - If the function succeeds, the return value is the number of
+'          milliseconds that have elapsed since Windows was started.
+'
+' @remarks The elapsed time is stored as a DWORD value. Therefore, the time
+'          will wrap around to zero if Windows is run continuously for 49.7 days.
+'          Windows NT: To obtain the time elapsed since the computer was started,
+'          look up the System Up Time counter in the performance data in the
+'          registry key HKEY_PERFORMANCE_DATA. The value returned is an 8 byte value.
+'
+Private Declare Function GetTickCount Lib "kernel32" () As Long

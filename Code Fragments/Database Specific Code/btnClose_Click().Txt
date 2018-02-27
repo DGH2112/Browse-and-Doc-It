@@ -1,0 +1,17 @@
+'
+' This method is a button on click event handler for the close button.
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon Closes this form.
+'
+Private Sub btnClose_Click()
+  Exception.Push ".btnClose_Click"
+  On Error GoTo ErrHnd
+  DoCmd.Close
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

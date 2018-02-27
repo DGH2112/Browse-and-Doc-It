@@ -1,0 +1,32 @@
+'
+' This function does a find and replace on all instances of the find string and replaces it
+' with the replace string.
+'
+' @Date    23 Sep 2003
+' @version 1.0
+'
+' @precon  None.
+' @postcon Does a find and replace on all instances of the find string and replaces it
+'          with the replace string.
+'
+' @param   strText as a String
+' @param   strFind as a String
+' @param   strReplace as a String
+' @return  a String
+'
+Function StringReplace(strText As String, strFind As String, strReplace As String) As String
+  Dim i As Long
+  Exception.Push "PrivateFunctions.StringReplace", strText, strFind, strReplace
+  On Error GoTo ErrHnd
+  StringReplace = strText
+  i = InStr(StringReplace, strFind)
+  While i > 0
+    StringReplace = Left$(StringReplace, i - 1) & strReplace & _
+      Right$(StringReplace, Len(StringReplace) - i - Len(strFind) + 1)
+    i = InStr(StringReplace, strFind)
+  Wend
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function
+

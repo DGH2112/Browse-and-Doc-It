@@ -1,0 +1,749 @@
+'
+' This class represents a collection indexed of related registry items.
+'
+' @Version 1.3
+' @Date    08 Mar 2004
+' @Author  David Hoyle
+'
+Option Explicit
+Option Compare Text
+
+' Record type for the key value pairs
+Private Type TKeyValuePairs
+  strKey As String
+  strValue As String
+End Type
+
+' Growth Capacity of the collection
+Private Const iCAPACITY = 25
+' Number of items in the collection
+Private FCount As Long
+' Collection variable
+Private FKeyValuePairs() As TKeyValuePairs
+' Current section name
+Private FSection As String
+' Current registry key
+Private FRegKey As String
+' A variable to define if there is a mass update in progress.
+Private Fupdating As Boolean
+' A variable to define of the collection is sorted
+Private FSorted As Boolean
+
+'
+' This method sorts the key pair records in the collection for a binary search
+'
+' @precon  None.
+' @postcon Sorts the collection by key
+'
+' @Version 1.1
+' @Date    09 Feb 2004
+'
+Private Sub Sort()
+  Dim i As Long
+  Dim j As Long
+  Dim iMin As Long
+  Dim tmpRec As TKeyValuePairs
+  Exception.Push "TNameValuePairs.Sort"
+  On Error GoTo ErrHnd
+  If FSorted Then
+    ' Select Sort
+    For i = 1 To FCount
+      iMin = i
+      For j = i + 1 To FCount
+        If FKeyValuePairs(iMin).strKey > FKeyValuePairs(j).strKey Then iMin = j
+      Next j
+      If iMin <> i Then
+        tmpRec = FKeyValuePairs(i)
+        FKeyValuePairs(i) = FKeyValuePairs(iMin)
+        FKeyValuePairs(iMin) = tmpRec
+      End If
+    Next i
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method finds the key in the collection using a binary search.
+'
+' @precon  None.
+' @postcon Searches the collection for the key using a binary search and returns
+'          the index else returns 0
+'
+' @Version 1.3
+' @Date    08 Mar 2004
+'
+' @param   strKey as a String
+' @return  a Long
+'
+Public Function Find(strKey As String) As Long
+  Dim iFirst As Long
+  Dim iMid As Long
+  Dim iLast As Long
+  Exception.Push "TNameValuePairs.Find", strKey
+  On Error GoTo ErrHnd
+  Find = 0
+  If FSorted Then
+    ' Binary search
+    iFirst = 1
+    iLast = FCount
+    While iLast >= iFirst
+      iMid = (iFirst + iLast) / 2
+      If strKey = FKeyValuePairs(iMid).strKey Then
+        Find = iMid
+        GoTo ErrHnd
+      End If
+      If strKey < FKeyValuePairs(iMid).strKey Then iLast = iMid - 1 Else iFirst = iMid + 1
+    Wend
+  Else
+    ' Sequential Search
+    For iMid = 1 To FCount
+      If strKey = FKeyValuePairs(iMid).strKey Then
+        Find = iMid
+        GoTo ErrHnd
+      End If
+    Next iMid
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function
+
+'
+' This method loads a section of key value pairs from the registry section specified.
+'
+' @precon  None.
+' @postcon Loads the specified section of key values pairs into the collection.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   strRegistryKey as a String
+' @param   strSection as a String
+' @param   Sorted as a Boolean
+'
+Public Sub LoadSection(strRegistryKey As String, strSection As String, Sorted As Boolean)
+  Exception.Push "TNameValuePairs.LoadSection", strRegistryKey, strSection, Sorted
+  On Error GoTo ErrHnd
+  FSection = strSection
+  FRegKey = strRegistryKey
+  FSorted = Sorted
+  Reload
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method resets the contents of the collection to empty.
+'
+' @precon  None.
+' @postcon Resets the contents of the collection to empty.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+Public Sub Reset()
+  Exception.Push "TNameValuePairs.Reset"
+  On Error GoTo ErrHnd
+  FCount = 0
+  ReDim FKeyValuePairs(1 To iCAPACITY)
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method reloads the contents of the collection from the already identified
+' registry section.
+'
+' @precon  The collection must have already been loaded using LoadSection
+' @postcon Reloads the contents of the collection from the already identified
+'          registry section.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+Public Sub Reload()
+  Dim i As Long
+  Dim varKeyVals As Variant
+  Exception.Push "TNameValuePairs.Reload"
+  On Error GoTo ErrHnd
+  Reset
+  varKeyVals = GetAllSettings(FRegKey, FSection)
+  If Not IsEmpty(varKeyVals) Then
+    For i = LBound(varKeyVals, 1) To UBound(varKeyVals, 1)
+      FCount = FCount + 1
+      If FCount > UBound(FKeyValuePairs) Then _
+        ReDim Preserve FKeyValuePairs(1 To iCAPACITY + UBound(FKeyValuePairs))
+      FKeyValuePairs(FCount).strKey = varKeyVals(i, 0)
+      FKeyValuePairs(FCount).strValue = varKeyVals(i, 1)
+    Next i
+  End If
+  Sort
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method saves a section of key value pairs to the registry section specified.
+'
+' @precon  None.
+' @postcon Saves the specified section of key values pairs from the collection.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+Public Sub Save()
+  Dim i As Long
+  Exception.Push "TNameValuePairs.Save"
+  On Error GoTo ErrHnd
+  EraseSection
+  For i = 1 To FCount
+    SaveSetting FRegKey, FSection, FKeyValuePairs(i).strKey, FKeyValuePairs(i).strValue
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method reads a boolean value from the collection.
+'
+' @precon  None.
+' @postcon Reads a values from the collection and returns its value. If the key
+'          does not exist the default value is returned.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   strKey as a String
+' @param   boolDefaultValue as a Boolean
+' @return  a Boolean
+'
+Public Function ReadBool(strKey As String, Optional boolDefaultValue As Boolean = False) As Boolean
+  Dim i As Long
+  Exception.Push "TNameValuePairs.ReadBool", strKey, boolDefaultValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i = 0 Then ReadBool = boolDefaultValue Else ReadBool = CBool(FKeyValuePairs(i).strValue)
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function
+
+'
+' This method writes a boolean value to the collection.
+'
+' @precon  None.
+' @postcon Writes a values to the collection. If the key
+'          does not exist a new key value pair is created.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   strKey as a String
+' @param   boolValue as a Boolean
+'
+Public Sub WriteBool(strKey As String, boolValue As Boolean)
+  Dim i As Long
+  Exception.Push "TNameValuePairs.WriteBool", strKey, boolValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i > 0 Then
+    FKeyValuePairs(i).strValue = CStr(boolValue)
+  Else
+    FCount = FCount + 1
+    If FCount > UBound(FKeyValuePairs) Then _
+      ReDim Preserve FKeyValuePairs(1 To iCAPACITY + UBound(FKeyValuePairs))
+    FKeyValuePairs(FCount).strKey = strKey
+    FKeyValuePairs(FCount).strValue = CStr(boolValue)
+    If Not Fupdating Then Sort
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method reads a long value from the collection.
+'
+' @precon  None.
+' @postcon Reads a values from the collection and returns its value. If the key
+'          does not exist the default value is returned.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   strKey as a String
+' @param   iDefaultValue as a Long
+' @return  a Long
+'
+Public Function ReadLong(strKey As String, Optional iDefaultValue As Long = 0) As Long
+  Dim i As Long
+  Exception.Push "TNameValuePairs.ReadLong", strKey, iDefaultValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i = 0 Then ReadLong = iDefaultValue Else ReadLong = CLng(FKeyValuePairs(i).strValue)
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function
+
+'
+' This method writes a long value to the collection.
+'
+' @precon  None.
+' @postcon Writes a values to the collection. If the key
+'          does not exist a new key value pair is created.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   strKey as a String
+' @param   iValue as a Long
+'
+Public Sub WriteLong(strKey As String, iValue As Long)
+  Dim i As Long
+  Exception.Push "TNameValuePairs.WriteLong", strKey, iValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i > 0 Then
+    FKeyValuePairs(i).strValue = CStr(iValue)
+  Else
+    FCount = FCount + 1
+    If FCount > UBound(FKeyValuePairs) Then _
+      ReDim Preserve FKeyValuePairs(1 To iCAPACITY + UBound(FKeyValuePairs))
+    FKeyValuePairs(FCount).strKey = strKey
+    FKeyValuePairs(FCount).strValue = CLng(iValue)
+    If Not Fupdating Then Sort
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method reads a double value from the collection.
+'
+' @precon  None.
+' @postcon Reads a values from the collection and returns its value. If the key
+'          does not exist the default value is returned.
+'
+' @Version 1.0
+' @Date    09 Feb 2004
+'
+' @param   strKey as a String
+' @param   dblDefaultValue as a Double
+' @return  a Double
+'
+Public Function ReadDouble(strKey As String, Optional dblDefaultValue As Double = 0#) As Double
+  Dim i As Long
+  Exception.Push "TNameValuePairs.ReadDouble", strKey, dblDefaultValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i = 0 Then ReadDouble = dblDefaultValue Else ReadDouble = CDbl(FKeyValuePairs(i).strValue)
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function
+
+'
+' This method writes a double value to the collection.
+'
+' @precon  None.
+' @postcon Writes a values to the collection. If the key
+'          does not exist a new key value pair is created.
+'
+' @Version 1.0
+' @Date    15 feb 2004
+'
+' @param   strKey as a String
+' @param   dblValue as a Double
+'
+Public Sub WriteDouble(strKey As String, dblValue As Double)
+  Dim i As Long
+  Exception.Push "TNameValuePairs.WriteDouble", strKey, dblValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i > 0 Then
+    FKeyValuePairs(i).strValue = CDbl(dblValue)
+  Else
+    FCount = FCount + 1
+    If FCount > UBound(FKeyValuePairs) Then _
+      ReDim Preserve FKeyValuePairs(1 To iCAPACITY + UBound(FKeyValuePairs))
+    FKeyValuePairs(FCount).strKey = strKey
+    FKeyValuePairs(FCount).strValue = CDbl(dblValue)
+    If Not Fupdating Then Sort
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method reads a date value from the collection.
+'
+' @precon  None.
+' @postcon Reads a values from the collection and returns its value. If the key
+'          does not exist the default value is returned.
+'
+' @Version 1.0
+' @Date    09 Feb 2004
+'
+' @param   strKey as a String
+' @param   dtDefaultValue as a Date
+' @return  a Date
+'
+Public Function ReadDate(strKey As String, Optional dtDefaultValue As Date = 0) As Date
+  Dim i As Long
+  Exception.Push "TNameValuePairs.ReadDate", strKey, dtDefaultValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If dtDefaultValue = 0 Then dtDefaultValue = Now()
+  If i = 0 Then ReadDate = dtDefaultValue Else ReadDate = CDate(FKeyValuePairs(i).strValue)
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function
+
+'
+' This method writes a date value to the collection.
+'
+' @precon  None.
+' @postcon Writes a values to the collection. If the key
+'          does not exist a new key value pair is created.
+'
+' @Version 1.0
+' @Date    09 Feb 2004
+'
+' @param   strKey as a String
+' @param   dtValue as a Date
+'
+Public Sub WriteDate(strKey As String, dtValue As Date)
+  Dim i As Long
+  Exception.Push "TNameValuePairs.WriteDate", strKey, dtValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i > 0 Then
+    FKeyValuePairs(i).strValue = Format(dtValue, "dd/mmm/yyyy")
+  Else
+    FCount = FCount + 1
+    If FCount > UBound(FKeyValuePairs) Then _
+      ReDim Preserve FKeyValuePairs(1 To iCAPACITY + UBound(FKeyValuePairs))
+    FKeyValuePairs(FCount).strKey = strKey
+    FKeyValuePairs(FCount).strValue = Format(dtValue, "dd/mmm/yyyy")
+    If Not Fupdating Then Sort
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method reads a string value from the collection.
+'
+' @precon  None.
+' @postcon Reads a values from the collection and returns its value. If the key
+'          does not exist the default value is returned.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   strKey as a String
+' @param   strDefaultValue as a String
+' @return  a String
+'
+Public Function ReadString(strKey As String, Optional strDefaultValue As String = "") As String
+  Dim i As Long
+  Exception.Push "TNameValuePairs.ReadString", strKey, strDefaultValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i = 0 Then ReadString = strDefaultValue Else ReadString = FKeyValuePairs(i).strValue
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function
+
+'
+' This method writes a string value to the collection.
+'
+' @precon  None.
+' @postcon Writes a values to the collection. If the key
+'          does not exist a new key value pair is created.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   strKey as a String
+' @param   strValue as a String
+'
+Public Sub WriteString(strKey As String, strValue As String)
+  Dim i As Long
+  Exception.Push "TNameValuePairs.WriteString", strKey, strValue
+  On Error GoTo ErrHnd
+  i = Find(strKey)
+  If i > 0 Then
+    FKeyValuePairs(i).strValue = CStr(strValue)
+  Else
+    FCount = FCount + 1
+    If FCount > UBound(FKeyValuePairs) Then _
+      ReDim Preserve FKeyValuePairs(1 To iCAPACITY + UBound(FKeyValuePairs))
+    FKeyValuePairs(FCount).strKey = strKey
+    FKeyValuePairs(FCount).strValue = strValue
+    If Not Fupdating Then Sort
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This property returns the number of items in the collection.
+'
+' @precon  None.
+' @postcon Returns the number of item in the collection.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @return  a Long
+'
+Public Property Get Count() As Long
+  Exception.Push "TNameValuePairs.Count"
+  On Error GoTo ErrHnd
+  Count = FCount
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property
+
+'
+' This property returns a comma separated list of the items in the collection
+' that meet the value passed
+'
+' @precon  None.
+' @postcon Returns a comma separated list of the items in the collection
+'          that meet the value passed
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   boolValue as a Boolean
+' @param   Quoted as a Boolean
+' @param   strDelimiter as a String
+' @return  a String
+'
+Public Property Get List(boolValue As Boolean, Quoted As Boolean, _
+    Optional strDelimiter As String = ",") As String
+  Dim i As Long
+  Exception.Push "TNameValuePairs.List", boolValue, Quoted, strDelimiter
+  On Error GoTo ErrHnd
+  List = ""
+  For i = 1 To FCount
+    If CBool(FKeyValuePairs(i).strValue) = boolValue Then
+      If List <> "" Then List = List & strDelimiter
+      If Not Quoted Then
+        List = List & FKeyValuePairs(i).strKey
+      Else
+        List = List & "'" & FKeyValuePairs(i).strKey & "'"
+      End If
+    End If
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property
+
+'
+' This property allows the user to extract the key by index
+'
+' @precon  None.
+' @postcon Allows the user to extract the key by index
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   iIndex as a Long
+' @return  a String
+'
+Public Property Get Names(iIndex As Long) As String
+  Exception.Push "TNameValuePairs.Names", iIndex
+  On Error GoTo ErrHnd
+  Names = FKeyValuePairs(iIndex).strKey
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property
+
+'
+' This property allows the user to extract the key by index
+'
+' @precon  None.
+' @postcon Allows the user to extract the key by index
+'
+' @Version 1.0
+' @Date    08 Mar 2004
+'
+' @param   iIndex as a Long
+' @param   strName as a String
+'
+Public Property Let Names(iIndex As Long, strName As String)
+  Exception.Push "TNameValuePairs.Names", iIndex, strName
+  On Error GoTo ErrHnd
+  FKeyValuePairs(iIndex).strKey = strName
+  If FSorted Then Sort
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property
+
+'
+' This property allows the user to extract the value by index
+'
+' @precon  None.
+' @postcon Allows the user to extract the value by index
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+' @param   iIndex as a Long
+' @return  a String
+'
+Public Property Get Values(iIndex As Long) As String
+  Exception.Push "TNameValuePairs.Values", iIndex
+  On Error GoTo ErrHnd
+  Values = FKeyValuePairs(iIndex).strValue
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property
+
+'
+' This property allows the user to extract the value by index
+'
+' @precon  None.
+' @postcon Allows the user to extract the value by index
+'
+' @Version 1.0
+' @Date    08 Mar 2004
+'
+' @param   iIndex as a Long
+' @param   strValue as a String
+'
+Public Property Let Values(iIndex As Long, strValue As String)
+  Exception.Push "TNameValuePairs.Values", iIndex, strValue
+  On Error GoTo ErrHnd
+  FKeyValuePairs(iIndex).strValue = strValue
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Property
+
+'
+' Erase the section of the registry
+'
+' @precon  None.
+' @postcon Erases the current section of the registry
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+Private Sub EraseSection()
+  Exception.Push "TNameValuePairs.EraseSection"
+  On Error GoTo ErrHnd
+  DeleteSetting FRegKey, FSection
+ErrHnd:
+  If Err <> 0 Then Err.Clear
+  Exception.Pop
+End Sub
+
+'
+' This method clears the collection of items.
+'
+' @precon  None.
+' @postcon Clears the collection of items.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+Public Sub Clear()
+  Exception.Push "TNameValuePairs.Clear"
+  On Error GoTo ErrHnd
+  FCount = 0
+  ReDim FKeyValuePairs(1 To iCAPACITY)
+ErrHnd:
+  If Err <> 0 Then Err.Clear
+  Exception.Pop
+End Sub
+
+'
+' This method start a mass update by disabling sorting when adding tasks to the list
+'
+' @precon  None.
+' @postcon Disables the sorting of the list during adding tasks
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+Public Sub BeginUpdate()
+  Exception.Push "TNameValuePairs.BeginUpdate"
+  On Error GoTo ErrHnd
+  Fupdating = True
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method ends a mass update by enabling sorting when adding tasks to the list and
+' by sorting the finalised list.
+'
+' @precon  None.
+' @postcon Enabling sorting when adding tasks to the list and by sorting the finalised list.
+'
+' @Version 1.0
+' @Date    14 Aug 2003
+'
+Public Sub EndUpdate()
+  Exception.Push "TNameValuePairs.EndUpdate"
+  On Error GoTo ErrHnd
+  Fupdating = False
+  Sort
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method deletes the indexed item from the collection.
+'
+' @precon  None.
+' @postcon Deletes the indexed item from the collection.
+'
+' @Version 1.0
+' @Date    13 Nov 2003
+'
+' @param   iIndex as a Long
+'
+Public Sub Delete(iIndex As Long)
+  Dim i As Long
+  Exception.Push "TNameValuePairs.Delete", iIndex
+  On Error GoTo ErrHnd
+  If iIndex >= 1 And iIndex <= FCount Then
+    For i = iIndex + 1 To FCount
+      FKeyValuePairs(i - 1) = FKeyValuePairs(i)
+    Next i
+    FCount = FCount - 1
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+
+
+
+

@@ -1,0 +1,856 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{77CE066E-3A47-45D3-9A15-E1CE209D5008}</ProjectGuid>
+        <MainSource>BrowseAndDocItTests.dpr</MainSource>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+        <ProjectVersion>18.3</ProjectVersion>
+        <FrameworkType>VCL</FrameworkType>
+        <Base>True</Base>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Application</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <SanitizedProjectName>BrowseAndDocItTests</SanitizedProjectName>
+        <VerInfo_Locale>2057</VerInfo_Locale>
+        <VerInfo_Build>2626</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=Season&apos;s Fall Music Limited (c) 1989;FileDescription=Test for Browse and Doc It;FileVersion=1.0.10.2626;InternalName=BrowseAndDocItTest2010;LegalCopyright=Season&apos;s Fall Music Limited (c) 1989;LegalTrademarks=Season&apos;s Fall Music Limited (c) 1989;OriginalFilename=BrowseAndDocItTest2010;ProductName=BrowseAndDocItTest2010;ProductVersion=1.0;Comments=Test for Browse and Doc It</VerInfo_Keys>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Release>10</VerInfo_Release>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_Platform>x86</DCC_Platform>
+        <DCC_DependencyCheckOutputName>BrowseAndDocItTestsXE2.exe</DCC_DependencyCheckOutputName>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_Define>CONSOLE_TESTRUNNER;USE_JEDI_JCL;TESTINSIGHT;$(DCC_Define)</DCC_Define>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_F>false</DCC_F>
+        <DCC_E>false</DCC_E>
+        <DCC_K>false</DCC_K>
+        <DCC_S>false</DCC_S>
+        <DCC_N>true</DCC_N>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_UsePackage>vclx;vcl;rtl;dbrtl;vcldb;adortl;dbxcds;dbexpress;xmlrtl;vclie;inet;inetdbbde;inetdbxpress;dclOfficeXP;soaprtl;dsnap;vclactnband;bdertl;vcldbx;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <VerInfo_Release>0</VerInfo_Release>
+        <VerInfo_Build>0</VerInfo_Build>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <DCC_UsePackage>vclimg;RaizeComponentsVcl;RaizeComponentsVclDb;$(DCC_UsePackage)</DCC_UsePackage>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <Icon_MainIcon>BrowseAndDocItTestsXE2_Icon.ico</Icon_MainIcon>
+        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <DCC_UsePackage>vclimg;RaizeComponentsVcl;RaizeComponentsVclDb;$(DCC_UsePackage)</DCC_UsePackage>
+        <Icon_MainIcon>BrowseAndDocItTestsXE2_Icon.ico</Icon_MainIcon>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Build>0</VerInfo_Build>
+        <VerInfo_Release>0</VerInfo_Release>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <Icon_MainIcon>BrowseAndDocItTestsXE2_Icon.ico</Icon_MainIcon>
+        <VerInfo_IncludeVerInfo>false</VerInfo_IncludeVerInfo>
+        <Manifest_File>None</Manifest_File>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <VerInfo_Release>0</VerInfo_Release>
+        <VerInfo_Build>0</VerInfo_Build>
+        <BT_BuildType>Debug</BT_BuildType>
+        <DCC_ExeOutput>.\</DCC_ExeOutput>
+        <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.10.2626;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <RcCompile Include="..\BADIVerInfo.RC">
+            <Form>BADIVerInfo.res</Form>
+        </RcCompile>
+        <DCCReference Include="..\Source\BADI.Initialisation.pas"/>
+        <DCCReference Include="..\Source\BADI.Module.Dispatcher.pas"/>
+        <DCCReference Include="..\Source\BADI.BackusNaur.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.CPP.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.DFM.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.INI.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.ModuleFull.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.Module.pas"/>
+        <DCCReference Include="..\Source\BADI.Options.pas"/>
+        <DCCReference Include="..\Source\BADI.Base.Module.pas"/>
+        <DCCReference Include="Source\Test.BADI.Base.Module.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.Module.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.ModuleFull.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.Module.pas"/>
+        <DCCReference Include="Source\Test.BADI.Common.IDE.Functions.pas"/>
+        <DCCReference Include="Source\Test.BADI.BackusNaur.Module.pas"/>
+        <DCCReference Include="Source\Test.BADI.Generic.Tokenizer.pas"/>
+        <DCCReference Include="..\Source\BADI.Generic.Tokenizer.pas"/>
+        <DCCReference Include="Source\Test.BADI.XML.Module.pas"/>
+        <DCCReference Include="Source\Test.BADI.DFM.Module.pas"/>
+        <DCCReference Include="Source\Test.BADI.Eidolon.Module.pas"/>
+        <DCCReference Include="Source\Test.BADI.Module.Dispatcher.pas"/>
+        <DCCReference Include="..\Source\BADI.CommonIDEFunctions.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Types.pas"/>
+        <DCCReference Include="..\Source\BADI.Base.Container.pas"/>
+        <DCCReference Include="..\Source\BADI.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.Comment.Tag.pas"/>
+        <DCCReference Include="..\Source\BADI.CompilerConditionData.pas"/>
+        <DCCReference Include="..\Source\BADI.CompilerConditionStack.pas"/>
+        <DCCReference Include="..\Source\BADI.Constants.pas"/>
+        <DCCReference Include="..\Source\BADI.DocIssue.pas"/>
+        <DCCReference Include="..\Source\BADI.ElementContainer.pas"/>
+        <DCCReference Include="..\Source\BADI.Generic.Constant.pas"/>
+        <DCCReference Include="..\Source\BADI.Generic.FunctionDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Generic.MethodDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Generic.Parameter.pas"/>
+        <DCCReference Include="..\Source\BADI.Generic.PropertyDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Generic.TypeDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Generic.Variable.pas"/>
+        <DCCReference Include="..\Source\BADI.ModuleInfo.pas"/>
+        <DCCReference Include="..\Source\BADI.ResourceStrings.pas"/>
+        <DCCReference Include="..\Source\BADI.TickOption.pas"/>
+        <DCCReference Include="..\Source\BADI.TokenInfo.pas"/>
+        <DCCReference Include="..\Source\BADI.Types.pas"/>
+        <DCCReference Include="..\Source\BADI.Functions.pas"/>
+        <DCCReference Include="Source\Test.BADI.TokenInfo.pas"/>
+        <DCCReference Include="Source\Test.BADI.Comment.Tag.pas"/>
+        <DCCReference Include="Source\Test.BADI.Comment.pas"/>
+        <DCCReference Include="Source\Test.BADI.ElementContainer.pas"/>
+        <DCCReference Include="Source\Test.BADI.DocIssue.pas"/>
+        <DCCReference Include="Source\Test.BADI.Generic.TypeDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Generic.Constant.pas"/>
+        <DCCReference Include="Source\Test.BADI.Generic.Variable.pas"/>
+        <DCCReference Include="Source\Test.BADI.Generic.Parameter.pas"/>
+        <DCCReference Include="Source\Test.BADI.Generic.MethodDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Generic.PropertyDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.DocumentConflicts.pas"/>
+        <DCCReference Include="Source\Test.BADI.LabelContainer.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.Types.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.IdentList.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.TempCntr.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.RecordDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.ParameterDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.MethodDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.PropertyDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.TypeDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.PropertySpec.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.ObjectDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.ClassDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.InterfaceDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.DispInterfaceDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.ConstantDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.ResourceStringDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.VariableDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.FieldDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.ExportsItem.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.InitializationDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.FinalizationDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.Constants.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.Functions.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.ResourceStrings.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.Comment.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.IdentList.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.TypeDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.ArrayType.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.RecordDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.Parameter.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.MethodDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.PropertyDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.PropertySpec.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.ObjectDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.ClassDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.InterfaceDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.DispInterfaceDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.ConstantDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.ResourceStringDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.VariableDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.ThreadVariable.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.FieldDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.ExportsItem.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.InitializationDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.Pascal.FinalizationDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.ThreadVariableDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.Pascal.UsesList.pas"/>
+        <DCCReference Include="..\Source\BADI.BackusNaur.Rule.pas"/>
+        <DCCReference Include="..\Source\BADI.BackusNaur.Comment.pas"/>
+        <DCCReference Include="Source\Test.BADI.BackusNaur.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.DFM.Types.pas"/>
+        <DCCReference Include="..\Source\BADI.DFM.ObjectDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.DFM.PropertyDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.DFM.Item.pas"/>
+        <DCCReference Include="Source\Test.BADI.DFM.ObjectDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.DFM.PropertyDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.INI.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.INI.KeyValuePair.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSShape.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSRoad.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSObject.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.SchematicSetting.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.NoText.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSStatic.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.ResourceStrings.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Constants.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.BaseElement.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.DocType.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.XMLElement.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.XMLElemDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.XMLDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.XMLPI.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.XMLPERef.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.XMLIncludeElement.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.XMLIgnoreElement.pas"/>
+        <DCCReference Include="..\Source\BADI.XML.ResourceStrings.pas"/>
+        <DCCReference Include="Source\Test.BADI.XML.XMLDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.XML.XMLDocType.pas"/>
+        <DCCReference Include="Source\Test.BADI.XML.XMLElemDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.XML.XMLElement.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Constants.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.FieldDef.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.BaseTable.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TextTable.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.DBConnection.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.DBTable.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.OutputTable.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Association.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.RequirementsTable.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Symbol.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TimeLocationTable.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TextTableDef.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.DatabaseDef.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.ConnectionDef.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.TableNameDef.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Line.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.CustomFillSymbol.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Rectangle.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Bar.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.SuperBar.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Diamond.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Triangle.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Ellipse.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.ResourceStrings.pas"/>
+        <DCCReference Include="..\Source\BADI.Eidolon.Functions.pas"/>
+        <DCCReference Include="Source\Test.BADI.Eidolon.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Attribute.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Comment.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.ConstantDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Constants.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.EnumerateDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.EnumIdent.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.EventDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.ExceptionHandling.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.FieldDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.ImplementedItem.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Interfaces.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.MethodDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Option.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Parameter.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.PropertyDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.RecordDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.ResourceStrings.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.TypeDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Types.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.VariableDecl.pas"/>
+        <DCCReference Include="..\Source\BADI.VB.Version.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.ParameterDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.MethodDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.ConstantDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.VariableDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.PropertyDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.RecordDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.TypeDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.Comment.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.ExceptionHandling.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.EnumerateDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.EnumIdent.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.FieldDecl.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.Option.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.Version.pas"/>
+        <DCCReference Include="Source\Test.BADI.VB.Attribute.pas"/>
+        <DCCReference Include="..\Source\BADI.Refactoring.Functions.pas"/>
+        <DCCReference Include="Source\Test.BADI.Refactoring.Functions.pas"/>
+        <None Include="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage"/>
+        <None Include="..\Source\CompilerDefinitions.inc"/>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">BrowseAndDocItTests.dpr</Source>
+                </Source>
+                <Parameters>
+                    <Parameters Name="UseLauncher">False</Parameters>
+                    <Parameters Name="LoadAllSymbols">True</Parameters>
+                    <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+                </Parameters>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">10</VersionInfo>
+                    <VersionInfo Name="Build">2626</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">2057</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileDescription">Test for Browse and Doc It</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileVersion">1.0.10.2626</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName">BrowseAndDocItTest2010</VersionInfoKeys>
+                    <VersionInfoKeys Name="LegalCopyright">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
+                    <VersionInfoKeys Name="LegalTrademarks">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
+                    <VersionInfoKeys Name="OriginalFilename">BrowseAndDocItTest2010</VersionInfoKeys>
+                    <VersionInfoKeys Name="ProductName">BrowseAndDocItTest2010</VersionInfoKeys>
+                    <VersionInfoKeys Name="ProductVersion">1.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments">Test for Browse and Doc It</VersionInfoKeys>
+                </VersionInfoKeys>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp250.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k250.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+            <Deployment Version="3">
+                <DeployFile LocalName="BrowseAndDocItTests.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>BrowseAndDocItTests.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Source\CompilerDefinitions.inc" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\BADIVerInfo.RC" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployClass Name="AdditionalDebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidServiceOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashImageDef">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStyles">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_DefaultAppIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon144">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage470">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage640">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage960">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyFramework">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="DependencyPackage">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="File">
+                    <Platform Name="Android">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1024">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1536">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2048">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch768">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch320">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640x1136">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectAndroidManifest">
+                    <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSEntitlements">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSInfoPList">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSResource">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXEntitlements">
+                    <Platform Name="OSX32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXInfoPList">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXResource">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Linux64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectUWPManifest">
+                    <Platform Name="Win32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+            </Deployment>
+            <UnitTesting>
+                <TestProjectName>D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Test\Test\BrowseAndDocItTestsTests.dproj</TestProjectName>
+            </UnitTesting>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+</Project>

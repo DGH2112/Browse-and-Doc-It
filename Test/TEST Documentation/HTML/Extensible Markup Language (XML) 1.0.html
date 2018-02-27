@@ -1,0 +1,938 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>Extensible Markup Language (XML) 1.0.bnf</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Backus-Naur Grammar.html">Backus-Naur Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Eidolon Map File Grammar.html">Eidolon Map File Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Extensible Markup Language (XML) 1.0.html">Extensible Markup Language (XML) 1.0.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Object Pascal Grammar.html">Object Pascal Grammar.bnf</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/TodoFolder.gif" alt=""/>&nbsp;<a href="#bug">Known Bugs</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a href="#Errors2">Errors</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/HintFolder.gif" alt=""/>&nbsp;<a href="#Hints2">Hints</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Rules2">Rules</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/WarningFolder.gif" alt=""/>&nbsp;<a href="#Warnings2">Warnings</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Extensible Markup Language (XML) 1.0.bnf -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Extensible Markup Language (XML) 1.0.bnf</h1>
+        <p class="Comment">This   module   contains   a   backus - Naur   Grammar   for   the   Extensible   Markup   Language   ( XML )   1 . 0 . </p>
+        <p class="TagHeader">Date Code Last Updated</p>
+        <ul>
+          <li class="SpecialTag">21   Jul   2009 </li>
+        </ul>
+        <p class="TagHeader">Code Author</p>
+        <ul>
+          <li class="SpecialTag">David   Hoyle </li>
+        </ul>
+        <p class="TagHeader">Code Version</p>
+        <ul>
+          <li class="SpecialTag">1 . 0 </li>
+        </ul>
+      
+      <!-- Errors -->
+      <h2><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a name="Errors"></a>Errors</h2>
+      <ul>
+        <li class="Error">')' expected but '#' found at line 17 column 28. [List]</li>
+        <li class="Error">')' expected but '-' found at line 37 column 71. [List]</li>
+        <li class="Error">')' expected but '-' found at line 43 column 44. [List]</li>
+        <li class="Error">')' expected but '&#60;line-end&#62;' found at line 43 column 87. [List]</li>
+        <li class="Error">')' expected but '-' found at line 45 column 62. [List]</li>
+        <li class="Error">']' expected but '&#60;line-end&#62;' found at line 45 column 100. [List]</li>
+        <li class="Error">Expected '&#60;end-of-line&#62;' but '-' found at line 47 column 33. [LineEnd]</li>
+        <li class="Error">')' expected but '-' found at line 53 column 40. [List]</li>
+        <li class="Error">Expected '&#60;end-of-line&#62;' but '-' found at line 135 column 38. [LineEnd]</li>
+      </ul>
+      
+      <!-- Warnings -->
+      <h2><img class="verticallymiddle" src="Images/WarningFolder.gif" alt=""/>&nbsp;<a name="Warnings"></a>Warnings</h2>
+      <ul>
+        <li class="Warning">The rule '&#60;CombiningChar&#62;' has not been defined at line 19 column 71. [CheckRules]</li>
+        <li class="Warning">The rule '&#60;Digit&#62;' has not been defined at line 19 column 37. [CheckRules]</li>
+        <li class="Warning">The rule '&#60;Extender&#62;' has not been defined at line 19 column 89. [CheckRules]</li>
+        <li class="Warning">The rule '&#60;Letter&#62;' has not been defined at line 19 column 26. [CheckRules]</li>
+      </ul>
+      
+      <!-- Hints -->
+      <h2><img class="verticallymiddle" src="Images/HintFolder.gif" alt=""/>&nbsp;<a name="Hints"></a>Hints</h2>
+      <ul>
+        <li class="Hint">The rule '&#60;cp&#62;' has not been referenced in the code at line 101 column 1. [CheckRules]</li>
+        <li class="Hint">The rule '&#60;extParsedEnt&#62;' has not been referenced in the code at line 161 column 1. [CheckRules]</li>
+        <li class="Hint">The rule '&#60;extSubset&#62;' has not been referenced in the code at line 77 column 1. [CheckRules]</li>
+        <li class="Hint">The rule '&#60;Names&#62;' has not been referenced in the code at line 25 column 1. [CheckRules]</li>
+        <li class="Hint">The rule '&#60;Nmtokens&#62;' has not been referenced in the code at line 29 column 1. [CheckRules]</li>
+      </ul>
+      
+      <!-- Known Bugs -->
+      <h2><img class="verticallymiddle" src="Images/TodoFolder.gif" alt=""/>&nbsp;<a name="bug"></a>Known Bugs</h2>
+      <ul>
+        <li class="ToDoItem">IS this an exclusion operator?</li>
+      </ul>
+      
+      <!-- Rules -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Rules2"></a>Rules</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<AttDef>"></a><AttDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">AttDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">AttType</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">DefaultDecl</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;AttDef&#62; ::= &#60;S&#62; &#60;Name&#62; &#60;S&#62; &#60;AttType&#62; &#60;S&#62; &#60;DefaultDecl&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<AttlistDecl>"></a><AttlistDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">AttlistDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!ATTLIST'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">AttDef</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'&#62;'</span></pre>
+          <!-- &#60;AttlistDecl&#62; ::= '&#60;!ATTLIST' &#60;S&#62; &#60;Name&#62; ( &#60;AttDef&#62; )* [ &#60;S&#62; ] '&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Attribute>"></a><Attribute></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Attribute</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Eq</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">AttValue</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Attribute&#62; ::= &#60;Name&#62; &#60;Eq&#62; &#60;AttValue&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<AttType>"></a><AttType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">AttType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">StringType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">TokenizedType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">EnumeratedType</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;AttType&#62; ::= &#60;StringType&#62; | &#60;TokenizedType&#62; | &#60;EnumeratedType&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<AttValue>"></a><AttValue></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">AttValue</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">(</span> <span class="CustomUserToken">? [^&#38;#60;&#38;"] ?</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Reference</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">|</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">(</span> <span class="CustomUserToken">? [^&#38;#60;&#38;'] ?</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Reference</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="DoubleLiteral">"'"</span></pre>
+          <!-- &#38;#38;#60;AttValue&#38;#38;#62; ::= '"' ( ? [^&#38;#38;#60;&#38;#38;"] ? | &#38;#38;#60;Reference&#38;#38;#62; )* '"' | "'" ( ? [^&#38;#38;#60;&#38;#38;'] ? | &#38;#38;#60;Reference&#38;#38;#62; )* "'" -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CData>"></a><CData></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CData</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Char</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;CData&#62; ::= ( ( &#60;Char&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CDEnd>"></a><CDEnd></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CDEnd</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">']]&#62;'</span></pre>
+          <!-- &#60;CDEnd&#62; ::= ']]&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CDSect>"></a><CDSect></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CDSect</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">CDStart</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">CData</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">CDEnd</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;CDSect&#62; ::= &#60;CDStart&#62; &#60;CData&#62; &#60;CDEnd&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CDStart>"></a><CDStart></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CDStart</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;![CDATA['</span></pre>
+          <!-- &#60;CDStart&#62; ::= '&#60;![CDATA[' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Char>"></a><Char></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Char</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF] ?</span></pre>
+          <!-- &#60;Char&#62; ::= ? #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF] ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CharData>"></a><CharData></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CharData</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? [^&#38;#38;#38;#60;&#38;#38;#38;]* - ([^&#38;#38;#38;#60;&#38;#38;#38;]* ']]&#38;#62;' [^&#38;#38;#38;#60;&#38;#38;#38;]*) ?</span></pre>
+          <!-- &#38;#38;#38;#60;CharData&#38;#38;#38;#62; ::= ? [^&#38;#38;#38;#60;&#38;#38;#38;]* - ([^&#38;#38;#38;#60;&#38;#38;#38;]* ']]&#38;#38;#38;#62;' [^&#38;#38;#38;#60;&#38;#38;#38;]*) ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<CharRef>"></a><CharRef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">CharRef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#38;#'</span> <span class="CustomUserToken">? [0-9]+ ?</span> <span class="SingleLiteral">';'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'&#38;#x'</span> <span class="CustomUserToken">? [0-9a-fA-F]+ ?</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#38;#38;#60;CharRef&#38;#38;#62; ::= '&#38;#38;#' ? [0-9]+ ? ';' | '&#38;#38;#x' ? [0-9a-fA-F]+ ? ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<children>"></a><children></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">children</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">choice</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">seq</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">[</span> <span class="SingleLiteral">'?'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'*'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'+'</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;children&#62; ::= ( &#60;choice&#62; | &#60;seq&#62; ) [ '?' | '*' | '+' ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<choice>"></a><choice></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">choice</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;cp&#62; ( &#60;S&#62;?</span> <span class="SingleLiteral">'|'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;cp&#62; )+ &#60;S&#62;?</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;choice&#62; ::= '(' &#60;S&#62; ? &#60;cp&#62; ( &#60;S&#62;? '|' &#60;S&#62; ? &#60;cp&#62; )+ &#60;S&#62;? ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Comment>"></a><Comment></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Comment</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!--'</span> <span class="Symbol">(</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Char</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Comment&#62; ::= '&#60;!--' ( ( &#60;Char&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<conditionalSect>"></a><conditionalSect></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">conditionalSect</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">includeSect</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ignoreSect</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;conditionalSect&#62; ::= &#60;includeSect&#62; | &#60;ignoreSect&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<content>"></a><content></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">content</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">CharData</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">(</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">element</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Reference</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">CDSect</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">PI</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Comment</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">[</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">CharData</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;content&#62; ::= [ &#60;CharData&#62; ] ( ( &#60;element&#62; | &#60;Reference&#62; | &#60;CDSect&#62; | &#60;PI&#62; | &#60;Comment&#62; ) [
+  &#60;CharData&#62; ] )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<contentspec>"></a><contentspec></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">contentspec</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'EMPTY'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ANY'</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Mixed</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">children</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;contentspec&#62; ::= 'EMPTY' | 'ANY' | &#60;Mixed&#62; | &#60;children&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<cp>"></a><cp></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">cp</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">choice</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">seq</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">[</span> <span class="SingleLiteral">'?'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'*'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'+'</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;cp&#62; ::= ( &#60;Name&#62; | &#60;choice&#62; | &#60;seq&#62; ) [ '?' | '*' | '+' ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DeclSep>"></a><DeclSep></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DeclSep</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">PEReference</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;DeclSep&#62; ::= &#60;PEReference&#62; | &#60;S&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<DefaultDecl>"></a><DefaultDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">DefaultDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'#REQUIRED'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'#IMPLIED'</span> <span class="Symbol">|</span> <span class="Symbol">(</span> <span class="Symbol">[</span> <span class="SingleLiteral">'#FIXED'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">AttValue</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;DefaultDecl&#62; ::= '#REQUIRED' | '#IMPLIED' | ( [ '#FIXED' &#60;S&#62; ] &#60;AttValue&#62; ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<doctypedecl>"></a><doctypedecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">doctypedecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!DOCTYPE'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">ExternalID</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="SingleLiteral">'['</span> <span class="Symbol">&#60;</span><span class="Identifier">intSubset</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">']'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span>
+  <span class="Symbol">]</span> <span class="SingleLiteral">'&#62;'</span></pre>
+          <!-- &#60;doctypedecl&#62; ::= '&#60;!DOCTYPE' &#60;S&#62; &#60;Name&#62; [ &#60;S&#62; &#60;ExternalID&#62; ] [ &#60;S&#62; ] [ '[' &#60;intSubset&#62; ']' [ &#60;S&#62; ]
+  ] '&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<document>"></a><document></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">document</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">prolog</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">element</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Misc</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;document&#62; ::= &#60;prolog&#62; &#60;element&#62; &#60;Misc&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<element>"></a><element></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">element</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">EmptyElemTag</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">STag</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">content</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">ETag</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;element&#62; ::= &#60;EmptyElemTag&#62; | &#60;STag&#62; &#60;content&#62; &#60;ETag&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<elementdecl>"></a><elementdecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">elementdecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!ELEMENT'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">contentspec</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">? '&#62;'</span></pre>
+          <!-- &#60;elementdecl&#62; ::= '&#60;!ELEMENT' &#60;S&#62; &#60;Name&#62; &#60;S&#62; &#60;contentspec&#62; &#60;S&#62; ? '&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EmptyElemTag>"></a><EmptyElemTag></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EmptyElemTag</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;'</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Attribute</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">? '/&#62;'</span></pre>
+          <!-- &#60;EmptyElemTag&#62; ::= '&#60;' &#60;Name&#62; ( &#60;S&#62; &#60;Attribute&#62; )* &#60;S&#62; ? '/&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EncName>"></a><EncName></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EncName</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? [A-Za-z] ( [A-Za-z0-9._] | '-' )* ?</span></pre>
+          <!-- &#60;EncName&#62; ::= ? [A-Za-z] ( [A-Za-z0-9._] | '-' )* ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EncodingDecl>"></a><EncodingDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EncodingDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'encoding'</span> <span class="Symbol">&#60;</span><span class="Identifier">Eq</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">&#60;</span><span class="Identifier">EncName</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">|</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">&#60;</span><span class="Identifier">EncName</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;EncodingDecl&#62; ::= &#60;S&#62; 'encoding' &#60;Eq&#62; ( '"' &#60;EncName&#62; '"' | "'" &#60;EncName&#62; "'" ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EntityDecl>"></a><EntityDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EntityDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">GEDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">PEDecl</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;EntityDecl&#62; ::= &#60;GEDecl&#62; | &#60;PEDecl&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EntityDef>"></a><EntityDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EntityDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">EntityValue</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ExternalID</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">NDataDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;EntityDef&#62; ::= &#60;EntityValue&#62; | ( &#60;ExternalID&#62; [ &#60;NDataDecl&#62; ] ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EntityRef>"></a><EntityRef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EntityRef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#38;'</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#38;#60;EntityRef&#38;#62; ::= '&#38;' &#38;#60;Name&#38;#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EntityValue>"></a><EntityValue></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EntityValue</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">(</span> <span class="CustomUserToken">? [^%&#38;"] ?</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">PEReference</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Reference</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">|</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">(</span> <span class="CustomUserToken">? [^%&#38;'] ?</span> <span class="Symbol">|</span>
+  <span class="Symbol">&#60;</span><span class="Identifier">PEReference</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Reference</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="DoubleLiteral">"'"</span></pre>
+          <!-- &#38;#38;#60;EntityValue&#38;#38;#62; ::= '"' ( ? [^%&#38;#38;"] ? | &#38;#38;#60;PEReference&#38;#38;#62; | &#38;#38;#60;Reference&#38;#38;#62; )* '"' | "'" ( ? [^%&#38;#38;'] ? |
+  &#38;#38;#60;PEReference&#38;#38;#62; | &#38;#38;#60;Reference&#38;#38;#62; )* "'" -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<EnumeratedType>"></a><EnumeratedType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">EnumeratedType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">NotationType</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Enumeration</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;EnumeratedType&#62; ::= &#60;NotationType&#62; | &#60;Enumeration&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Enumeration>"></a><Enumeration></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Enumeration</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;Nmtoken&#62; ( &#60;S&#62;?</span> <span class="SingleLiteral">'|'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;Nmtoken&#62; )* &#60;S&#62;?</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;Enumeration&#62; ::= '(' &#60;S&#62; ? &#60;Nmtoken&#62; ( &#60;S&#62;? '|' &#60;S&#62; ? &#60;Nmtoken&#62; )* &#60;S&#62;? ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Eq>"></a><Eq></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Eq</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? '=' &#60;S&#62;?</span></pre>
+          <!-- &#60;Eq&#62; ::= &#60;S&#62; ? '=' &#60;S&#62;? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ETag>"></a><ETag></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ETag</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;/'</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'&#62;'</span></pre>
+          <!-- &#60;ETag&#62; ::= '&#60;/' &#60;Name&#62; [ &#60;S&#62; ] '&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ExternalID>"></a><ExternalID></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ExternalID</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'SYSTEM'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">SystemLiteral</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'PUBLIC'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">PubidLiteral</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">SystemLiteral</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;ExternalID&#62; ::= 'SYSTEM' &#60;S&#62; &#60;SystemLiteral&#62; | 'PUBLIC' &#60;S&#62; &#60;PubidLiteral&#62; &#60;S&#62; &#60;SystemLiteral&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<extParsedEnt>"></a><extParsedEnt></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">extParsedEnt</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">TextDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">content</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;extParsedEnt&#62; ::= [ &#60;TextDecl&#62; ] &#60;content&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<extSubset>"></a><extSubset></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">extSubset</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">TextDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">extSubsetDecl</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;extSubset&#62; ::= [ &#60;TextDecl&#62; ] &#60;extSubsetDecl&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<extSubsetDecl>"></a><extSubsetDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">extSubsetDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">markupdecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">conditionalSect</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">DeclSep</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;extSubsetDecl&#62; ::= ( &#60;markupdecl&#62; | &#60;conditionalSect&#62; | &#60;DeclSep&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<GEDecl>"></a><GEDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">GEDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!ENTITY'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">EntityDef</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">? '&#62;'</span></pre>
+          <!-- &#60;GEDecl&#62; ::= '&#60;!ENTITY' &#60;S&#62; &#60;Name&#62; &#60;S&#62; &#60;EntityDef&#62; &#60;S&#62; ? '&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Goal>"></a><Goal></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Goal</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">document</span><span class="Symbol">&#62;</span></pre>
+              <p class="Comment">This   module   contains   a   backus - Naur   Grammar   for   the   Extensible   Markup   Language   ( XML )   1 . 0 . </p>
+              <p class="TagHeader">Date Code Last Updated</p>
+              <ul>
+                <li class="SpecialTag">21   Jul   2009 </li>
+              </ul>
+              <p class="TagHeader">Code Author</p>
+              <ul>
+                <li class="SpecialTag">David   Hoyle </li>
+              </ul>
+              <p class="TagHeader">Code Version</p>
+              <ul>
+                <li class="SpecialTag">1 . 0 </li>
+              </ul>
+          <!-- &#60;Goal&#62; ::= &#60;document&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Ignore>"></a><Ignore></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Ignore</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Char</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Ignore&#62; ::= ( &#60;Char&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ignoreSect>"></a><ignoreSect></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ignoreSect</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!['</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'IGNORE'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'['</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ignoreSectContents</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="SingleLiteral">']]&#62;'</span></pre>
+          <!-- &#60;ignoreSect&#62; ::= '&#60;![' [ &#60;S&#62; ] 'IGNORE' [ &#60;S&#62; ] '[' ( &#60;ignoreSectContents&#62; )* ']]&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<ignoreSectContents>"></a><ignoreSectContents></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">ignoreSectContents</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Ignore</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="SingleLiteral">'&#60;!['</span> <span class="Symbol">&#60;</span><span class="Identifier">ignoreSectContents</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">']]&#62;'</span> <span class="Symbol">&#60;</span><span class="Identifier">Ignore</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;ignoreSectContents&#62; ::= &#60;Ignore&#62; ( '&#60;![' &#60;ignoreSectContents&#62; ']]&#62;' &#60;Ignore&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<includeSect>"></a><includeSect></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">includeSect</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!['</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? 'INCLUDE' &#60;S&#62;?</span> <span class="SingleLiteral">'['</span> <span class="Symbol">&#60;</span><span class="Identifier">extSubsetDecl</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">']]&#62;'</span></pre>
+          <!-- &#60;includeSect&#62; ::= '&#60;![' &#60;S&#62; ? 'INCLUDE' &#60;S&#62;? '[' &#60;extSubsetDecl&#62; ']]&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<intSubset>"></a><intSubset></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">intSubset</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">markupdecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">DeclSep</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;intSubset&#62; ::= ( &#60;markupdecl&#62; | &#60;DeclSep&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<markupdecl>"></a><markupdecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">markupdecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">elementdecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">AttlistDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">EntityDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">NotationDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">PI</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Comment</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;markupdecl&#62; ::= &#60;elementdecl&#62; | &#60;AttlistDecl&#62; | &#60;EntityDecl&#62; | &#60;NotationDecl&#62; | &#60;PI&#62; | &#60;Comment&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Misc>"></a><Misc></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Misc</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Comment</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">PI</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Misc&#62; ::= &#60;Comment&#62; | &#60;PI&#62; | &#60;S&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Mixed>"></a><Mixed></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Mixed</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? '#PCDATA' ( &#60;S&#62;?</span> <span class="SingleLiteral">'|'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;Name&#62; )* &#60;S&#62;?</span> <span class="SingleLiteral">')*'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span>
+  <span class="CustomUserToken">? '#PCDATA' &#60;S&#62;?</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;Mixed&#62; ::= '(' &#60;S&#62; ? '#PCDATA' ( &#60;S&#62;? '|' &#60;S&#62; ? &#60;Name&#62; )* &#60;S&#62;? ')*' | '(' &#60;S&#62;
+  ? '#PCDATA' &#60;S&#62;? ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Name>"></a><Name></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Letter</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'_'</span> <span class="Symbol">|</span> <span class="SingleLiteral">':'</span> <span class="Symbol">)</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">NameChar</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Name&#62; ::= ( &#60;Letter&#62; | '_' | ':' ) ( &#60;NameChar&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<NameChar>"></a><NameChar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">NameChar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Letter</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Digit</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="SingleLiteral">'.'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'-'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'_'</span> <span class="Symbol">|</span> <span class="SingleLiteral">':'</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">CombiningChar</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">Extender</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;NameChar&#62; ::= &#60;Letter&#62; | &#60;Digit&#62; | '.' | '-' | '_' | ':' | &#60;CombiningChar&#62; | &#60;Extender&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Names>"></a><Names></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Names</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">space</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Names&#62; ::= &#60;Name&#62; ( &#60;space&#62; &#60;Name&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<NDataDecl>"></a><NDataDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">NDataDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'NDATA'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;NDataDecl&#62; ::= &#60;S&#62; 'NDATA' &#60;S&#62; &#60;Name&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Nmtoken>"></a><Nmtoken></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Nmtoken</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">NameChar</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">+</span></pre>
+          <!-- &#60;Nmtoken&#62; ::= ( &#60;NameChar&#62; )+ -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Nmtokens>"></a><Nmtokens></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Nmtokens</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Nmtoken</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">space</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Nmtoken</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;Nmtokens&#62; ::= &#60;Nmtoken&#62; ( &#60;space&#62; &#60;Nmtoken&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<NotationDecl>"></a><NotationDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">NotationDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!NOTATION'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">ExternalID</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">PublicID</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'&#62;'</span></pre>
+          <!-- &#60;NotationDecl&#62; ::= '&#60;!NOTATION' &#60;S&#62; &#60;Name&#62; &#60;S&#62; ( &#60;ExternalID&#62; | &#60;PublicID&#62; ) [ &#60;S&#62; ] '&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<NotationType>"></a><NotationType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">NotationType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'NOTATION'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;Name&#62; ( &#60;S&#62;?</span> <span class="SingleLiteral">'|'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;Name&#62; )* &#60;S&#62;?</span></pre>
+          <!-- &#60;NotationType&#62; ::= 'NOTATION' &#60;S&#62; '(' &#60;S&#62; ? &#60;Name&#62; ( &#60;S&#62;? '|' &#60;S&#62; ? &#60;Name&#62; )* &#60;S&#62;? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PEDecl>"></a><PEDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PEDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;!ENTITY'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'%'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">PEDef</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'&#62;'</span></pre>
+          <!-- &#60;PEDecl&#62; ::= '&#60;!ENTITY' &#60;S&#62; '%' &#60;S&#62; &#60;Name&#62; &#60;S&#62; &#60;PEDef&#62; [ &#60;S&#62; ] '&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PEDef>"></a><PEDef></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PEDef</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">EntityValue</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">ExternalID</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;PEDef&#62; ::= &#60;EntityValue&#62; | &#60;ExternalID&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PEReference>"></a><PEReference></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PEReference</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'%'</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">';'</span></pre>
+          <!-- &#60;PEReference&#62; ::= '%' &#60;Name&#62; ';' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PI>"></a><PI></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PI</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;?'</span> <span class="Symbol">&#60;</span><span class="Identifier">PITarget</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Char</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span></pre>
+          <!-- &#60;PI&#62; ::= '&#60;?' &#60;PITarget&#62; [ &#60;S&#62; ( ( &#60;Char&#62; )* -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PITarget>"></a><PITarget></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PITarget</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;PITarget&#62; ::= &#60;Name&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<prolog>"></a><prolog></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">prolog</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">XMLDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Misc</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">doctypedecl</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">Misc</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">]</span></pre>
+          <!-- &#60;prolog&#62; ::= [ &#60;XMLDecl&#62; ] ( &#60;Misc&#62; )* [ &#60;doctypedecl&#62; ( &#60;Misc&#62; )* ] -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PubidChar>"></a><PubidChar></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PubidChar</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="CustomUserToken">? #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?</span> <span class="CustomUserToken">?;!*#@$_%] ?</span></pre>
+              <p class="Comment"></p>
+              <p class="TagHeader">Known Bugs</p>
+              <ul>
+                <li class="SpecialTag">IS   this   an   exclusion   operator ? </li>
+              </ul>
+          <!-- &#60;PubidChar&#62; ::= ? #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=? ?;!*#@$_%] ? -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PubidLiteral>"></a><PubidLiteral></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PubidLiteral</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">PubidChar</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">|</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">PubidChar</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;PubidLiteral&#62; ::= '"' ( &#60;PubidChar&#62; )* '"' | "'" ( &#60;PubidChar&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<PublicID>"></a><PublicID></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">PublicID</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'PUBLIC'</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">PubidLiteral</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;PublicID&#62; ::= 'PUBLIC' &#60;S&#62; &#60;PubidLiteral&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<Reference>"></a><Reference></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">Reference</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">EntityRef</span><span class="Symbol">&#62;</span> <span class="Symbol">|</span> <span class="Symbol">&#60;</span><span class="Identifier">CharRef</span><span class="Symbol">&#62;</span></pre>
+          <!-- &#60;Reference&#62; ::= &#60;EntityRef&#62; | &#60;CharRef&#62; -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<S>"></a><S></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span></pre>
+          <!-- &#60;S&#62; ::= ( -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SDDecl>"></a><SDDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SDDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'standalone'</span> <span class="Symbol">&#60;</span><span class="Identifier">Eq</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">(</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">(</span> <span class="SingleLiteral">'yes'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'no'</span> <span class="Symbol">)</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">)</span> <span class="Symbol">|</span> <span class="Symbol">(</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">(</span> <span class="SingleLiteral">'yes'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'no'</span> <span class="Symbol">)</span> <span class="SingleLiteral">'"'</span>
+  <span class="Symbol">)</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;SDDecl&#62; ::= &#60;S&#62; 'standalone' &#60;Eq&#62; ( ( "'" ( 'yes' | 'no' ) "'" ) | ( '"' ( 'yes' | 'no' ) '"'
+  ) ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<seq>"></a><seq></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">seq</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'('</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;cp&#62; ( &#60;S&#62;?</span> <span class="SingleLiteral">','</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="CustomUserToken">? &#60;cp&#62; )* &#60;S&#62;?</span> <span class="SingleLiteral">')'</span></pre>
+          <!-- &#60;seq&#62; ::= '(' &#60;S&#62; ? &#60;cp&#62; ( &#60;S&#62;? ',' &#60;S&#62; ? &#60;cp&#62; )* &#60;S&#62;? ')' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<space>"></a><space></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">space</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">' '</span></pre>
+          <!-- &#60;space&#62; ::= ' ' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<STag>"></a><STag></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">STag</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;'</span> <span class="Symbol">&#60;</span><span class="Identifier">Name</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">&#60;</span><span class="Identifier">Attribute</span><span class="Symbol">&#62;</span> <span class="Symbol">)</span><span class="Symbol">*</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'&#62;'</span></pre>
+          <!-- &#60;STag&#62; ::= '&#60;' &#60;Name&#62; ( &#60;S&#62; &#60;Attribute&#62; )* [ &#60;S&#62; ] '&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<StringType>"></a><StringType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">StringType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'CDATA'</span></pre>
+          <!-- &#60;StringType&#62; ::= 'CDATA' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<SystemLiteral>"></a><SystemLiteral></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">SystemLiteral</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">(</span> <span class="SingleLiteral">'"'</span> <span class="CustomUserToken">? [^"]* ?</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">)</span> <span class="Symbol">|</span> <span class="Symbol">(</span> <span class="DoubleLiteral">"'"</span> <span class="CustomUserToken">? [^']* ?</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;SystemLiteral&#62; ::= ( '"' ? [^"]* ? '"' ) | ( "'" ? [^']* ? "'" ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TextDecl>"></a><TextDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TextDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;?xml'</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">VersionInfo</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">&#60;</span><span class="Identifier">EncodingDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'?&#62;'</span></pre>
+          <!-- &#60;TextDecl&#62; ::= '&#60;?xml' [ &#60;VersionInfo&#62; ] &#60;EncodingDecl&#62; [ &#60;S&#62; ] '?&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<TokenizedType>"></a><TokenizedType></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">TokenizedType</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'ID'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'IDREF'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'IDREFS'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ENTITY'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'ENTITIES'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'NMTOKEN'</span> <span class="Symbol">|</span> <span class="SingleLiteral">'NMTOKENS'</span></pre>
+          <!-- &#60;TokenizedType&#62; ::= 'ID' | 'IDREF' | 'IDREFS' | 'ENTITY' | 'ENTITIES' | 'NMTOKEN' | 'NMTOKENS' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<VersionInfo>"></a><VersionInfo></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">VersionInfo</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'version'</span> <span class="Symbol">&#60;</span><span class="Identifier">Eq</span><span class="Symbol">&#62;</span> <span class="Symbol">(</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">&#60;</span><span class="Identifier">VersionNum</span><span class="Symbol">&#62;</span> <span class="DoubleLiteral">"'"</span> <span class="Symbol">|</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">&#60;</span><span class="Identifier">VersionNum</span><span class="Symbol">&#62;</span> <span class="SingleLiteral">'"'</span> <span class="Symbol">)</span></pre>
+          <!-- &#60;VersionInfo&#62; ::= &#60;S&#62; 'version' &#60;Eq&#62; ( "'" &#60;VersionNum&#62; "'" | '"' &#60;VersionNum&#62; '"' ) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<VersionNum>"></a><VersionNum></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">VersionNum</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'1.0'</span></pre>
+          <!-- &#60;VersionNum&#62; ::= '1.0' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Rules.<XMLDecl>"></a><XMLDecl></td>
+              <td>
+                <pre><span class="Symbol">&#60;</span><span class="Identifier">XMLDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">:</span><span class="Symbol">:</span><span class="Symbol">=</span> <span class="SingleLiteral">'&#60;?xml'</span> <span class="Symbol">&#60;</span><span class="Identifier">VersionInfo</span><span class="Symbol">&#62;</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">EncodingDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">SDDecl</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="Symbol">[</span> <span class="Symbol">&#60;</span><span class="Identifier">S</span><span class="Symbol">&#62;</span> <span class="Symbol">]</span> <span class="SingleLiteral">'?&#62;'</span></pre>
+          <!-- &#60;XMLDecl&#62; ::= '&#60;?xml' &#60;VersionInfo&#62; [ &#60;EncodingDecl&#62; ] [ &#60;SDDecl&#62; ] [ &#60;S&#62; ] '?&#62;' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

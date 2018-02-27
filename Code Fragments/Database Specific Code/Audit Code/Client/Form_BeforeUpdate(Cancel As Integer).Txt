@@ -1,0 +1,20 @@
+'
+' This is a form before update event handler.
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon save the old values to a variant array.
+'
+' @param   Cancel as an Integer
+'
+Private Sub Form_BeforeUpdate(Cancel As Integer)
+  Exception.Push ".Form_BeforeUpdate", Cancel
+  On Error GoTo ErrHnd
+  OldValues(1) = edtCatID.OldValue
+  OldValues(2) = edtCategory.OldValue
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

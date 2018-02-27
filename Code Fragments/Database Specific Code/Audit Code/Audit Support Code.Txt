@@ -1,0 +1,10 @@
+' SQL Insert statement for the Audit log
+Private Const strAuditSQL = _
+  "INSERT INTO [pdbCategoriesAudit] ([Date], [Cat ID], [User], [Field], [Old Value], [New Value]) " & _
+  "VALUES (CURRENT_TIMESTAMP, %param%, CURRENT_USER, N'%param%', N'%param%', N'%param%')"
+' SQL Select sattement for the revisions form
+Private Const strAuditTable = "SELECT * FROM [pdbCategoriesAudit] WHERE [Cat ID] = %param% ORDER BY [Date] DESC;"
+' A private variable that determines if the record is new.
+Private boolNew As Boolean
+' An array of variants to hold old values
+Private OldValues(1 To 2) As Variant

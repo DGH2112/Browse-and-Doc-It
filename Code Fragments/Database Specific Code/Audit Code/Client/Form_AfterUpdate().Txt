@@ -1,0 +1,19 @@
+'
+' Form before update event handler
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None
+' @postcon Save the changes to the record to the revision log.
+'
+Private Sub Form_AfterUpdate()
+  Exception.Push ".Form_AfterUpdate"
+  On Error GoTo ErrHnd
+  HasChanged edtCatID.ControlSource, OldValues(1), edtCatID.Value
+  HasChanged edtCategory.ControlSource, OldValues(2), edtCategory.Value
+  If boolNew Then boolNew = False
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

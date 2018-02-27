@@ -1,0 +1,62 @@
+'
+' The GetWindowLong function retrieves information about the specified window. The
+' function also retrieves the 32-bit (long) value at the specified offset into the extra
+' window memory of a window.
+'
+' LONG GetWindowLong(
+'   HWND hWnd,  // handle of window
+'   int nIndex  // offset of value to retrieve
+' );
+'
+' @Date    16 Oct 2003
+' @Version 1.0
+'
+' @precon  None.
+' @postcon
+'
+' @param   hwnd as a Long - Identifies the window and, indirectly, the class to which
+'          the window belongs.
+' @param   nIndex as a Long - Specifies the zero-based offset to the value to be
+'          retrieved. Valid values are in the range zero through the number of bytes
+'          of extra window memory, minus four; for example, if you specified 12 or more
+'          bytes of extra memory, a value of 8 would be an index to the third 32-bit
+'          integer. To retrieve any other value, specify one of the following values:
+'
+'          Value Action
+'          GWL_EXSTYLE     Retrieves the extended window styles.
+'          GWL_STYLE       Retrieves the window styles.
+'          GWL_WNDPROC     Retrieves the address of the window procedure, or a handle
+'                          representing the address of the window procedure. You must use
+'                          the CallWindowProc function to call the window procedure.
+'          GWL_HINSTANCE   Retrieves the handle of the application instance.
+'          GWL_HWNDPARENT  Retrieves the handle of the parent window, if any.
+'          GWL_ID          Retrieves the identifier of the window.
+'          GWL_USERDATA    Retrieves the 32-bit value associated with the window. Each
+'                          window has a corresponding 32-bit value intended for use by the
+'                          application that created the window.
+'
+'          The following values are also available when the hWnd parameter identifies a
+'          dialog box:
+'
+'          Value Action
+'          DWL_DLGPROC     Retrieves the address of the dialog box procedure, or a
+'                          handle representing the address of the dialog box procedure. You
+'                          must use the CallWindowProc function to call the dialog box
+'                          procedure.
+'          DWL_MSGRESULT   Retrieves the return value of a message processed in the dialog
+'                          box procedure.
+'          DWL_USER        Retrieves extra information private to the application, such as
+'                          handles or pointers.
+'
+' @return  a Long - If the function succeeds, the return value is the requested 32-bit value.
+'          If the function fails, the return value is zero. To get extended error
+'          information, call GetLastError.
+'
+' @remark  Reserve extra window memory by specifying a nonzero value in the cbWndExtra
+'          member of the WNDCLASS structure used with the RegisterClass function.
+'
+' @see     CallWindowProc , GetWindowWord, RegisterClass, SetParent, SetWindowLong,
+'          SetWindowWord, WNDCLASS
+'
+Private Declare Function GetWindowLong Lib "user32" Alias "GetWindowLongA" ( _
+  ByVal hwnd As Long, ByVal nIndex As Long) As Long

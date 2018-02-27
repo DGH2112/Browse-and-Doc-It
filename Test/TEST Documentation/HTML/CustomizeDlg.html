@@ -1,0 +1,2574 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>CustomizeDlg.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="About.html">About.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="AddInDesignerObjects_TLB.html">AddInDesignerObjects_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ADODB_TLB.html">ADODB_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseDocumentation.html">BaseDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="BaseLanguageModule.html">BaseLanguageModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="checkforupdates.html">checkforupdates.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CheckForUpdatesForm.html">CheckForUpdatesForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ConfirmationDlgForm.html">ConfirmationDlgForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="CustomizeDlg.html">CustomizeDlg.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="dghlibrary.html">dghlibrary.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationDispatcher.html">DocumentationDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="DocumentationOptionsForm.html">DocumentationOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EditorOptionsForm.html">EditorOptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="EventSink.html">EventSink.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Excel_TLB.html">Excel_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ExternalProcessInfo.html">ExternalProcessInfo.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="GenericTokenizer.html">GenericTokenizer.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="HTMLDocumentation.html">HTMLDocumentation.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MethodDescriptionForm.html">MethodDescriptionForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleDispatcher.html">ModuleDispatcher.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ModuleExplorerFrame.html">ModuleExplorerFrame.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MSXML2_TLB.html">MSXML2_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Office_TLB.html">Office_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OptionsForm.html">OptionsForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PascalModule.html">PascalModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintingFrm.html">PrintingFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintPreviewFrm.html">PrintPreviewFrm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="PrintPreviewOptions.html">PrintPreviewOptions.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Profiler.html">Profiler.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgrammeInfoForm.html">ProgrammeInfoForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ProgressForm.html">ProgressForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SearchReplaceForm.html">SearchReplaceForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SHDocVw_TLB.html">SHDocVw_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SingleInstanceAppUsingDDE.html">SingleInstanceAppUsingDDE.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SndKey32.html">SndKey32.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SpecialTagForm.html">SpecialTagForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="SynEditHeaderFooterItemForm.html">SynEditHeaderFooterItemForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="TokenForm.html">TokenForm.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBIDE_TLB.html">VBIDE_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VBModule.html">VBModule.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Word_TLB.html">Word_TLB.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/TodoFolder.gif" alt=""/>&nbsp;<a href="#debug">Debugging Code</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/InitializationLabel.gif" alt=""/>&nbsp;<a href="#initialization2">initialization</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a href="#Variables2">Variables</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit CustomizeDlg -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit CustomizeDlg</h1>
+        <p class="Comment">***************************************************** </p>
+      
+      <!-- Debugging Code -->
+      <h2><img class="verticallymiddle" src="Images/TodoFolder.gif" alt=""/>&nbsp;<a name="debug"></a>Debugging Code</h2>
+      <ul>
+        <li class="ToDoItem">This lines have been commented out because the stop the Main Menu from being control and IF the main menu is the first ActionBar then "Reset" is out of sync by one. if not (ActionBar is TCustomActionMainMenuBar) then begin</li>
+      </ul>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+          <!-- TActionSeparatorDragObject -->
+          <h3><img class="verticallymiddle" src="Images/PrivateClass.gif" alt=""/>&nbsp;<a name="TActionSeparatorDragObject3"></a>TActionSeparatorDragObject</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedConstructor.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TActionSeparatorDragObject.Create"></a>Create</td>
+                  <td>
+                    <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">CustomizeFrm</span> <span class="Symbol">:</span> <span class="Identifier">TCustomizeFrm</span><span class="Symbol">;</span>
+  <span class="Identifier">Client</span> <span class="Symbol">:</span> <span class="Identifier">TActionClientItem</span>
+<span class="Symbol">)</span></pre>
+              <!-- Constructor Create(
+  CustomizeFrm : TCustomizeFrm;
+  Client : TActionClientItem
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TActionSeparatorDragObject.Finished"></a>Finished</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Finished</span><span class="Symbol">(</span>
+  <span class="Identifier">Target</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="Identifier">X</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Y</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Accepted</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure Finished(
+  Target : TObject;
+  X : Integer;
+  Y : Integer;
+  Accepted : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TCustomizeDlg -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TCustomizeDlg3"></a>TCustomizeDlg</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeDlg.Notification"></a>Notification</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Notification</span><span class="Symbol">(</span>
+  <span class="Identifier">AComponent</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span><span class="Symbol">;</span>
+  <span class="Identifier">Operation</span> <span class="Symbol">:</span> <span class="Identifier">TOperation</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure Notification(
+  AComponent : TComponent;
+  Operation : TOperation
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeDlg.SetActionManager"></a>SetActionManager</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetActionManager</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionManager</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetActionManager(
+  const Value : TCustomActionManager
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeDlg.SetStayOnTop"></a>SetStayOnTop</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetStayOnTop</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetStayOnTop(
+  const Value : Boolean
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeDlg.SetupDlg"></a>SetupDlg</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetupDlg</span></pre>
+              <!-- Procedure SetupDlg -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeDlg.Show"></a>Show</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Show</span></pre>
+              <!-- Procedure Show -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+          <!-- TCustomizeFrm -->
+          <h3><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="TCustomizeFrm3"></a>TCustomizeFrm</h3>
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ActionBarListClick"></a>ActionBarListClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionBarListClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ActionBarListClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ActionBarListClickCheck"></a>ActionBarListClickCheck</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionBarListClickCheck</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ActionBarListClickCheck(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ActionsListClick"></a>ActionsListClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ActionsListClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ActionsListData"></a>ActionsListData</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListData</span><span class="Symbol">(</span>
+  <span class="Identifier">Control</span> <span class="Symbol">:</span> <span class="Identifier">TWinControl</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Data</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ActionsListData(
+  Control : TWinControl;
+  Index : Integer;
+  var Data : string
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ActionsListDrawItem"></a>ActionsListDrawItem</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListDrawItem</span><span class="Symbol">(</span>
+  <span class="Identifier">Control</span> <span class="Symbol">:</span> <span class="Identifier">TWinControl</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Rect</span> <span class="Symbol">:</span> <span class="Identifier">TRect</span><span class="Symbol">;</span>
+  <span class="Identifier">State</span> <span class="Symbol">:</span> <span class="Identifier">TOwnerDrawState</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ActionsListDrawItem(
+  Control : TWinControl;
+  Index : Integer;
+  Rect : TRect;
+  State : TOwnerDrawState
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ActionsListMeasureItem"></a>ActionsListMeasureItem</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListMeasureItem</span><span class="Symbol">(</span>
+  <span class="Identifier">Control</span> <span class="Symbol">:</span> <span class="Identifier">TWinControl</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Height</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ActionsListMeasureItem(
+  Control : TWinControl;
+  Index : Integer;
+  var Height : Integer
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ActionsListStartDrag"></a>ActionsListStartDrag</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListStartDrag</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">DragObject</span> <span class="Symbol">:</span> <span class="Identifier">TDragObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ActionsListStartDrag(
+  Sender : TObject;
+  var DragObject : TDragObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.AddAction"></a>AddAction</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">AddAction</span><span class="Symbol">(</span>
+  <span class="Identifier">AnAction</span> <span class="Symbol">:</span> <span class="Identifier">TContainedAction</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+              <!-- Function AddAction(
+  AnAction : TContainedAction
+) : string -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ApplyToAllActnUpdate"></a>ApplyToAllActnUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ApplyToAllActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ApplyToAllActnUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.CaptionOptionsComboChange"></a>CaptionOptionsComboChange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CaptionOptionsComboChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure CaptionOptionsComboChange(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.CatListClick"></a>CatListClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CatListClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure CatListClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.CatListStartDrag"></a>CatListStartDrag</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CatListStartDrag</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">DragObject</span> <span class="Symbol">:</span> <span class="Identifier">TDragObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure CatListStartDrag(
+  Sender : TObject;
+  var DragObject : TDragObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ClearCatList"></a>ClearCatList</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ClearCatList</span></pre>
+              <!-- Procedure ClearCatList -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.CloseBtnClick"></a>CloseBtnClick</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CloseBtnClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure CloseBtnClick(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.CMVisiblechanged"></a>CMVisiblechanged</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CMVisiblechanged</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TMessage</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure CMVisiblechanged(
+  var Message : TMessage
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.FindActionBars"></a>FindActionBars</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FindActionBars</span></pre>
+              <!-- Procedure FindActionBars -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.FormClose"></a>FormClose</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormClose</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Action</span> <span class="Symbol">:</span> <span class="Identifier">TCloseAction</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure FormClose(
+  Sender : TObject;
+  var Action : TCloseAction
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.FormCreate"></a>FormCreate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormCreate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure FormCreate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.FormResize"></a>FormResize</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormResize</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure FormResize(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.IsDupShortCut"></a>IsDupShortCut</td>
+                  <td>
+                    <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsDupShortCut</span><span class="Symbol">(</span>
+  <span class="Identifier">AShortCut</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Action</span> <span class="Symbol">:</span> <span class="Identifier">TContainedAction</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+              <!-- Function IsDupShortCut(
+  AShortCut : TShortCut;
+  var Action : TContainedAction
+) : Boolean -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.LargeIconsActnExecute"></a>LargeIconsActnExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LargeIconsActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure LargeIconsActnExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.LargeIconsActnUpdate"></a>LargeIconsActnUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LargeIconsActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure LargeIconsActnUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ListComboSelect"></a>ListComboSelect</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ListComboSelect</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ListComboSelect(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.MenuAnimationStylesChange"></a>MenuAnimationStylesChange</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MenuAnimationStylesChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure MenuAnimationStylesChange(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.Notification"></a>Notification</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Notification</span><span class="Symbol">(</span>
+  <span class="Identifier">AComponent</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span><span class="Symbol">;</span>
+  <span class="Identifier">Operation</span> <span class="Symbol">:</span> <span class="Identifier">TOperation</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure Notification(
+  AComponent : TComponent;
+  Operation : TOperation
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.RecentlyUsedActnExecute"></a>RecentlyUsedActnExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">RecentlyUsedActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure RecentlyUsedActnExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.RecentlyUsedActnUpdate"></a>RecentlyUsedActnUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">RecentlyUsedActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure RecentlyUsedActnUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ResetActnExecute"></a>ResetActnExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ResetActnExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ResetActnUpdate"></a>ResetActnUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ResetActnUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ResetUsageDataActnExecute"></a>ResetUsageDataActnExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetUsageDataActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ResetUsageDataActnExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.SeparatorBtnStartDrag"></a>SeparatorBtnStartDrag</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SeparatorBtnStartDrag</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">DragObject</span> <span class="Symbol">:</span> <span class="Identifier">TDragObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SeparatorBtnStartDrag(
+  Sender : TObject;
+  var DragObject : TDragObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.SetActionManager"></a>SetActionManager</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetActionManager</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionManager</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetActionManager(
+  const Value : TCustomActionManager
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.SetActiveActionList"></a>SetActiveActionList</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetActiveActionList</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionList</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure SetActiveActionList(
+  const Value : TCustomActionList
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.SetupListCombo"></a>SetupListCombo</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetupListCombo</span></pre>
+              <!-- Procedure SetupListCombo -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ShowHintsActnExecute"></a>ShowHintsActnExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowHintsActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ShowHintsActnExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ShowHintsActnUpdate"></a>ShowHintsActnUpdate</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowHintsActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ShowHintsActnUpdate(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.ShowShortCutsInTipsActnExecute"></a>ShowShortCutsInTipsActnExecute</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowShortCutsInTipsActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+              <!-- Procedure ShowShortCutsInTipsActnExecute(
+  Sender : TObject
+) -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="ImplementedMethods.TCustomizeFrm.UpdateDialog"></a>UpdateDialog</td>
+                  <td>
+                    <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">UpdateDialog</span></pre>
+              <!-- Procedure UpdateDialog -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+      </div>
+      
+      <!-- initialization -->
+      <div class="Indent">
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateClass.gif" alt=""/>&nbsp;<a name="Types.TActionSeparatorDragObject"></a>TActionSeparatorDragObject</td>
+              <td>
+                <pre><span class="Identifier">TActionSeparatorDragObject</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TActionItemDragObject</span><span class="Symbol">)</span></pre>
+          <!-- TActionSeparatorDragObject = Class(TActionItemDragObject) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TActionSeparatorDragObject.Fields.FCustomizeFrm"></a>FCustomizeFrm</td>
+                      <td>
+                        <pre><span class="Identifier">FCustomizeFrm</span> <span class="Symbol">:</span> <span class="Identifier">TCustomizeFrm</span></pre>
+                  <!-- FCustomizeFrm : TCustomizeFrm -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedConstructor.gif" alt=""/>&nbsp;<a name="Types.TActionSeparatorDragObject.Methods.Create"></a>Create</td>
+                      <td>
+                        <pre><span class="ReservedWord">Constructor</span> <span class="Identifier">Create</span><span class="Symbol">(</span>
+  <span class="Identifier">CustomizeFrm</span> <span class="Symbol">:</span> <span class="Identifier">TCustomizeFrm</span><span class="Symbol">;</span>
+  <span class="Identifier">Client</span> <span class="Symbol">:</span> <span class="Identifier">TActionClientItem</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Constructor Create(
+  CustomizeFrm : TCustomizeFrm;
+  Client : TActionClientItem
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TActionSeparatorDragObject.Methods.Finished"></a>Finished</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Finished</span><span class="Symbol">(</span>
+  <span class="Identifier">Target</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="Identifier">X</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Y</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Accepted</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Finished(
+  Target : TObject;
+  X : Integer;
+  Y : Integer;
+  Accepted : Boolean
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateClass.gif" alt=""/>&nbsp;<a name="Types.TControlClass"></a>TControlClass</td>
+              <td>
+                <pre><span class="Identifier">TControlClass</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TControl</span><span class="Symbol">)</span></pre>
+          <!-- TControlClass = Class(TControl) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateClass.gif" alt=""/>&nbsp;<a name="Types.TCustomActionControlClass"></a>TCustomActionControlClass</td>
+              <td>
+                <pre><span class="Identifier">TCustomActionControlClass</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TCustomActionControl</span><span class="Symbol">)</span></pre>
+          <!-- TCustomActionControlClass = Class(TCustomActionControl) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg"></a>TCustomizeDlg</td>
+              <td>
+                <pre><span class="Identifier">TCustomizeDlg</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TComponent</span><span class="Symbol">)</span></pre>
+          <!-- TCustomizeDlg = Class(TComponent) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Fields.FActionManager"></a>FActionManager</td>
+                      <td>
+                        <pre><span class="Identifier">FActionManager</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionManager</span></pre>
+                  <!-- FActionManager : TCustomActionManager -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Fields.FCustomizeFrm"></a>FCustomizeFrm</td>
+                      <td>
+                        <pre><span class="Identifier">FCustomizeFrm</span> <span class="Symbol">:</span> <span class="Identifier">TCustomizeFrm</span></pre>
+                  <!-- FCustomizeFrm : TCustomizeFrm -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Fields.FOnClose"></a>FOnClose</td>
+                      <td>
+                        <pre><span class="Identifier">FOnClose</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span></pre>
+                  <!-- FOnClose : TNotifyEvent -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Fields.FOnShow"></a>FOnShow</td>
+                      <td>
+                        <pre><span class="Identifier">FOnShow</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span></pre>
+                  <!-- FOnShow : TNotifyEvent -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Fields.FStayOnTop"></a>FStayOnTop</td>
+                      <td>
+                        <pre><span class="Identifier">FStayOnTop</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- FStayOnTop : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Methods.Notification"></a>Notification</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Notification</span><span class="Symbol">(</span>
+  <span class="Identifier">AComponent</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span><span class="Symbol">;</span>
+  <span class="Identifier">Operation</span> <span class="Symbol">:</span> <span class="Identifier">TOperation</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Notification(
+  AComponent : TComponent;
+  Operation : TOperation
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Methods.SetActionManager"></a>SetActionManager</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetActionManager</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionManager</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetActionManager(
+  const Value : TCustomActionManager
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Methods.SetStayOnTop"></a>SetStayOnTop</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetStayOnTop</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetStayOnTop(
+  const Value : Boolean
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Methods.SetupDlg"></a>SetupDlg</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetupDlg</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure SetupDlg; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Methods.Show"></a>Show</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Show</span></pre>
+                  <!-- Procedure Show -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Properties.ActionManager"></a>ActionManager</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ActionManager</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionManager</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FActionManager</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetActionManager</span>
+</pre>
+                  <!-- Property ActionManager : TCustomActionManager
+  Read FActionManager
+  Write SetActionManager
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Properties.CustomizeForm"></a>CustomizeForm</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">CustomizeForm</span> <span class="Symbol">:</span> <span class="Identifier">TCustomizeFrm</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FCustomizeFrm</span>
+</pre>
+                  <!-- Property CustomizeForm : TCustomizeFrm
+  Read FCustomizeFrm
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Properties.OnClose"></a>OnClose</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnClose</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FOnClose</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">FOnClose</span>
+</pre>
+                  <!-- Property OnClose : TNotifyEvent
+  Read FOnClose
+  Write FOnClose
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Properties.OnShow"></a>OnShow</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">OnShow</span> <span class="Symbol">:</span> <span class="Identifier">TNotifyEvent</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FOnShow</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">FOnShow</span>
+</pre>
+                  <!-- Property OnShow : TNotifyEvent
+  Read FOnShow
+  Write FOnShow
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProperty.gif" alt=""/>&nbsp;<a name="Types.TCustomizeDlg.Properties.StayOnTop"></a>StayOnTop</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">StayOnTop</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FStayOnTop</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetStayOnTop</span>
+</pre>
+                  <!-- Property StayOnTop : Boolean
+  Read FStayOnTop
+  Write SetStayOnTop
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicClass.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm"></a>TCustomizeFrm</td>
+              <td>
+                <pre><span class="Identifier">TCustomizeFrm</span> <span class="Symbol">=</span> <span class="ReservedWord">Class</span><span class="Symbol">(</span><span class="Identifier">TForm</span><span class="Symbol">)</span></pre>
+          <!-- TCustomizeFrm = Class(TForm) -->
+          <div class="Indent">
+              <!-- Fields -->
+              <h3><img class="verticallymiddle" src="Images/FieldsLabel.gif" alt=""/>&nbsp;<a name="Fields3"></a>Fields</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ActionBarList"></a>ActionBarList</td>
+                      <td>
+                        <pre><span class="Identifier">ActionBarList</span> <span class="Symbol">:</span> <span class="Identifier">TCheckListBox</span></pre>
+                  <!-- ActionBarList : TCheckListBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ActionImages"></a>ActionImages</td>
+                      <td>
+                        <pre><span class="Identifier">ActionImages</span> <span class="Symbol">:</span> <span class="Identifier">TImageList</span></pre>
+                  <!-- ActionImages : TImageList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ActionList1"></a>ActionList1</td>
+                      <td>
+                        <pre><span class="Identifier">ActionList1</span> <span class="Symbol">:</span> <span class="Identifier">TActionList</span></pre>
+                  <!-- ActionList1 : TActionList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ActionsActionsLbl"></a>ActionsActionsLbl</td>
+                      <td>
+                        <pre><span class="Identifier">ActionsActionsLbl</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- ActionsActionsLbl : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ActionsCatLbl"></a>ActionsCatLbl</td>
+                      <td>
+                        <pre><span class="Identifier">ActionsCatLbl</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- ActionsCatLbl : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ActionsList"></a>ActionsList</td>
+                      <td>
+                        <pre><span class="Identifier">ActionsList</span> <span class="Symbol">:</span> <span class="Identifier">TListBox</span></pre>
+                  <!-- ActionsList : TListBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ActionsTab"></a>ActionsTab</td>
+                      <td>
+                        <pre><span class="Identifier">ActionsTab</span> <span class="Symbol">:</span> <span class="Identifier">TTabSheet</span></pre>
+                  <!-- ActionsTab : TTabSheet -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ApplyToAllActn"></a>ApplyToAllActn</td>
+                      <td>
+                        <pre><span class="Identifier">ApplyToAllActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- ApplyToAllActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ApplyToAllChk"></a>ApplyToAllChk</td>
+                      <td>
+                        <pre><span class="Identifier">ApplyToAllChk</span> <span class="Symbol">:</span> <span class="Identifier">TCheckBox</span></pre>
+                  <!-- ApplyToAllChk : TCheckBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.CaptionOptionsCombo"></a>CaptionOptionsCombo</td>
+                      <td>
+                        <pre><span class="Identifier">CaptionOptionsCombo</span> <span class="Symbol">:</span> <span class="Identifier">TComboBox</span></pre>
+                  <!-- CaptionOptionsCombo : TComboBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.CaptionOptionsGrp"></a>CaptionOptionsGrp</td>
+                      <td>
+                        <pre><span class="Identifier">CaptionOptionsGrp</span> <span class="Symbol">:</span> <span class="Identifier">TGroupBox</span></pre>
+                  <!-- CaptionOptionsGrp : TGroupBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.CatList"></a>CatList</td>
+                      <td>
+                        <pre><span class="Identifier">CatList</span> <span class="Symbol">:</span> <span class="Identifier">TListBox</span></pre>
+                  <!-- CatList : TListBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.CloseActn"></a>CloseActn</td>
+                      <td>
+                        <pre><span class="Identifier">CloseActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- CloseActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.CloseBtn"></a>CloseBtn</td>
+                      <td>
+                        <pre><span class="Identifier">CloseBtn</span> <span class="Symbol">:</span> <span class="Identifier">TButton</span></pre>
+                  <!-- CloseBtn : TButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.CloseItem"></a>CloseItem</td>
+                      <td>
+                        <pre><span class="Identifier">CloseItem</span> <span class="Symbol">:</span> <span class="Identifier">TMenuItem</span></pre>
+                  <!-- CloseItem : TMenuItem -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.CloseMenu"></a>CloseMenu</td>
+                      <td>
+                        <pre><span class="Identifier">CloseMenu</span> <span class="Symbol">:</span> <span class="Identifier">TPopupMenu</span></pre>
+                  <!-- CloseMenu : TPopupMenu -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ComboPanel"></a>ComboPanel</td>
+                      <td>
+                        <pre><span class="Identifier">ComboPanel</span> <span class="Symbol">:</span> <span class="Identifier">TPanel</span></pre>
+                  <!-- ComboPanel : TPanel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.DescGroupBox"></a>DescGroupBox</td>
+                      <td>
+                        <pre><span class="Identifier">DescGroupBox</span> <span class="Symbol">:</span> <span class="Identifier">TGroupBox</span></pre>
+                  <!-- DescGroupBox : TGroupBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.FActionManager"></a>FActionManager</td>
+                      <td>
+                        <pre><span class="Identifier">FActionManager</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionManager</span></pre>
+                  <!-- FActionManager : TCustomActionManager -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.FActiveActionList"></a>FActiveActionList</td>
+                      <td>
+                        <pre><span class="Identifier">FActiveActionList</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionList</span></pre>
+                  <!-- FActiveActionList : TCustomActionList -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.FScratchBar"></a>FScratchBar</td>
+                      <td>
+                        <pre><span class="Identifier">FScratchBar</span> <span class="Symbol">:</span> <span class="Identifier">TActionBarItem</span></pre>
+                  <!-- FScratchBar : TActionBarItem -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.FullMenusActn"></a>FullMenusActn</td>
+                      <td>
+                        <pre><span class="Identifier">FullMenusActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- FullMenusActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.HintLbl"></a>HintLbl</td>
+                      <td>
+                        <pre><span class="Identifier">HintLbl</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- HintLbl : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.InfoLbl"></a>InfoLbl</td>
+                      <td>
+                        <pre><span class="Identifier">InfoLbl</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- InfoLbl : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.Label1"></a>Label1</td>
+                      <td>
+                        <pre><span class="Identifier">Label1</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- Label1 : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.Label2"></a>Label2</td>
+                      <td>
+                        <pre><span class="Identifier">Label2</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- Label2 : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.Label4"></a>Label4</td>
+                      <td>
+                        <pre><span class="Identifier">Label4</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- Label4 : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.LargeIconsActn"></a>LargeIconsActn</td>
+                      <td>
+                        <pre><span class="Identifier">LargeIconsActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- LargeIconsActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.LargeIconsChk"></a>LargeIconsChk</td>
+                      <td>
+                        <pre><span class="Identifier">LargeIconsChk</span> <span class="Symbol">:</span> <span class="Identifier">TCheckBox</span></pre>
+                  <!-- LargeIconsChk : TCheckBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ListCombo"></a>ListCombo</td>
+                      <td>
+                        <pre><span class="Identifier">ListCombo</span> <span class="Symbol">:</span> <span class="Identifier">TComboBox</span></pre>
+                  <!-- ListCombo : TComboBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ListPanel"></a>ListPanel</td>
+                      <td>
+                        <pre><span class="Identifier">ListPanel</span> <span class="Symbol">:</span> <span class="Identifier">TPanel</span></pre>
+                  <!-- ListPanel : TPanel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.MenuAnimationStyles"></a>MenuAnimationStyles</td>
+                      <td>
+                        <pre><span class="Identifier">MenuAnimationStyles</span> <span class="Symbol">:</span> <span class="Identifier">TComboBox</span></pre>
+                  <!-- MenuAnimationStyles : TComboBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.OptionsBevel1"></a>OptionsBevel1</td>
+                      <td>
+                        <pre><span class="Identifier">OptionsBevel1</span> <span class="Symbol">:</span> <span class="Identifier">TBevel</span></pre>
+                  <!-- OptionsBevel1 : TBevel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.OptionsBevel2"></a>OptionsBevel2</td>
+                      <td>
+                        <pre><span class="Identifier">OptionsBevel2</span> <span class="Symbol">:</span> <span class="Identifier">TBevel</span></pre>
+                  <!-- OptionsBevel2 : TBevel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.OptionsTab"></a>OptionsTab</td>
+                      <td>
+                        <pre><span class="Identifier">OptionsTab</span> <span class="Symbol">:</span> <span class="Identifier">TTabSheet</span></pre>
+                  <!-- OptionsTab : TTabSheet -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.OtherLbl"></a>OtherLbl</td>
+                      <td>
+                        <pre><span class="Identifier">OtherLbl</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- OtherLbl : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.PersonalizeLbl"></a>PersonalizeLbl</td>
+                      <td>
+                        <pre><span class="Identifier">PersonalizeLbl</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- PersonalizeLbl : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.RecentlyUsedActn"></a>RecentlyUsedActn</td>
+                      <td>
+                        <pre><span class="Identifier">RecentlyUsedActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- RecentlyUsedActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.RecentlyUsedChk"></a>RecentlyUsedChk</td>
+                      <td>
+                        <pre><span class="Identifier">RecentlyUsedChk</span> <span class="Symbol">:</span> <span class="Identifier">TCheckBox</span></pre>
+                  <!-- RecentlyUsedChk : TCheckBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ResetActn"></a>ResetActn</td>
+                      <td>
+                        <pre><span class="Identifier">ResetActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- ResetActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ResetBtn"></a>ResetBtn</td>
+                      <td>
+                        <pre><span class="Identifier">ResetBtn</span> <span class="Symbol">:</span> <span class="Identifier">TButton</span></pre>
+                  <!-- ResetBtn : TButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ResetUsageBtn"></a>ResetUsageBtn</td>
+                      <td>
+                        <pre><span class="Identifier">ResetUsageBtn</span> <span class="Symbol">:</span> <span class="Identifier">TButton</span></pre>
+                  <!-- ResetUsageBtn : TButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ResetUsageDataActn"></a>ResetUsageDataActn</td>
+                      <td>
+                        <pre><span class="Identifier">ResetUsageDataActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- ResetUsageDataActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.SeparatorBtn"></a>SeparatorBtn</td>
+                      <td>
+                        <pre><span class="Identifier">SeparatorBtn</span> <span class="Symbol">:</span> <span class="Identifier">TButton</span></pre>
+                  <!-- SeparatorBtn : TButton -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ShortCutTipsChk"></a>ShortCutTipsChk</td>
+                      <td>
+                        <pre><span class="Identifier">ShortCutTipsChk</span> <span class="Symbol">:</span> <span class="Identifier">TCheckBox</span></pre>
+                  <!-- ShortCutTipsChk : TCheckBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ShowHintsActn"></a>ShowHintsActn</td>
+                      <td>
+                        <pre><span class="Identifier">ShowHintsActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- ShowHintsActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ShowShortCutsInTipsActn"></a>ShowShortCutsInTipsActn</td>
+                      <td>
+                        <pre><span class="Identifier">ShowShortCutsInTipsActn</span> <span class="Symbol">:</span> <span class="Identifier">TAction</span></pre>
+                  <!-- ShowShortCutsInTipsActn : TAction -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ShowTipsChk"></a>ShowTipsChk</td>
+                      <td>
+                        <pre><span class="Identifier">ShowTipsChk</span> <span class="Symbol">:</span> <span class="Identifier">TCheckBox</span></pre>
+                  <!-- ShowTipsChk : TCheckBox -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.Tabs"></a>Tabs</td>
+                      <td>
+                        <pre><span class="Identifier">Tabs</span> <span class="Symbol">:</span> <span class="Identifier">TPageControl</span></pre>
+                  <!-- Tabs : TPageControl -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ToolbarsLbl"></a>ToolbarsLbl</td>
+                      <td>
+                        <pre><span class="Identifier">ToolbarsLbl</span> <span class="Symbol">:</span> <span class="Identifier">TLabel</span></pre>
+                  <!-- ToolbarsLbl : TLabel -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedField.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Fields.ToolbarsTab"></a>ToolbarsTab</td>
+                      <td>
+                        <pre><span class="Identifier">ToolbarsTab</span> <span class="Symbol">:</span> <span class="Identifier">TTabSheet</span></pre>
+                  <!-- ToolbarsTab : TTabSheet -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Methods -->
+              <h3><img class="verticallymiddle" src="Images/ImplementedMethodsLabel.gif" alt=""/>&nbsp;<a name="Methods3"></a>Methods</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ActionBarListClick"></a>ActionBarListClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionBarListClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ActionBarListClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ActionBarListClickCheck"></a>ActionBarListClickCheck</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionBarListClickCheck</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ActionBarListClickCheck(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ActionsListClick"></a>ActionsListClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ActionsListClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ActionsListData"></a>ActionsListData</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListData</span><span class="Symbol">(</span>
+  <span class="Identifier">Control</span> <span class="Symbol">:</span> <span class="Identifier">TWinControl</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Data</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ActionsListData(
+  Control : TWinControl;
+  Index : Integer;
+  var Data : string
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ActionsListDrawItem"></a>ActionsListDrawItem</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListDrawItem</span><span class="Symbol">(</span>
+  <span class="Identifier">Control</span> <span class="Symbol">:</span> <span class="Identifier">TWinControl</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="Identifier">Rect</span> <span class="Symbol">:</span> <span class="Identifier">TRect</span><span class="Symbol">;</span>
+  <span class="Identifier">State</span> <span class="Symbol">:</span> <span class="Identifier">TOwnerDrawState</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ActionsListDrawItem(
+  Control : TWinControl;
+  Index : Integer;
+  Rect : TRect;
+  State : TOwnerDrawState
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ActionsListMeasureItem"></a>ActionsListMeasureItem</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListMeasureItem</span><span class="Symbol">(</span>
+  <span class="Identifier">Control</span> <span class="Symbol">:</span> <span class="Identifier">TWinControl</span><span class="Symbol">;</span>
+  <span class="ReservedWord">Index</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Height</span> <span class="Symbol">:</span> <span class="Identifier">Integer</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ActionsListMeasureItem(
+  Control : TWinControl;
+  Index : Integer;
+  var Height : Integer
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ActionsListStartDrag"></a>ActionsListStartDrag</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ActionsListStartDrag</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">DragObject</span> <span class="Symbol">:</span> <span class="Identifier">TDragObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ActionsListStartDrag(
+  Sender : TObject;
+  var DragObject : TDragObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.AddAction"></a>AddAction</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">AddAction</span><span class="Symbol">(</span>
+  <span class="Identifier">AnAction</span> <span class="Symbol">:</span> <span class="Identifier">TContainedAction</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="ReservedWord">string</span></pre>
+                  <!-- Function AddAction(
+  AnAction : TContainedAction
+) : string -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ApplyToAllActnUpdate"></a>ApplyToAllActnUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ApplyToAllActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ApplyToAllActnUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.CaptionOptionsComboChange"></a>CaptionOptionsComboChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CaptionOptionsComboChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure CaptionOptionsComboChange(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.CatListClick"></a>CatListClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CatListClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure CatListClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.CatListStartDrag"></a>CatListStartDrag</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CatListStartDrag</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">DragObject</span> <span class="Symbol">:</span> <span class="Identifier">TDragObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure CatListStartDrag(
+  Sender : TObject;
+  var DragObject : TDragObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ClearCatList"></a>ClearCatList</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ClearCatList</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure ClearCatList; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.CloseBtnClick"></a>CloseBtnClick</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CloseBtnClick</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure CloseBtnClick(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.CMVisiblechanged"></a>CMVisiblechanged</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">CMVisiblechanged</span><span class="Symbol">(</span>
+  <span class="ReservedWord">var</span> <span class="ReservedWord">Message</span> <span class="Symbol">:</span> <span class="Identifier">TMessage</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">Message</span> <span class="Identifier">CM_VISIBLECHANGED</span></pre>
+                  <!-- Procedure CMVisiblechanged(
+  var Message : TMessage
+); Message CM_VISIBLECHANGED -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.FindActionBars"></a>FindActionBars</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FindActionBars</span></pre>
+                  <!-- Procedure FindActionBars -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.FormClose"></a>FormClose</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormClose</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Action</span> <span class="Symbol">:</span> <span class="Identifier">TCloseAction</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormClose(
+  Sender : TObject;
+  var Action : TCloseAction
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.FormCreate"></a>FormCreate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormCreate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormCreate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.FormResize"></a>FormResize</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">FormResize</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure FormResize(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedFunction.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.IsDupShortCut"></a>IsDupShortCut</td>
+                      <td>
+                        <pre><span class="ReservedWord">Function</span> <span class="Identifier">IsDupShortCut</span><span class="Symbol">(</span>
+  <span class="Identifier">AShortCut</span> <span class="Symbol">:</span> <span class="Identifier">TShortCut</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">Action</span> <span class="Symbol">:</span> <span class="Identifier">TContainedAction</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Boolean</span></pre>
+                  <!-- Function IsDupShortCut(
+  AShortCut : TShortCut;
+  var Action : TContainedAction
+) : Boolean -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.LargeIconsActnExecute"></a>LargeIconsActnExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LargeIconsActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure LargeIconsActnExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.LargeIconsActnUpdate"></a>LargeIconsActnUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">LargeIconsActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure LargeIconsActnUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ListComboSelect"></a>ListComboSelect</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ListComboSelect</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ListComboSelect(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.MenuAnimationStylesChange"></a>MenuAnimationStylesChange</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">MenuAnimationStylesChange</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure MenuAnimationStylesChange(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.Notification"></a>Notification</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">Notification</span><span class="Symbol">(</span>
+  <span class="Identifier">AComponent</span> <span class="Symbol">:</span> <span class="Identifier">TComponent</span><span class="Symbol">;</span>
+  <span class="Identifier">Operation</span> <span class="Symbol">:</span> <span class="Identifier">TOperation</span>
+<span class="Symbol">)</span><span class="Symbol">;</span> <span class="ReservedWord">override</span></pre>
+                  <!-- Procedure Notification(
+  AComponent : TComponent;
+  Operation : TOperation
+); override -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.RecentlyUsedActnExecute"></a>RecentlyUsedActnExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">RecentlyUsedActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure RecentlyUsedActnExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.RecentlyUsedActnUpdate"></a>RecentlyUsedActnUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">RecentlyUsedActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure RecentlyUsedActnUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ResetActnExecute"></a>ResetActnExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ResetActnExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ResetActnUpdate"></a>ResetActnUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ResetActnUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ResetUsageDataActnExecute"></a>ResetUsageDataActnExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ResetUsageDataActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ResetUsageDataActnExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.SeparatorBtnStartDrag"></a>SeparatorBtnStartDrag</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SeparatorBtnStartDrag</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span><span class="Symbol">;</span>
+  <span class="ReservedWord">var</span> <span class="Identifier">DragObject</span> <span class="Symbol">:</span> <span class="Identifier">TDragObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SeparatorBtnStartDrag(
+  Sender : TObject;
+  var DragObject : TDragObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.SetActionManager"></a>SetActionManager</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetActionManager</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionManager</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetActionManager(
+  const Value : TCustomActionManager
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.SetActiveActionList"></a>SetActiveActionList</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetActiveActionList</span><span class="Symbol">(</span>
+  <span class="ReservedWord">const</span> <span class="Identifier">Value</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionList</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure SetActiveActionList(
+  const Value : TCustomActionList
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PrivateProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.SetupListCombo"></a>SetupListCombo</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">SetupListCombo</span></pre>
+                  <!-- Procedure SetupListCombo -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ShowHintsActnExecute"></a>ShowHintsActnExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowHintsActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ShowHintsActnExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ShowHintsActnUpdate"></a>ShowHintsActnUpdate</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowHintsActnUpdate</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ShowHintsActnUpdate(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublishedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.ShowShortCutsInTipsActnExecute"></a>ShowShortCutsInTipsActnExecute</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">ShowShortCutsInTipsActnExecute</span><span class="Symbol">(</span>
+  <span class="Identifier">Sender</span> <span class="Symbol">:</span> <span class="Identifier">TObject</span>
+<span class="Symbol">)</span></pre>
+                  <!-- Procedure ShowShortCutsInTipsActnExecute(
+  Sender : TObject
+) -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/ProtectedProcedure.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Methods.UpdateDialog"></a>UpdateDialog</td>
+                      <td>
+                        <pre><span class="ReservedWord">Procedure</span> <span class="Identifier">UpdateDialog</span><span class="Symbol">;</span> <span class="ReservedWord">virtual</span></pre>
+                  <!-- Procedure UpdateDialog; virtual -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+              <!-- Properties -->
+              <h3><img class="verticallymiddle" src="Images/PropertyLabel.gif" alt=""/>&nbsp;<a name="Properties3"></a>Properties</h3>
+              <div class="Indent">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data / Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Properties.ActionManager"></a>ActionManager</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ActionManager</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionManager</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FActionManager</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetActionManager</span>
+</pre>
+                  <!-- Property ActionManager : TCustomActionManager
+  Read FActionManager
+  Write SetActionManager
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img class="verticallymiddle" src="Images/PublicProperty.gif" alt=""/>&nbsp;<a name="Types.TCustomizeFrm.Properties.ActiveActionList"></a>ActiveActionList</td>
+                      <td>
+                        <pre><span class="ReservedWord">Property</span> <span class="Identifier">ActiveActionList</span> <span class="Symbol">:</span> <span class="Identifier">TCustomActionList</span>
+  <span class="ReservedWord">Read</span> <span class="Identifier">FActiveActionList</span>
+  <span class="ReservedWord">Write</span> <span class="Identifier">SetActiveActionList</span>
+</pre>
+                  <!-- Property ActiveActionList : TCustomActionList
+  Read FActiveActionList
+  Write SetActiveActionList
+ -->
+                  <div class="Indent">
+                  </div>
+      
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+      
+              </div>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ActnCtrls"></a>ActnCtrls</td>
+              <td>
+                <pre><span class="Identifier">ActnCtrls</span></pre>
+          <!-- ActnCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ActnList"></a>ActnList</td>
+              <td>
+                <pre><span class="Identifier">ActnList</span></pre>
+          <!-- ActnList -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ActnMan"></a>ActnMan</td>
+              <td>
+                <pre><span class="Identifier">ActnMan</span></pre>
+          <!-- ActnMan -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ActnMenus"></a>ActnMenus</td>
+              <td>
+                <pre><span class="Identifier">ActnMenus</span></pre>
+          <!-- ActnMenus -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Buttons"></a>Buttons</td>
+              <td>
+                <pre><span class="Identifier">Buttons</span></pre>
+          <!-- Buttons -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.CheckLst"></a>CheckLst</td>
+              <td>
+                <pre><span class="Identifier">CheckLst</span></pre>
+          <!-- CheckLst -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Classes"></a>Classes</td>
+              <td>
+                <pre><span class="Identifier">Classes</span></pre>
+          <!-- Classes -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ComCtrls"></a>ComCtrls</td>
+              <td>
+                <pre><span class="Identifier">ComCtrls</span></pre>
+          <!-- ComCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Commctrl"></a>Commctrl</td>
+              <td>
+                <pre><span class="Identifier">Commctrl</span></pre>
+          <!-- Commctrl -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Consts"></a>Consts</td>
+              <td>
+                <pre><span class="Identifier">Consts</span></pre>
+          <!-- Consts -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Controls"></a>Controls</td>
+              <td>
+                <pre><span class="Identifier">Controls</span></pre>
+          <!-- Controls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Dialogs"></a>Dialogs</td>
+              <td>
+                <pre><span class="Identifier">Dialogs</span></pre>
+          <!-- Dialogs -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ExtCtrls"></a>ExtCtrls</td>
+              <td>
+                <pre><span class="Identifier">ExtCtrls</span></pre>
+          <!-- ExtCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Forms"></a>Forms</td>
+              <td>
+                <pre><span class="Identifier">Forms</span></pre>
+          <!-- Forms -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Graphics"></a>Graphics</td>
+              <td>
+                <pre><span class="Identifier">Graphics</span></pre>
+          <!-- Graphics -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.ImgList"></a>ImgList</td>
+              <td>
+                <pre><span class="Identifier">ImgList</span></pre>
+          <!-- ImgList -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Menus"></a>Menus</td>
+              <td>
+                <pre><span class="Identifier">Menus</span></pre>
+          <!-- Menus -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Messages"></a>Messages</td>
+              <td>
+                <pre><span class="Identifier">Messages</span></pre>
+          <!-- Messages -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.StdCtrls"></a>StdCtrls</td>
+              <td>
+                <pre><span class="Identifier">StdCtrls</span></pre>
+          <!-- StdCtrls -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.SysUtils"></a>SysUtils</td>
+              <td>
+                <pre><span class="Identifier">SysUtils</span></pre>
+          <!-- SysUtils -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.TypInfo"></a>TypInfo</td>
+              <td>
+                <pre><span class="Identifier">TypInfo</span></pre>
+          <!-- TypInfo -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Variants"></a>Variants</td>
+              <td>
+                <pre><span class="Identifier">Variants</span></pre>
+          <!-- Variants -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Variables -->
+      <h2><img class="verticallymiddle" src="Images/PublicVariablesLabel.gif" alt=""/>&nbsp;<a name="Variables2"></a>Variables</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateVariable.gif" alt=""/>&nbsp;<a name="Variables.CustomizeFrm"></a>CustomizeFrm</td>
+              <td>
+                <pre><span class="Identifier">CustomizeFrm</span> <span class="Symbol">:</span> <span class="Identifier">TCustomizeFrm</span></pre>
+          <!-- CustomizeFrm : TCustomizeFrm -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

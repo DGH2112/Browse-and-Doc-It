@@ -1,0 +1,804 @@
+'
+' This class represents an Exception handling class with stack tracing and
+' event logging.
+'
+' @Version 1.7
+' @Date    01 Oct 2008
+' @Author  David Hoyle
+'
+Option Explicit
+Option Compare Text
+
+' Growth capacity of the exception stack
+Private Const iCAPACITY = 20
+' A constant to indicate that the class is not a state of no exception.
+Private Const iNOEXCEPTION = 1
+' A constant to indicate that the class is not a state of an ignored exception.
+Private Const iIGNOREEXCEPTION = 2
+' A constant to indicate that the class is not a state of an aborted exception.
+Private Const iABORTEXCEPTION = 3
+
+' The stack as an array of strings
+Private FStack() As String
+' The top position of the stack
+Private FStackTop As Long
+' A private variable defining the log file path.
+Private FLogPath As String
+' A private variable to hold the state of the Exception class.
+Private FExceptionState As Long
+' A private variable to hold the Number of the Exception
+Private FNumber As Long
+' A private variable to hold the Description of the Exception
+Private FDescription As String
+' A private variable to hold the Source of the Exception
+Private FSource As String
+' A private variable to hold the Last DLL Error of the Exception
+Private FLastDLLError As Long
+' A private variable to hold the Help File of the Exception
+Private FHelpFile As String
+' A private variable to hold the Help Context of the Exception
+Private FHelpContext As Long
+
+' A private variable to hold the root of the profile tree
+Private FRootProfile As New TProfile
+' A reference to the current position in the profile tree.
+Private FCurrentProfile As TProfile
+' A private varaiable to determine of the application should be profiled
+Private FProfileApp As Boolean
+' A private variable to hold the time thresh hold for dumping profiles.
+Private FProfileTimeThreadHold As Long
+
+'
+' The GetUserName function retrieves the user name of the current thread. This
+' is the name of the user currently logged onto the system.
+'
+' BOOL GetUserName(
+'    LPTSTR lpBuffer,  // address of name buffer
+'    LPDWORD nSize   // address of size of name buffer
+'   );
+'
+' @Version 1.0
+' @Date    18 Aug 2003
+'
+' @precon  lpBuffer must be a string initialiss to at least nSize length.
+' @postcon Retrieves the user name of the current thread
+'
+' @Remark If the current thread is impersonating another client, the GetUserName
+'         function returns the user name of the client that the thread is
+'         impersonating.
+'
+' @param  lpBuffer as a String - Points to the buffer to receive the
+'         null-terminated string containing the user's logon name. If this
+'         buffer is not large enough to contain the entire user name, the
+'         function fails.
+' @param  nSize as a Long - Pointer to a DWORD that, on input, specifies the
+'         maximum size, in characters, of the buffer specified by the lpBuffer
+'         parameter. If this buffer is not large enough to contain the entire
+'         user name, the function fails. If the function succeeds, it will place
+'         the number of characters copied to the buffer into the DWORD that
+'         nSize points to.
+'
+' @return a Long - If the function succeeds, the return value is nonzero, and
+'         the variable pointed to by nSize contains the number of characters
+'         copied to the buffer specified by lpBuffer, including the terminating
+'         null character If the function fails, the return value is zero. To get
+'         extended error information, call GetLastError.
+'
+Private Declare Function GetUserName Lib "advapi32.dll" Alias "GetUserNameA" ( _
+  ByVal lpBuffer As String, nSize As Long) As Long
+
+'
+' The GetComputerName function retrieves the computer name of the current
+' system. This name is established at system startup, when it is initialized
+' from the registry.
+'
+' BOOL GetComputerName(
+'    LPTSTR lpBuffer,  // address of name buffer
+'    LPDWORD nSize   // address of size of name buffer
+'   );
+'
+' @Version 1.0
+' @Date    18 Aug 2003
+'
+' @precon  lpBuffer must be a string initialiss to at least nSize length.
+' @postcon Retrieves the computer name of the current system
+'
+' @param   lpBuffer as a String - Points to a buffer to receive the
+'          null-terminated character string containing the computer name.
+' @param   nSize as a Long - Points to a variable that specifies the maximum
+'          size, in characters, of the buffer. This value should be large enough
+'          to contain MAX_COMPUTERNAME_LENGTH + 1 characters.
+' @return  as Long - If the function succeeds, the return value is nonzero and
+'          the variable represented by the nSize parameter contains the number
+'          of characters copied to the destination buffer, not including the
+'          terminating null character If the function fails, the return value is
+'          zero. To get extended error information, call GetLastError.
+'
+Private Declare Function GetComputerName Lib "kernel32" Alias "GetComputerNameA" ( _
+  ByVal lpBuffer As String, nSize As Long) As Long
+
+'
+' The GetTempPath function retrieves the path of the directory designated for
+' temporary files. This function supersedes the GetTempDrive function.
+'
+' DWORD GetTempPath(
+'   DWORD  nBufferLength,  // size, in characters, of the buffer
+'   LPTSTR lpBuffer        // address of buffer for temp. path
+' );
+'
+' @Version 1.0
+' @Date    18 Aug 2003
+'
+' @precon  lpBuffer must be a string initialises to at least nBufferLength in
+'          size.
+' @postcon Retrieves the path of the directory designated for temporary files
+'
+' @Remarks
+'
+' The GetTempPath function gets the temporary file path as follows:
+'
+'  1.  The path specified by the TMP environment variable.
+'  2.  The path specified by the TEMP environment variable, if TMP is not
+'      defined.
+'  3.  The current directory, if both TMP and TEMP are not defined.
+'
+' @See GetTempFileName
+'
+' @param nBufferLength as a Long - Specifies the size, in characters, of the
+'        string buffer identified by lpBuffer.
+'
+' @param lpBuffer as a String - Points to a string buffer that receives the
+'        null-terminated string specifying the temporary file path.
+' @return a Long - If the function succeeds, the return value is the length, in
+'         characters, of the string copied to lpBuffer, not including the
+'         terminating null character. If the return value is greater than
+'         nBufferLength, the return value is the size of the buffer required to
+'         hold the path. If the function fails, the return value is zero. To get
+'         extended error information, call GetLastError.
+'
+Private Declare Function GetTempPath Lib "kernel32" Alias "GetTempPathA" ( _
+  ByVal nBufferLength As Long, ByVal lpBuffer As String) As Long
+
+'
+' The GetEnvironmentVariable function retrieves the value of the specified
+' variable from the environment block of the calling process. The value is
+' in the form of a null-terminated string of characters.
+'
+' DWORD GetEnvironmentVariable(
+'    LPCTSTR lpName, // address of environment variable name
+'    LPTSTR lpBuffer,  // address of buffer for variable value
+'    DWORD nSize   // size of buffer, in characters
+'   );
+'
+' @precon  nBufferLength must be set to the length of a valid lpBuffer.
+' @postcon Function retrieves the value of the specified
+'          variable from the environment block of the calling process.
+'
+' @param   lpName as a String - Points to a null-terminated string that
+'          specifies the environment variable.
+' @param   lpBuffer as a String - Points to a buffer to receive the value of
+'          the specified environment variable.
+' @param   nSize as a Long - Specifies the size, in characters, of the buffer
+'          pointed to by the lpBuffer parameter.
+'
+' @return  a Long - If the function succeeds, the return value is the number of
+'                   characters stored into the buffer pointed to by lpBuffer,
+'                   not including the terminating null character.
+'                   If the specified environment variable name was not found in
+'                   the environment block for the current process, the return
+'                   value is zero.
+'                   If the buffer pointed to by lpBuffer is not large enough, the
+'                   return value is the buffer size, in characters, required to
+'                   hold the value string and its terminating null character.
+'
+' @see     GetEnvironmentStrings , SetEnvironmentVariable
+'
+Private Declare Function GetEnvironmentVariable Lib "kernel32" _
+  Alias "GetEnvironmentVariableA" (ByVal lpName As String, _
+  ByVal lpBuffer As String, ByVal nSize As Long) As Long
+
+'Private constant for the SHGetFolderPath function
+Private Const CSIDL_PERSONAL = &H5
+
+'Private constant for the SHGetFolderPath function
+Private Const SHGFP_TYPE_CURRENT = &H0
+
+'
+' Takes the CSIDL of a folder and returns the path.
+'
+' Syntax
+'
+' HRESULT SHGetFolderPath(          HWND hwndOwner,
+'    int nFolder,
+'    HANDLE hToken,
+'    DWORD dwFlags,
+'    LPTSTR pszPath
+' );
+' Parameters
+'
+' @precon  None.
+' @postcon Takes the CSIDL of a folder and returns the path.
+'
+' @param   hwndOwner as a Long - [in] Handle to an owner window. This parameter is
+'                                typically set to NULL. If it is not NULL, and a
+'                                dial-up connection needs to be made to access the
+'                                folder, a user interface (UI) prompt will appear in
+'                                this window.
+' @param   nFolder as a Long -   [in] A CSIDL value that identifies the folder whose
+'                                path is to be retrieved. Only real folders are valid.
+'                                If a virtual folder is specified, this function will
+'                                fail. You can force creation of a folder with
+'                                SHGetFolderPath by combining the folder's CSIDL with
+'                                CSIDL_FLAG_CREATE.
+' @param   hToken as a Long -    [in] An access token that can be used to represent a
+'                                particular user. For systems earlier than Microsoft
+'                                Windows 2000, it should be set to NULL. For later
+'                                systems, hToken is usually set to NULL. However, you
+'                                may need to assign a value to hToken for those
+'                                folders that can have multiple users but are treated
+'                                as belonging to a single user. The most commonly used
+'                                folder of this type is My Documents.
+'
+' The caller is responsible for correct impersonation when hToken is non-NULL. It
+' must have appropriate security privileges for the particular user, including
+' TOKEN_QUERY and TOKEN_IMPERSONATE, and the user's registry hive must be currently
+' mounted. See Access Control for further discussion of access control issues.
+'
+' Assigning the hToken parameter a value of -1 indicates the Default User. This
+' allows clients of SHGetFolderPath to find folder locations (such as the Desktop
+' folder) for the Default User. The Default User user profile is duplicated when any
+' new user account is created, and includes special folders such as My Documents and
+' Desktop. Any items added to the Default User folder also appear in any new user
+' account.
+'
+' @param  dwFlags as a Long -    [in] Flags to specify which path is to be returned.
+'                                It is used for cases where the folder associated
+'                                with a CSIDL may be moved or renamed by the user.
+'
+' SHGFP_TYPE_CURRENT
+' Return the folder's current path.
+' SHGFP_TYPE_DEFAULT
+' Return the folder's default path.
+'
+' @param  pszPath as a String    [out] Pointer to a null-terminated string of length
+'                                MAX_PATH which will receive the path. If an error
+'                                occurs or S_FALSE is returned, this string will be
+'                                empty.
+' @Return  a Long - Returns standard HRESULT codes, including the following:
+'
+' S_FALSE SHGetFolderPathA only. The CSIDL in nFolder is valid, but the folder does not exist. Note that the failure code is different for the ANSI and Unicode versions of this function.
+' E_FAIL SHGetFolderPathW only. The CSIDL in nFolder is valid, but the folder does not exist. Note that the failure code is different for the ANSI and Unicode versions of this function.
+' E_INVALIDARG The CSIDL in nFolder is not valid.
+'
+' @remarks - This function is a superset of SHGetSpecialFolderPath, included with
+' earlier versions of the Shell. On systems preceeding those including Shell32.dll
+' version 5.0 (Windows Millennium Edition (Windows Me) and Windows 2000),
+' SHGetFolderPath was obtained through SHFolder.dll, distributed with Microsoft
+' Internet Explorer 4.0 and later versions. SHFolder.dll always calls the current
+' platform's version of this function. If that fails, it will try to simulate the
+' appropriate behavior. SHFolder.dll continues to be included for backward
+' compatibility, though the function is now implemented in Shell32.dll.
+'
+Private Declare Function SHGetFolderPath Lib "shfolder.dll" _
+   Alias "SHGetFolderPathA" (ByVal hwndOwner As Long, ByVal nFolder As Long, _
+   ByVal hToken As Long, ByVal dwFlags As Long, ByVal pszPath As String) As Long
+
+Private Declare Function RegOpenKeyEx Lib "advapi32.dll" Alias "RegOpenKeyExA" (ByVal hKey As Long, _
+  ByVal lpSubKey As String, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
+
+Private Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
+
+Private Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, _
+  ByVal lpValueName As String, ByVal lpReserved As Long, lpType As Long, lpData As Any, lpcbData As Long) As Long         ' Note that if you declare the lpData parameter as String, you must pass it By Value.
+
+'
+' This function pushes the current method call onto a trace stack for debugging
+' and error logging
+'
+' @Version 1.4
+' @Date    30 May 2008
+'
+' @precon  None.
+' @postcon Pushes onto the top of the stack a method declaration for the current
+'          method.
+'
+' @param   strMethod as a String
+' @param   varArray as an Variant array
+'
+' @noerror
+' @noexception
+'
+Public Sub Push(strMethod As String, ParamArray varArray())
+  Dim i As Long
+  If FStackTop = 0 Then
+    FExceptionState = iNOEXCEPTION
+    If FProfileApp Then
+      ' Set profiling on start of new procedure
+      Set FRootProfile = Nothing
+      Set FCurrentProfile = FRootProfile
+    End If
+  End If
+  FStackTop = FStackTop + 1
+  If FStackTop > UBound(FStack) Then _
+    ReDim Preserve FStack(1 To UBound(FStack) + iCAPACITY)
+  FStack(FStackTop) = strMethod & "("
+  For i = LBound(varArray) To UBound(varArray)
+    FStack(FStackTop) = FStack(FStackTop) & GetDataValue(varArray(i))
+    If i <> UBound(varArray) Then FStack(FStackTop) = FStack(FStackTop) & ", "
+  Next i
+  FStack(FStackTop) = FStack(FStackTop) & ")"
+  If FProfileApp Then
+    Set FCurrentProfile = FCurrentProfile.StartProfile(strMethod, FStackTop)
+  End If
+End Sub
+
+'
+' This method pops the current method off the top of the trace stack
+'
+' @Version 1.5
+' @Date    18 Jan 2006
+'
+' @param   strMethod as a String
+'
+' @precon  None.
+' @postcon pop off the top of the stack the exiting method call.
+'
+' @noerror
+' @noexception
+'
+Public Sub Pop(Optional strMethod As String = "")
+  If strMethod <> "" Then
+    If Not FStack(FStackTop) Like strMethod & "*" Then
+      MsgBox "TException Error:" & vbLf & "PUSHED " & FStack(FStackTop) & vbLf & _
+        "POPPED " & strMethod, , AppName
+    End If
+  End If
+  FStackTop = FStackTop - 1
+  If FStackTop < 0 Then FStackTop = 0
+  If FStackTop = 0 Then
+    FExceptionState = iNOEXCEPTION
+    Err.Clear
+  Else
+    If FExceptionState = iABORTEXCEPTION Then
+      Err.Raise FNumber, FSource, FDescription, FHelpFile, FHelpContext
+    Else
+      FExceptionState = iNOEXCEPTION
+    End If
+  End If
+  If FProfileApp Then
+    Set FCurrentProfile = FCurrentProfile.StopProfile()
+    If FStackTop = 0 Then DumpProfileInformation
+  End If
+End Sub
+
+'
+' This method displays the current state of the trace stack
+'
+' @Version 1.1
+' @Date    18 Aug 2003
+'
+' @precon  None.
+' @postcon Returns a string representing the current call stack.
+'
+' @return a String
+'
+' @noexception
+'
+Private Function GetStackTrace() As String
+  Dim i As Long
+  On Error GoTo ErrHnd
+  GetStackTrace = ""
+  For i = 1 To FStackTop
+    GetStackTrace = GetStackTrace & "[" & i & "]" & String(i * 2, " ") & _
+      FStack(i) & vbCrLf
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then ShowError Err, "TException.GetStackTrace"
+End Function
+
+'
+' This is the classes constructor event handler.
+'
+' @Version 1.3
+' @Date    04 Jan 2005
+'
+' @precon  None.
+' @postcon Initialises the stack of the class.
+' @noexception
+'
+Private Sub Class_Initialize()
+  Dim iLen As Long
+  Dim lpBuffer As String
+  On Error GoTo ErrHnd
+  FStackTop = 0
+  ReDim FStack(1 To iCAPACITY)
+  'FLogPath = String(1024, Chr$(0))
+  'i = GetTempPath(1024, FLogPath)
+  'LogPath = Left$(FLogPath, i)
+  FLogPath = ThisWorkbook.Path & "\"
+  lpBuffer = String(1024, Chr$(0))
+  iLen = GetEnvironmentVariable("DGHProfileVBACode", lpBuffer, Len(lpBuffer))
+  If iLen > 0 Then FProfileApp = (Left$(lpBuffer, iLen) = "Yes")
+  FProfileTimeThreadHold = &HFFFFFF
+  lpBuffer = String(1024, Chr$(0))
+  iLen = GetEnvironmentVariable("DGHProfiletimeThreshHold", lpBuffer, Len(lpBuffer))
+  If iLen > 0 Then
+    lpBuffer = Left$(lpBuffer, iLen)
+    If IsNumeric(lpBuffer) Then FProfileTimeThreadHold = CLng(lpBuffer)
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then ShowError Err, "TException.Class_Initialize"
+End Sub
+
+'
+' This procedure is a generic error handler. If displays the error message with
+' information on the screen and also logs the information to a file.
+'
+' @Version 1.3
+' @Date    04 Sep 2007
+'
+' @precon  None.
+' @postcon Displays an error message on the screen for the error that occurred
+'          and writes the error to the event log.
+'
+' @param   Err as an ErrObject
+' @param   boolWriteToLog as a Boolean
+'
+' @noerror
+' @noexception
+'
+Sub DisplayErrorMessage(Err As ErrObject, _
+  Optional boolWriteToLog As Boolean = True)
+  Dim strMsg As String
+  Dim strStackTrace As String
+  If FExceptionState = iNOEXCEPTION Then
+    FNumber = Err.Number
+    FDescription = RemoveNulls(Err.Description)
+    FSource = Err.Source
+    FLastDLLError = Err.LastDllError
+    FHelpFile = Err.HelpFile
+    FHelpContext = Err.HelpContext
+    strStackTrace = GetStackTrace
+    strMsg = "The following error has occurred:" & vbCrLf & vbCrLf & _
+      "Description:     " & vbTab & FDescription & vbCrLf & vbCrLf & _
+      "Number:          " & vbTab & FNumber & vbCrLf & _
+      "HelpContext:     " & vbTab & FHelpContext & vbCrLf & _
+      "HelpFile:        " & vbTab & FHelpFile & vbCrLf & _
+      "LastDLLError:    " & vbTab & FLastDLLError & vbCrLf & _
+      "Source:          " & vbTab & FSource & vbCrLf & vbCrLf & _
+      "Stace Trace:     " & vbCrLf & vbCrLf & strStackTrace
+    If boolWriteToLog Then WriteEventLog strStackTrace
+    Select Case MsgBox(strMsg, vbCritical + vbMsgBoxHelpButton + _
+      vbAbortRetryIgnore + vbDefaultButton1 + vbMsgBoxSetForeground, _
+      AppName, FHelpFile, FHelpContext)
+      Case vbAbort
+        FExceptionState = iABORTEXCEPTION
+      Case vbIgnore, vbRetry
+        FExceptionState = iIGNOREEXCEPTION
+    End Select
+  End If
+  Err.Clear ' Clear the original exception
+End Sub
+
+'
+' This function returns the value of the variant supplied.
+'
+' @Version 1.7
+' @Date    02 Jun 2008
+'
+' @precon  None.
+' @postcon Returns the value of the variant passed
+'
+' @param   varData as a variant
+' @return  a String
+' @noexception
+'
+Public Function GetDataValue(varData As Variant) As String
+  Dim i As Long
+  Dim j As Long
+  Dim v As Variant
+  Dim iArrayElements As Long
+  On Error GoTo ErrHnd
+  i = VarType(varData)
+  If (i And vbArray) > 0 Then
+    GetDataValue = ""
+    iArrayElements = 0
+    For Each v In varData
+      iArrayElements = iArrayElements + 1
+      If GetDataValue <> "" Then GetDataValue = GetDataValue & ", "
+      If iArrayElements < 4 Then
+        GetDataValue = GetDataValue & GetDataValue(v)
+      Else
+        GetDataValue = GetDataValue & "..."
+        Exit For
+      End If
+    Next v
+    GetDataValue = "[" & GetDataValue & "]"
+  Else
+    Select Case i
+      Case vbEmpty:      GetDataValue = "<Empty>"
+      Case vbNull:       GetDataValue = "<Null>"
+      Case vbInteger:    GetDataValue = varData
+      Case vbLong:       GetDataValue = varData
+      Case vbSingle:     GetDataValue = varData
+      Case vbDouble:     GetDataValue = varData
+      Case vbCurrency:   GetDataValue = varData
+      Case vbDate:       GetDataValue = varData
+      Case vbString:     GetDataValue = """" & varData & """"
+      Case vbObject:
+        If varData Is Nothing Then
+          GetDataValue = "<Nothing>"
+        Else
+          GetDataValue = "<Object>"
+        End If
+      Case vbError:      GetDataValue = "<Error> Error value"
+      Case vbBoolean:    GetDataValue = varData
+      Case vbVariant:    GetDataValue = varData
+      Case vbDataObject: GetDataValue = "A data access object"
+      Case vbDecimal:    GetDataValue = varData
+      Case vbByte:       GetDataValue = varData
+    Case Else
+      GetDataValue = "<Unknown Data Type (" & i & ")>"
+    End Select
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then
+    Err.Clear
+    GetDataValue = "[Undetermineable Data Structure]"
+  End If
+End Function
+
+'
+' This method cleans the string of problem characters.
+'
+' @Version 1.1
+' @Date    18 Aug 2003
+'
+' @precon  None.
+' @postcon Replaces the following characters with alternates:
+'          (") Double Quote with (') Single Quote
+'          Line Feed and Carriage Return with a Pipe (|)
+'          Null character with a space ( )
+'
+' @param   strText as a String
+' @return  a String
+' @noexception
+'
+Private Function CleanString(strText As String) As String
+  Dim i As Long
+  On Error GoTo ErrHnd
+  For i = 1 To Len(strText)
+    Select Case Mid$(strText, i, 1)
+      Case """": CleanString = CleanString + "'"
+      Case vbLf, vbCr: CleanString = CleanString + "|"
+      Case Chr$(0): CleanString = CleanString + " "
+    Case Else
+      CleanString = CleanString + Mid$(strText, i, 1)
+    End Select
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then _
+    ShowError Err, "TException.CleanString(" & strText & ")"
+End Function
+
+'
+' This procedure outputs the message to the event log.
+'
+' @Version 1.2
+' @Date    10 Oct 2005
+'
+' @precon  None.
+' @postcon Writes the passed error to the event log.
+'
+' @param   strDetails as a String
+' @noexception
+'
+Private Sub WriteEventLog(strDetails As String)
+  Const strIdentifer = "EventLogVersion10"
+  Const strHeader = "Number,Description,Source,LastDLLError,HelpFile," & _
+    "HelpContext,Login,Computer,Date,Time,Details"
+  Dim strFileName As String
+  Dim iFile As Long
+  Dim boolNew As Boolean
+  On Error GoTo ErrHnd
+  strFileName = FLogPath & AppName & " Event Log.elg"
+  boolNew = (Dir$(strFileName) = "")
+  iFile = FreeFile
+  Open strFileName For Append Access Write Lock Write As #iFile
+  If boolNew Then
+    Print #iFile, strIdentifer
+    Print #iFile, strHeader
+  End If
+  Print #iFile, FormatString("%param%,""%param%"",""%param%"",%param%," & _
+    """%param%"",%param%,""%param%"",""%param%"",%param%,%param%,""%param%""", _
+    FNumber, CleanString(FDescription), FSource, FLastDLLError, FHelpFile, _
+    FHelpContext, GetCurrentUserName, GetCurrentComputerName, _
+    Format(Now, "dd/mmm/yyyy"), Format(Now, "hh:mm:ss"), _
+    CleanString(strDetails))
+  Close #iFile
+ErrHnd:
+  If Err.Number <> 0 Then _
+    MsgBox "There was an error writing the event log:" & vbLf & _
+    Err.Number & ", " & Err.Description & vbLf & _
+    "Original error: " & vbLf & FNumber & ", " & FDescription, , AppName
+End Sub
+
+'
+' This method provides a mechanism for displaying an erro in this exception
+' class with out using this class's exception handling and thus causing a
+' potential cascading error.
+'
+' @Version 1.1
+' @Date    18 Aug 2003
+'
+' @precon  None.
+' @postcon provides a mechanism for displaying an erro in this exception class
+'          with out using this class's exception handling and thus causing a
+'          potential cascading error.
+'
+' @param   Err as an ErrObject
+' @param   strMethod as a String
+'
+' @noexception
+' @noerror
+'
+Private Sub ShowError(Err As ErrObject, strMethod As String)
+  MsgBox "An unhandled error has occurred in method : " & strMethod & vbLf & _
+    vbLf & "Number : " & Err.Number & vbLf & "Description : " & Err.Description
+End Sub
+
+'
+' This method remove any null terminators from the string passed and returns the
+' string before the null
+'
+' @Version 1.1
+' @Date    18 Aug 2003
+'
+' @precon  None.
+' @postcon Returns the passed string minus the null terminator.
+'
+' @param   strText as a String
+' @return  a String
+'
+' @noexception
+'
+Function RemoveNulls(strText As String) As String
+  On Error GoTo ErrHnd
+  RemoveNulls = strText
+  If InStr(strText, Chr$(0)) > 0 Then _
+    RemoveNulls = Left$(strText, InStr(strText, Chr$(0)) - 1)
+ErrHnd:
+  If Err.Number <> 0 Then _
+    ShowError Err, "TException.RemoveNulls(" & strText & ")"
+End Function
+
+'
+' This is a wrapper for the windows 32 api function
+'
+' @Version 1.1
+' @Date    18 Aug 2003
+'
+' @precon  None.
+' @postcon Returns the user name of the network connection.
+'
+' @return  a String
+'
+' @noexception
+'
+Public Function GetCurrentUserName() As String
+  Const iBufSize = 1024
+  Dim str As String
+  Dim iSize As Long
+  On Error GoTo ErrHnd
+  iSize = iBufSize
+  str = String(iBufSize, Chr$(0))
+  If GetUserName(str, iSize) > 0 Then GetCurrentUserName = Left$(str, iSize - 1)
+ErrHnd:
+  If Err.Number <> 0 Then ShowError Err, "TException.GetCurrentUserName"
+End Function
+
+'
+' This is a wrapper for the windows 32 api function
+'
+' @Version 1.1
+' @Date    18 Aug 2003
+'
+' @precon  None.
+' @postcon Returns the host computer name of the network connection.
+'
+' @return  a String
+'
+' @noexception
+'
+Public Function GetCurrentComputerName() As String
+  Const iBufSize = 1024
+  Dim str As String
+  Dim iSize As Long
+  On Error GoTo ErrHnd
+  iSize = iBufSize
+  str = String(iBufSize, Chr$(0))
+  If GetComputerName(str, iSize) > 0 Then _
+    GetCurrentComputerName = Left$(str, iSize)
+ErrHnd:
+  If Err.Number <> 0 Then ShowError Err, "TException.GetCurrentComputerName"
+End Function
+
+'
+' This is a getter method for the classes LogPath property.
+'
+' @Version 1.1
+' @Date    18 Aug 2003
+'
+' @precon  None.
+' @postcon Gets the LogPath property
+'
+' @return a String
+'
+' @noexception
+'
+Public Property Get LogPath() As String
+  On Error GoTo ErrHnd
+  LogPath = FLogPath
+ErrHnd:
+  If Err.Number <> 0 Then ShowError Err, "TException.LogPath"
+End Property
+
+'
+' This is a setter method for the classes LogPath property.
+'
+' @Version 1.2
+' @Date    22 Sep 2003
+'
+' @precon  None.
+' @postcon Sets the LogPath property
+'
+' @param strLogPath as a String
+'
+' @noexception
+'
+Public Property Let LogPath(strLogPath As String)
+  On Error GoTo ErrHnd
+  FLogPath = strLogPath
+ErrHnd:
+  If Err.Number <> 0 Then ShowError Err, "TException.LogPath"
+End Property
+
+'
+' This method check for profiling and it true dumps the information to a text file.
+'
+' @Version 1.4
+' @Date    01 Oct 2008
+'
+' @precon  None.
+' @postcon Check for profiling and it true dumps the information to a text file.
+'
+' @noexception
+'
+Private Sub DumpProfileInformation()
+  Dim iFileHandle As Long
+  Dim strFileName As String
+  Dim i As Long
+  On Error GoTo ErrHnd
+  If FProfileApp And FRootProfile.TotalTime >= FProfileTimeThreadHold Then
+    iFileHandle = FreeFile
+    strFileName = ThisWorkbook.Path + "\" + ThisWorkbook.Name
+    For i = Len(strFileName) To 1 Step -1
+      If Mid$(strFileName, i, 1) = "." Then
+        strFileName = Left$(strFileName, i) + "profile"
+        Exit For
+      End If
+    Next i
+    Application.StatusBar = "Saving new profile information..."
+    Open strFileName For Append As #iFileHandle
+    Print #iFileHandle, _
+      "Profile Dump For Application " & ThisWorkbook.Path + "\" + _
+      ThisWorkbook.Name & " on " & Format(Now(), "ddd dd/mmm/yyyy hh:mm:ss")
+    Print #iFileHandle, _
+      "Stack Depth,Class,Method Name,Total Tick Count (micro sec),In Process Tick Count (micro sec),Call Count"
+    FRootProfile.DumpProfileInformation iFileHandle
+    Close #1
+    Application.StatusBar = False
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then ShowError Err, "TException.Class_Terminate"
+End Sub

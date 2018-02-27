@@ -1,0 +1,54 @@
+'
+' This routine determines the fields type and calls the appropriate sequence builder,
+' else handles it itself and returns the appropriate section of an SQL WHERE clause.
+'
+' @Version 1.1
+' @Date    01 Oct 2003
+'
+' @precon  None.
+' @postcon Name of the field as a string
+'          A string of text depicting the values required
+'          The name of the DB table containing the field / data as a string
+'          Returns a section of an SQL WHERE clause as a string
+'
+' @param   strField as a String
+' @param   varValues as a Variant
+' @param   strSrc as a String
+' @return  a String
+'
+Function GetSQLInfo(strField As String, varValues As Variant, _
+  strSrc As String) As String
+  Dim rs As Recordset
+  Exception.Push "GetSQLInfo", strField, varValues, strSrc
+  On Error GoTo ErrHnd
+  If IsNull(varValues) Then
+    GetSQLInfo = "[" & strField & "] IS NULL"
+  Else
+    Set rs = New Recordset
+    rs.Open FormatString("SELECT * FROM [%param%];", strSrc), CurrentProject.Connection, adOpenStatic
+    rs.Find FormatString("[Field Name] = '%param%'", strField)
+    If Not rs.EOF Then
+      Select Case rs.Fields("Type").Value
+        Case adBigInt, adCurrency, adDecimal, adDouble, adInteger, adNumeric, adSingle, adSmallInt, adTinyInt, _
+          adUnsignedBigInt, adUnsignedSmallInt, adUnsignedInt, adUnsignedTinyInt
+          GetSQLInfo = "(" & GetNumericSQLInfo(strField, CStr(varValues)) & ")"
+        Case adDate, adDBDate, adDBTime, adDBTimeStamp
+          GetSQLInfo = "(" & GetDateTimeSQLInfo(strField, CStr(varValues)) & ")"
+        Case adBoolean
+          GetSQLInfo = "[" & strField & "] = " & CStr(Abs(CInt(CBool(varValues))))
+        Case adBSTR, adChar, adLongVarChar, adVarChar
+          GetSQLInfo = "(" & GetTextSQLInfo(strField, CStr(varValues)) & ")"
+        Case Else
+          Err.Raise 9999, "GetSQLInfo", FormatString("The field type (%param%) for  field [%param%] was not found", _
+            rs.Fields("Type").Value, strField)
+      End Select
+    Else
+      Err.Raise 9999, "GetSQLInfo", FormatString("The field [%param%] was not found", strField)
+    End If
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  If Not rs Is Nothing Then If rs.State <> adStateClosed Then rs.Close
+  Set rs = Nothing
+  Exception.Pop
+End Function

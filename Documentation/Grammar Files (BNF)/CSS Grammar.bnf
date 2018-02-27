@@ -1,0 +1,40 @@
+/**
+
+  This is a BNF Grammar file for CSS.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    12 Apr 2017
+
+  @usesemicolon
+
+**/
+<Stylesheet>       ::= ( <CDOToken> | <CDCToken> | <WhitespaceToken> | <QuanlifiedRule> | <AtRule> )*;
+<RuleList>         ::= ( <WhiteSpaceToken> | <QualifiedRule> | <AtRule> )*;
+<AtRule>           ::= <AtKeyWordToken> [ ( <ComponentValue> )* ( ';' | <BraceBlock> ) ];
+<QualifiedRule>    ::= ( <ComponentValue> )* <BraceBlock>;
+<DeclarationList>  ::= <WS> ( <AtRule> <DelcarationList> | [ <Declaration> ] [ ';' <DeclarationList> ] );
+<Declaration>      ::= <IdentToken> <WS> ':' ( <ComponentValue> )* [ <Important> ];
+<Important>        ::= '!' <WS> 'IMPORTANT' <WS>;
+<ComponentValue>   ::= <PreservedToken> | <BraceBlock> | <ParenthesisBlock> | <SquareBlock> | <FunctionBlock>;
+<BraceBlock>       ::= '{' ( <Componentvalue> )* '}';
+<ParenthesisBlock> ::= '(' ( <Componentvalue> )* ')';
+<SquareBlock>      ::= '[' ( <Componentvalue> )* ']';
+<FunctionBlock>    ::= <FunctionToken> ( <ComponentValue> )*  ')';
+
+<Comment>          ::= '/*' ? anything but * followed by / ? '*/';
+<NewLine>          ::= '\n' | '\r\n' | '\r' | '\f';
+<WhiteSpace>       ::= <space> | '\t' | <NewLine>;
+<HexDigit>         ::= '0'..'9' | 'a'..'f' | 'A'..'F';
+<Escape>           ::= '\' ( ? not newline or hex digit ? | <HexDigit>* [ <Whitespace> ] );
+<WhitespaceToken>  ::= ( <Whitespace> )*;
+<WS>               ::= ( <WhitespaceToken> )*;
+<IdentToken>       ::= [ '-' ] ( ( 'a'..'z' | 'A'..'Z' | '_' | '-' | ? non-ASCII ? ) | <Escape> )
+                       ( ( 'a'..'z' | 'A'..'Z' | '_' | ? non-ASCII ? ) | <Escape> )*;
+<FunctionToken>    ::= <IdentToken> '(';
+<AtKeywordToken>   ::= '@' <HashToken>;
+<HashToken>        ::= '#' ( ( 'a'..'z' | 'A'..'Z' | '_' | '-' | ? non-ASCII ? ) | <Escape> )+;
+<StringToken>      ::= '"' ( ? not " \ or newline ? | <Escape> | '\' <NewLine> ) '"' |
+                       "'" ( ? not " \ or newline ? | <Escape> | '\' <NewLine> ) "'";
+<URLToken>         ::= 'URL' '(' <WS>* [ ( <URLUnquoted> | <StringToken> ) <WS>* ] ')';
+<URLUnquoted>      ::= [ ( ? not " ' ( ) / whitespace or non-printable ? | <Escape> ) ];

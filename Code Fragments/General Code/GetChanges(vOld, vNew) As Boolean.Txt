@@ -1,0 +1,26 @@
+'
+' Routine to determine if a field has been modified
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon Old field value as a variant (could be null)
+'          New field value as a variant (could be null)
+'          Returns True if the values are not the same
+'
+' @param vOld as a variant
+' @param vNew as a variant
+' @return a boolean
+'
+Function GetChanges(vOld As Variant, vNew As Variant) As Boolean
+  On Error GoTo ErrHnd
+  Exception.Push "GetChanges", vOld, vNew
+  On Error Resume Next
+  ' Check for null values first
+  GetChanges = (IsNull(vOld) <> IsNull(vNew))
+  GetChanges = GetChanges Or (vOld <> vNew)
+ErrHnd:
+  If Err.Number <> 0 Then Err.Clear
+  Exception.Pop
+End Function

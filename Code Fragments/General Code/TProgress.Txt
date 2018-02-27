@@ -1,0 +1,168 @@
+'
+' This class represents an interface for displaying progress. If the client is Excel 97 then
+' progress is displayed using the status bar, else if the client is Excel 2000 or above the
+' progress is displayed using a modeless form.
+'
+' @Version 1.2
+' @Date    06 May 2008
+' @Author  David Hoyle
+'
+Option Explicit
+Option Compare Text
+
+' A private record to describe min and max limits for various operations.
+Private Type TMinMax
+  iMin As Long
+  iMax As Long
+End Type
+
+' A private constant to indicate the first version of excel to allow a modeless dialogue.
+Private Const dblVersion As Double = 9#
+
+' A private variable to hold the progress form
+Private frm As frmProgress
+' A private variable to hold the start time of the process - used to calculate the
+' remaining time
+Private FStartTime As Date
+' A private variable an array of min and max values
+Private FMinMax() As TMinMax
+' A private variable to hold the version number of the current excel client.
+Private FExcelVersion As Double
+
+'
+' This is the classes on initialise event handler.
+'
+' @precon  None.
+' @postcon Creates the progress form.
+'
+' @Version 1.0
+' @Date    10 May 2005
+'
+Private Sub Class_Initialize()
+  Exception.Push "TProgress.Class_Initialize"
+  On Error GoTo ErrHnd
+  Set frm = New frmProgress
+  FExcelVersion = Val(Application.Version)
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This is the classes on terminate event handler.
+'
+' @precon  None.
+' @postcon Destroys the progress form instance.
+'
+' @Version 1.0
+' @Date    10 May 2005
+'
+' @dontcheckversion
+'
+Private Sub Class_Terminate()
+  Exception.Push "TProgress.Class_Terminate"
+  On Error GoTo ErrHnd
+  If Not frm Is Nothing Then Unload frm
+  Set frm = Nothing
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method shows either the initial progress dialogue under Excel 2000+ or stores the initial
+' settings required for the Excel 97 status bar.
+'
+' @precon  None.
+' @postcon Shows either the initial progress dialogue under Excel 2000+ or stores the initial
+'          settings required for the Excel 97 status bar.
+'
+' @Version 1.0
+' @Date    10 May 2005
+'
+' @param   iStep as a Long
+' @param   iMin as a Long
+' @param   iMax as a Long
+'
+Public Sub Show(iStep As Long, iMin As Long, iMax As Long)
+  Exception.Push "TProgress.Show", iStep, iMin, iMax
+  On Error GoTo ErrHnd
+  FMinMax(iStep).iMin = iMin
+  If FMinMax(iStep).iMin < 0 Then FMinMax(iStep).iMin = 0
+  FMinMax(iStep).iMax = iMax
+  If FMinMax(iStep).iMax <= FMinMax(iStep).iMin Then FMinMax(iStep).iMax = FMinMax(iStep).iMin + 1
+  If FExcelVersion >= dblVersion Then frm.Display
+  frm.Progress "Please wait...", FStartTime, CDbl(iStep - 1) / CDbl(UBound(FMinMax))
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method hides either the progress dialogue under Excel 2000+ or the status bar
+' in Excel 97.
+'
+' @precon  None.
+' @postcon Hides either the progress dialogue under Excel 2000+ or the status bar
+'          in Excel 97
+'
+' @Version 1.0
+' @Date    10 May 2005
+'
+Public Sub Hide()
+  Exception.Push "TProgress.Hide"
+  On Error GoTo ErrHnd
+  If FExcelVersion >= dblVersion Then frm.HideDisplay
+  Application.StatusBar = False
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method update the progress of either the status bar or the progress dialogue.
+'
+' @precon  None.
+' @postcon Update the progress of either the status bar or the progress dialogue.
+'
+' @Version 1.2
+' @Date    06 May 2008
+'
+' @param   strText as a String
+' @param   iStep as a Long
+' @param   iPosition as a Long
+' @param   iMax as a Long
+'
+Public Sub Progress(iStep As Long, strText As String, ByVal iPosition As Long, Optional iMax As Long = 0)
+  Dim dblPos As Double
+  Exception.Push "TProgress.Progress", iStep, strText, iPosition, iMax
+  On Error GoTo ErrHnd
+  If iMax > 0 Then FMinMax(iStep).iMax = iMax
+  If iPosition > FMinMax(iStep).iMax Then iPosition = FMinMax(iStep).iMax
+  dblPos = CDbl(iPosition - FMinMax(iStep).iMin) / CDbl(FMinMax(iStep).iMax - FMinMax(iStep).iMin)
+  dblPos = dblPos / CDbl(UBound(FMinMax))
+  dblPos = dblPos + CDbl(iStep - 1) / CDbl(UBound(FMinMax))
+  If FExcelVersion >= dblVersion Then frm.Progress strText, FStartTime, dblPos
+  DoEvents
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub
+
+'
+' This method allocates room for iSteps number of steps in the progress.
+'
+' @precon  iSteps must be a positive number.
+' @postcon Allocates room for iSteps number of steps in the progress.
+'
+' @param   iSteps as a Long
+'
+Public Sub Register(iSteps As Long)
+  Exception.Push "TProgress.Register", iSteps
+  On Error GoTo ErrHnd
+  ReDim FMinMax(1 To iSteps)
+  FStartTime = Now
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

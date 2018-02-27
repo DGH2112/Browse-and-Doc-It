@@ -1,0 +1,376 @@
+/*
+
+  This file contains CSS information for the Browse And Doc It HTML Output.
+
+  @Author  David Hoyle
+  @Date    04 Oct 2008
+  @Version 1.0
+
+*/
+a:active {
+  background       : Red;
+  color            : Yellow;
+}
+
+a:link {
+  color            : Blue;
+}
+
+a:visited {
+  color            : Navy;
+}
+
+a:hover {
+  background       : Green;
+  color            : White;
+}
+
+body {
+  background       : #FFFFFF;
+  font-family      : "Tahoma", Times, Serif;
+  font-size        : 10pt;
+}
+
+div.Contents {
+  margin           : 2pt;
+  position         : absolute;
+  top              : 5em;
+  bottom           : 0;
+  left             : 21em;
+  right            : 0;
+  overflow         : auto;
+  margin           : 5px;
+}
+
+div.Indent {
+  margin-left      : 2em;
+}
+
+div.List {
+  margin-bottom    : 2pt;
+  font-weight      : Bold;
+  border           : solid thin;
+}
+
+div.Module {
+  margin-left      : 5pt;
+  margin-right     : 5pt;
+  padding-top      : 2pt;
+  padding-bottom   : 2pt;
+  font-weight      : normal;
+}
+
+div.Module:hover {
+  background       : Green;
+  color            : White;
+}
+
+div.Modules {
+  position         : absolute;
+  top              : 0;
+  bottom           : 0;
+  left             : 0;
+  width            : 20em;
+  overflow         : auto;
+  margin           : 1em;
+}
+
+div.ModuleTitle {
+  background       : #EEEEFF;
+  padding-top      : 1em;
+  padding-left     : 1em;
+  padding-right    : 1em;
+  padding-bottom   : 1.7em;
+  border-bottom    : solid thin;
+}
+
+div.Section {
+  margin-left      : 5pt;
+  margin-right     : 5pt;
+  padding-top      : 2pt;
+  padding-bottom   : 2pt;
+  float            : left;
+}
+
+div.Section:hover {
+  background       : Green;
+  color            : White;
+}
+
+div.Sections {
+  position         : absolute;
+  top              : 0;
+  left             : 21em;
+  height           : 4em;
+  right            : 0;
+  background       : #EEEEFF;
+  margin-top       : 1em;
+  margin-left      : 0.2em;
+  margin-bottom    : 1em;
+  margin-right     : 0.2em;
+  border           : solid 1px;
+}
+
+h1 {
+  color            : black;
+  font-family      : times;
+  border-top       : Thin;
+  border-bottom    : Thin;
+}
+
+h2 {
+  color            : navy;
+  font-family      : times;
+}
+
+h3 {
+  color            : maroon;
+  font-family      : times;
+}
+
+h4 {
+  color            : green;
+  font-family      : times;
+  margin           : 1em;
+}
+
+h5 {
+  color            : purple;
+  font-family      : times;
+}
+
+h6 {
+  color            : black;
+  font-family      : times;
+}
+
+img.left {
+  float            : Left;
+  margin           : 5pt;
+}
+
+img.right {
+  float            : Right;
+  margin           : 5pt;
+}
+
+img.verticallymiddle {
+  vertical-align : middle;
+}
+
+li.DocConflictIncorrect {
+  list-style-image : URL('../Images/DocConflictIncorrect.gif');
+}
+
+li.DocConflictItem {
+  list-style-image : URL('../Images/DocConflictItem.gif');
+}
+
+li.DocConflictMissing {
+  list-style-image : URL('../Images/DocConflictMissing.gif');
+}
+
+li.Error {
+  list-style-image : URL('../Images/Error.gif');
+}
+
+li.Hint {
+  list-style-image : URL('../Images/Hint.gif');
+}
+
+li.SpecialTag {
+  color            : maroon;
+}
+
+li.ToDoItem {
+  list-style-image : URL('../Images/TodoItem.gif');
+}
+
+li.Warning {
+  list-style-image : URL('../Images/Warning.gif');
+}
+
+p {
+  margin-top     : 0.5em;
+  margin-bottom  : 0.5em;
+}
+
+p.Comment {
+  color            : blue;
+}
+
+p.TagHeader {
+  color            : purple;
+  text-decoration  : underline;
+  font-weight      : bold;
+}
+
+pre {
+  background       : #C0E0C0;
+  border-bottom    : solid thin gray;
+  color            : black;
+  margin-top       : -0.5em;
+  margin-bottom    : 0em;
+  margin-left      : -0.5em;
+  margin-right     : -0.5em;
+  padding          : 0.5em;
+}
+
+table {
+  border           : solid thin gray;
+  border-collapse  : collapse;
+  border-spacing   : 0em;
+}
+
+table.Tags {
+  color            : maroon
+}
+
+td {
+  border           : solid thin gray;
+  color            : black;
+  padding-left     : 0.5em;
+  padding-right    : 0.5em;
+  padding-top      : 0.5em;
+  padding-bottom   : 0em;
+  vertical-align   : top;
+}
+
+td.TagName {
+  font-weight      : bold;
+}
+
+td.Red {
+  background       : #FFCCCC;
+}
+
+td.Green {
+  background       : #CCFFCC;
+}
+
+td.Yellow {
+  background       : #FFFFCC;
+}
+
+th {
+  background       : #EEEEFF;
+  border           : solid thin gray;
+  color            : black;
+  padding-left     : 0.5em;
+  padding-right    : 0.5em;
+  padding-top      : 0.25em;
+  padding-bottom   : 0.25em;
+  text-align       : left;
+}
+
+ul {
+  margin-top       : 0em;
+  margin-left      : 0em;
+  margin-right     : 0em;
+}
+span.Unknown {
+  color            : #000000;
+  background       : #FFFFFF;
+}
+
+span.WhiteSpace {
+  color            : #000000;
+  background       : #FFFFFF;
+}
+
+span.ReservedWord {
+  color            : #000000;
+  background       : #FFFFFF;
+  font-weight      : bold;
+}
+
+span.Identifier {
+  color            : #000080;
+  background       : #FFFFFF;
+}
+
+span.Number {
+  color            : #008000;
+  background       : #FFFFFF;
+}
+
+span.Symbol {
+  color            : #800000;
+  background       : #FFFFFF;
+}
+
+span.LineEnd {
+  color            : #000000;
+  background       : #FFFFFF;
+}
+
+span.SingleLiteral {
+  color            : #008080;
+  background       : #E2C6FF;
+}
+
+span.DoubleLiteral {
+  color            : #008080;
+  background       : #FFCCCC;
+}
+
+span.LineComment {
+  color            : #800080;
+  background       : #FFFFFF;
+  font-style       : italic;
+}
+
+span.BlockComment {
+  color            : #800080;
+  background       : #FFFFFF;
+  font-style       : italic;
+}
+
+span.HTMLStartTag {
+  color            : #0000FF;
+  background       : #FFFFFF;
+}
+
+span.HTMLEndTag {
+  color            : #0000FF;
+  background       : #FFFFFF;
+}
+
+span.Directive {
+  color            : #800000;
+  background       : #FFFFFF;
+  font-weight      : bold;
+}
+
+span.CompilerDirective {
+  color            : #008000;
+  background       : #FFFF80;
+  font-weight      : bold;
+}
+
+span.LinkTag {
+  color            : #000000;
+  background       : #FFFFFF;
+}
+
+span.TreeHeader {
+  color            : #0000FF;
+  background       : #FFFFFF;
+  font-weight      : bold;
+}
+
+span.FileEnd {
+  color            : #000000;
+  background       : #FFFFFF;
+}
+
+span.LineContinuation {
+  color            : #000000;
+  background       : #FFFFFF;
+}
+
+span.CustomUserToken {
+  color            : #000000;
+  background       : #FFFFFF;
+}
+

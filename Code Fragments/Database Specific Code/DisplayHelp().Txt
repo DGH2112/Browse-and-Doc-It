@@ -1,0 +1,24 @@
+'
+' Displays the Applications Help File
+'
+' @Version 1.1
+' @Date    25 Sep 2003
+'
+' @precon  None.
+' @postcon Display the apps help file.
+'
+Function DisplayHelp()
+  Dim iRes As Long
+  Exception.Push "DisplayHelp"
+  On Error GoTo ErrHnd
+  iRes = ShellExecute(Application.hWndAccessApp, "Open", Exception.strLogPath & _
+    "Help\index.html", "", CurrentProject.Path, SW_SHOWNORMAL)
+  If iRes <= 32 Then
+    MsgBox FormatString("There was a problem opening the file '%param%'. " & _
+      "Please check that the file exists.", _
+      Exception.LogPath & "Help\index.html")
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Function

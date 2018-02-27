@@ -1,0 +1,320 @@
+'
+' This module contains a class to monitor profiling information in a tree of
+' profiles.
+'
+' @Version 1.1
+' @Date    30 Sep 2008
+' @Author  David Hoyle
+'
+Option Explicit
+Option Compare Text
+
+' A private constant to control the growth of the sub profile collection
+Private Const iCAPACITY As Long = 10
+' A private variable to hold the method name of this profile.
+Private FMethodName As String
+' A private variable to hold the start time of the current profile session
+Private FStartTick As Double
+' A private varaiable to hold the total duration of all profile sessions for this
+' method
+Private FDurationTick As Double
+' A private variable to hold the in process tick count, i.e. the length of time in
+' the current method not spent in sub method calls.
+Private FInProcessTick As Double
+' A private variable to hold the number of time the method is called.
+Private FCallCount As Long
+' A private variable to hold a collection of sub profiles - call methods.
+Private FProfiles() As TProfile
+' A private variable to point the the profiles parent profile.
+Private FParent As TProfile
+' A private varaiable to hold the current methods stach depth
+Private FStackDepth As Long
+' A private variable to hold the number of profiles in the collection.
+Private FProfileCount As Long
+
+Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
+Private Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
+
+'
+' This method outputs the profiles information to the given file handle.
+'
+' @Date    30 Sep 2008
+' @Version 1.1
+'
+' @precon  None.
+' @postcon Outputs the profiles information to the given file handle.
+'
+' @noexception
+'
+' @param   iFileHandle as a Long
+'
+Public Sub DumpProfileInformation(iFileHandle As Long)
+  Dim i As Long
+  Dim iPos As Long
+  On Error GoTo ErrHnd
+  If FMethodName <> "" Then
+    For i = 1 To FProfileCount
+      FInProcessTick = FInProcessTick - FProfiles(i).Duration
+    Next i
+    iPos = InStr(FMethodName, ".")
+    Print #iFileHandle, _
+      Format(FStackDepth, "0") + "," + _
+      Left$(FMethodName, iPos - 1) + "," + _
+      Right$(FMethodName, Len(FMethodName) - iPos) + "," + _
+      Format(FDurationTick, "0.0") + "," + _
+      Format(FInProcessTick, "0.0") + "," + _
+      Format(FCallCount, "0")
+  End If
+  For i = 1 To FProfileCount
+    FProfiles(i).DumpProfileInformation iFileHandle
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "DumpProfileInformation: " & Err.Description, , AppName
+End Sub
+
+
+'
+' This method attempts to find the named method in the profile collection. If
+' found the profile is returned else a new profile is added and that profile
+' returned.
+'
+' @Date    16 Dec 2005
+' @Version 1.0
+'
+' @precon  None.
+' @postcon Attempts to find the named method in the profile collection. If
+'          found the profile is returned else a new profile is added and that
+'          profile returned.
+'
+' @noexception
+'
+' @param   strMethod as a String
+' @param   iStackDepth as a Long
+' @return  a TProfile
+'
+Private Function FindProfile(strMethod As String, iStackDepth As Long) As TProfile
+  Dim i As Long
+  Dim boolFound As Boolean
+  On Error GoTo ErrHnd
+  boolFound = False
+  For i = 1 To FProfileCount
+    If FProfiles(i).MethodName = strMethod Then
+      Set FindProfile = FProfiles(i)
+      boolFound = True
+      Exit For
+    End If
+  Next i
+  If Not boolFound Then
+    FProfileCount = FProfileCount + 1
+    If FProfileCount > UBound(FProfiles) Then
+      ReDim Preserve FProfiles(1 To UBound(FProfiles) + iCAPACITY)
+    End If
+    Set FProfiles(FProfileCount) = New TProfile
+    Set FindProfile = FProfiles(FProfileCount)
+    FindProfile.InitialiseProfile strMethod, iStackDepth, Me
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "FindProfile: " & Err.Description, , AppName
+End Function
+
+'
+' This property returns the value of the profiles method name.
+'
+' @Date    16 Dec 2005
+' @Version 1.0
+'
+' @precon  None.
+' @postcon Returns the value of the profiles method name.
+'
+' @noexception
+'
+' @return  a String
+'
+Public Property Get MethodName() As String
+  On Error GoTo ErrHnd
+  MethodName = FMethodName
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "MethodName: " & Err.Description, , AppName
+End Property
+
+'
+' This method starts the process of monitoring the current methods profile session.
+'
+' @Date    16 Dec 2005
+' @Version 1.0
+'
+' @precon  None.
+' @postcon Starts the process of monitoring the current methods profile session.
+'
+' @param   strMethod as a String
+' @param   iStackDepth as a Long
+' @return  a TProfile
+'
+' @noexception
+'
+Public Function StartProfile(strMethod As String, iStackDepth As Long) As TProfile
+  On Error GoTo ErrHnd
+  Set StartProfile = FindProfile(strMethod, iStackDepth)
+  StartProfile.StartTiming
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "StartProfile: " & Err.Description, , AppName
+End Function
+
+'
+' This method starts the timing of the current profile session.
+'
+' @Date    30 Sep 2008
+' @Version 1.1
+'
+' @noexception
+'
+' @precon  None.
+' @postcon Starts the timing of the current profile session.
+'
+Public Sub StartTiming()
+  On Error GoTo ErrHnd
+  FStartTick = TickCount
+  FCallCount = FCallCount + 1
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "StartTiming: " & Err.Description, , AppName
+End Sub
+
+'
+' This method initialises the profiles information for the current session.
+'
+' @Date    16 Dec 2005
+' @Version 1.0
+'
+' @precon  None.
+' @postcon Initialises the profiles information for the current session.
+'
+' @noexception
+'
+' @param   strMethod as a String
+' @param   iStackDepth as a Long
+' @param   objParent as a TProfile
+' @return  a TProfile
+'
+Public Function InitialiseProfile(strMethod As String, iStackDepth As Long, _
+  objParent As TProfile) As TProfile
+  On Error GoTo ErrHnd
+  FDurationTick = 0
+  FInProcessTick = 0
+  FMethodName = strMethod
+  Set FParent = objParent
+  FStackDepth = iStackDepth
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "InitialiseProfile: " & Err.Description, , AppName
+End Function
+
+'
+' This method stop profiling the current method and returns the parent profile.
+'
+' @Date    22 Sep 2008
+' @Version 1.1
+'
+' @precon  None.
+' @postcon Stop profiling the current method and returns the parent profile.
+'
+' @noexception
+'
+' @return  a TProfile
+'
+Public Function StopProfile() As TProfile
+  On Error GoTo ErrHnd
+  FDurationTick = FDurationTick + (TickCount - FStartTick)
+  FInProcessTick = FDurationTick ' Make the same as FDuration. A call to calculate
+                                 ' this needs to be made after profiling and before
+                                 ' dumping the information.
+  Set StopProfile = FParent
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "StopProfile: " & Err.Description, , AppName
+End Function
+
+
+'
+' This is the classes on initialise event handler.
+'
+' @Date    16 Dec 2005
+' @Version 1.0
+'
+' @precon  None.
+' @postcon Creates a sub profile collection.
+'
+' @noexception
+'
+Private Sub Class_Initialize()
+  On Error GoTo ErrHnd
+  ReDim FProfiles(1 To iCAPACITY) As TProfile
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "Class_Initialize: " & Err.Description, , AppName
+End Sub
+
+'
+' This property returns the total duration of the profiles calls, i.e. TickCount.
+'
+' @Date    30 Sep 2008
+' @Version 1.1
+'
+' @precon  None.
+' @postcon Returns the total duration of the profiles calls.
+'
+' @noexception
+'
+' @return  a Double
+'
+Public Property Get Duration() As Double
+  On Error GoTo ErrHnd
+  Duration = FDurationTick
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "Duration: " & Err.Description, , AppName
+End Property
+
+'
+' This property returns the total duration of all the profiles sub profile calls.
+'
+' @Date    30 Sep 2008
+' @Version 1.1
+'
+' @precon  None.
+' @postcon Returns the total duration of all the profiles sub profile calls
+'
+' @noexception
+'
+' @return  a Double
+'
+Public Property Get TotalTime() As Double
+  Dim i As Long
+  On Error GoTo ErrHnd
+  TotalTime = 0
+  For i = 1 To FProfileCount
+    TotalTime = TotalTime + FProfiles(i).Duration
+  Next i
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "TotalTime: " & Err.Description, , AppName
+End Property
+
+'
+' This method returns a high performance counter adjusted for frequency.
+'
+' @precon  None.
+' @postcon Returns a high performance counter adjusted for frequency.
+'
+' @return  a Double
+'
+' @noexception
+'
+Private Function TickCount() As Double
+  Dim c As Currency
+  Dim f As Currency
+  Dim dblC As Double
+  Dim dblF As Double
+  On Error GoTo ErrHnd
+  QueryPerformanceCounter c
+  QueryPerformanceFrequency f
+  dblC = CDbl(c) * 10000#
+  dblF = CDbl(f) * 10000#
+  TickCount = 1000000# * dblC / dblF
+ErrHnd:
+  If Err.Number <> 0 Then MsgBox "TickTime: " & Err.Description, , AppName
+End Function

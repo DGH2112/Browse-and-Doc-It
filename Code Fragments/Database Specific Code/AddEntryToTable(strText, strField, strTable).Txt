@@ -1,0 +1,29 @@
+'
+' A generic routine that adds the text entry [strText], to the field [strField]
+' in the table [strTable]. Used to add information to the support tables during
+' data entry.
+'
+' @Version 1.0
+' @Date    15 Aug 2003
+'
+' @precon  None.
+' @postcon String representation of the value to be added to the table
+'          The field name as a string
+'          The name of the table as a string
+'
+' @param strText as a string
+' @param strField as a string
+' @param strTable as a string
+'
+Sub AddEntryToTable(strText As String, strField As String, strTable As String)
+  Exception.Push "AddEntryToTable", strText, strField, strTable
+  On Error GoTo ErrHnd
+  If MsgBox("Are you sure you want to add """ & strText & """ to the table """ & strTable & _
+    """?", vbYesNoCancel) = vbYes Then
+    CurrentProject.Connection.Execute _
+      FormatString("INSERT INTO [%param%] ([%param%]) VALUES(N'%param%');", strTable, strField, strText)
+  End If
+ErrHnd:
+  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err
+  Exception.Pop
+End Sub

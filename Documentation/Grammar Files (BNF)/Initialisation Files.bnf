@@ -1,0 +1,35 @@
+/**
+
+  This grammar file defines the elements that make up an Initialisation (INI)
+  file.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    28 Apr 2013
+
+**/
+<goal>          ::= <Section>* <EndOfFile>
+
+<Section>       ::= <SectionHeader> <KeyValuePair>*
+
+<SectionHeader> ::= '[' (<AlphaNumeric> | <FolderSymbol> | <Space>)+ ']' <EndOfLine>
+
+<KeyValuePair>  ::= <Key> '=' <Value> <EndOfLine>
+
+<Key>           ::= (<AlphaNumeric> | <Space>)+
+
+<Value>         ::= (<AlphaNumeric> | <Space>)+
+
+<FolderSymbol>  ::= '.' | '\' | '/'
+
+<AlphaNumeric>  ::= (<Alpha> | <Numeric>)+
+
+<Alpha>         ::= 'a'..'z' | 'A'..'Z'
+
+<Numeric>       ::= '0'..'9'
+
+<Space>         ::= #32 | #9
+
+<EndOfLine>     ::= (#13 | #10)+
+
+<EndOfFile>     ::= ? The end of file stream ?

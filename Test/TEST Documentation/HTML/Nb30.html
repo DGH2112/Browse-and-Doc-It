@@ -1,0 +1,1994 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "Schema/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>Nb30.pas</title>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItScreen.css" media="Screen"/>
+    <link rel="StyleSheet" href="Styles/BrowseAndDocItPrint.css" media="Print"/>
+  </head>
+
+  <body>
+  
+    <div class="Modules">
+      <div class="List">
+        <div class="ModuleTitle">Modules</div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Summary.html">Summary</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="MMSystem.html">MMSystem.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Nb30.html">Nb30.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="OpenGL.html">OpenGL.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="ShlObj.html">ShlObj.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Windows.html">Windows.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Spin.html">Spin.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Unit.html">Unit.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="VirtualTrees.html">VirtualTrees.pas</a></div>
+        <div class="Module"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="Index.html">Index</a></div>
+      </div>
+
+    </div>
+
+    <div class="Sections">
+      <div class="Section"><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a href="#ModuleOverview">Module Overview</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a href="#Constants2">Constants</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a href="#Errors2">Errors</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a href="#ExportedHeadings2">Exported Headings</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a href="#ImplementedMethods2">Implemented Methods</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a href="#Types2">Types</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a href="#Uses2">Uses</a></div>
+      <div class="Section"><img class="verticallymiddle" src="Images/WarningFolder.gif" alt=""/>&nbsp;<a href="#Warnings2">Warnings</a></div>
+
+    </div>
+
+    <div class="Contents">
+      <!-- Unit Nb30 -->
+      <h1><img class="verticallymiddle" src="Images/Module.gif" alt=""/>&nbsp;<a name="ModuleOverview"></a>Documentation for Unit Nb30</h1>
+        <p class="Comment">***************************************************** </p>
+      
+      <!-- Errors -->
+      <h2><img class="verticallymiddle" src="Images/ErrorFolder.gif" alt=""/>&nbsp;<a name="Errors"></a>Errors</h2>
+      <ul>
+        <li class="Error">Method 'Netbios' has an unsatisfied forward reference. [FindUnresolvedExportedMethods]</li>
+      </ul>
+      
+      <!-- Warnings -->
+      <h2><img class="verticallymiddle" src="Images/WarningFolder.gif" alt=""/>&nbsp;<a name="Warnings"></a>Warnings</h2>
+      <ul>
+        <li class="Warning">Function 'Netbios' does not have a return type specified. [FunctionHeading]</li>
+      </ul>
+      
+      <!-- Constants -->
+      <h2><img class="verticallymiddle" src="Images/PublicConstantsLabel.gif" alt=""/>&nbsp;<a name="Constants2"></a>Constants</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ALL_TRANSPORTS"></a>ALL_TRANSPORTS</td>
+              <td>
+                <pre><span class="Identifier">ALL_TRANSPORTS</span> <span class="Symbol">=</span> <span class="StringLiteral">'M'</span><span class="Identifier">#0#0#0</span></pre>
+          <!-- ALL_TRANSPORTS = 'M'#0#0#0 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.ASYNCH"></a>ASYNCH</td>
+              <td>
+                <pre><span class="Identifier">ASYNCH</span> <span class="Symbol">=</span> <span class="Number">$80</span></pre>
+          <!-- ASYNCH = $80 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.CALL_PENDING"></a>CALL_PENDING</td>
+              <td>
+                <pre><span class="Identifier">CALL_PENDING</span> <span class="Symbol">=</span> <span class="Number">$02</span></pre>
+          <!-- CALL_PENDING = $02 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.DEREGISTERED"></a>DEREGISTERED</td>
+              <td>
+                <pre><span class="Identifier">DEREGISTERED</span> <span class="Symbol">=</span> <span class="Number">$05</span></pre>
+          <!-- DEREGISTERED = $05 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.DUPLICATE"></a>DUPLICATE</td>
+              <td>
+                <pre><span class="Identifier">DUPLICATE</span> <span class="Symbol">=</span> <span class="Number">$06</span></pre>
+          <!-- DUPLICATE = $06 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.DUPLICATE_DEREG"></a>DUPLICATE_DEREG</td>
+              <td>
+                <pre><span class="Identifier">DUPLICATE_DEREG</span> <span class="Symbol">=</span> <span class="Number">$07</span></pre>
+          <!-- DUPLICATE_DEREG = $07 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.GROUP_NAME"></a>GROUP_NAME</td>
+              <td>
+                <pre><span class="Identifier">GROUP_NAME</span> <span class="Symbol">=</span> <span class="Number">$80</span></pre>
+          <!-- GROUP_NAME = $80 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.HANGUP_COMPLETE"></a>HANGUP_COMPLETE</td>
+              <td>
+                <pre><span class="Identifier">HANGUP_COMPLETE</span> <span class="Symbol">=</span> <span class="Number">$05</span></pre>
+          <!-- HANGUP_COMPLETE = $05 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.HANGUP_PENDING"></a>HANGUP_PENDING</td>
+              <td>
+                <pre><span class="Identifier">HANGUP_PENDING</span> <span class="Symbol">=</span> <span class="Number">$04</span></pre>
+          <!-- HANGUP_PENDING = $04 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.LISTEN_OUTSTANDING"></a>LISTEN_OUTSTANDING</td>
+              <td>
+                <pre><span class="Identifier">LISTEN_OUTSTANDING</span> <span class="Symbol">=</span> <span class="Number">$01</span></pre>
+          <!-- LISTEN_OUTSTANDING = $01 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.MAX_LANA"></a>MAX_LANA</td>
+              <td>
+                <pre><span class="Identifier">MAX_LANA</span> <span class="Symbol">=</span> <span class="Number">254</span></pre>
+          <!-- MAX_LANA = 254 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.MS_NBF"></a>MS_NBF</td>
+              <td>
+                <pre><span class="Identifier">MS_NBF</span> <span class="Symbol">=</span> <span class="StringLiteral">'MNBF'</span></pre>
+          <!-- MS_NBF = 'MNBF' -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NAME_FLAGS_MASK"></a>NAME_FLAGS_MASK</td>
+              <td>
+                <pre><span class="Identifier">NAME_FLAGS_MASK</span> <span class="Symbol">=</span> <span class="Number">$87</span></pre>
+          <!-- NAME_FLAGS_MASK = $87 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBACTION"></a>NCBACTION</td>
+              <td>
+                <pre><span class="Identifier">NCBACTION</span> <span class="Symbol">=</span> <span class="Number">$77</span></pre>
+          <!-- NCBACTION = $77 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBADDGRNAME"></a>NCBADDGRNAME</td>
+              <td>
+                <pre><span class="Identifier">NCBADDGRNAME</span> <span class="Symbol">=</span> <span class="Number">$36</span></pre>
+          <!-- NCBADDGRNAME = $36 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBADDNAME"></a>NCBADDNAME</td>
+              <td>
+                <pre><span class="Identifier">NCBADDNAME</span> <span class="Symbol">=</span> <span class="Number">$30</span></pre>
+          <!-- NCBADDNAME = $30 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBASTAT"></a>NCBASTAT</td>
+              <td>
+                <pre><span class="Identifier">NCBASTAT</span> <span class="Symbol">=</span> <span class="Number">$33</span></pre>
+          <!-- NCBASTAT = $33 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBCALL"></a>NCBCALL</td>
+              <td>
+                <pre><span class="Identifier">NCBCALL</span> <span class="Symbol">=</span> <span class="Number">$10</span></pre>
+          <!-- NCBCALL = $10 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBCANCEL"></a>NCBCANCEL</td>
+              <td>
+                <pre><span class="Identifier">NCBCANCEL</span> <span class="Symbol">=</span> <span class="Number">$35</span></pre>
+          <!-- NCBCANCEL = $35 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBCHAINSEND"></a>NCBCHAINSEND</td>
+              <td>
+                <pre><span class="Identifier">NCBCHAINSEND</span> <span class="Symbol">=</span> <span class="Number">$17</span></pre>
+          <!-- NCBCHAINSEND = $17 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBCHAINSENDNA"></a>NCBCHAINSENDNA</td>
+              <td>
+                <pre><span class="Identifier">NCBCHAINSENDNA</span> <span class="Symbol">=</span> <span class="Number">$72</span></pre>
+          <!-- NCBCHAINSENDNA = $72 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBDELNAME"></a>NCBDELNAME</td>
+              <td>
+                <pre><span class="Identifier">NCBDELNAME</span> <span class="Symbol">=</span> <span class="Number">$31</span></pre>
+          <!-- NCBDELNAME = $31 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBDGRECV"></a>NCBDGRECV</td>
+              <td>
+                <pre><span class="Identifier">NCBDGRECV</span> <span class="Symbol">=</span> <span class="Number">$21</span></pre>
+          <!-- NCBDGRECV = $21 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBDGRECVBC"></a>NCBDGRECVBC</td>
+              <td>
+                <pre><span class="Identifier">NCBDGRECVBC</span> <span class="Symbol">=</span> <span class="Number">$23</span></pre>
+          <!-- NCBDGRECVBC = $23 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBDGSEND"></a>NCBDGSEND</td>
+              <td>
+                <pre><span class="Identifier">NCBDGSEND</span> <span class="Symbol">=</span> <span class="Number">$20</span></pre>
+          <!-- NCBDGSEND = $20 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBDGSENDBC"></a>NCBDGSENDBC</td>
+              <td>
+                <pre><span class="Identifier">NCBDGSENDBC</span> <span class="Symbol">=</span> <span class="Number">$22</span></pre>
+          <!-- NCBDGSENDBC = $22 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBENUM"></a>NCBENUM</td>
+              <td>
+                <pre><span class="Identifier">NCBENUM</span> <span class="Symbol">=</span> <span class="Number">$37</span></pre>
+          <!-- NCBENUM = $37 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBFINDNAME"></a>NCBFINDNAME</td>
+              <td>
+                <pre><span class="Identifier">NCBFINDNAME</span> <span class="Symbol">=</span> <span class="Number">$78</span></pre>
+          <!-- NCBFINDNAME = $78 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBHANGUP"></a>NCBHANGUP</td>
+              <td>
+                <pre><span class="Identifier">NCBHANGUP</span> <span class="Symbol">=</span> <span class="Number">$12</span></pre>
+          <!-- NCBHANGUP = $12 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBLANSTALERT"></a>NCBLANSTALERT</td>
+              <td>
+                <pre><span class="Identifier">NCBLANSTALERT</span> <span class="Symbol">=</span> <span class="Number">$73</span></pre>
+          <!-- NCBLANSTALERT = $73 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBLISTEN"></a>NCBLISTEN</td>
+              <td>
+                <pre><span class="Identifier">NCBLISTEN</span> <span class="Symbol">=</span> <span class="Number">$11</span></pre>
+          <!-- NCBLISTEN = $11 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBNAMSZ"></a>NCBNAMSZ</td>
+              <td>
+                <pre><span class="Identifier">NCBNAMSZ</span> <span class="Symbol">=</span> <span class="Number">16</span></pre>
+          <!-- NCBNAMSZ = 16 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBRECV"></a>NCBRECV</td>
+              <td>
+                <pre><span class="Identifier">NCBRECV</span> <span class="Symbol">=</span> <span class="Number">$15</span></pre>
+          <!-- NCBRECV = $15 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBRECVANY"></a>NCBRECVANY</td>
+              <td>
+                <pre><span class="Identifier">NCBRECVANY</span> <span class="Symbol">=</span> <span class="Number">$16</span></pre>
+          <!-- NCBRECVANY = $16 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBRESET"></a>NCBRESET</td>
+              <td>
+                <pre><span class="Identifier">NCBRESET</span> <span class="Symbol">=</span> <span class="Number">$32</span></pre>
+          <!-- NCBRESET = $32 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBSEND"></a>NCBSEND</td>
+              <td>
+                <pre><span class="Identifier">NCBSEND</span> <span class="Symbol">=</span> <span class="Number">$14</span></pre>
+          <!-- NCBSEND = $14 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBSENDNA"></a>NCBSENDNA</td>
+              <td>
+                <pre><span class="Identifier">NCBSENDNA</span> <span class="Symbol">=</span> <span class="Number">$71</span></pre>
+          <!-- NCBSENDNA = $71 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBSSTAT"></a>NCBSSTAT</td>
+              <td>
+                <pre><span class="Identifier">NCBSSTAT</span> <span class="Symbol">=</span> <span class="Number">$34</span></pre>
+          <!-- NCBSSTAT = $34 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBTRACE"></a>NCBTRACE</td>
+              <td>
+                <pre><span class="Identifier">NCBTRACE</span> <span class="Symbol">=</span> <span class="Number">$79</span></pre>
+          <!-- NCBTRACE = $79 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NCBUNLINK"></a>NCBUNLINK</td>
+              <td>
+                <pre><span class="Identifier">NCBUNLINK</span> <span class="Symbol">=</span> <span class="Number">$70</span></pre>
+          <!-- NCBUNLINK = $70 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_ACTSES"></a>NRC_ACTSES</td>
+              <td>
+                <pre><span class="Identifier">NRC_ACTSES</span> <span class="Symbol">=</span> <span class="Number">$0f</span></pre>
+          <!-- NRC_ACTSES = $0f -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_BADDR"></a>NRC_BADDR</td>
+              <td>
+                <pre><span class="Identifier">NRC_BADDR</span> <span class="Symbol">=</span> <span class="Number">$07</span></pre>
+          <!-- NRC_BADDR = $07 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_BRIDGE"></a>NRC_BRIDGE</td>
+              <td>
+                <pre><span class="Identifier">NRC_BRIDGE</span> <span class="Symbol">=</span> <span class="Number">$23</span></pre>
+          <!-- NRC_BRIDGE = $23 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_BUFLEN"></a>NRC_BUFLEN</td>
+              <td>
+                <pre><span class="Identifier">NRC_BUFLEN</span> <span class="Symbol">=</span> <span class="Number">$01</span></pre>
+          <!-- NRC_BUFLEN = $01 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_CANCEL"></a>NRC_CANCEL</td>
+              <td>
+                <pre><span class="Identifier">NRC_CANCEL</span> <span class="Symbol">=</span> <span class="Number">$26</span></pre>
+          <!-- NRC_CANCEL = $26 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_CANOCCR"></a>NRC_CANOCCR</td>
+              <td>
+                <pre><span class="Identifier">NRC_CANOCCR</span> <span class="Symbol">=</span> <span class="Number">$24</span></pre>
+          <!-- NRC_CANOCCR = $24 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_CMDCAN"></a>NRC_CMDCAN</td>
+              <td>
+                <pre><span class="Identifier">NRC_CMDCAN</span> <span class="Symbol">=</span> <span class="Number">$0b</span></pre>
+          <!-- NRC_CMDCAN = $0b -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_CMDTMO"></a>NRC_CMDTMO</td>
+              <td>
+                <pre><span class="Identifier">NRC_CMDTMO</span> <span class="Symbol">=</span> <span class="Number">$05</span></pre>
+          <!-- NRC_CMDTMO = $05 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_DUPENV"></a>NRC_DUPENV</td>
+              <td>
+                <pre><span class="Identifier">NRC_DUPENV</span> <span class="Symbol">=</span> <span class="Number">$30</span></pre>
+          <!-- NRC_DUPENV = $30 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_DUPNAME"></a>NRC_DUPNAME</td>
+              <td>
+                <pre><span class="Identifier">NRC_DUPNAME</span> <span class="Symbol">=</span> <span class="Number">$0d</span></pre>
+          <!-- NRC_DUPNAME = $0d -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_ENVNOTDEF"></a>NRC_ENVNOTDEF</td>
+              <td>
+                <pre><span class="Identifier">NRC_ENVNOTDEF</span> <span class="Symbol">=</span> <span class="Number">$34</span></pre>
+          <!-- NRC_ENVNOTDEF = $34 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_GOODRET"></a>NRC_GOODRET</td>
+              <td>
+                <pre><span class="Identifier">NRC_GOODRET</span> <span class="Symbol">=</span> <span class="Number">$00</span></pre>
+          <!-- NRC_GOODRET = $00 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_IFBUSY"></a>NRC_IFBUSY</td>
+              <td>
+                <pre><span class="Identifier">NRC_IFBUSY</span> <span class="Symbol">=</span> <span class="Number">$21</span></pre>
+          <!-- NRC_IFBUSY = $21 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_ILLCMD"></a>NRC_ILLCMD</td>
+              <td>
+                <pre><span class="Identifier">NRC_ILLCMD</span> <span class="Symbol">=</span> <span class="Number">$03</span></pre>
+          <!-- NRC_ILLCMD = $03 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_ILLNN"></a>NRC_ILLNN</td>
+              <td>
+                <pre><span class="Identifier">NRC_ILLNN</span> <span class="Symbol">=</span> <span class="Number">$13</span></pre>
+          <!-- NRC_ILLNN = $13 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_INCOMP"></a>NRC_INCOMP</td>
+              <td>
+                <pre><span class="Identifier">NRC_INCOMP</span> <span class="Symbol">=</span> <span class="Number">$06</span></pre>
+          <!-- NRC_INCOMP = $06 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_INUSE"></a>NRC_INUSE</td>
+              <td>
+                <pre><span class="Identifier">NRC_INUSE</span> <span class="Symbol">=</span> <span class="Number">$16</span></pre>
+          <!-- NRC_INUSE = $16 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_INVADDRESS"></a>NRC_INVADDRESS</td>
+              <td>
+                <pre><span class="Identifier">NRC_INVADDRESS</span> <span class="Symbol">=</span> <span class="Number">$39</span></pre>
+          <!-- NRC_INVADDRESS = $39 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_INVDDID"></a>NRC_INVDDID</td>
+              <td>
+                <pre><span class="Identifier">NRC_INVDDID</span> <span class="Symbol">=</span> <span class="Number">$3B</span></pre>
+          <!-- NRC_INVDDID = $3B -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_LOCKFAIL"></a>NRC_LOCKFAIL</td>
+              <td>
+                <pre><span class="Identifier">NRC_LOCKFAIL</span> <span class="Symbol">=</span> <span class="Number">$3C</span></pre>
+          <!-- NRC_LOCKFAIL = $3C -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_LOCTFUL"></a>NRC_LOCTFUL</td>
+              <td>
+                <pre><span class="Identifier">NRC_LOCTFUL</span> <span class="Symbol">=</span> <span class="Number">$11</span></pre>
+          <!-- NRC_LOCTFUL = $11 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_MAXAPPS"></a>NRC_MAXAPPS</td>
+              <td>
+                <pre><span class="Identifier">NRC_MAXAPPS</span> <span class="Symbol">=</span> <span class="Number">$36</span></pre>
+          <!-- NRC_MAXAPPS = $36 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_NAMCONF"></a>NRC_NAMCONF</td>
+              <td>
+                <pre><span class="Identifier">NRC_NAMCONF</span> <span class="Symbol">=</span> <span class="Number">$19</span></pre>
+          <!-- NRC_NAMCONF = $19 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_NAMERR"></a>NRC_NAMERR</td>
+              <td>
+                <pre><span class="Identifier">NRC_NAMERR</span> <span class="Symbol">=</span> <span class="Number">$17</span></pre>
+          <!-- NRC_NAMERR = $17 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_NAMTFUL"></a>NRC_NAMTFUL</td>
+              <td>
+                <pre><span class="Identifier">NRC_NAMTFUL</span> <span class="Symbol">=</span> <span class="Number">$0e</span></pre>
+          <!-- NRC_NAMTFUL = $0e -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_NOCALL"></a>NRC_NOCALL</td>
+              <td>
+                <pre><span class="Identifier">NRC_NOCALL</span> <span class="Symbol">=</span> <span class="Number">$14</span></pre>
+          <!-- NRC_NOCALL = $14 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_NORES"></a>NRC_NORES</td>
+              <td>
+                <pre><span class="Identifier">NRC_NORES</span> <span class="Symbol">=</span> <span class="Number">$09</span></pre>
+          <!-- NRC_NORES = $09 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_NORESOURCES"></a>NRC_NORESOURCES</td>
+              <td>
+                <pre><span class="Identifier">NRC_NORESOURCES</span> <span class="Symbol">=</span> <span class="Number">$38</span></pre>
+          <!-- NRC_NORESOURCES = $38 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_NOSAPS"></a>NRC_NOSAPS</td>
+              <td>
+                <pre><span class="Identifier">NRC_NOSAPS</span> <span class="Symbol">=</span> <span class="Number">$37</span></pre>
+          <!-- NRC_NOSAPS = $37 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_NOWILD"></a>NRC_NOWILD</td>
+              <td>
+                <pre><span class="Identifier">NRC_NOWILD</span> <span class="Symbol">=</span> <span class="Number">$15</span></pre>
+          <!-- NRC_NOWILD = $15 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_OPENERR"></a>NRC_OPENERR</td>
+              <td>
+                <pre><span class="Identifier">NRC_OPENERR</span> <span class="Symbol">=</span> <span class="Number">$3f</span></pre>
+          <!-- NRC_OPENERR = $3f -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_OSRESNOTAV"></a>NRC_OSRESNOTAV</td>
+              <td>
+                <pre><span class="Identifier">NRC_OSRESNOTAV</span> <span class="Symbol">=</span> <span class="Number">$35</span></pre>
+          <!-- NRC_OSRESNOTAV = $35 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_PENDING"></a>NRC_PENDING</td>
+              <td>
+                <pre><span class="Identifier">NRC_PENDING</span> <span class="Symbol">=</span> <span class="Number">$ff</span></pre>
+          <!-- NRC_PENDING = $ff -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_REMTFUL"></a>NRC_REMTFUL</td>
+              <td>
+                <pre><span class="Identifier">NRC_REMTFUL</span> <span class="Symbol">=</span> <span class="Number">$12</span></pre>
+          <!-- NRC_REMTFUL = $12 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_SABORT"></a>NRC_SABORT</td>
+              <td>
+                <pre><span class="Identifier">NRC_SABORT</span> <span class="Symbol">=</span> <span class="Number">$18</span></pre>
+          <!-- NRC_SABORT = $18 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_SCLOSED"></a>NRC_SCLOSED</td>
+              <td>
+                <pre><span class="Identifier">NRC_SCLOSED</span> <span class="Symbol">=</span> <span class="Number">$0a</span></pre>
+          <!-- NRC_SCLOSED = $0a -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_SNUMOUT"></a>NRC_SNUMOUT</td>
+              <td>
+                <pre><span class="Identifier">NRC_SNUMOUT</span> <span class="Symbol">=</span> <span class="Number">$08</span></pre>
+          <!-- NRC_SNUMOUT = $08 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_SYSTEM"></a>NRC_SYSTEM</td>
+              <td>
+                <pre><span class="Identifier">NRC_SYSTEM</span> <span class="Symbol">=</span> <span class="Number">$40</span></pre>
+          <!-- NRC_SYSTEM = $40 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.NRC_TOOMANY"></a>NRC_TOOMANY</td>
+              <td>
+                <pre><span class="Identifier">NRC_TOOMANY</span> <span class="Symbol">=</span> <span class="Number">$22</span></pre>
+          <!-- NRC_TOOMANY = $22 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.REGISTERED"></a>REGISTERED</td>
+              <td>
+                <pre><span class="Identifier">REGISTERED</span> <span class="Symbol">=</span> <span class="Number">$04</span></pre>
+          <!-- REGISTERED = $04 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.REGISTERING"></a>REGISTERING</td>
+              <td>
+                <pre><span class="Identifier">REGISTERING</span> <span class="Symbol">=</span> <span class="Number">$00</span></pre>
+          <!-- REGISTERING = $00 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.SESSION_ABORTED"></a>SESSION_ABORTED</td>
+              <td>
+                <pre><span class="Identifier">SESSION_ABORTED</span> <span class="Symbol">=</span> <span class="Number">$06</span></pre>
+          <!-- SESSION_ABORTED = $06 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.SESSION_ESTABLISHED"></a>SESSION_ESTABLISHED</td>
+              <td>
+                <pre><span class="Identifier">SESSION_ESTABLISHED</span> <span class="Symbol">=</span> <span class="Number">$03</span></pre>
+          <!-- SESSION_ESTABLISHED = $03 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicConst.gif" alt=""/>&nbsp;<a name="Constants.UNIQUE_NAME"></a>UNIQUE_NAME</td>
+              <td>
+                <pre><span class="Identifier">UNIQUE_NAME</span> <span class="Symbol">=</span> <span class="Number">$00</span></pre>
+          <!-- UNIQUE_NAME = $00 -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Exported Headings -->
+      <h2><img class="verticallymiddle" src="Images/ExportedHeadingsLabel.gif" alt=""/>&nbsp;<a name="ExportedHeadings2"></a>Exported Headings</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicFunction.gif" alt=""/>&nbsp;<a name="ExportedHeadings.Netbios"></a>Netbios</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">Netbios</span><span class="Symbol">(</span>
+  <span class="Identifier">P</span> <span class="Symbol">:</span> <span class="Identifier">PNCB</span>
+<span class="Symbol">)</span> <span class="Symbol">:</span> <span class="Identifier">Char</span><span class="Symbol">;</span> <span class="ReservedWord">stdcall</span></pre>
+          <!-- Function Netbios(
+  P : PNCB
+) : Char; stdcall -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Implemented Methods -->
+      <h2><img class="verticallymiddle" src="Images/MethodsLabel.gif" alt=""/>&nbsp;<a name="ImplementedMethods2"></a>Implemented Methods</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PrivateFunction.gif" alt=""/>&nbsp;<a name="ImplementedMethods.Netbios"></a>Netbios</td>
+              <td>
+                <pre><span class="ReservedWord">Function</span> <span class="Identifier">Netbios</span><span class="Symbol">;</span> <span class="ReservedWord">External</span><span class="Symbol">;</span> <span class="Symbol">;</span> <span class="ReservedWord">Name</span> </pre>
+          <!-- Function Netbios; External; ; Name  -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Types -->
+      <h2><img class="verticallymiddle" src="Images/PublicTypesLabel.gif" alt=""/>&nbsp;<a name="Types2"></a>Types</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PActionHeader"></a>PActionHeader</td>
+              <td>
+                <pre><span class="Identifier">PActionHeader</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TActionHeader</span></pre>
+          <!-- PActionHeader = ^ TActionHeader -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PAdapterStatus"></a>PAdapterStatus</td>
+              <td>
+                <pre><span class="Identifier">PAdapterStatus</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TAdapterStatus</span></pre>
+          <!-- PAdapterStatus = ^ TAdapterStatus -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PFindNameBuffer"></a>PFindNameBuffer</td>
+              <td>
+                <pre><span class="Identifier">PFindNameBuffer</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TFindNameBuffer</span></pre>
+          <!-- PFindNameBuffer = ^ TFindNameBuffer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PFindNameHeader"></a>PFindNameHeader</td>
+              <td>
+                <pre><span class="Identifier">PFindNameHeader</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TFindNameHeader</span></pre>
+          <!-- PFindNameHeader = ^ TFindNameHeader -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PLanaEnum"></a>PLanaEnum</td>
+              <td>
+                <pre><span class="Identifier">PLanaEnum</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TLanaEnum</span></pre>
+          <!-- PLanaEnum = ^ TLanaEnum -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PNameBuffer"></a>PNameBuffer</td>
+              <td>
+                <pre><span class="Identifier">PNameBuffer</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TNameBuffer</span></pre>
+          <!-- PNameBuffer = ^ TNameBuffer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PNCB"></a>PNCB</td>
+              <td>
+                <pre><span class="Identifier">PNCB</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TNCB</span></pre>
+          <!-- PNCB = ^ TNCB -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PSessionBuffer"></a>PSessionBuffer</td>
+              <td>
+                <pre><span class="Identifier">PSessionBuffer</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TSessionBuffer</span></pre>
+          <!-- PSessionBuffer = ^ TSessionBuffer -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.PSessionHeader"></a>PSessionHeader</td>
+              <td>
+                <pre><span class="Identifier">PSessionHeader</span> <span class="Symbol">=</span> <span class="Symbol">^</span> <span class="Identifier">TSessionHeader</span></pre>
+          <!-- PSessionHeader = ^ TSessionHeader -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TActionHeader"></a>TActionHeader</td>
+              <td>
+                <pre><span class="Identifier">TActionHeader</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TActionHeader = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TActionHeader.action_code"></a>action_code</td>
+                  <td>
+                    <pre><span class="Identifier">action_code</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- action_code = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TActionHeader.reserved"></a>reserved</td>
+                  <td>
+                    <pre><span class="Identifier">reserved</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- reserved = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TActionHeader.transport_id"></a>transport_id</td>
+                  <td>
+                    <pre><span class="Identifier">transport_id</span> <span class="Symbol">=</span> <span class="Identifier">Longint</span></pre>
+              <!-- transport_id = Longint -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus"></a>TAdapterStatus</td>
+              <td>
+                <pre><span class="Identifier">TAdapterStatus</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TAdapterStatus = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.adapter_address"></a>adapter_address</td>
+                  <td>
+                    <pre><span class="Identifier">adapter_address</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Number">5</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- adapter_address = array [ 0 .. 5 ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.adapter_type"></a>adapter_type</td>
+                  <td>
+                    <pre><span class="Identifier">adapter_type</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- adapter_type = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.duration"></a>duration</td>
+                  <td>
+                    <pre><span class="Identifier">duration</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- duration = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.free_ncbs"></a>free_ncbs</td>
+                  <td>
+                    <pre><span class="Identifier">free_ncbs</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- free_ncbs = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.frmr_recv"></a>frmr_recv</td>
+                  <td>
+                    <pre><span class="Identifier">frmr_recv</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- frmr_recv = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.frmr_xmit"></a>frmr_xmit</td>
+                  <td>
+                    <pre><span class="Identifier">frmr_xmit</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- frmr_xmit = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.iframe_recv_err"></a>iframe_recv_err</td>
+                  <td>
+                    <pre><span class="Identifier">iframe_recv_err</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- iframe_recv_err = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.iframe_xmit_err"></a>iframe_xmit_err</td>
+                  <td>
+                    <pre><span class="Identifier">iframe_xmit_err</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- iframe_xmit_err = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.max_cfg_ncbs"></a>max_cfg_ncbs</td>
+                  <td>
+                    <pre><span class="Identifier">max_cfg_ncbs</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- max_cfg_ncbs = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.max_cfg_sess"></a>max_cfg_sess</td>
+                  <td>
+                    <pre><span class="Identifier">max_cfg_sess</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- max_cfg_sess = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.max_dgram_size"></a>max_dgram_size</td>
+                  <td>
+                    <pre><span class="Identifier">max_dgram_size</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- max_dgram_size = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.max_ncbs"></a>max_ncbs</td>
+                  <td>
+                    <pre><span class="Identifier">max_ncbs</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- max_ncbs = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.max_sess"></a>max_sess</td>
+                  <td>
+                    <pre><span class="Identifier">max_sess</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- max_sess = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.max_sess_pkt_size"></a>max_sess_pkt_size</td>
+                  <td>
+                    <pre><span class="Identifier">max_sess_pkt_size</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- max_sess_pkt_size = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.name_count"></a>name_count</td>
+                  <td>
+                    <pre><span class="Identifier">name_count</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- name_count = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.pending_sess"></a>pending_sess</td>
+                  <td>
+                    <pre><span class="Identifier">pending_sess</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- pending_sess = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.recv_buff_unavail"></a>recv_buff_unavail</td>
+                  <td>
+                    <pre><span class="Identifier">recv_buff_unavail</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- recv_buff_unavail = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.recv_success"></a>recv_success</td>
+                  <td>
+                    <pre><span class="Identifier">recv_success</span> <span class="Symbol">=</span> <span class="Identifier">DWORD</span></pre>
+              <!-- recv_success = DWORD -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.reserved0"></a>reserved0</td>
+                  <td>
+                    <pre><span class="Identifier">reserved0</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- reserved0 = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.reserved1"></a>reserved1</td>
+                  <td>
+                    <pre><span class="Identifier">reserved1</span> <span class="Symbol">=</span> <span class="Identifier">DWORD</span></pre>
+              <!-- reserved1 = DWORD -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.rev_major"></a>rev_major</td>
+                  <td>
+                    <pre><span class="Identifier">rev_major</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- rev_major = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.rev_minor"></a>rev_minor</td>
+                  <td>
+                    <pre><span class="Identifier">rev_minor</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- rev_minor = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.t1_timeouts"></a>t1_timeouts</td>
+                  <td>
+                    <pre><span class="Identifier">t1_timeouts</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- t1_timeouts = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.ti_timeouts"></a>ti_timeouts</td>
+                  <td>
+                    <pre><span class="Identifier">ti_timeouts</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- ti_timeouts = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.xmit_aborts"></a>xmit_aborts</td>
+                  <td>
+                    <pre><span class="Identifier">xmit_aborts</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- xmit_aborts = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.xmit_buf_unavail"></a>xmit_buf_unavail</td>
+                  <td>
+                    <pre><span class="Identifier">xmit_buf_unavail</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- xmit_buf_unavail = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TAdapterStatus.xmit_success"></a>xmit_success</td>
+                  <td>
+                    <pre><span class="Identifier">xmit_success</span> <span class="Symbol">=</span> <span class="Identifier">DWORD</span></pre>
+              <!-- xmit_success = DWORD -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TFindNameBuffer"></a>TFindNameBuffer</td>
+              <td>
+                <pre><span class="Identifier">TFindNameBuffer</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TFindNameBuffer = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameBuffer.access_control"></a>access_control</td>
+                  <td>
+                    <pre><span class="Identifier">access_control</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- access_control = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameBuffer.destination_addr"></a>destination_addr</td>
+                  <td>
+                    <pre><span class="Identifier">destination_addr</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Number">5</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- destination_addr = array [ 0 .. 5 ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameBuffer.frame_control"></a>frame_control</td>
+                  <td>
+                    <pre><span class="Identifier">frame_control</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- frame_control = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameBuffer.length"></a>length</td>
+                  <td>
+                    <pre><span class="Identifier">length</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- length = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameBuffer.routing_info"></a>routing_info</td>
+                  <td>
+                    <pre><span class="Identifier">routing_info</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Number">17</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- routing_info = array [ 0 .. 17 ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameBuffer.source_addr"></a>source_addr</td>
+                  <td>
+                    <pre><span class="Identifier">source_addr</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Number">5</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- source_addr = array [ 0 .. 5 ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TFindNameHeader"></a>TFindNameHeader</td>
+              <td>
+                <pre><span class="Identifier">TFindNameHeader</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TFindNameHeader = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameHeader.node_count"></a>node_count</td>
+                  <td>
+                    <pre><span class="Identifier">node_count</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- node_count = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameHeader.reserved"></a>reserved</td>
+                  <td>
+                    <pre><span class="Identifier">reserved</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- reserved = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TFindNameHeader.unique_group"></a>unique_group</td>
+                  <td>
+                    <pre><span class="Identifier">unique_group</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- unique_group = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TLanaEnum"></a>TLanaEnum</td>
+              <td>
+                <pre><span class="Identifier">TLanaEnum</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TLanaEnum = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TLanaEnum.lana"></a>lana</td>
+                  <td>
+                    <pre><span class="Identifier">lana</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Identifier">MAX_LANA</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- lana = array [ 0 .. MAX_LANA ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TLanaEnum.length"></a>length</td>
+                  <td>
+                    <pre><span class="Identifier">length</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- length = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TNameBuffer"></a>TNameBuffer</td>
+              <td>
+                <pre><span class="Identifier">TNameBuffer</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TNameBuffer = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNameBuffer.name"></a>name</td>
+                  <td>
+                    <pre><span class="ReservedWord">name</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Identifier">NCBNAMSZ</span> <span class="Symbol">-</span> <span class="Number">1</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- name = array [ 0 .. NCBNAMSZ - 1 ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNameBuffer.name_flags"></a>name_flags</td>
+                  <td>
+                    <pre><span class="Identifier">name_flags</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- name_flags = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNameBuffer.name_num"></a>name_num</td>
+                  <td>
+                    <pre><span class="Identifier">name_num</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- name_num = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TNCB"></a>TNCB</td>
+              <td>
+                <pre><span class="Identifier">TNCB</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TNCB = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_buffer"></a>ncb_buffer</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_buffer</span> <span class="Symbol">=</span> <span class="Identifier">PChar</span></pre>
+              <!-- ncb_buffer = PChar -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_callname"></a>ncb_callname</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_callname</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Identifier">NCBNAMSZ</span> <span class="Symbol">-</span> <span class="Number">1</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">char</span></pre>
+              <!-- ncb_callname = array [ 0 .. NCBNAMSZ - 1 ] of char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_cmd_cplt"></a>ncb_cmd_cplt</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_cmd_cplt</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_cmd_cplt = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_command"></a>ncb_command</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_command</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_command = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_event"></a>ncb_event</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_event</span> <span class="Symbol">=</span> <span class="Identifier">THandle</span></pre>
+              <!-- ncb_event = THandle -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_lana_num"></a>ncb_lana_num</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_lana_num</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_lana_num = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_length"></a>ncb_length</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_length</span> <span class="Symbol">=</span> <span class="Identifier">Word</span></pre>
+              <!-- ncb_length = Word -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_lsn"></a>ncb_lsn</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_lsn</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_lsn = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_name"></a>ncb_name</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_name</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Identifier">NCBNAMSZ</span> <span class="Symbol">-</span> <span class="Number">1</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">char</span></pre>
+              <!-- ncb_name = array [ 0 .. NCBNAMSZ - 1 ] of char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_num"></a>ncb_num</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_num</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_num = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_post"></a>ncb_post</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_post</span> <span class="Symbol">=</span> <span class="Identifier">TNCBPostProc</span></pre>
+              <!-- ncb_post = TNCBPostProc -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_reserve"></a>ncb_reserve</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_reserve</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Number">9</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_reserve = array [ 0 .. 9 ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_retcode"></a>ncb_retcode</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_retcode</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_retcode = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_rto"></a>ncb_rto</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_rto</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_rto = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TNCB.ncb_sto"></a>ncb_sto</td>
+                  <td>
+                    <pre><span class="Identifier">ncb_sto</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- ncb_sto = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicType.gif" alt=""/>&nbsp;<a name="Types.TNCBPostProc"></a>TNCBPostProc</td>
+              <td>
+                <pre><span class="Identifier">TNCBPostProc</span> <span class="Symbol">=</span> <span class="ReservedWord">Procedure</span> <span class="Symbol">(</span><span class="Identifier">P</span> <span class="Symbol">:</span> <span class="Identifier">PNCB</span><span class="Symbol">)</span></pre>
+          <!-- TNCBPostProc = Procedure (P : PNCB) -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TSessionBuffer"></a>TSessionBuffer</td>
+              <td>
+                <pre><span class="Identifier">TSessionBuffer</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TSessionBuffer = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionBuffer.local_name"></a>local_name</td>
+                  <td>
+                    <pre><span class="Identifier">local_name</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Identifier">NCBNAMSZ</span> <span class="Symbol">-</span> <span class="Number">1</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- local_name = array [ 0 .. NCBNAMSZ - 1 ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionBuffer.lsn"></a>lsn</td>
+                  <td>
+                    <pre><span class="Identifier">lsn</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- lsn = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionBuffer.rcvs_outstanding"></a>rcvs_outstanding</td>
+                  <td>
+                    <pre><span class="Identifier">rcvs_outstanding</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- rcvs_outstanding = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionBuffer.remote_name"></a>remote_name</td>
+                  <td>
+                    <pre><span class="Identifier">remote_name</span> <span class="Symbol">=</span> <span class="ReservedWord">array</span> <span class="Symbol">[</span> <span class="Number">0</span> <span class="Symbol">.</span><span class="Symbol">.</span> <span class="Identifier">NCBNAMSZ</span> <span class="Symbol">-</span> <span class="Number">1</span> <span class="Symbol">]</span> <span class="ReservedWord">of</span> <span class="Identifier">Char</span></pre>
+              <!-- remote_name = array [ 0 .. NCBNAMSZ - 1 ] of Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionBuffer.sends_outstanding"></a>sends_outstanding</td>
+                  <td>
+                    <pre><span class="Identifier">sends_outstanding</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- sends_outstanding = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionBuffer.state"></a>state</td>
+                  <td>
+                    <pre><span class="Identifier">state</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- state = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/PublicRecord.gif" alt=""/>&nbsp;<a name="Types.TSessionHeader"></a>TSessionHeader</td>
+              <td>
+                <pre><span class="Identifier">TSessionHeader</span> <span class="Symbol">=</span> <span class="ReservedWord">Record</span></pre>
+          <!-- TSessionHeader = Record -->
+          <div class="Indent">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Data / Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionHeader.num_sess"></a>num_sess</td>
+                  <td>
+                    <pre><span class="Identifier">num_sess</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- num_sess = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionHeader.rcv_any_outstanding"></a>rcv_any_outstanding</td>
+                  <td>
+                    <pre><span class="Identifier">rcv_any_outstanding</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- rcv_any_outstanding = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionHeader.rcv_dg_outstanding"></a>rcv_dg_outstanding</td>
+                  <td>
+                    <pre><span class="Identifier">rcv_dg_outstanding</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- rcv_dg_outstanding = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+                <tr>
+                  <td><img class="verticallymiddle" src="Images/PublicField.gif" alt=""/>&nbsp;<a name="Types.TSessionHeader.sess_name"></a>sess_name</td>
+                  <td>
+                    <pre><span class="Identifier">sess_name</span> <span class="Symbol">=</span> <span class="Identifier">Char</span></pre>
+              <!-- sess_name = Char -->
+              <div class="Indent">
+              </div>
+      
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+      <!-- Uses -->
+      <h2><img class="verticallymiddle" src="Images/UsesLabel.gif" alt=""/>&nbsp;<a name="Uses2"></a>Uses</h2>
+      <div class="Indent">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Data / Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img class="verticallymiddle" src="Images/UsesItem.gif" alt=""/>&nbsp;<a name="Uses.Windows"></a>Windows</td>
+              <td>
+                <pre><span class="Identifier">Windows</span></pre>
+          <!-- Windows -->
+          <div class="Indent">
+          </div>
+      
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      
+
+    </div>
+
+  </body>
+</html>

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       20 Jan 2018
+  @Date       27 Feb 2018
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -307,7 +307,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE} //: @debug should be CODESITE
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   {$IFDEF PROFILECODE}
@@ -791,12 +791,15 @@ begin
                 FImplementedMethodsLabel := Add(strImplementedMethodsLabel,
                   iiImplementedMethods, scNone, Nil) As TLabelContainer;
               C := FImplementedMethodsLabel;
-            End else
+            End Else
             Begin
-              E := CurrentMethod.FindElement(strAnonymousMethods);
-              If E = Nil Then
-                E := CurrentMethod.Add(strAnonymousMethods, iiMethodsLabel, scNone, Nil);
-              C := E;
+              If Assigned(CurrentMethod) Then
+                Begin
+                  E := CurrentMethod.FindElement(strAnonymousMethods);
+                  If E = Nil Then
+                    E := CurrentMethod.Add(strAnonymousMethods, iiMethodsLabel, scNone, Nil);
+                  C := E;
+                End;
             End;
           iIcon := iiUnknownClsObj;
           AScope := scNone;
@@ -812,10 +815,11 @@ begin
                       AScope := E.Scope;
                       E := E.FindElement(strTypes);
                     End;
-                  C := C.Add(TLabelContainer.Create(
-                    Method.ClassNames[iCls], AScope, 0, 0, iIcon, Nil));
-                  // Need to add a Types C to the E.FindElement search before
-                  // looking for another class.
+                  If Assigned(C) Then
+                    C := C.Add(TLabelContainer.Create(
+                      Method.ClassNames[iCls], AScope, 0, 0, iIcon, Nil));
+                      // Need to add a Types C to the E.FindElement search before
+                      // looking for another class.
                 End;
         End;
       If C Is TRecordDecl Then
@@ -827,10 +831,13 @@ begin
           C := MethodsLabel;
         End;
       tmpMethod := Method;
-      Method := C.Add(tmpMethod) As TPascalMethod;
-      If tmpMethod <> Method Then
-        AddIssue(Format(strDuplicateIdentifierFound, [Method.Identifier,
-          Method.Line, Method.Column]), scNone, tmpMethod.Line, tmpMethod.Column, etError, Self);
+      If Assigned(C) Then
+        Begin
+          Method := C.Add(tmpMethod) As TPascalMethod;
+          If tmpMethod <> Method Then
+            AddIssue(Format(strDuplicateIdentifierFound, [Method.Identifier,
+              Method.Line, Method.Column]), scNone, tmpMethod.Line, tmpMethod.Column, etError, Self);
+        End;
     End;
 end;
 

@@ -307,6 +307,7 @@ type
     Procedure TestCodeFailure37;
     Procedure TestCodeFailure38;
     Procedure TestCodeFailure39;
+    Procedure TestCodeFailure40;
   Public
   End;
 
@@ -2270,6 +2271,40 @@ Begin
     'End;',
     [ttErrors],
     []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure40;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TfrmMyEditorMainForm = Class'#13#10 +
+    '    Function FindEditor(Const strFileName: String): TDGHSynEdit;'#13#10 +
+    '  End;',
+    'Function TfrmMyEditorMainForm.FindEditor(Const strFileName: String): TDGHSynEdit;'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  i: Integer;'#13#10 +
+    '  ;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, ''FindEditor'', tmoTiming);{$ENDIF}'#13#10 +
+    '  Editor := Nil;'#13#10 +
+    '  TabbedDocIterator('#13#10 +
+    '    Procedure(Const E : TDGHSynEdit; Const iIndex : Integer)'#13#10 +
+    '    Begin'#13#10 +
+    '      If AnsiCompareFileName(strFileName, E.FileName) = 0 Then'#13#10 +
+    '        Editor := E;'#13#10 +
+    '    End'#13#10 +
+    '  );'#13#10 +
+    '  Result := Editor;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [],
+    1
   );
 End;
 

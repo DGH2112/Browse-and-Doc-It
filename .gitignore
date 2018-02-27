@@ -66,3 +66,9 @@ __recovery/
 *.stat
 
 # Browse and Doc It files to be ignored
+ModelSupport_*/
+DCUs/
+Archive/
+OLD DLLs/
+*.elf
+*.profile

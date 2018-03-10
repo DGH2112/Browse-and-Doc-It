@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    27 Feb 2018
   @Author  David Hoyle
 
 **)
@@ -42,20 +42,14 @@ Type
     Procedure CheckForCursorMovement(Const Editor : IOTASourceEditor);
     Procedure CheckFileNameAndSize(Const Editor : IOTASourceEditor);
     // INTAEditServicesNotifier
-    //: @nometric MissingCONSTInParam
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
-    //: @nometric MissingCONSTInParam
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
     procedure WindowActivated(const EditWindow: INTAEditWindow);
-    //: @nometric MissingCONSTInParam
     procedure WindowCommand(const EditWindow: INTAEditWindow; Command, Param: Integer; var Handled: Boolean);
     procedure EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
     procedure EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
-    //: @nometric MissingCONSTInParam
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    //: @nometric MissingCONSTInParam
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    //: @nometric MissingCONSTInParam
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
   Public
     Constructor Create;
@@ -66,7 +60,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,
@@ -178,8 +172,8 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow DockForm
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
@@ -197,8 +191,8 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow DockForm
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
@@ -217,8 +211,8 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow DockForm
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
@@ -390,18 +384,20 @@ end;
   @precon  None.
   @postcon Refreshes the module explorer IF the last parser was sucessful.
 
-  @nohint
+  @nohint  EditWindow EditView
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   EditView   as an IOTAEditView as a constant
 
 **)
-procedure TEditorNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
-  const EditView: IOTAEditView);
-begin
+Procedure TEditorNotifier.EditorViewActivated(Const EditWindow: INTAEditWindow;
+  Const EditView: IOTAEditView);
+
+Begin
+  FUpdateTimer.Enabled := True;
   FLastParserResult := True;
   FLastUpdateTickCount := 1;
-end;
+End;
 
 (**
 
@@ -411,7 +407,7 @@ end;
   @precon  None.
   @postcon Logs the last time the editor was updated.
 
-  @nohint
+  @nohint  EditWindow EditView
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   EditView   as an IOTAEditView as a constant
@@ -514,7 +510,7 @@ begin
   If (FLastUpdateTickCount > 0) And
     (GetTickCount > FLastUpdateTickCount + TBADIOptions.BADIOptions.UpdateInterval) Then
     Begin
-      If (Application <> Nil) And (Application.MainForm <> Nil) And Application.MainForm.Visible Then
+      If Assigned(Application) And Assigned(Application.MainForm) And Application.MainForm.Visible Then
         Begin
           FLastUpdateTickCount := 0;
           FUpdateTimer.Enabled := False;
@@ -531,8 +527,8 @@ end;
   This an impementation of the WindowActivated method for the Editor Notifier
   interface.
 
-  @nohint
-  @nometric EmptyMethod
+  @nohint  EditWindow
+  @nocheck EmptyMethod
 
   @precon  None.
   @postcon Not used.
@@ -552,8 +548,8 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow Command Param Handled
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   Command    as an Integer
@@ -573,8 +569,8 @@ end;
   @precon  None.
   @postcon None.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow Operation
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   Operation  as a TOperation
@@ -592,8 +588,8 @@ end;
   @precon  None.
   @postcon None.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow Show LoadedFromDesktop
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow        as an INTAEditWindow as a constant
   @param   Show              as a Boolean

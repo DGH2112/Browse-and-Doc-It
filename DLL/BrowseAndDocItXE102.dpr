@@ -4,10 +4,13 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jan 2018
+  @Date    27 Feb 2018
 
   @nocheck EmptyBEGINEND
 
+  @bug      nohint does not always find tags!
+  @bug      Hints do not align the comment of the method!
+  
   @todo     Splits explorer and documentation options.
   @todo     Add the ability to set individual metric font colours and styles.
   @todo     Add Checks to documentation

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    10 Dec 2017
+  @Date    10 Mar 2018
 
 **)
 Unit BADI.Pascal.MethodDecl;
@@ -41,6 +41,7 @@ Type
     Function HasDirective(Const strDirective : String) : Boolean;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
+    Function GetQualifiedName : String; Override;
     (**
       Returns the string list of directives associated with the method.
       @precon  None.
@@ -256,6 +257,31 @@ begin
   If HasDirective(strForward) Then
     Result := Result + '!' + strForward;
 end;
+
+(**
+
+  This is a getter method for the QualifiedName property.
+
+  @precon  None.
+  @postcon For anonymous methods, the parent qualified name is pre-pended.
+
+  @return  a String
+
+**)
+Function TPascalMethod.GetQualifiedName: String;
+
+ResourceString
+  strAnonymous = 'Anonymous';
+
+Begin
+  Result := Inherited GetQualifiedName;
+  If Length(Result) = 0 Then
+    Begin
+      Result := strAnonymous;
+      If Assigned(Parent) And (Parent Is TGenericMethodDecl) Then
+        Result := (Parent As TGenericMethodDecl).QualifiedName + '.' + Result;
+    End;
+End;
 
 (**
 

@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{BA41C309-29D5-414B-950B-8A1A47C300D0}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Test\BrowseAndDocItTests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Test\BrowseAndDocItTestApp.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="BrowseAndDocIt.dproj">
+            <Dependencies>Test\BrowseAndDocItTests.dproj</Dependencies>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="BrowseAndDocItTests">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocItTests:Clean">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocItTests:Make">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp:Clean">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp:Make">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BrowseAndDocIt" DependsOnTargets="BrowseAndDocItTests">
+        <MSBuild Projects="BrowseAndDocIt.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocIt:Clean" DependsOnTargets="BrowseAndDocItTests:Clean">
+        <MSBuild Projects="BrowseAndDocIt.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocIt:Make" DependsOnTargets="BrowseAndDocItTests:Make">
+        <MSBuild Projects="BrowseAndDocIt.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="BrowseAndDocItTests;BrowseAndDocItTestApp;BrowseAndDocIt"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="BrowseAndDocItTests:Clean;BrowseAndDocItTestApp:Clean;BrowseAndDocIt:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="BrowseAndDocItTests:Make;BrowseAndDocItTestApp:Make;BrowseAndDocIt:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

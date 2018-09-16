@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Jan 2018
+  @Date    02 Sep 2018
   
 **)
 Unit BADI.CustomVirtualStringTree;
@@ -117,7 +117,7 @@ Begin
   Font.Style := [];
   Header.Options := [hoAutoResize, hoOwnerDraw, hoVisible];
   Header.Font.Assign(Font);
-  HintAnimation := hatFade;
+  //: @debug REMOVED FROM 7.0.0 HintAnimation := hatFade;
   HintMode := hmTooltip;
   SelectionBlendFactor := iDefaultBlendFactor;
   TreeOptions.MiscOptions := [toFullRepaintOnResize, toGridExtensions, toInitOnSave,

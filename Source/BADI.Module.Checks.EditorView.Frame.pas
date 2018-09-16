@@ -38,7 +38,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes, System.ImageList;
+  UITypes;
 
 {$INCLUDE CompilerDefinitions.inc}
 

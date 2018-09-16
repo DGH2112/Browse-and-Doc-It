@@ -311,6 +311,9 @@ Const
   {$IFDEF VER320} // Delphi XE10.2 Tokyo
   strCompilerVersion = 'VER320';
   {$ENDIF}
+  {$IFDEF VER330} // Delphi XE10.3 Carnival
+  strCompilerVersion = 'VER320';
+  {$ENDIF}
   {$IFNDEF D0001}
     {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
   {$ENDIF}

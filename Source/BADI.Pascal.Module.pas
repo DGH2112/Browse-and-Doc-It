@@ -10,6 +10,7 @@
               Needs to be able to evaluate constants in the code and use the
               two functions Defined() and Declared().
   @todo       There are some metrics and checks whihc are overridden.
+  @todo       Make the Interface and Implementation uses sections go to those areas of the code on click
   @nometric   UnsortedModule Toxicity
 
 **)

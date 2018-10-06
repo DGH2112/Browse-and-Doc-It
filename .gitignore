@@ -72,3 +72,4 @@ OLD DLLs/
 *.elf
 *.profile
 DLL.zip
+Test/EndUserFailureCode/

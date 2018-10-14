@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    03 Jan 2018
+  @date    14 Oct 2018
 
 **)
 Unit BADI.Module.Checks.Options.Frame;
@@ -62,7 +62,7 @@ Uses
   BADI.Types,
   BADI.Constants,
   BADI.Options, 
-  BADI.Functions;
+  BADI.Functions, BADI.Interfaces;
 
 {$R *.dfm}
 
@@ -188,7 +188,7 @@ Procedure TframeBADIModuleChecksOptions.LoadSettings;
 Var
   N : PVirtualNode;
   NodeData : PCheckNodeData;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
   N := FVSTChecks.GetFirst;
@@ -203,7 +203,7 @@ Begin
           Else
             FVSTChecks.CheckState[N] := csUncheckedNormal;
         ntSubOption:
-          If NodeData.FModuleCheckSubOp In BO.BADIOptions.ModuleCheckSubOptions Then
+          If NodeData.FModuleCheckSubOp In BO.ModuleCheckSubOptions Then
             FVSTChecks.CheckState[N] := csCheckedNormal
           Else
             FVSTChecks.CheckState[N] := csUncheckedNormal;
@@ -263,7 +263,7 @@ Var
   N : PVirtualNode;
   NodeData : PCheckNodeData;
   R : TBADICheckRecord;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
   N := FVSTChecks.GetFirst();

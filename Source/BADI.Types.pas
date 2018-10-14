@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    04 Jan 2018
+  @Version 1.1
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.Types;
@@ -405,6 +405,9 @@ Type
     FStyles     : TFontStyles;
     FBackColour : TColor;
   End;
+
+  (** This is an array of token font info records for each token type **)
+  TBADITokenFontInfoTokenSet = Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
 
   (** An enumerate to define the different types of issues to limit output for. **)
   TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts, ltChecks, ltMetrics);

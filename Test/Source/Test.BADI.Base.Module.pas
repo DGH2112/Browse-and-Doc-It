@@ -1,4 +1,4 @@
-//: @nometrics @nohints
+//: @nochecks @nometrics @nohints
 unit Test.BADI.Base.Module;
 
 interface

@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jan 2018
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.ModuleExplorerOpsFrame;
@@ -366,12 +366,15 @@ Procedure TfmBADIModuleExplorerFrame.SaveSettings;
 
 Var
   k: TBADITokenType;
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
 
 Begin
   TBADIOptions.BADIOptions.TreeFontName := cbxTreeFontName.Text;
   TBADIOptions.BADIOptions.FixedFontName := cbxFixedFontName.Text;
+  TokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo;
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
-    TBADIOptions.BADIOptions.TokenFontInfo[k] := FTokenFontInfo[k];
+    TokenFontInfo[k] := FTokenFontInfo[k];
+  TBADIOptions.BADIOptions.TokenFontInfo := TokenFontInfo;
   TBADIOptions.BADIOptions.TreeFontSize := udTreeFontSize.Position;
   TBADIOptions.BADIOptions.FixedFontSize := udFixedFontSize.Position;
   TBADIOptions.BADIOptions.BGColour := cbxBGColour.Selected;

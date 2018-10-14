@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.Options;
@@ -16,17 +16,14 @@ Uses
   Graphics,
   Generics.Collections,
   IniFiles,
-  BADI.Types;
+  BADI.Types,
+  BADI.Interfaces;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** This is a class to define a set of options for the application. **)
-  TBADIOptions = Class
-  Strict Private
-    Class Var
-      (** This is a clas varaiable to hide and hold the BADI Options instance reference. **)
-      FBADIOptionsInstance : TBADIOptions;
+  TBADIOptions = Class(TInterfacedObject, IBADIOptions)
   Strict Private
     FOptions                : TDocOptions;
     FDefines                : TStringList;
@@ -40,7 +37,9 @@ Type
     FTreeFontSize           : Integer;
     FFixedFontName          : String;
     FFixedFontSize          : Integer;
-    FTokenFontInfo          : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
+    FIDEEditorColours       : IBADIIDEEditorColours;
+    FTokenFontInfo          : Array[False..True] Of TBADITokenFontInfoTokenSet;
+    FUseIDEEditorColours    : Boolean;
     FExcludeDocFiles        : TStringList;
     FMethodDescriptions     : TStringList;
     FScopesToDocument       : TScopes;
@@ -62,21 +61,74 @@ Type
     FHighMetricMargin       : Double;
     FRefactorConstNewLine   : Boolean;
   Strict Protected
-    Function  GetTokenFontInfo(Const ATokenType  : TBADITokenType) : TTokenFontInfo;
-    Procedure SetTokenFontInfo(Const ATokenType  : TBADITokenType;
-      Const ATokenFontInfo : TTokenFontInfo);
-    Function  GetProfilingCode(Const strModuleName: String): String;
-    Procedure SetProfilingCode(Const strModuleName: String; Const strValue: String);
-    Function  GetIssueLimit(Const LimitType : TLimitType) : Integer;
-    Procedure SetIssueLimit(Const LimitType : TLimitType; Const iValue : Integer);
-    Function  GetMenuShortcut(Const iBADIMenu : TBADIMenu) : String;
-    Procedure SetMenuShortcut(Const iBADIMenu : TBADIMenu; Const strShortcut : String);
-    Function  GetModulelMetric(Const eModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
-    Procedure SetModuleMetric(Const eModuleMetric: TBADIModuleMetric;
-      Const recValue: TBADIMetricRecord);
-    Function  GetModulelCheck(Const eModuleCheck: TBADIModuleCheck): TBADICheckRecord;
-    Procedure SetModuleCheck(Const eModuleCheck: TBADIModuleCheck;
-      Const recValue: TBADICheckRecord);
+    // IBADIOptions
+    Function  GetOptions : TDocOptions;
+    Procedure SetOptions(Const setOptions : TDocOptions);
+    Function  GetDefines : TStringList;
+    Function  GetSpecialtags : TList<TBADISpecialTag>;
+    Function  GetExpandedNodes : TStringList;
+    Function  GetUpdateInterval : Cardinal;
+    Procedure SetUpdateInterval(Const iInterval : Cardinal);
+    Function  GetScopesToRender : TScopes;
+    Procedure SetScopesToRender(Const setScopes : TScopes);
+    Function  GetBrowsePosition : TBrowsePosition;
+    Procedure SetBrowsePosition(Const eBrowsePosition : TBrowsePosition);
+    Function  GetTreeFontName : String;
+    Procedure SetTreeFontName(Const strFontName : String);
+    Function  GetTreeFontSize : Integer;
+    Procedure SetTreeFontSize(Const iFontSize : Integer);
+    Function  GetFixedFontName : String;
+    Procedure SetFixedFontName(Const strFontName : String);
+    Function  GetFixedFontSize : Integer;
+    Procedure SetFixedFontSize(Const iFontSize : Integer);
+    Function  GetTokenFontInfo : TBADITokenFontInfoTokenSet;
+    Procedure SetTokenFontInfo(Const TokenFontInfo : TBADITokenFontInfoTokenSet);
+    Function  GetExcludeDocFiles : TStringList;
+    Function  GetMethodDescriptions : TStringList;
+    Function  GetScopestoDocument : TScopes;
+    Procedure SetScopesToDocument(Const setScopes : TScopes);
+    Function  GetModuleExplorerBGColour : TColor;
+    Procedure SetModuleExplorerBGColour(Const iColour : TColor);
+    Function  GetTokenLimit : Integer;
+    Procedure SetTokenLimit(Const iTokenLimit : Integer);
+    Function  GetMaxDocOutputWidth : Integer;
+    Procedure SetMaxDocOutputWidth(Const iMaxDocOutputWidth : Integer);
+    Function  GetManagedNodesLife : Integer;
+    Procedure SetManagedNodesLife(Const iNodeLife : Integer);
+    Function  GetTreeColour : TColor;
+    Procedure SetTreeColour(Const iColour : TColor);
+    Function  GetINIFileName : String;
+    Function  GetProfilingCode(Const strModuleName : String) : String;
+    Procedure SetProfilingCode(Const strModuleName, strProfileCode : String);
+    Function  GetIssueLimit(Const eLimitType : TLimitType) : Integer;
+    Procedure SetIssueLimit(Const eLimitType : TLimitType; Const iLimit : Integer);
+    Function  GetMenuShortcut(Const eBADIMenu : TBADIMenu) : String;
+    Procedure SetMenuShortcut(Const eBADIMenu : TBADIMenu; Const strShortcut : String);
+    Function  GetModuleMetric(Const eModuleMetric : TBADIModuleMetric) : TBADIMetricRecord;
+    Procedure SetModuleMetric(Const eModuleMetric : TBADIModuleMetric;
+      Const recMetric : TBADIMetricRecord);
+    Function  GetModuleMetricSubOps : TBADIModuleMetricSubOps;
+    Procedure SetModuleMetricSubOps(Const setModuleMetricSubOps : TBADIModuleMetricSubOps);
+    Function  GetToxicityPower : Integer;
+    Procedure SetToxicityPower(Const iPower : Integer);
+    Function  GetToxicitySummation : TBADIToxicitySummation;
+    Procedure SetToxicitySummation(Const eToxicitySummartion : TBADIToxicitySummation);
+    Function  GetModuleCheck(Const eModuleCheck : TBADIModuleCheck) : TBADICheckRecord;
+    Procedure SetModuleCheck(Const eModuleCheck : TBADIModuleCheck; Const recCheck : TBADICheckRecord);
+    Function  GetModuleCheckSubOps : TBADIModuleCheckSubOps;
+    Procedure SetModuleCheckSubOps(Const setModuleCheckSubOps : TBADIModuleCheckSubOps);
+    Function  GetLowMetricMargin : Double;
+    Procedure SetLowMetricMargin(Const dblMargin : Double);
+    Function  GetHighMetricMargin : Double;
+    Procedure SetHighMetricMargin(Const dblMargin : Double);
+    Function  GetRefactorConstNewLine : Boolean;
+    Procedure SetRefactorConstNewLine(Const boolNewLine : Boolean);
+    Function  GetUseIDEEditorColours : Boolean;
+    Procedure SetUseIDEEditorColours(Const boolUseIDEEditorColours : Boolean);
+    Procedure LoadSettings;
+    Procedure SaveSettings;
+    Procedure LoadIDEEditorColours;
+  Strict Protected
     Procedure LoadDocOptions(Const iniFile: TMemIniFile);
     Procedure LoadSpecialTags(Const iniFile: TMemIniFile);
     Procedure LoadManagedNodes(Const iniFile: TMemIniFile);
@@ -100,280 +152,23 @@ Type
     Procedure SaveMetrics(Const iniFile: TMemIniFile);
     Procedure SaveChecks(Const iniFile: TMemIniFile);
   Public
-    Constructor Create;
+    Constructor Create(Const IDEEditorColours : IBADIIDEEditorColours);
     Destructor Destroy; Override;
-    Class Function BADIOptions : TBADIOptions;
-    Procedure LoadSettings;
-    Procedure SaveSettings;
-    (**
-      This property contains the basic toggleable options for the application.
-      @precon  None.
-      @postcon Contains the basic toggleable options for the application.
-      @return  a TDocOptions
-    **)
-    Property Options : TDocOptions Read FOptions Write FOptions;
-    (**
-      This property provides a list of Compiler Conditional Defines.
-      @precon  None.
-      @postcon Provides a list of Compiler Conditional Defines.
-      @return  a TStringList
-    **)
-    Property Defines : TStringList Read FDefines;
-    (**
-      This property provide access to the special tags string list.
-      @precon  None.
-      @postcon Provide access to the special tags string list.
-      @return  a TList<TBADISpecialTag>
-    **)
-    Property SpecialTags : TList<TBADISpecialTag> Read FSpecialTags;
-    (**
-      This property provide access to the expanded nodes string list.
-      @precon  None.
-      @postcon Provide access to the expanded nodes string list.
-      @return  a TStringList
-    **)
-    Property ExpandedNodes : TStringList Read FExpandedNodes;
-    (**
-      This property determines the amount of time in milliseonds between the
-      last editor update and the next refresh. Interval only, the application
-      needs to implement the logic.
-      @precon  None.
-      @postcon Gets and sets the update interval.
-      @return  a Cardinal
-    **)
-    Property UpdateInterval : Cardinal Read FUpdateInterval Write FUpdateInterval;
-    (**
-      This property determines the scopes to render in the module explorer.
-      @precon  None.
-      @postcon Gets and sets the scopes to render.
-      @return  a TScopes
-    **)
-    Property ScopesToRender : TScopes Read FScopesToRender Write FScopesToRender;
-    (**
-      This property determines the behaviour of the positioning of the cursor
-      in the editor window.
-      @precon  None.
-      @postcon Gets and sets the browse position.
-      @return  a TBrowsePosition
-    **)
-    Property BrowsePosition : TBrowsePosition Read FBrowsePosition Write FBrowsePosition;
-    (**
-      This property determines the Font Name of the Module Explorer Tree Nodes.
-      @precon  None.
-      @postcon Gets or sets the module explorer tree node font name.
-      @return  a String
-    **)
-    Property TreeFontName : String Read FTreeFontName Write FTreeFontName;
-    (**
-      This property determines the font size of the module explorer tree node font.
-      @precon  None.
-      @postcon Gets or sets the module explorer tree node font size.
-      @return  an Integer
-    **)
-    Property TreeFontSize : Integer Read FTreeFontSize Write FTreeFontSize;
-    (**
-      This property determines the Font Name of the Module Explorer Comment Fixed Fonts.
-      @precon  None.
-      @postcon Gets or sets the module explorer comment fixed font name.
-      @return  a String
-    **)
-    Property FixedFontName : String Read FFixedFontName Write FFixedFontName;
-    (**
-      This property determines the font size of the module explorer comment fixed font.
-      @precon  None.
-      @postcon Gets or sets the module explorer comment fixed font size.
-      @return  an Integer
-    **)
-    Property FixedFontSize : Integer Read FFixedFontSize Write FFixedFontSize;
-    (**
-      This property determines the colour and style attribute of a token in the
-      module explorer
-      @precon  None.
-      @postcon Gets and sets the colour and style of the token.
-      @param   ATokenType as a TBADITokenType as a constant
-      @return  a TTokenFontInfo
-    **)
-    Property TokenFontInfo[Const ATokenType : TBADITokenType] : TTokenFontInfo Read
-      GetTokenFontInfo Write SetTokenFontInfo;
-    (**
-      This properrty holds a list of files / partial or full which should not be
-      documented.
-      @precon  None.
-      @postcon Gets and sets the list.
-      @return  a TStringList
-    **)
-    Property ExcludeDocFiles : TStringList Read FExcludeDocFiles;
-    (**
-      This property stores a list of method descriptions related to pattern
-      matches.
-      @precon  None.
-      @postcon Gets and sets the method list.
-      @return  a TStringList
-    **)
-    Property MethodDescriptions : TStringList Read FMethodDescriptions;
-    (**
-      This property determines the scopes to document.
-      @precon  None.
-      @postcon Gets and sets the scopes to document.
-      @return  a TScopes
-    **)
-    Property ScopesToDocument : TScopes Read FScopesToDocument Write FScopesToDocument;
-    (**
-      This gets and sets the background colour for the Module explorer.
-      @precon  None.
-      @postcon Gets and sets the background colour for the Module explorer.
-      @return  a TColor
-    **)
-    Property BGColour : TColor Read FModuleExplorerBGColour Write FModuleExplorerBGColour;
-    (**
-      This property gets ans sets the token limit to the module explorer.
-      @precon  None.
-      @postcon Gets ans sets the token limit to the module explorer.
-      @return  an Integer
-    **)
-    Property TokenLimit : Integer Read FTokenLimit Write FTokenLimit;
-    (**
-      This property gets and sets the maximum width of the code output in
-      documentation.
-      @precon  None.
-      @postcon Gets and sets the maximum width of the code output in
-               documentation.
-      @return  an Integer
-    **)
-    Property MaxDocOutputWidth : Integer Read FMaxDocOutputWidth Write FMaxDocOutputWidth;
-    (**
-      This property gets and sets the period of time in days which managed nodes
-      are alive for.
-      @precon  None.
-      @postcon Gets and sets the period of time in days which managed nodes
-               are alive for.
-      @return  an Integer
-    **)
-    Property ManagedNodesLife : Integer Read FManagedNodesLife Write FManagedNodesLife;
-    (**
-      This property gets and sets the colour of the explorer tree lines.
-      @precon  None.
-      @postcon Gets and sets the colour of the explorer tree lines.
-      @return  a TColor
-    **)
-    Property TreeColour : TColor Read FTreeColour Write FTreeColour;
-    (**
-      This property returns the name of the inifile.
-      @precon  None.
-      @postcon Returns the name of the inifile.
-      @return  a String
-    **)
-    Property INIFileName : String Read FINIFileName;
-    (**
-      This property gets and sets the profiling code for the given filenames.
-      @precon  None.
-      @postcon Gets and sets the profiling code for the given filenames.
-      @param   strModuleName as a String as a constant
-      @return  a String
-    **)
-    Property ProfilingCode[Const strModuleName : String] : String Read GetProfilingCode
-      Write SetProfilingCode;
-    (**
-      This property gets and sets the numerical limits for the output of errors, warnings,
-      hints and conflicts.
-      @precon  None.
-      @postcon Gets and sets the numerical limits for the output of errors, warnings,
-               hints and conflicts.
-      @param   LimitType as a TLimitType as a constant
-      @return  an Integer
-    **)
-    Property IssueLimits[Const LimitType : TLimitType] : Integer Read GetIssueLimit
-      Write SetIssueLimit;
-    (**
-      This property provide access to the string representation of the menu shortcuts.
-      @precon  None.
-      @postcon Gets and sets the string representation of the menu shortcuts.
-      @param   BADIMenu as a TBADIMenu as a constant
-      @return  a String
-    **)
-    Property MenuShortcut[Const BADIMenu : TBADIMenu] : String Read GetMenuShortcut
-      Write SetMenuShortcut;
-    (**
-      A property to read and write module metric configuration information.
-      @precon  None.
-      @postcon Gets and sets the module metric information.
-      @param   eModuleMetric as a TBADIModuleMetric as a constant
-      @return  a TBADIMetricRecord
-    **)
-    Property ModuleMetric[Const eModuleMetric : TBADIModuleMetric] : TBADIMetricRecord
-      Read GetModulelMetric Write SetModuleMetric;
-    (**
-      This property gets and sets the metric sub-options set.
-      @precon  None.
-      @postcon Gets and sets the metric sub-options set.
-      @return  a TBADIModuleMetricSubOps
-    **)
-    Property ModuleMetricSubOptions : TBADIModuleMetricSubOps Read FModuleMetricSubOps
-      Write FModuleMEtricSubOps;
-    (**
-      This property defines the power of the y = x ^ z equiation used to combine the metrics for
-      toxicity.
-      @precon  None.
-      @postcon Gets ad sets the power of the toxicity summation.
-      @return  an Integer
-    **)
-    Property ToxicityPower : Integer Read FToxicityPower Write FToxicityPower;
-    (**
-      This property determines whether the metrics are summed before or after being powered.
-      @precon  None.
-      @postcon Gets and set the toxicity summation mechanism.
-      @return  a TBADIToxicitySummation
-    **)
-    Property ToxicitySummartion : TBADIToxicitySummation Read FToxicitySummation
-      Write FToxicitySummation;
-    (**
-      A property to read and write module checks configuration information.
-      @precon  None.
-      @postcon Gets and sets the module check information.
-      @param   eModuleCheck as a TBADIModuleCheck as a constant
-      @return  a TBADICheckRecord
-    **)
-    Property ModuleCheck[Const eModuleCheck : TBADIModuleCheck] : TBADICheckRecord
-      Read GetModulelCheck Write SetModuleCheck;
-    (**
-      This property gets and sets the check sub-options set.
-      @precon  None.
-      @postcon Gets and sets the check sub-options set.
-      @return  a TBADIModuleCheckSubOps
-    **)
-    Property ModuleCheckSubOptions : TBADIModuleCheckSubOps Read FModuleCheckSubOps
-      Write FModuleCheckSubOps;
-    (**
-      A property to define the lower limit margin for metrics in the metrics views.
-      @precon  None.
-      @postcon Returns the lower margin limit for a metric (a percentage).
-      @return  a Double
-    **)
-    Property LowMetricMargin : Double Read FLowMetricMargin Write FLowMetricMargin;
-    (**
-      A property to define the upper limit margin for metrics in the metrics views.
-      @precon  None.
-      @postcon Returns the upper margin limit for a metric (a percentage).
-      @return  a Double
-    **)
-    Property HighMetricMargin : Double Read FHighMetricMargin Write FHighMetricMargin;
-    (**
-      A property to determine of a constant refactoring should have a new line between declaration
-      sections.
-      @precon  None.
-      @postcon Gets or set the boolena value.
-      @return  a Boolean
-    **)
-    Property RefactorConstNewLine : Boolean Read FRefactorConstNewLine Write FRefactorConstNewLine;
+    Class Function BADIOptions : IBADIOptions;
+    Class Procedure Release;
   End;
 
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   SysUtils,
   BADI.Constants,
   BADI.Module.Dispatcher,
-  BADI.Functions;
+  BADI.Functions,
+  BADI.IDEEditorColours;
 
 Const
   (** An INI section name for the special tag names. **)
@@ -476,6 +271,12 @@ Const
   strToxicityPower = 'ToxicityPower';
   (** A constant string to define the INI key for Toxicity Summation **)
   strToxicitySummation = 'ToxicitySummation';
+  (** An INI Key for Using IDE Editor Colours rather than custom colours. **)
+  strUseIDEEditorColours = 'UseIDEEditorColours';
+
+Var
+  (** This is a class varaiable to hide and hold the BADI Options instance reference. **)
+  FBADIOptionsInstance  : IBADIOptions;
 
 (**
 
@@ -484,14 +285,14 @@ Const
   @precon  None.
   @postcon returns the instance of the BADI Options (and creates it if it hasnt alrady been done).
 
-  @return  a TBADIOptions
+  @return  an IBADIOptions
 
 **)
-Class Function TBADIOptions.BADIOptions: TBADIOptions;
+Class Function TBADIOptions.BADIOptions: IBADIOptions;
 
 Begin
   If Not Assigned(FBADIOptionsInstance) Then
-    FBADIOptionsInstance := TBADIOptions.Create;
+    FBADIOptionsInstance := TBADIOptions.Create(TBADIIDEEditorColours.Create);
   Result := FBADIOptionsInstance;
 End;
 
@@ -502,8 +303,10 @@ End;
   @precon  None.
   @postcon Does nothing at the moment.
 
+  @param   IDEEditorColours as an IBADIIDEEditorColours as a constant
+
 **)
-Constructor TBADIOptions.Create;
+Constructor TBADIOptions.Create(Const IDEEditorColours : IBADIIDEEditorColours);
 
 Type
   TDefaultSpecialTag = Record
@@ -534,7 +337,9 @@ var
   iTag: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
+  FIDEEditorColours := IDEEditorColours;
   FDefines := TStringList.Create;
   FSpecialTags := TList<TBADISpecialTag>.Create;
   // Create a default set of Special Tags.
@@ -567,6 +372,7 @@ End;
 Destructor TBADIOptions.Destroy;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   SaveSettings;
   FProfilingCode.Free;
   FMethodDescriptions.Free;
@@ -575,7 +381,134 @@ Begin
   FSpecialTags.Free;
   FDefines.Free;
   Inherited Destroy;
-  FBADIOptionsInstance := Nil;
+End;
+
+(**
+
+  This is a getter method for the BrowsePosition property.
+
+  @precon  None.
+  @postcon Returns the position the cursor shold be placed when browsing.
+
+  @return  a TBrowsePosition
+
+**)
+Function TBADIOptions.GetBrowsePosition: TBrowsePosition;
+
+Begin
+  Result := FBrowsePosition;
+End;
+
+(**
+
+  This is a getter method for the Defines property.
+
+  @precon  None.
+  @postcon Returns a strings ist containing all the conditional defines for the current project.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetDefines: TStringList;
+
+Begin
+  Result := FDefines;
+End;
+
+(**
+
+  This is a getter method for the ExcludeDocFiles property.
+
+  @precon  None.
+  @postcon Returns a string list of filename / path patterns to be used to ignore documentation.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetExcludeDocFiles: TStringList;
+
+Begin
+  Result := FExcludeDocFiles;
+End;
+
+(**
+
+  This is a getter method for the ExpandedNodes property.
+
+  @precon  None.
+  @postcon Returns a string list of the paths of all the expanded nodes.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetExpandedNodes: TStringList;
+
+Begin
+  Result := FExpandedNodes;
+End;
+
+(**
+
+  This is a getter method for the FixedFontName property.
+
+  @precon  None.
+  @postcon Returns the font name to be used for fixed font output.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetFixedFontName: String;
+
+Begin
+  Result := FFixedFontName;
+End;
+
+(**
+
+  This is a getter method for the FixedFontSize property.
+
+  @precon  None.
+  @postcon Returns the fone size to be used for fixed font output.
+
+  @return  an Integer
+
+**)
+Function TBADIOptions.GetFixedFontSize: Integer;
+
+Begin
+  Result := FFixedFontSize;
+End;
+
+(**
+
+  This is a getter method for the HighMetricMargin property.
+
+  @precon  None.
+  @postcon Returns the value to be used as the upper limit for the metric margin.
+
+  @return  a Double
+
+**)
+Function TBADIOptions.GetHighMetricMargin: Double;
+
+Begin
+  Result := FHighMetricMargin;
+End;
+
+(**
+
+  This is a getter method for the INIFileName property.
+
+  @precon  None.
+  @postcon Returns the filename and path for BADI INI file.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetINIFileName: String;
+
+Begin
+  Result := FINIFileName;
 End;
 
 (**
@@ -585,14 +518,62 @@ End;
   @precon  None.
   @postcon Returns the numerical limit for the given limit type.
 
-  @param   LimitType as a TLimitType as a constant
+  @param   eLimitType as a TLimitType as a constant
   @return  an Integer
 
 **)
-Function TBADIOptions.GetIssueLimit(Const LimitType: TLimitType): Integer;
+Function TBADIOptions.GetIssueLimit(Const eLimitType: TLimitType): Integer;
 
 Begin
-  Result := FIssueLimits[LimitType];
+  Result := FIssueLimits[eLimitType];
+End;
+
+(**
+
+  This is a getter method for the LowMetricMargin property.
+
+  @precon  None.
+  @postcon Returns the value to be used for the lower metric margin.
+
+  @return  a Double
+
+**)
+Function TBADIOptions.GetLowMetricMargin: Double;
+
+Begin
+  Result := FLowMetricMargin;
+End;
+
+(**
+
+  This is a getter method for the ManagedNodesLife property.
+
+  @precon  None.
+  @postcon Returns the number of days a node is to be managaed in the expanded nodes list.
+
+  @return  an Integer
+
+**)
+Function TBADIOptions.GetManagedNodesLife: Integer;
+
+Begin
+  Result := FManagedNodesLife;
+End;
+
+(**
+
+  This is a getter method for the MaxDocOutputWidth property.
+
+  @precon  None.
+  @postcon Returns the maximum otuput width to be used for docuentation be a line feed is inserted.
+
+  @return  an Integer
+
+**)
+Function TBADIOptions.GetMaxDocOutputWidth: Integer;
+
+Begin
+  Result := FMaxDocOutputWidth;
 End;
 
 (**
@@ -602,14 +583,30 @@ End;
   @precon  None.
   @postcon Returns the string representation of the enumerated menu shortcut.
 
-  @param   iBADIMenu as a TBADIMenu as a constant
+  @param   eBADIMenu as a TBADIMenu as a constant
   @return  a String
 
 **)
-Function TBADIOptions.GetMenuShortcut(Const iBADIMenu: TBADIMenu): String;
+Function TBADIOptions.GetMenuShortcut(Const eBADIMenu: TBADIMenu): String;
 
 Begin
-  Result := FBADIMenuShortCuts[iBADIMenu];
+  Result := FBADIMenuShortCuts[eBADIMenu];
+End;
+
+(**
+
+  This is a getter method for the MethodDescriptions property.
+
+  @precon  None.
+  @postcon Returns a string list of method descriptions name value pairs (method pattern = description).
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetMethodDescriptions: TStringList;
+
+Begin
+  Result := FMethodDescriptions;
 End;
 
 (**
@@ -623,10 +620,42 @@ End;
   @return  a TBADICheckRecord
 
 **)
-Function TBADIOptions.GetModulelCheck(Const eModuleCheck: TBADIModuleCheck): TBADICheckRecord;
+Function TBADIOptions.GetModuleCheck(Const eModuleCheck: TBADIModuleCheck): TBADICheckRecord;
 
 Begin
   Result := FModuleChecks[eModuleCheck];
+End;
+
+(**
+
+  This is a getter method for the ModuleCheckSubOps property.
+
+  @precon  None.
+  @postcon Returns the module check sub options set.
+
+  @return  a TBADIModuleCheckSubOps
+
+**)
+Function TBADIOptions.GetModuleCheckSubOps: TBADIModuleCheckSubOps;
+
+Begin
+  Result := FModuleCheckSubOps;
+End;
+
+(**
+
+  This is a getter method for the ModuleExploirerBGColour property.
+
+  @precon  None.
+  @postcon Returns the default background colour for the explorer rendering.
+
+  @return  a TColor
+
+**)
+Function TBADIOptions.GetModuleExplorerBGColour: TColor;
+
+Begin
+  Result := FModuleExplorerBGColour;
 End;
 
 (**
@@ -640,10 +669,42 @@ End;
   @return  a TBADIMetricRecord
 
 **)
-Function TBADIOptions.GetModulelMetric(Const eModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
+Function TBADIOptions.GetModuleMetric(Const eModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
 
 Begin
   Result := FModuleMetrics[eModuleMetric];
+End;
+
+(**
+
+  This is a getter method for the ModuleMetricSubOps property.
+
+  @precon  None.
+  @postcon Returns the module metric sub options set.
+
+  @return  a TBADIModuleMetricSubOps
+
+**)
+Function TBADIOptions.GetModuleMetricSubOps: TBADIModuleMetricSubOps;
+
+Begin
+  Result := FModuleMetricSubOps;
+End;
+
+(**
+
+  This is a getter method for the Options property.
+
+  @precon  None.
+  @postcon Returns a set of the document options to be used for rendering module information.
+
+  @return  a TDocOptions
+
+**)
+Function TBADIOptions.GetOptions: TDocOptions;
+
+Begin
+  Result := FOptions;
 End;
 
 (**
@@ -658,7 +719,8 @@ End;
 
 **)
 Function TBADIOptions.GetProfilingCode(Const strModuleName : String): String;
-var
+
+Var
   iModule: Integer;
 
 Begin
@@ -674,21 +736,210 @@ End;
 
 (**
 
+  This is a getter method for the RefactorConstNewLine property.
+
+  @precon  None.
+  @postcon Returns whether a new line shoudl be inserted for constant refactoring.
+
+  @return  a Boolean
+
+**)
+Function TBADIOptions.GetRefactorConstNewLine: Boolean;
+
+Begin
+  Result := FRefactorConstNewLine;
+End;
+
+(**
+
+  This is a getter method for the ScopesToDocument property.
+
+  @precon  None.
+  @postcon Returns the scopes to be documented.
+
+  @return  a TScopes
+
+**)
+Function TBADIOptions.GetScopestoDocument: TScopes;
+
+Begin
+  Result := FScopesToDocument;
+End;
+
+(**
+
+  This is a getter method for the ScopesToRender property.
+
+  @precon  None.
+  @postcon Returns the scopes to be rendered in the module explorer.
+
+  @return  a TScopes
+
+**)
+Function TBADIOptions.GetScopesToRender: TScopes;
+
+Begin
+  Result := FScopesToRender;
+End;
+
+(**
+
+  This is a getter method for the SpecialTags property.
+
+  @precon  None.
+  @postcon Returns a list of the special tags.
+
+  @return  a TList<TBADISpecialTag>
+
+**)
+Function TBADIOptions.GetSpecialtags: TList<TBADISpecialTag>;
+
+Begin
+  Result := FSpecialTags;
+End;
+
+(**
 
   This is a getter method for the TokenFontInfo property.
 
   @precon  None.
   @postcon Retursn the record information for the token type.
 
-
-  @param   ATokenType as a TBADITokenType as a constant
-  @return  a TTokenFontInfo
+  @return  a TBADITokenFontInfoTokenSet
 
 **)
-Function TBADIOptions.GetTokenFontInfo(Const ATokenType: TBADITokenType): TTokenFontInfo;
+Function TBADIOptions.GetTokenFontInfo : TBADITokenFontInfoTokenSet;
 
 Begin
-  Result := FTokenFontInfo[ATokenType];
+  Result := FTokenFontInfo[FUseIDEEditorColours];
+End;
+
+(**
+
+  This is a getter method for the TokenLimit property.
+
+  @precon  None.
+  @postcon Returns the maximum number of tokens to render in the module explorer.
+
+  @return  an Integer
+
+**)
+Function TBADIOptions.GetTokenLimit: Integer;
+
+Begin
+  Result := FTokenLimit;
+End;
+
+(**
+
+  This is a getter method for the ToxicityPower property.
+
+  @precon  None.
+  @postcon Returns the power to be used to calculate the toxcity of method.
+
+  @return  an Integer
+
+**)
+Function TBADIOptions.GetToxicityPower: Integer;
+
+Begin
+  Result := FToxicityPower;
+End;
+
+(**
+
+  This is a getter method for the ToxicitySummation property.
+
+  @precon  None.
+  @postcon Returns the type of summation to be used in the toxicity calculation.
+
+  @return  a TBADIToxicitySummation
+
+**)
+Function TBADIOptions.GetToxicitySummation: TBADIToxicitySummation;
+
+Begin
+  Result := FToxicitySummation;
+End;
+
+(**
+
+  This is a getter method for the TreeColour property.
+
+  @precon  None.
+  @postcon Returns the colour to be used to render the tree in the module explorer.
+
+  @return  a TColor
+
+**)
+Function TBADIOptions.GetTreeColour: TColor;
+
+Begin
+  Result := FTreeColour;
+End;
+
+(**
+
+  This is a getter method for the TreeFontName property.
+
+  @precon  None.
+  @postcon Returns the name of the font to be used for the proportional font text.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetTreeFontName: String;
+
+Begin
+  Result := FTreeFontName;
+End;
+
+(**
+
+  This is a getter method for the TreeFontSize property.
+
+  @precon  None.
+  @postcon Returns the font size to be used for the tree proportional font in the module explorer.
+
+  @return  an Integer
+
+**)
+Function TBADIOptions.GetTreeFontSize: Integer;
+
+Begin
+  Result := FTreeFontSize;
+End;
+
+(**
+
+  This is a getter method for the Updateinterval property.
+
+  @precon  None.
+  @postcon Returns the update interval for refreshing the module explorer (in milliseconds).
+
+  @return  a Cardinal
+
+**)
+Function TBADIOptions.GetUpdateInterval: Cardinal;
+ 
+Begin
+  Result := FUpdateInterval;
+End;
+
+(**
+
+  This is a getter method for the UseIDEEditorColours property.
+
+  @precon  None.
+  @postcon Returns whether the module explorer uses custom colours or editor colours.
+
+  @return  a Boolean
+
+**)
+Function TBADIOptions.GetUseIDEEditorColours: Boolean;
+
+Begin
+  Result := FUseIDEEditorColours;
 End;
 
 (**
@@ -764,6 +1015,21 @@ Begin
     TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions := iniFile.ReadString(strModuleExtensions,
       TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
       TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions);
+End;
+
+(**
+
+  This method loads the IDE Editor Colours using the given interface.
+
+  @precon  None.
+  @postcon The IDEs Editor Colours are loaded.
+
+**)
+Procedure TBADIOptions.LoadIDEEditorColours;
+
+Begin
+  If Assigned(FIDEEditorColours) Then
+    FTokenFontInfo[True] := FIDEEditorColours.GetIDEEditorColours;
 End;
 
 (**
@@ -926,16 +1192,23 @@ Begin
   FFixedFontSize := iniFile.ReadInteger(strModuleExplorer, strFixedFontSize, iDefaultFontSize);
   For T := Low(TBADITokenType) To High(TBADITokenType) Do
     Begin
-      FTokenFontInfo[T].FForeColour :=
-        StringToColor(iniFile.ReadString(strTokenFontInfo, Format(strFontColour, [strTokenType[T]]),
-        ColorToString(strTokenTypeInfo[T].FForeColour)));
-      FTokenFontInfo[T].FStyles :=
-        TFontStyles(Byte(iniFile.ReadInteger(strTokenFontInfo, Format(strFontStyles, [strTokenType[T]]),
-        Byte(strTokenTypeInfo[T].FStyles))));
-      FTokenFontInfo[T].FBackColour :=
-        StringToColor(iniFile.ReadString(strTokenFontInfo, Format(strFontBackColour, [strTokenType[T]]),
-        ColorToString(strTokenTypeInfo[T].FBackColour)));
+      FTokenFontInfo[False, T].FForeColour := StringToColor(iniFile.ReadString(
+        strTokenFontInfo,
+        Format(strFontColour, [strTokenType[T]]),
+        ColorToString(strTokenTypeInfo[T].FForeColour)
+      ));
+      FTokenFontInfo[False, T].FStyles := TFontStyles(Byte(iniFile.ReadInteger(
+        strTokenFontInfo,
+        Format(strFontStyles, [strTokenType[T]]),
+        Byte(strTokenTypeInfo[T].FStyles)
+      )));
+      FTokenFontInfo[False, T].FBackColour := StringToColor(iniFile.ReadString(
+        strTokenFontInfo,
+        Format(strFontBackColour, [strTokenType[T]]),
+        ColorToString(strTokenTypeInfo[T].FBackColour)
+      ));
     End;
+  FUseIDEEditorColours := iniFile.ReadBool(strModuleExplorer, strUseIDEEditorColours, False);
   FModuleExplorerBGColour := StringToColor(iniFile.ReadString(strModuleExplorer, strBGColour,
     ColorToString(clWindow)));
   FTokenLimit := iniFile.ReadInteger(strModuleExplorer, strTokenLimit, iDefaultTokenLimit);
@@ -1008,6 +1281,7 @@ Begin
     LoadMetrics(iniFile);
     LoadChecks(iniFile);
     FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
+    LoadIDEEditorColours;
   Finally
     iniFile.Free;
   End;
@@ -1074,6 +1348,20 @@ Begin
   Finally
     sl.Free;
   End;
+End;
+
+(**
+
+  This method forces the release of the interface reference to allow the object to be destroyed.
+
+  @precon  None.
+  @postcon the interface is freed and thus destroyed.
+
+**)
+Class Procedure TBADIOptions.Release;
+
+Begin
+  FBADIOptionsInstance := Nil;
 End;
 
 (**
@@ -1185,7 +1473,7 @@ Var
 
 Begin
   iniFile.EraseSection(strManagedExpandedNodes);
-  For iNode := 0 To ExpandedNodes.Count - 1 Do
+  For iNode := 0 To GetExpandedNodes.Count - 1 Do
     iniFile.WriteInteger(strManagedExpandedNodes, StringReplace(FExpandedNodes[iNode], '=', '|',
       [rfReplaceAll]), Integer(FExpandedNodes.Objects[iNode]));
 End;
@@ -1270,12 +1558,21 @@ Begin
   iniFile.WriteInteger(strModuleExplorer, strFixedFontSize, FFixedFontSize);
   For T := Low(TBADITokenType) To High(TBADITokenType) Do
     Begin
-      iniFile.WriteString(strTokenFontInfo, Format(strFontColour, [strTokenType[T]]),
-        ColorToString(FTokenFontInfo[T].FForeColour));
-      iniFile.WriteInteger(strTokenFontInfo, Format(strFontStyles, [strTokenType[T]]),
-        Byte(FTokenFontInfo[T].FStyles));
-      iniFile.WriteString(strTokenFontInfo, Format(strFontBackColour, [strTokenType[T]]),
-        ColorToString(FTokenFontInfo[T].FBackColour));
+      iniFile.WriteString(
+        strTokenFontInfo,
+        Format(strFontColour, [strTokenType[T]]),
+        ColorToString(FTokenFontInfo[False, T].FForeColour)
+      );
+      iniFile.WriteInteger(
+        strTokenFontInfo,
+        Format(strFontStyles, [strTokenType[T]]),
+        Byte(FTokenFontInfo[False, T].FStyles)
+      );
+      iniFile.WriteString(
+        strTokenFontInfo,
+        Format(strFontBackColour, [strTokenType[T]]),
+        ColorToString(FTokenFontInfo[False, T].FBackColour)
+      );
     End;
   iniFile.WriteString(strModuleExplorer, strBGColour, ColorToString(FModuleExplorerBGColour));
   iniFile.WriteInteger(strModuleExplorer, strTokenLimit, FTokenLimit);
@@ -1341,6 +1638,7 @@ Begin
   Finally
     iniFile.Free;
   End;
+  LoadIDEEditorColours;
 End;
 
 (**
@@ -1398,19 +1696,133 @@ End;
 
 (**
 
+  This is a setter method for the BrowsePosition property.
+
+  @precon  None.
+  @postcon Sets the browsing position to be used.
+
+  @param   eBrowsePosition as a TBrowsePosition as a constant
+
+**)
+Procedure TBADIOptions.SetBrowsePosition(Const eBrowsePosition: TBrowsePosition);
+
+Begin
+  FBrowsePosition := eBrowsePosition;
+End;
+
+(**
+
+  This is a setter method for the FixedFontName property.
+
+  @precon  None.
+  @postcon Sets the name of the fixed font to be used.
+
+  @param   strFontName as a String as a constant
+
+**)
+Procedure TBADIOptions.SetFixedFontName(Const strFontName: String);
+
+Begin
+  FFixedFontName := strFontName;
+End;
+
+(**
+
+  This is a setter method for the FixedFontSize property.
+
+  @precon  None.
+  @postcon Sets the size of the fixed font to be used.
+
+  @param   iFontSize as an Integer as a constant
+
+**)
+Procedure TBADIOptions.SetFixedFontSize(Const iFontSize: Integer);
+
+Begin
+  FFixedFontSize := iFontSize;
+End;
+
+(**
+
+  This is a setter method for the HighMetricMargin property.
+
+  @precon  None.
+  @postcon Sets the value of the high metric margin over which issues should be highlighted and below
+           which should be highlighted as marginal.
+
+  @param   dblMargin as a Double as a constant
+
+**)
+Procedure TBADIOptions.SetHighMetricMargin(Const dblMargin: Double);
+
+Begin
+  FHighMetricMargin := dblMargin;
+End;
+
+(**
+
   This is a setter method for the IssueLimit property.
 
   @precon  None.
   @postcon Sets the numerical limit for the given limit type.
 
-  @param   LimitType as a TLimitType as a constant
-  @param   iValue as an Integer as a constant
+  @param   eLimitType as a TLimitType as a constant
+  @param   iLimit as an Integer as a constant
 
 **)
-Procedure TBADIOptions.SetIssueLimit(Const LimitType: TLimitType; Const iValue: Integer);
+Procedure TBADIOptions.SetIssueLimit(Const eLimitType: TLimitType; Const iLimit: Integer);
 
 Begin
-  FIssueLimits[LimitType] := iValue;
+  FIssueLimits[eLimitType] := iLimit;
+End;
+
+(**
+
+  This is a setter method for the LowMetricMargin property.
+
+  @precon  None.
+  @postcon Sets the valid of the low margin for metrics below which is okay and above should be
+           highlighted.
+
+  @param   dblMargin as a Double as a constant
+
+**)
+Procedure TBADIOptions.SetLowMetricMargin(Const dblMargin: Double);
+
+Begin
+  FLowMetricMargin := dblMargin;
+End;
+
+(**
+
+  This is a setter method for the ManagedNodesLife property.
+
+  @precon  None.
+  @postcon Sets the valud in days for how long a managed node should be kept.
+
+  @param   iNodeLife as an Integer as a constant
+
+**)
+Procedure TBADIOptions.SetManagedNodesLife(Const iNodeLife: Integer);
+
+Begin
+  FManagedNodesLife := iNodeLife;
+End;
+
+(**
+
+  This is a setter method for the MaxDocOutputWidth property.
+
+  @precon  None.
+  @postcon Sets the maximum width of documentation output beyond which the information should be wrapped.
+
+  @param   iMaxDocOutputWidth as an Integer as a constant
+
+**)
+Procedure TBADIOptions.SetMaxDocOutputWidth(Const iMaxDocOutputWidth: Integer);
+
+Begin
+  FMaxDocOutputWidth := iMaxDocOutputWidth;
 End;
 
 (**
@@ -1420,16 +1832,16 @@ End;
   @precon  None.
   @postcon Sets the string representation of the enumerated menu shortcut.
 
-  @param   iBADIMenu   as a TBADIMenu as a constant
+  @param   eBADIMenu   as a TBADIMenu as a constant
   @param   strShortcut as a String as a constant
 
 **)
-Procedure TBADIOptions.SetMenuShortcut(Const iBADIMenu: TBADIMenu;
+Procedure TBADIOptions.SetMenuShortcut(Const eBADIMenu: TBADIMenu;
   Const strShortcut: String);
 
 Begin
-  If FBADIMenuShortCuts[iBADIMenu] <> strShortcut Then
-    FBADIMenuShortCuts[iBADIMenu] := strShortcut;
+  If FBADIMenuShortCuts[eBADIMenu] <> strShortcut Then
+    FBADIMenuShortCuts[eBADIMenu] := strShortcut;
 End;
 
 (**
@@ -1440,14 +1852,46 @@ End;
   @postcon Sets the module check configuration.
 
   @param   eModuleCheck as a TBADIModuleCheck as a constant
-  @param   recValue     as a TBADICheckRecord as a constant
+  @param   recCheck     as a TBADICheckRecord as a constant
 
 **)
 Procedure TBADIOptions.SetModuleCheck(Const eModuleCheck: TBADIModuleCheck;
-  Const recValue: TBADICheckRecord);
+  Const recCheck: TBADICheckRecord);
 
 Begin
-  FModuleChecks[eModuleCheck] := recValue;
+  FModuleChecks[eModuleCheck] := recCheck;
+End;
+
+(**
+
+  This is a setter method for the ModuleCheckSubOps property.
+
+  @precon  None.
+  @postcon Sets the module check sub-options set.
+
+  @param   setModuleCheckSubOps as a TBADIModuleCheckSubOps as a constant
+
+**)
+Procedure TBADIOptions.SetModuleCheckSubOps(Const setModuleCheckSubOps: TBADIModuleCheckSubOps);
+
+Begin
+  FModuleCheckSubOps := setModuleCheckSubOps;
+End;
+
+(**
+
+  This is a setter method for the ModuleExplorerBGColour property.
+
+  @precon  None.
+  @postcon Sets the background colours of the module explorer.
+
+  @param   iColour as a TColor as a constant
+
+**)
+Procedure TBADIOptions.SetModuleExplorerBGColour(Const iColour: TColor);
+
+Begin
+  FModuleExplorerBGColour := iColour;
 End;
 
 (**
@@ -1458,14 +1902,46 @@ End;
   @postcon Sets the module metric configuration.
 
   @param   eModuleMetric as a TBADIModuleMetric as a constant
-  @param   recValue      as a TBADIMetricRecord as a constant
+  @param   recMetric     as a TBADIMetricRecord as a constant
 
 **)
 Procedure TBADIOptions.SetModuleMetric(Const eModuleMetric: TBADIModuleMetric;
-  Const recValue: TBADIMetricRecord);
+  Const recMetric: TBADIMetricRecord);
 
 Begin
-  FModuleMetrics[eModuleMetric] := recValue;
+  FModuleMetrics[eModuleMetric] := recMetric;
+End;
+
+(**
+
+  This is a setter method for the ModuleMetricSubOps property.
+
+  @precon  None.
+  @postcon Sets the value of the Module Metric sub-options set.
+
+  @param   setModuleMetricSubOps as a TBADIModuleMetricSubOps as a constant
+
+**)
+Procedure TBADIOptions.SetModuleMetricSubOps(Const setModuleMetricSubOps: TBADIModuleMetricSubOps);
+
+Begin
+  FModuleMetricSubOps := setModuleMetricSubOps;
+End;
+
+(**
+
+  This is a setter method for the Options property.
+
+  @precon  None.
+  @postcon Sets the main Documenation options set.
+
+  @param   setOptions as a TDocOptions as a constant
+
+**)
+Procedure TBADIOptions.SetOptions(Const setOptions: TDocOptions);
+
+Begin
+  FOptions := setOptions;
 End;
 
 (**
@@ -1475,34 +1951,207 @@ End;
   @precon  None.
   @postcon saves the profiling code for the given filename.
 
-  @param   strModuleName as a String as a constant
-  @param   strValue      as a String as a constant
+  @param   strModuleName  as a String as a constant
+  @param   strProfileCode as a String as a constant
 
 **)
-Procedure TBADIOptions.SetProfilingCode(Const strModuleName : String; Const strValue: String);
+Procedure TBADIOptions.SetProfilingCode(Const strModuleName : String; Const strProfileCode: String);
 
 Begin
-  FProfilingCode.Values[strModuleName] := StringReplace(strValue, #13#10, '|', [rfReplaceAll]);
+  FProfilingCode.Values[strModuleName] := StringReplace(strProfileCode, #13#10, '|', [rfReplaceAll]);
 End;
 
 (**
 
+  This is a setter method for the RefactorConstNewLine property.
+
+  @precon  None.
+  @postcon Sets whether a new line should be aded when inserted a constant refactoring.
+
+  @param   boolNewLine as a Boolean as a constant
+
+**)
+Procedure TBADIOptions.SetRefactorConstNewLine(Const boolNewLine: Boolean);
+
+Begin
+  FRefactorConstNewLine := boolNewLine;
+End;
+
+(**
+
+  This is a setter method for the ScopesToDocument property.
+
+  @precon  None.
+  @postcon Sets the value of the scopes to document set.
+
+  @param   setScopes as a TScopes as a constant
+
+**)
+Procedure TBADIOptions.SetScopesToDocument(Const setScopes: TScopes);
+
+Begin
+  FScopesToDocument := setScopes;
+End;
+
+(**
+
+  This is a setter method for the ScopesToRender property.
+
+  @precon  None.
+  @postcon Sets the value of the scopes to Render set.
+
+  @param   setScopes as a TScopes as a constant
+
+**)
+Procedure TBADIOptions.SetScopesToRender(Const setScopes: TScopes);
+
+Begin
+  FScopesToRender := setScopes;
+End;
+
+(**
 
   This is a setter method for the TokenFontInfo property.
 
   @precon  None.
   @postcon Sets the indexed Token Font Information record.
 
-
-  @param   ATokenType     as a TBADITokenType as a constant
-  @param   ATokenFontInfo as a TTokenFontInfo as a constant
+  @param   TokenFontInfo as a TBADITokenFontInfoTokenSet as a constant
 
 **)
-Procedure TBADIOptions.SetTokenFontInfo(Const ATokenType: TBADITokenType;
-  Const ATokenFontInfo: TTokenFontInfo);
+Procedure TBADIOptions.SetTokenFontInfo(Const TokenFontInfo : TBADITokenFontInfoTokenSet);
 
 Begin
-  FTokenFontInfo[ATokenType] := ATokenFontInfo;
+  FTokenFontInfo[FUseIDEEditorColours] := TokenFontInfo;
+End;
+
+(**
+
+  This is a setter method for the TokenLimit property.
+
+  @precon  None.
+  @postcon Sets the limit for the tokens to be rendered.
+
+  @param   iTokenLimit as an Integer as a constant
+
+**)
+Procedure TBADIOptions.SetTokenLimit(Const iTokenLimit: Integer);
+
+Begin
+  FTokenLimit := iTokenLimit;
+End;
+
+(**
+
+  This is a setter method for the ToxicityPower property.
+
+  @precon  None.
+  @postcon Sets the polynomial power to be used to conbine metrics for the toxicity calculation.
+
+  @param   iPower as an Integer as a constant
+
+**)
+Procedure TBADIOptions.SetToxicityPower(Const iPower: Integer);
+
+Begin
+  FToxicityPower := iPower;
+End;
+
+(**
+
+  This is a setter method for the ToxicitySummation property.
+
+  @precon  None.
+  @postcon Sets the enumerate value which determines how the metrics are combined for the toxcicity
+           calculation.
+
+  @param   eToxicitySummartion as a TBADIToxicitySummation as a constant
+
+**)
+Procedure TBADIOptions.SetToxicitySummation(Const eToxicitySummartion: TBADIToxicitySummation);
+
+Begin
+  FToxicitySummation := eToxicitySummartion;
+End;
+
+(**
+
+  This is a setter method for the TreeColour property.
+
+  @precon  None.
+  @postcon Sets the colour of the module explorer tree.
+
+  @param   iColour as a TColor as a constant
+
+**)
+Procedure TBADIOptions.SetTreeColour(Const iColour: TColor);
+
+Begin
+  FTreeColour := iColour;
+End;
+
+(**
+
+  This is a setter method for the TreeFontName property.
+
+  @precon  None.
+  @postcon Sets the font name for the proportional font used in the tree.
+
+  @param   strFontName as a String as a constant
+
+**)
+Procedure TBADIOptions.SetTreeFontName(Const strFontName: String);
+
+Begin
+  FTreeFontName := strFontName;
+End;
+
+(**
+
+  This is a setter method for the TreeFontSize property.
+
+  @precon  None.
+  @postcon Sets the font size for the proportional font used in the tree.
+
+  @param   iFontSize as a Integer as a constant
+
+**)
+Procedure TBADIOptions.SetTreeFontSize(Const iFontSize: Integer);
+
+Begin
+  FTreeFontSize := iFontSize;
+End;
+
+(**
+
+  This is a setter method for the UpdateInterval property.
+
+  @precon  None.
+  @postcon Sets the update interval for the module explorer in milliseconds.
+
+  @param   iInterval as a Cardinal as a constant
+
+**)
+Procedure TBADIOptions.SetUpdateInterval(Const iInterval: Cardinal);
+
+Begin
+  FUpdateInterval := iInterval;
+End;
+
+(**
+
+  This is a setter method for the UseIDEEditorColours property.
+
+  @precon  None.
+  @postcon Sets whether the IDE Editor colours should b e used for the module explorer or custom colours.
+
+  @param   boolUseIDEEditorColours as a Boolean as a constant
+
+**)
+Procedure TBADIOptions.SetUseIDEEditorColours(Const boolUseIDEEditorColours: Boolean);
+
+Begin
+  FUseIDEEditorColours := boolUseIDEEditorColours;
 End;
 
 End.

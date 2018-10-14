@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    28 Oct 2017
+  @Date    08 Oct 2018
   @Version 1.0
   @Author  David Hoyle
 
@@ -398,7 +398,7 @@ End;
   @precon  None.
   @postcon Override and default GetAsString method and returns the name of the module.
 
-  @nohint
+  @nohint boolShowIdentifier boolForDocumentation
   
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant
@@ -557,7 +557,7 @@ End;
   @precon  None.
   @postcon Initialise this base class and Tokensizes the passed stream of characters.
 
-  @nohint
+  @nohint  Source
 
   @param   Source        as a String as a constant
   @param   strFileName   as a String as a constant

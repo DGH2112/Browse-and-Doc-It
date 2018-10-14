@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    03 Jan 2018
+  @date    14 Oct 2018
 
 **)
 Unit BADI.Module.Metrics.Options.Frame;
@@ -86,7 +86,7 @@ Uses
   BADI.Constants,
   BADI.Options, 
   BADI.Functions,
-  Themes;
+  Themes, BADI.Interfaces;
 
 {$R *.dfm}
 
@@ -229,7 +229,7 @@ Procedure TframeBADIModuleMetricsOptions.LoadSettings;
 Var
   N : PVirtualNode;
   NodeData : PMetricNodeData;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
   N := FVSTMetrics.GetFirst;
@@ -258,10 +258,10 @@ Begin
       N := FVSTMetrics.GetNext(N);
     End;
   vstMetricsChecked(Nil, Nil);
-  udToxicityPower.Position := BO.BADIOptions.ToxicityPower;
-  cbxToxicitySummation.ItemIndex := Integer(BO.BADIOptions.ToxicitySummartion);
-  udMetricLowerLimit.Position := Trunc(BO.BADIOptions.LowMetricMargin);
-  udMetricUpperLimit.Position := Trunc(BO.BADIOptions.HighMetricMargin);
+  udToxicityPower.Position := BO.ToxicityPower;
+  cbxToxicitySummation.ItemIndex := Integer(BO.ToxicitySummartion);
+  udMetricLowerLimit.Position := Trunc(BO.LowMetricMargin);
+  udMetricUpperLimit.Position := Trunc(BO.HighMetricMargin);
   udMetricLowerLimit.OnChangingEx := udMetricLowerLimitChangingEx;
   udMetricUpperLimit.OnChangingEx := udMetricUpperLimitChangingEx;
 End;
@@ -316,7 +316,7 @@ Var
   N : PVirtualNode;
   NodeData : PMetricNodeData;
   R : TBADIMetricRecord;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
   N := FVSTMetrics.GetFirst();
@@ -347,10 +347,10 @@ Begin
       End;
       N := FVSTMetrics.GetNext(N);
     End;
-  BO.BADIOptions.ToxicityPower := udToxicityPower.Position;
-  BO.BADIOptions.ToxicitySummartion := TBADIToxicitySummation(cbxToxicitySummation.ItemIndex);
-  BO.BADIOptions.LowMetricMargin := Int(udMetricLowerLimit.Position);
-  BO.BADIOptions.HighMetricMargin := Int(udMetricUpperLimit.Position);
+  BO.ToxicityPower := udToxicityPower.Position;
+  BO.ToxicitySummartion := TBADIToxicitySummation(cbxToxicitySummation.ItemIndex);
+  BO.LowMetricMargin := Int(udMetricLowerLimit.Position);
+  BO.HighMetricMargin := Int(udMetricUpperLimit.Position);
 End;
 
 (**

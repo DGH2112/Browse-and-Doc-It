@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    04 Jan 2018
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.Constants;
@@ -142,7 +142,7 @@ Const
   );
 
   (** This is a default set of font information for the application. **)
-  strTokenTypeInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo = (
+  strTokenTypeInfo : TBADITokenFontInfoTokenSet = (
     (FForeColour : clRed;        FStyles : [];                     FBackColour: clWindow),
     (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
     (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clWindow),

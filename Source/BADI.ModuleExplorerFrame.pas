@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    28 Dec 2017
+  @Date    14 Oct 2018
   @Author  David Hoyle
   @Version 1.0
 
@@ -32,12 +32,13 @@ Uses
   VirtualTrees,
   StdCtrls,
   RegularExpressions,
+  BADI.Interfaces,
   BADI.Comment,
   BADI.ElementContainer,
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types;
+  BADI.Types, System.Actions, System.ImageList;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
@@ -136,6 +137,7 @@ Type
       strNodeHeightTest = 'Ag';
   Strict Private
     { Private declarations }
+    FBADIOptions       : IBADIOptions;
     FModule            : PVirtualNode;
     FNodeInfo          : TObjectList;
     FSelectionChange   : TSelectionChange;
@@ -317,17 +319,13 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
     @param   AScope as a TScope as a constant
 
   **)
-  Procedure UpdateScopes(Const AScope : TScope); InLine;
-
-  Var
-    O : TBADIOptions;
+  Procedure UpdateScopes(Const AScope : TScope);
 
   Begin
-    O := TBADIOptions.BADIOptions;
-    If AScope In O.ScopesToRender Then
-      O.ScopesToRender := O.ScopesToRender - [AScope]
+    If AScope In FBADIOptions.ScopesToRender Then
+      FBADIOptions.ScopesToRender := FBADIOptions.ScopesToRender - [AScope]
     Else
-      O.ScopesToRender := O.ScopesToRender + [AScope];
+      FBADIOptions.ScopesToRender := FBADIOptions.ScopesToRender + [AScope];
   End;
 
   (**
@@ -340,17 +338,13 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
     @param   Option as a TDocOption as a constant
 
   **)
-  procedure UpdateOptions(Const Option : TDocOption); InLine;
-
-  Var
-    O : TBADIOptions;
+  procedure UpdateOptions(Const Option : TDocOption);
 
   Begin
-    O := TBADIOptions.BADIOptions;
-    If Option In O.Options Then
-      O.Options := O.Options - [Option]
+    If Option In FBADIOptions.Options Then
+      FBADIOptions.Options := FBADIOptions.Options - [Option]
     Else
-      O.Options := O.Options + [Option];
+      FBADIOptions.Options := FBADIOptions.Options + [Option];
   End;
 
 begin
@@ -595,6 +589,7 @@ begin
   {$IFDEF D2009}
   DoubleBuffered := True;
   {$ENDIF}
+  FBADIOptions := TBADIOptions.BADIOptions;
   FExplorer := TBADIVirtualStringTree.Create(Self);
   FExplorer.Parent := Self;
   FExplorer.Align := alClient;
@@ -790,6 +785,8 @@ Var
   HL: TTokenFontInfo;
   i: Integer;
   iRight : Integer;
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
+  iBGColour: TColor;
 
 Begin
   If FExplorer.Selected[FNode] Then
@@ -797,12 +794,14 @@ Begin
       // Need to amend the width of the rectangle for the custom drawing
       iPos := iLeft;
       iRight := iPos;
-      InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties);
+      InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
+      TokenFontInfo := FBADIOptions.TokenFontInfo;
+      iBGColour := FBADIOptions.BGColour;
       For i := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
             FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
-            FTargetCanvas);
+            TokenFontInfo, iBGColour, FTargetCanvas);
           If sl[i] = #13#10 Then
             iRight := iLeft
           Else
@@ -947,27 +946,31 @@ Const
   
 Var
   iLeft, iTop : Integer;
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
+  iBGColour: Integer;
 
 Var
   i: Integer;
   iTextPos: Integer;
   MC: TMatchCollection;
   MR: TMatchResult;
-  iColour: Integer;
+  iColour: TColor;
 
 Begin
   R.Left := R.Left + ilScopeImages.Width + FExplorer.TextMargin;
   iTop := R.Top;
   iLeft := R.Left + iPadding;
   iTextPos := 1;
-  InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties);
+  InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
+  TokenFontInfo := FBADIOptions.TokenFontInfo;
+  iBGColour := FBADIOptions.BGColour;
   If edtExplorerFilter.Text <> '' Then
     MC := FFilterRegEx.Matches(FNodeData.FNode.Text);
   For i := 0 To sl.Count - 1 Do
     Begin
       GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
         FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
-        FTargetCanvas);
+        TokenFontInfo, iBGColour, FTargetCanvas);
       If FNode = FExplorer.FocusedNode Then
         If FTargetCanvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then
           FTargetCanvas.Brush.Color :=
@@ -2081,7 +2084,7 @@ Begin
   NodeData := Sender.GetNodeData(Node);
   If Assigned(NodeData.FNode) Then
     Begin
-      InitCanvasFont(TargetCanvas, tpFixed In NodeData.FNode.TagProperties);
+      InitCanvasFont(TargetCanvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
       sl := NodeData.FNode.Tokens;
       NodeHeight := 1 + TargetCanvas.TextHeight(strNodeHeightTest) + 1;
       For iToken := 0 To sl.Count - 1 Do

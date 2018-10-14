@@ -231,7 +231,9 @@ uses
   Test.BADI.VB.Version in 'Source\Test.BADI.VB.Version.pas',
   Test.BADI.VB.Attribute in 'Source\Test.BADI.VB.Attribute.pas',
   BADI.Refactoring.Functions in '..\Source\BADI.Refactoring.Functions.pas',
-  Test.BADI.Refactoring.Functions in 'Source\Test.BADI.Refactoring.Functions.pas';
+  Test.BADI.Refactoring.Functions in 'Source\Test.BADI.Refactoring.Functions.pas',
+  BADI.Interfaces in '..\Source\BADI.Interfaces.pas',
+  BADI.IDEEditorColours in '..\Source\BADI.IDEEditorColours.pas';
 
 {$R *.RES}
 

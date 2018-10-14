@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    16 Sep 2018
+  @Date    14 Oct 2018
 
   @nocheck EmptyBEGINEND
 
@@ -244,7 +244,8 @@ uses
   BADI.Module.Checks in 'Source\BADI.Module.Checks.pas',
   BADI.Module.Checks.EditorView.Frame in 'Source\BADI.Module.Checks.EditorView.Frame.pas' {frameBADIModuleChecksEditorView: TFrame},
   BADI.Module.Checks.SubView.Frame in 'Source\BADI.Module.Checks.SubView.Frame.pas' {frameBADIModuleChecksSubView: TFrame},
-  BADI.Module.Checks.SubView in 'Source\BADI.Module.Checks.SubView.pas';
+  BADI.Module.Checks.SubView in 'Source\BADI.Module.Checks.SubView.pas',
+  BADI.IDEEditorColours in 'Source\BADI.IDEEditorColours.pas';
 
 {$R *.res}
 

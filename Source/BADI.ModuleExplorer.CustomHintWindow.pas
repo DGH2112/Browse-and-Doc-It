@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.ModuleExplorer.CustomHintWindow;
@@ -20,6 +20,7 @@ Uses
   Classes,
   Windows,
   Graphics,
+  BADI.Interfaces,
   BADI.ModuleExplorer.VirtualStringTree;
 
 Type
@@ -35,13 +36,14 @@ Type
       (** This is the size of the bullett in the special tags list. **)
       iBulletSize = 8;
   Strict Private
-    FComment    : TComment;
-    FNodeLevel  : Integer;
-    FTitle      : Boolean;
-    FCustomDraw : Boolean;
-    FTreeView   : TVirtualStringTree;
-    FNode       : PVirtualNode;
-    FRect       : TRect;
+    FComment     : TComment;
+    FNodeLevel   : Integer;
+    FTitle       : Boolean;
+    FCustomDraw  : Boolean;
+    FTreeView    : TVirtualStringTree;
+    FNode        : PVirtualNode;
+    FRect        : TRect;
+    FBADIOptions : IBADIOptions;
   Strict Protected
     Procedure CalcTreeNodeWidth(Const SyntaxHighlight : Boolean; Const Node : PVirtualNode;
       Var Result : TRect); InLine;
@@ -110,7 +112,7 @@ Begin
   FNodeLevel := NodeData.FNode.Level;
   FCustomDraw := SyntaxHighlight;
   FNode := Node;
-  Color := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+  Color := FBADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
   ActivateHint(Rect, NodeData.FNode.Text);
 End;
 
@@ -161,7 +163,7 @@ Begin
       Inc(Result.Bottom, iPadding + 1);
       Inc(Result.Bottom, iPadding + 1);
       Refresh;
-      InitCanvasFont(Canvas, False);
+      InitCanvasFont(Canvas, False, FBADIOptions);
       SetTokenFont(Canvas, ttCommentText);
       strText := Comment.AsString(MaxInt, False);
       R := Rect(Result.Left + iPadding, 0, Result.Right - iPadding, 0);
@@ -197,11 +199,11 @@ Var
 
 Begin
   For iTag := 0 To Comment.TagCount - 1 Do
-    If CompareText(TBADIOptions.BADIOptions.SpecialTags[iSpecialTag].FName,
+    If CompareText(FBADIOptions.SpecialTags[iSpecialTag].FName,
       Comment.Tag[iTag].TagName) = 0 Then
       Begin
         Refresh;
-        InitCanvasFont(Canvas, Comment.Tag[iTag].Fixed);
+        InitCanvasFont(Canvas, Comment.Tag[iTag].Fixed, FBADIOptions);
         SetTokenFont(Canvas, ttTagHeaderText);
         R := Rect(Result.Left + iPadding, 0, Result.Right - iPadding - iMultipler * iBulletSize, 0);
         strText := Comment.Tag[iTag].AsString(MaxInt, False);
@@ -230,15 +232,15 @@ Var
   strText: String;
 
 Begin
-  For iSpecialTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
+  For iSpecialTag := 0 To FBADIOptions.SpecialTags.Count - 1 Do
     Begin
-      If CanDrawSpecialTag(Comment, TBADIOptions.BADIOptions.SpecialTags[iSpecialTag].FName) Then
+      If CanDrawSpecialTag(Comment, FBADIOptions.SpecialTags[iSpecialTag].FName) Then
         Begin
           Refresh;
-          InitCanvasFont(Canvas, False);
+          InitCanvasFont(Canvas, False, FBADIOptions);
           SetTokenFont(Canvas, ttTagHeaderText);
           R := Rect(Result.Left + iPadding, 0, Result.Right - iPadding, 0);
-          strText := TBADIOptions.BADIOptions.SpecialTags[iSpecialTag].FDescription;
+          strText := FBADIOptions.SpecialTags[iSpecialTag].FDescription;
           Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(strText), -1, R,
             DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
             DrawTextBiDiModeFlagsReadingOnly) + iPadding);
@@ -276,6 +278,8 @@ Var
   iLastmax: Integer;
   iToken: Integer;
   iMaxPos : Integer;
+  TokenFontInfo : TBADITokenFontInfoTokenSet;
+  iBGColour: TColor;
 
 Begin
   iMaxPos := FTreeView.ScreenToClient(Point(Screen.WorkAreaRect.Right, 0)).X - Result.Left;
@@ -286,13 +290,16 @@ Begin
       NodeData := FTreeView.GetNodeData(Node);
       sl := NodeData.FNode.Tokens;
       iLastmax := 0;
-      InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties);
+      InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
+      TokenFontInfo := FBADIOptions.TokenFontInfo;
+      iBGColour := FBADIOptions.BGColour;
       // Start with single line height
       Result.Bottom := Result.Top + iPadding * iMultipler + Canvas.TextHeight(strTextHeightTest);
       For iToken := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, iToken, NodeData.FNode.Title, tpSyntax In NodeData.FNode.TagProperties,
-            NodeData.FNode.ForeColour, NodeData.FNode.BackColour, NodeData.FNode.FontStyles, Canvas);
+            NodeData.FNode.ForeColour, NodeData.FNode.BackColour, NodeData.FNode.FontStyles,
+            TokenFontInfo, iBGColour, Canvas);
           Inc(iPos, Canvas.TextWidth(sl[iToken]));
           If (iPos > iMaxPos) Or (sl[iToken] = #13#10) Then
             Begin
@@ -358,6 +365,7 @@ Constructor TBADICustomHintWindow.Create(Const AOwner: TComponent; Const ATreeVi
 Begin
   Inherited Create(AOwner);
   FTreeView := ATreeView;
+  FBADIOptions := TBADIOptions.BADIOptions;
 End;
 
 (**
@@ -455,24 +463,24 @@ Var
 Begin
   R := FRect;
   R.Top := iBottom;
-  For iSpecialTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
+  For iSpecialTag := 0 To FBADIOptions.SpecialTags.Count - 1 Do
     Begin
-      If CanDrawSpecialTag(FComment, TBADIOptions.BADIOptions.SpecialTags[iSpecialTag].FName) Then
+      If CanDrawSpecialTag(FComment, FBADIOptions.SpecialTags[iSpecialTag].FName) Then
         Begin
           Canvas.Refresh;
           SetTokenFont(Canvas, ttTagHeaderText);
           Inc(R.Top, 1 + iPadding);
-          strText := TBADIOptions.BADIOptions.SpecialTags[iSpecialTag].FDescription;
+          strText := FBADIOptions.SpecialTags[iSpecialTag].FDescription;
           Inc(R.Top, DrawText(Canvas.Handle, PChar(strText), -1, R,
             DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
             DrawTextBiDiModeFlagsReadingOnly) + 1);
           Inc(R.Top, 1 + iPadding);
           For iTag := 0 To FComment.TagCount - 1 Do
-            If CompareText(TBADIOptions.BADIOptions.SpecialTags[iSpecialTag].FName,
+            If CompareText(FBADIOptions.SpecialTags[iSpecialTag].FName,
               FComment.Tag[iTag].TagName) = 0 Then
               Begin
                 SetTokenFont(Canvas, ttTagText);
-                InitCanvasFont(Canvas, FComment.Tag[iTag].Fixed);
+                InitCanvasFont(Canvas, FComment.Tag[iTag].Fixed, FBADIOptions);
                 Canvas.Pen.Color := clBlack;
                 Canvas.Brush.Color := clBlack;
                 Canvas.Ellipse(
@@ -481,8 +489,7 @@ Begin
                   iBulletSize * iMultipler - iBulletSize Div iDivisor,
                   R.Top + iBulletSize * iMultipler - iBulletSize Div iDivisor
                 );
-                Canvas.Brush.Color :=
-                  TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+                Canvas.Brush.Color := FBADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
                 Canvas.Refresh;
                 S := R;
                 S.Left := iBulletSize * iMultipler;
@@ -519,6 +526,8 @@ Var
   R : TRect;
   iLeft : Integer;
   iTop : Integer;
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
+  iBFColour: TColor;
 
 Begin
   iLines := 1;
@@ -527,15 +536,16 @@ Begin
     Begin
       iLeft := FRect.Left;
       iTop := FRect.Top;
-      InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties);
+      InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
+      TokenFontInfo := FBADIOptions.TokenFontInfo;
+      iBFColour := FBADIOptions.BGColour;
       sl := NodeData.FNode.Tokens;
       For i := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, i, FTitle, tpSyntax In NodeData.FNode.TagProperties, NodeData.FNode.ForeColour,
-            NodeData.FNode.BackColour, NodeData.FNode.FontStyles, Canvas);
-          If Canvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then
-            Canvas.Brush.Color :=
-              TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+            NodeData.FNode.BackColour, NodeData.FNode.FontStyles, TokenFontInfo, iBFColour, Canvas);
+          If Canvas.Brush.Color = FBADIOptions.BGColour Then
+            Canvas.Brush.Color := FBADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
           If (sl[i] = #13#10) Or (iLeft + Canvas.TextWidth(sl[i]) > Width) Then
             Begin
               iLeft := FRect.Left;
@@ -552,7 +562,7 @@ Begin
     End Else
     Begin
       S := FRect;
-      InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties);
+      InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
       SetTokenFont(Canvas, ttPlainText);
       Inc(iBottom, DrawText(Canvas.Handle, PChar(NodeData.FNode.Text), Length(NodeData.FNode.Text), S,
         DT_LEFT Or DT_VCENTER));
@@ -572,18 +582,14 @@ End;
 **)
 Procedure TBADICustomHintWindow.SetTokenFont(Const Canvas : TCanvas; Const eTokenType: TBADITokenType);
 
-Var
-  Ops : TBADIOptions;
-
 Begin
-  Ops := TBADIOptions.BADIOptions;
-  Canvas.Font.Name := Ops.TreeFontName;
-  Canvas.Font.Size := Ops.TreeFontSize;
-  Canvas.Font.Color := Ops.TokenFontInfo[eTokenType].FForeColour;
-  Canvas.Font.Style := Ops.TokenFontInfo[eTokenType].FStyles;
-  Canvas.Brush.Color := Ops.TokenFontInfo[eTokenType].FBackColour;
-  If (Canvas.Brush.Color = clNone) Or (Canvas.Brush.Color = Ops.BGColour) Then
-    Canvas.Brush.Color := Ops.TokenFontInfo[ttExplorerHighlight].FBackColour;
+  Canvas.Font.Name := FBADIOptions.TreeFontName;
+  Canvas.Font.Size := FBADIOptions.TreeFontSize;
+  Canvas.Font.Color := FBADIOptions.TokenFontInfo[eTokenType].FForeColour;
+  Canvas.Font.Style := FBADIOptions.TokenFontInfo[eTokenType].FStyles;
+  Canvas.Brush.Color := FBADIOptions.TokenFontInfo[eTokenType].FBackColour;
+  If (Canvas.Brush.Color = clNone) Or (Canvas.Brush.Color = FBADIOptions.BGColour) Then
+    Canvas.Brush.Color := FBADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
 End;
 
 End.

@@ -18,7 +18,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     Height = 42
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 1
+    TabOrder = 0
     DesignSize = (
       525
       42)
@@ -81,22 +81,26 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       TabOrder = 3
     end
   end
-  object lvOptions: TListView
+  object vstGeneralOptions: TVirtualStringTree
     Left = 0
     Top = 0
     Width = 525
     Height = 249
     Align = alClient
-    Checkboxes = True
-    Columns = <
-      item
-        AutoSize = True
-        Caption = 'Module Explorer View Options'
-      end>
-    GridLines = True
-    ReadOnly = True
-    RowSelect = True
-    TabOrder = 0
-    ViewStyle = vsReport
+    Header.AutoSizeIndex = 0
+    Header.MainColumn = -1
+    TabOrder = 1
+    TreeOptions.AnimationOptions = [toAnimatedToggle]
+    TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
+    TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
+    TreeOptions.SelectionOptions = [toFullRowSelect]
+    OnFreeNode = vstGeneralOptionsFreeNode
+    OnGetText = vstGeneralOptionsGetText
+    OnPaintText = vstGeneralOptionsPaintText
+    ExplicitLeft = 160
+    ExplicitTop = 96
+    ExplicitWidth = 200
+    ExplicitHeight = 100
+    Columns = <>
   end
 end

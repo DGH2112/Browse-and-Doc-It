@@ -12,7 +12,7 @@ object frmSpecialTag: TfrmSpecialTag
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poMainFormCenter
   DesignSize = (
     479
     331)
@@ -168,7 +168,7 @@ object frmSpecialTag: TfrmSpecialTag
       object chkBold: TCheckBox
         AlignWithMargins = True
         Left = 3
-        Top = 3
+        Top = 4
         Width = 86
         Height = 17
         Anchors = []
@@ -178,7 +178,7 @@ object frmSpecialTag: TfrmSpecialTag
       object chkItalic: TCheckBox
         AlignWithMargins = True
         Left = 95
-        Top = 3
+        Top = 4
         Width = 86
         Height = 17
         Anchors = []
@@ -188,7 +188,7 @@ object frmSpecialTag: TfrmSpecialTag
       object chkUnderlined: TCheckBox
         AlignWithMargins = True
         Left = 187
-        Top = 3
+        Top = 4
         Width = 86
         Height = 17
         Anchors = []
@@ -197,8 +197,8 @@ object frmSpecialTag: TfrmSpecialTag
       end
       object chkStrikeout: TCheckBox
         AlignWithMargins = True
-        Left = 279
-        Top = 3
+        Left = 280
+        Top = 4
         Width = 87
         Height = 17
         Anchors = []

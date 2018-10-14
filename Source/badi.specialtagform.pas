@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Nov 2017
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.SpecialTagForm;
@@ -24,7 +24,10 @@ Uses
   StdCtrls,
   Buttons,
   CheckLst,
-  BADI.Types, Vcl.ExtCtrls;
+  BADI.Types,
+  Vcl.ExtCtrls;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** Form for editing special tags **)
@@ -58,6 +61,7 @@ Type
 Implementation
 
 Uses
+  ToolsAPI,
   BADI.Constants;
 
 {$R *.DFM}
@@ -114,10 +118,23 @@ Var
   frm : TfrmSpecialTag;
   eTagProp : TBADITagProperty;
   iIndex: Integer;
+  {$IFDEF DXE102}
+  ITS : IOTAIDEThemingServices250;
+  {$ENDIF}
 
 Begin
-  frm := TfrmSpecialTag.Create(Nil);
+  { $IFDEF DXE102
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      ITS.RegisterFormClass(TfrmSpecialTag); // <= Blows up IDE
+  {$ENDIF}
+  frm := TfrmSpecialTag.Create(Application.MainForm);
   Try
+    {$IFDEF DXE102}
+    If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+      If ITS.IDEThemingEnabled Then
+        ITS.ApplyTheme(frm);
+    {$ENDIF}
     Result := False;
     frm.edtName.Text := SpecialTag.FName;
     frm.edtDescription.Text := SpecialTag.FDescription;

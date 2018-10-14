@@ -1672,7 +1672,7 @@ Var
   N : PVirtualNode;
 
 Begin
-  FExplorer.Color := TBADIOptions.BADIOptions.BGColour[TBADIOptions.BADIOptions.UseIDEEditorColours];
+  FExplorer.Color := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
   If Module = Nil Then
     Begin
       strReservedWords := Nil;

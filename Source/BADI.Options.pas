@@ -43,7 +43,7 @@ Type
     FExcludeDocFiles        : TStringList;
     FMethodDescriptions     : TStringList;
     FScopesToDocument       : TScopes;
-    FModuleExplorerBGColour : TColor;
+    FModuleExplorerBGColour : Array[False..True] Of TColor;
     FTokenLimit             : Integer;
     FMaxDocOutputWidth      : Integer;
     FManagedNodesLife       : Integer;
@@ -88,8 +88,8 @@ Type
     Function  GetMethodDescriptions : TStringList;
     Function  GetScopestoDocument : TScopes;
     Procedure SetScopesToDocument(Const setScopes : TScopes);
-    Function  GetModuleExplorerBGColour : TColor;
-    Procedure SetModuleExplorerBGColour(Const iColour : TColor);
+    Function  GetModuleExplorerBGColour(Const boolUseIDEEditorColours : Boolean) : TColor;
+    Procedure SetModuleExplorerBGColour(Const boolUseIDEEditorColours : Boolean; Const iColour : TColor);
     Function  GetTokenLimit : Integer;
     Procedure SetTokenLimit(Const iTokenLimit : Integer);
     Function  GetMaxDocOutputWidth : Integer;
@@ -650,13 +650,14 @@ End;
   @precon  None.
   @postcon Returns the default background colour for the explorer rendering.
 
+  @param   boolUseIDEEditorColours as a Boolean as a constant
   @return  a TColor
 
 **)
-Function TBADIOptions.GetModuleExplorerBGColour: TColor;
+Function TBADIOptions.GetModuleExplorerBGColour(Const boolUseIDEEditorColours : Boolean) : TColor;
 
 Begin
-  Result := FModuleExplorerBGColour;
+  Result := FModuleExplorerBGColour[boolUseIDEEditorColours];
 End;
 
 (**
@@ -1029,11 +1030,17 @@ End;
 
 **)
 Procedure TBADIOptions.LoadIDEEditorColours;
+var
+  iBGColour: TColor;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadIDEEditorColours', tmoTiming);{$ENDIF}
   If Assigned(FIDEEditorColours) Then
-    FTokenFontInfo[True] := FIDEEditorColours.GetIDEEditorColours;
+    Begin
+      FTokenFontInfo[True] := FIDEEditorColours.GetIDEEditorColours(iBGColour);
+      FModuleExplorerBGColour[True] := iBGColour;
+      FTokenFontInfo[True][ttTreeHeader] := FTokenFontInfo[False][ttTreeHeader];
+    End;
 End;
 
 (**
@@ -1213,7 +1220,7 @@ Begin
       ));
     End;
   FUseIDEEditorColours := iniFile.ReadBool(strModuleExplorer, strUseIDEEditorColours, False);
-  FModuleExplorerBGColour := StringToColor(iniFile.ReadString(strModuleExplorer, strBGColour,
+  FModuleExplorerBGColour[False] := StringToColor(iniFile.ReadString(strModuleExplorer, strBGColour,
     ColorToString(clWindow)));
   FTokenLimit := iniFile.ReadInteger(strModuleExplorer, strTokenLimit, iDefaultTokenLimit);
   FMaxDocOutputWidth := iniFile.ReadInteger(strDocumentation, strMaxDocOutputWidth, iDefaultMaxDocumentationWidth);
@@ -1580,7 +1587,7 @@ Begin
       );
     End;
   iniFile.WriteBool(strModuleExplorer, strUseIDEEditorColours, FUseIDEEditorColours);
-  iniFile.WriteString(strModuleExplorer, strBGColour, ColorToString(FModuleExplorerBGColour));
+  iniFile.WriteString(strModuleExplorer, strBGColour, ColorToString(FModuleExplorerBGColour[False]));
   iniFile.WriteInteger(strModuleExplorer, strTokenLimit, FTokenLimit);
   iniFile.WriteInteger(strDocumentation, strMaxDocOutputWidth, FMaxDocOutputWidth);
   iniFile.WriteInteger(strModuleExplorer, strManagedNodesLife, FManagedNodesLife);
@@ -1892,13 +1899,15 @@ End;
   @precon  None.
   @postcon Sets the background colours of the module explorer.
 
-  @param   iColour as a TColor as a constant
+  @param   boolUseIDEEditorColours as a Boolean as a constant
+  @param   iColour                 as a TColor as a constant
 
 **)
-Procedure TBADIOptions.SetModuleExplorerBGColour(Const iColour: TColor);
+Procedure TBADIOptions.SetModuleExplorerBGColour(Const boolUseIDEEditorColours : Boolean;
+  Const iColour : TColor);
 
 Begin
-  FModuleExplorerBGColour := iColour;
+  FModuleExplorerBGColour[boolUseIDEEditorColours] := iColour;
 End;
 
 (**

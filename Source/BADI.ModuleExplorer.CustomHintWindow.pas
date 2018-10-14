@@ -292,7 +292,7 @@ Begin
       iLastmax := 0;
       InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
       TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
-      iBGColour := FBADIOptions.BGColour;
+      iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
       // Start with single line height
       Result.Bottom := Result.Top + iPadding * iMultipler + Canvas.TextHeight(strTextHeightTest);
       For iToken := 0 To sl.Count - 1 Do
@@ -529,7 +529,7 @@ Var
   iLeft : Integer;
   iTop : Integer;
   TokenFontInfo: TBADITokenFontInfoTokenSet;
-  iBFColour: TColor;
+  iBGColour: TColor;
 
 Begin
   iLines := 1;
@@ -540,13 +540,13 @@ Begin
       iTop := FRect.Top;
       InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
       TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
-      iBFColour := FBADIOptions.BGColour;
+      iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
       sl := NodeData.FNode.Tokens;
       For i := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, i, FTitle, tpSyntax In NodeData.FNode.TagProperties, NodeData.FNode.ForeColour,
-            NodeData.FNode.BackColour, NodeData.FNode.FontStyles, TokenFontInfo, iBFColour, Canvas);
-          If Canvas.Brush.Color = FBADIOptions.BGColour Then
+            NodeData.FNode.BackColour, NodeData.FNode.FontStyles, TokenFontInfo, iBGColour, Canvas);
+          If Canvas.Brush.Color = iBGColour Then
             Canvas.Brush.Color := TokenFontInfo[ttExplorerHighlight].FBackColour;
           If (sl[i] = #13#10) Or (iLeft + Canvas.TextWidth(sl[i]) > Width) Then
             Begin
@@ -586,15 +586,17 @@ Procedure TBADICustomHintWindow.SetTokenFont(Const Canvas : TCanvas; Const eToke
 
 Var
   TokenFontInfo: TBADITokenFontInfoTokenSet;
+  iBGColour: TColor;
 
 Begin
   TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
+  iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
   Canvas.Font.Name := FBADIOptions.TreeFontName;
   Canvas.Font.Size := FBADIOptions.TreeFontSize;
   Canvas.Font.Color := TokenFontInfo[eTokenType].FForeColour;
   Canvas.Font.Style := TokenFontInfo[eTokenType].FStyles;
   Canvas.Brush.Color := TokenFontInfo[eTokenType].FBackColour;
-  If (Canvas.Brush.Color = clNone) Or (Canvas.Brush.Color = FBADIOptions.BGColour) Then
+  If (Canvas.Brush.Color = clNone) Or (Canvas.Brush.Color = iBGColour) Then
     Canvas.Brush.Color := TokenFontInfo[ttExplorerHighlight].FBackColour;
 End;
 

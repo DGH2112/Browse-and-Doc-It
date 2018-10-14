@@ -48,8 +48,8 @@ Type
     Function  GetMethodDescriptions : TStringList;
     Function  GetScopestoDocument : TScopes;
     Procedure SetScopesToDocument(Const setScopesToDocument : TScopes);
-    Function  GetModuleExplorerBGColour : TColor;
-    Procedure SetModuleExplorerBGColour(Const iColour : TColor);
+    Function  GetModuleExplorerBGColour(Const boolUseIDEEditorColours : Boolean) : TColor;
+    Procedure SetModuleExplorerBGColour(Const boolUseIDEEditorColours : Boolean; Const iColour : TColor);
     Function  GetTokenLimit : Integer;
     Procedure SetTokenLimit(Const iTokenLimit : Integer);
     Function  GetMaxDocOutputWidth : Integer;
@@ -208,7 +208,8 @@ Type
       @postcon Gets and sets the background colour for the Module explorer.
       @return  a TColor
     **)
-    Property BGColour : TColor Read GetModuleExplorerBGColour Write SetModuleExplorerBGColour;
+    Property BGColour[Const boolUseIDEEditorColours : Boolean] : TColor Read GetModuleExplorerBGColour 
+      Write SetModuleExplorerBGColour;
     (**
       This property gets ans sets the token limit to the module explorer.
       @precon  None.
@@ -361,7 +362,7 @@ Type
   (** An interface to get the IDE Editor Colours from the Registry. **)
   IBADIIDEEditorColours = Interface
   ['{F49776DF-C09A-4141-BAB7-AC166AC5FB35}']
-    Function GetIDEEditorColours : TBADITokenFontInfoTokenSet;
+    Function GetIDEEditorColours(Var iBGColour : TColor) : TBADITokenFontInfoTokenSet;
   End;
 
 Implementation

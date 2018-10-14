@@ -172,7 +172,7 @@ Var
   iPos: Integer;
 
 Begin
-  lb := Control As TListBox;
+  lb := Sender As TListBox;
   lb.Canvas.FillRect(Rect);
   iPos := Pos('=', lb.Items[Index]);
   lb.Canvas.TextOut(Rect.Left + 4, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));

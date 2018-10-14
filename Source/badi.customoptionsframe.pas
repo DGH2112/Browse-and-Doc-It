@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    02 Apr 2017
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.CustomOptionsFrame;
@@ -29,7 +29,7 @@ Type
       a call back event for checking whether an action is in use. **)
   IBADIInstallShortcutUsedCallBack = Interface
   ['{ECBC6389-DA38-4AE1-A4E9-83E6826E3776}']
-    Procedure InstallShortcutUsedCallBack(ShortCutUsed : TBADIShortcutUsedEvent);
+    Procedure InstallShortcutUsedCallBack(Const ShortCutUsed : TBADIShortcutUsedEvent);
   End;
 
   (** This is a class reference for TFrames. **)

@@ -796,7 +796,7 @@ Begin
       iRight := iPos;
       InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
       TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
-      iBGColour := FBADIOptions.BGColour;
+      iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
       For i := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
@@ -963,7 +963,7 @@ Begin
   iTextPos := 1;
   InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
   TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
-  iBGColour := FBADIOptions.BGColour;
+  iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
   If edtExplorerFilter.Text <> '' Then
     MC := FFilterRegEx.Matches(FNodeData.FNode.Text);
   For i := 0 To sl.Count - 1 Do
@@ -972,7 +972,7 @@ Begin
         FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
         TokenFontInfo, iBGColour, FTargetCanvas);
       If FNode = FExplorer.FocusedNode Then
-        If FTargetCanvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then
+        If FTargetCanvas.Brush.Color = iBGColour Then
           FTargetCanvas.Brush.Color :=
             TokenFontInfo[ttExplorerHighlight].FBackColour;
       If edtExplorerFilter.Text = '' Then
@@ -1672,7 +1672,7 @@ Var
   N : PVirtualNode;
 
 Begin
-  FExplorer.Color := TBADIOptions.BADIOptions.BGColour;
+  FExplorer.Color := TBADIOptions.BADIOptions.BGColour[TBADIOptions.BADIOptions.UseIDEEditorColours];
   If Module = Nil Then
     Begin
       strReservedWords := Nil;

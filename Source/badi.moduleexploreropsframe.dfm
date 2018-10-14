@@ -109,7 +109,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 1
-      ExplicitWidth = 759
     end
     object cbxLimits: TComboBox
       Left = 120
@@ -129,7 +128,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 3
-      ExplicitWidth = 759
     end
     object clbxTreeColour: TColorBox
       Left = 120

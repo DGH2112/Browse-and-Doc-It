@@ -605,7 +605,7 @@ Begin
           End Else
             sl.LoadFromFile(strFileName + CSSFiles[i].FFileName);
         sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
-          TBADIOptions.BADIOptions.BGColour), []);
+          TBADIOptions.BADIOptions.BGColour[TBADIOptions.BADIOptions.UseIDEEditorColours]), []);
         OutputCodeStyles;
         sl.SaveToFile(FOutputDirectory + 'Styles\' + CSSFiles[i].FFileName);
       End;

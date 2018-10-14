@@ -14,6 +14,7 @@ Interface
 
 Uses
   System.Win.Registry,
+  VCL.Graphics,
   BADI.Types,
   BADI.Interfaces;
 
@@ -27,7 +28,7 @@ Type
     Procedure ReadHighlight(Const Reg : TRegIniFile; Const strSectionName : String;
       Var TokenFontInfo : TTokenFontInfo);
   Strict Protected
-    Function GetIDEEditorColours : TBADITokenFontInfoTokenSet;
+    Function GetIDEEditorColours(Var iBGColour : TColor) : TBADITokenFontInfoTokenSet;
   Public
   End;
 
@@ -38,7 +39,6 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   System.SysUtils,
-  VCL.Graphics,
   BADI.Constants;
 
 (**
@@ -48,40 +48,41 @@ Uses
   @precon  None.
   @postcon The IDE Editor Colours are loaded.
 
+  @param   iBGColour as a TColor as a reference
   @return  a TBADITokenFontInfoTokenSet
 
 **)
-Function TBADIIDEEditorColours.GetIDEEditorColours : TBADITokenFontInfoTokenSet;
+Function TBADIIDEEditorColours.GetIDEEditorColours(Var iBGColour : TColor) : TBADITokenFontInfoTokenSet;
 
 Const
   strBDSEnviroVar = 'BDS';
   strHelpRegKey = 'Software\Embarcadero\%s\%s\Editor\Highlight';
   strTokenHighlightMap : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
-    'Illegal Char',
-    'Whitespace',
-    'Reserved word',
-    'Identifier',
-    'Number',
-    'Symbol',
-    'Whitespace',
-    'String',
-    'Character',
-    'Comment',
-    'Comment',
-    'Tags',
-    'Tags',
-    'Reserved word',
-    'Preprocessor',
-    'Hot Link',
-    'ttTreeHeader',
-    'Whitespace',
-    'Whitespace',
-    'ttCustomUserToken',
-    'Marked Block',
-    'Plain text',
-    'ttCommentText',
-    'ttTagHeaderText',
-    'ttTagText'
+    'Illegal Char',             // ttUnknown
+    'Whitespace',               // ttWhiteSpace
+    'Reserved word',            // ttReservedWord
+    'Identifier',               // ttIdentifier
+    'Number',                   // ttNumber
+    'Symbol',                   // ttSymbol
+    'Whitespace',               // ttLineEnd
+    'String',                   // ttSingleLiteral
+    'Character',                // ttDoubleLiteral
+    'Comment',                  // ttLineComment
+    'Comment',                  // ttBlockComment
+    'Tags',                     // ttHTMLStartTag
+    'Tags',                     // ttHTMLEndTag
+    'Reserved word',            // ttDirective
+    'Preprocessor',             // ttCompilerDirective
+    'Hot Link',                 // ttLinkTag
+    'ttTreeHeader',             // ttTreeHeader
+    'Whitespace',               // ttFileEnd
+    'Whitespace',               // ttLineContinuation
+    'Tags',                     // ttCustomUserToken
+    'Marked Block',             // ttExplorerHighlight
+    'Plain text',               // ttPlainText
+    'Comment',                  // ttCommentText
+    'Attribute Names',          // ttTagHeaderText
+    'Attribute Values'          // ttTagText
   );
 
 Var
@@ -98,6 +99,7 @@ Begin
       Try
         For eTokenType := Low(TBADITokenType) To High(TBADITokenType) Do
           ReadHighlight(R, strTokenHighlightMap[eTokenType], Result[eTokenType]);
+        iBGColour := Result[ttPlainText].FBackColour;
       Finally
         R.Free;
       End;

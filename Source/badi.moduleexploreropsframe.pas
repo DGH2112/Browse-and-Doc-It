@@ -349,7 +349,7 @@ Begin
   chkUseIDEEditorColours.Checked := TBADIOptions.BADIOptions.UseIDEEditorColours;
   udTreeFontSize.Position := TBADIOptions.BADIOptions.TreeFontSize;
   udFixedFontSize.Position := TBADIOptions.BADIOptions.FixedFontSize;
-  cbxBGColour.Selected := TBADIOptions.BADIOptions.BGColour;
+  cbxBGColour.Selected := TBADIOptions.BADIOptions.BGColour[False];
   udTokenLimit.Position := TBADIOptions.BADIOptions.TokenLimit;
   clbxTreeColour.Selected := TBADIOptions.BADIOptions.TreeColour;
   lbxTokenTypesClick(Nil);
@@ -387,7 +387,7 @@ Begin
   TBADIOptions.BADIOptions.TokenFontInfo[False] := TokenFontInfo;
   TBADIOptions.BADIOptions.TreeFontSize := udTreeFontSize.Position;
   TBADIOptions.BADIOptions.FixedFontSize := udFixedFontSize.Position;
-  TBADIOptions.BADIOptions.BGColour := cbxBGColour.Selected;
+  TBADIOptions.BADIOptions.BGColour[False] := cbxBGColour.Selected;
   TBADIOptions.BADIOptions.TokenLimit := udTokenLimit.Position;
   TBADIOptions.BADIOptions.TreeColour := clbxTreeColour.Selected;
   TBADIOptions.BADIOptions.IssueLimits[ltErrors] := FIssueLimits[ltErrors];

@@ -22,6 +22,7 @@ Uses
   Controls,
   Forms,
   Dialogs,
+  VCL.Themes,
   BADI.CustomOptionsFrame,
   VirtualTrees, 
   BADI.CustomVirtualStringTree;
@@ -42,6 +43,7 @@ Type
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     FVSTChecks : TBADIChecksOptionsVirtualStringTree;
+    FStyleServices: TCustomStyleServices;
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -59,6 +61,7 @@ Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
+  ToolsAPI,
   BADI.Types,
   BADI.Constants,
   BADI.Options, 
@@ -101,11 +104,19 @@ Var
   eCheckSubOp: TBADIModuleCheckSubOp;
   N, S : PVirtualNode;
   NodeData : PCheckNodeData;
+  {$IFDEF DXE102}
+  ITS : IOTAIDEThemingServices;
+  {$ENDIF}
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(AOwner);
   CreateVirtualStringTree;
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    FStyleServices := ITS.StyleServices;
+  {$ENDIF}
   FVSTChecks.NodeDataSize := SizeOf(TCheckNodeData);
   For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
     Begin
@@ -422,8 +433,8 @@ Procedure TframeBADIModuleChecksOptions.vstChecksPaintText(Sender: TBaseVirtualT
 Begin
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTChecks.StyleServices) And FVSTChecks.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTChecks.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
 End;
 

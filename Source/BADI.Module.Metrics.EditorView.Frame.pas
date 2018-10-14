@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Jan 2018
+  @Date    14 Oct 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -38,7 +38,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes;
+  UITypes, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -125,7 +125,7 @@ Type
     FOverLimit     : Integer;
     FVSTMetrics    : TBADIEditorViewVirtualStringTree;
     {$IFDEF DXE102}
-    FStyleServicesNotifier: Integer;
+    FStyleServices : TCustomStyleServices;
     {$ENDIF}
   Strict Protected
     Procedure vstStatisticsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -581,10 +581,9 @@ Begin
   FVSTMetrics.NodeDataSize := SizeOf(TBADIMetricRecord);
   LoadBADIImages(ilScopeImages);
   {$IFDEF DXE102}
-  FStyleServicesNotifier := -1;
+  FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    FStyleServicesNotifier :=
-      ITS.AddNotifier(TBADIStyleServicesNotifier.Create(FVSTMetrics.UpdateTreeColours));
+    FStyleServices := ITS.StyleServices;
   {$ENDIF}
 End;
 
@@ -672,16 +671,7 @@ End;
 **)
 Destructor TframeBADIModuleMetricsEditorView.Destroy;
 
-{$IFDEF DXE102}
-Var
-  ITS : IOTAIDEThemingServices;
-{$ENDIF}
-  
 Begin
-  {$IFDEF DXE102}
-  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    ITS.RemoveNotifier(FStyleServicesNotifier);
-  {$ENDIF}
   Inherited Destroy;
 End;
 
@@ -1195,8 +1185,8 @@ Begin
   NodeData := FVSTMetrics.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
   {$IFDEF DXE102}
-  If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
-    TargetCanvas.Brush.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindow);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
   {$ENDIF}
   Case TBADIMetricColumn(Column) Of
     mcLength: TargetCanvas.Brush.Color := Colour(NodeData.FMetrics[mmLongMethods],
@@ -1361,8 +1351,8 @@ Begin
   TargetCanvas.Font.Style := [];
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
   Case TBADIMetricColumn(Column) Of
     mcLength..mcToxicity: TargetCanvas.Font.Color := clBlack;

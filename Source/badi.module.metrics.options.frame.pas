@@ -27,7 +27,8 @@ Uses
   BADI.CustomVirtualStringTree,
   StdCtrls,
   ExtCtrls,
-  ComCtrls;
+  ComCtrls,
+  VCL.Themes;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -61,6 +62,7 @@ Type
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     FVSTMetrics : TBADIMetricsOptionsVirtualStringTree;
+    FStyleServices: TCustomStyleServices;
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -82,11 +84,12 @@ Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
+  ToolsAPI,
   BADI.Types,
   BADI.Constants,
   BADI.Options, 
   BADI.Functions,
-  Themes, BADI.Interfaces;
+  BADI.Interfaces;
 
 {$R *.dfm}
 
@@ -133,11 +136,19 @@ Var
   eMetricSubOp: TBADIModuleMetricSubOp;
   N, S : PVirtualNode;
   NodeData : PMetricNodeData;
+  {$IFDEF DXE102}
+  ITS : IOTAIDEThemingServices;
+  {$ENDIF}
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(AOwner);
   CreateVirtualStringTree;
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    FStyleServices := ITS.StyleServices;
+  {$ENDIF}
   FVSTMetrics.NodeDataSize := SizeOf(TMetricNodeData);
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
     Begin
@@ -613,8 +624,8 @@ Procedure TframeBADIModuleMetricsOptions.vstMetricsPaintText(Sender: TBaseVirtua
 Begin
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
 End;
 

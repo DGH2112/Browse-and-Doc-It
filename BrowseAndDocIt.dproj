@@ -95,7 +95,7 @@
         <Debugger_DebugSourcePath>D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Source;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
         <Debugger_SymbolSourcePath>D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt;D:\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\DLL;$(Debugger_SymbolSourcePath)</Debugger_SymbolSourcePath>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
-        <DCC_Define>CODE_SITE;$(DCC_Define)</DCC_Define>
+        <DCC_Define>CODESITE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -383,6 +383,7 @@
         </DCCReference>
         <DCCReference Include="Source\BADI.Module.Checks.SubView.pas"/>
         <DCCReference Include="Source\BADI.IDEEditorColours.pas"/>
+        <DCCReference Include="Source\BADI.IDEThemingNotifier.pas"/>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

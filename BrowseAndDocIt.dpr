@@ -245,7 +245,8 @@ uses
   BADI.Module.Checks.EditorView.Frame in 'Source\BADI.Module.Checks.EditorView.Frame.pas' {frameBADIModuleChecksEditorView: TFrame},
   BADI.Module.Checks.SubView.Frame in 'Source\BADI.Module.Checks.SubView.Frame.pas' {frameBADIModuleChecksSubView: TFrame},
   BADI.Module.Checks.SubView in 'Source\BADI.Module.Checks.SubView.pas',
-  BADI.IDEEditorColours in 'Source\BADI.IDEEditorColours.pas';
+  BADI.IDEEditorColours in 'Source\BADI.IDEEditorColours.pas',
+  BADI.IDEThemingNotifier in 'Source\BADI.IDEThemingNotifier.pas';
 
 {$R *.res}
 

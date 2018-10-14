@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    02 Jan 2018
+  @Date    14 Oct 2018
   @Version 1.0
 
 **)
@@ -136,7 +136,7 @@ Uses
   BADI.ResourceStrings,
   BADI.Constants,
   BADI.Module.Dispatcher,
-  BADI.Functions;
+  BADI.Functions, BADI.Interfaces;
 
 (**
 
@@ -540,29 +540,33 @@ Var
 
   **)
   Procedure OutputCodeStyles;
+  
   Var
     i : TBADITokenType;
+    Ops: IBADIOptions;
+    TokenFontInfo: TBADITokenFontInfoTokenSet;
 
   Begin
-    With TBADIOptions.BADIOptions Do
-      For i := Low(TBADITokenType) to High(TBADITokenType) Do
-        Begin
-          sl.Add(Format('span.%s {', [StringReplace(strTokenType[i], #32, '', [rfReplaceAll])]));
-          sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FForeColour)]));
-          If (TokenFontInfo[i].FBackColour <> clNone) And
-             (TokenFontInfo[i].FBackColour <> clWindow) Then
-            sl.Add(Format('  background       : #%s;', [HTMLColour(TokenFontInfo[i].FBackColour)]));
-          If fsBold In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-weight      : bold;');
-          If fsItalic In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-style       : italic;');
-          If fsUnderline In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-decoration  : underline;');
-          If fsStrikeout In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-decoration  : line-through;');
-          sl.Add('}');
-          sl.Add('');
-        End;
+    Ops := TBADIOptions.BADIOptions;
+    TokenFontInfo := Ops.TokenFontInfo[Ops.UseIDEEditorColours];
+    For i := Low(TBADITokenType) to High(TBADITokenType) Do
+      Begin
+        sl.Add(Format('span.%s {', [StringReplace(strTokenType[i], #32, '', [rfReplaceAll])]));
+        sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FForeColour)]));
+        If (TokenFontInfo[i].FBackColour <> clNone) And
+           (TokenFontInfo[i].FBackColour <> clWindow) Then
+          sl.Add(Format('  background       : #%s;', [HTMLColour(TokenFontInfo[i].FBackColour)]));
+        If fsBold In TokenFontInfo[i].FStyles Then
+          sl.Add('  font-weight      : bold;');
+        If fsItalic In TokenFontInfo[i].FStyles Then
+          sl.Add('  font-style       : italic;');
+        If fsUnderline In TokenFontInfo[i].FStyles Then
+          sl.Add('  font-decoration  : underline;');
+        If fsStrikeout In TokenFontInfo[i].FStyles Then
+          sl.Add('  font-decoration  : line-through;');
+        sl.Add('}');
+        sl.Add('');
+      End;
   End;
 
 Type

@@ -41,8 +41,9 @@ Type
     Procedure SetFixedFontName(Const strFontName : String);
     Function  GetFixedFontSize : Integer;
     Procedure SetFixedFontSize(Const iFontSize : Integer);
-    Function  GetTokenFontInfo : TBADITokenFontInfoTokenSet;
-    Procedure SetTokenFontInfo(Const eTokenFontInfo : TBADITokenFontInfoTokenSet);
+    Function  GetTokenFontInfo(Const boolUseIDEEditorColours : Boolean) : TBADITokenFontInfoTokenSet;
+    Procedure SetTokenFontInfo(Const boolUseIDEEditorColours : Boolean;
+      Const eTokenFontInfo : TBADITokenFontInfoTokenSet);
     Function  GetExcludeDocFiles : TStringList;
     Function  GetMethodDescriptions : TStringList;
     Function  GetScopestoDocument : TScopes;
@@ -173,9 +174,11 @@ Type
       This property determines the colour and style attribute of a token in the module explorer
       @precon  None.
       @postcon Gets and sets the colour and style of the token.
+      @param   boolUseIDEEditorColours as a Boolean as a constant
       @return  a TBADITokenFontInfoTokenSet
     **)
-    Property TokenFontInfo : TBADITokenFontInfoTokenSet Read GetTokenFontInfo Write SetTokenFontInfo;
+    Property TokenFontInfo[Const boolUseIDEEditorColours : Boolean] : TBADITokenFontInfoTokenSet
+      Read GetTokenFontInfo Write SetTokenFontInfo;
     (**
       This properrty holds a list of files / partial or full which should not be
       documented.

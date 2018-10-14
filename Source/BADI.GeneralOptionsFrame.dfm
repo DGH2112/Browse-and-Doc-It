@@ -19,7 +19,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitWidth = 508
     DesignSize = (
       525
       42)
@@ -69,7 +68,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Anchors = [akTop, akRight]
       TabOrder = 2
       Text = '100'
-      ExplicitLeft = 411
     end
     object udManagedNodesLife: TUpDown
       Left = 498
@@ -81,7 +79,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Max = 365
       Position = 100
       TabOrder = 3
-      ExplicitLeft = 481
     end
   end
   object lvOptions: TListView

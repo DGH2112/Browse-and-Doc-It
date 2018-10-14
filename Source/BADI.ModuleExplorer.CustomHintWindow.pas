@@ -112,7 +112,7 @@ Begin
   FNodeLevel := NodeData.FNode.Level;
   FCustomDraw := SyntaxHighlight;
   FNode := Node;
-  Color := FBADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+  Color := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours][ttExplorerHighlight].FBackColour;
   ActivateHint(Rect, NodeData.FNode.Text);
 End;
 
@@ -291,7 +291,7 @@ Begin
       sl := NodeData.FNode.Tokens;
       iLastmax := 0;
       InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
-      TokenFontInfo := FBADIOptions.TokenFontInfo;
+      TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
       iBGColour := FBADIOptions.BGColour;
       // Start with single line height
       Result.Bottom := Result.Top + iPadding * iMultipler + Canvas.TextHeight(strTextHeightTest);
@@ -459,10 +459,12 @@ Var
   iTag: Integer;
   strText : String;
   S: TRect;
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
 
 Begin
   R := FRect;
   R.Top := iBottom;
+  TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
   For iSpecialTag := 0 To FBADIOptions.SpecialTags.Count - 1 Do
     Begin
       If CanDrawSpecialTag(FComment, FBADIOptions.SpecialTags[iSpecialTag].FName) Then
@@ -489,7 +491,7 @@ Begin
                   iBulletSize * iMultipler - iBulletSize Div iDivisor,
                   R.Top + iBulletSize * iMultipler - iBulletSize Div iDivisor
                 );
-                Canvas.Brush.Color := FBADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+                Canvas.Brush.Color := TokenFontInfo[ttExplorerHighlight].FBackColour;
                 Canvas.Refresh;
                 S := R;
                 S.Left := iBulletSize * iMultipler;
@@ -537,7 +539,7 @@ Begin
       iLeft := FRect.Left;
       iTop := FRect.Top;
       InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
-      TokenFontInfo := FBADIOptions.TokenFontInfo;
+      TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
       iBFColour := FBADIOptions.BGColour;
       sl := NodeData.FNode.Tokens;
       For i := 0 To sl.Count - 1 Do
@@ -545,7 +547,7 @@ Begin
           GetFontInfo(sl, i, FTitle, tpSyntax In NodeData.FNode.TagProperties, NodeData.FNode.ForeColour,
             NodeData.FNode.BackColour, NodeData.FNode.FontStyles, TokenFontInfo, iBFColour, Canvas);
           If Canvas.Brush.Color = FBADIOptions.BGColour Then
-            Canvas.Brush.Color := FBADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+            Canvas.Brush.Color := TokenFontInfo[ttExplorerHighlight].FBackColour;
           If (sl[i] = #13#10) Or (iLeft + Canvas.TextWidth(sl[i]) > Width) Then
             Begin
               iLeft := FRect.Left;
@@ -582,14 +584,18 @@ End;
 **)
 Procedure TBADICustomHintWindow.SetTokenFont(Const Canvas : TCanvas; Const eTokenType: TBADITokenType);
 
+Var
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
+
 Begin
+  TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
   Canvas.Font.Name := FBADIOptions.TreeFontName;
   Canvas.Font.Size := FBADIOptions.TreeFontSize;
-  Canvas.Font.Color := FBADIOptions.TokenFontInfo[eTokenType].FForeColour;
-  Canvas.Font.Style := FBADIOptions.TokenFontInfo[eTokenType].FStyles;
-  Canvas.Brush.Color := FBADIOptions.TokenFontInfo[eTokenType].FBackColour;
+  Canvas.Font.Color := TokenFontInfo[eTokenType].FForeColour;
+  Canvas.Font.Style := TokenFontInfo[eTokenType].FStyles;
+  Canvas.Brush.Color := TokenFontInfo[eTokenType].FBackColour;
   If (Canvas.Brush.Color = clNone) Or (Canvas.Brush.Color = FBADIOptions.BGColour) Then
-    Canvas.Brush.Color := FBADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+    Canvas.Brush.Color := TokenFontInfo[ttExplorerHighlight].FBackColour;
 End;
 
 End.

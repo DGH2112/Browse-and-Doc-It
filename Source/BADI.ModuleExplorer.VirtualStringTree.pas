@@ -68,6 +68,8 @@ Var
   NodeData: PBADITreeData;
   sl: TStringList;
   i: Integer;
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
+  iBGColour: TColor;
 
 Begin
   Result := iPadding;
@@ -75,6 +77,8 @@ Begin
   //: @note Self.Canvas used to access the treeview canvas as Canvas from the parameters above is
   //:       NIL!
   InitCanvasFont(Self.Canvas, tpFixed In NodeData.FNode.TagProperties, TBADIOptions.BADIOptions);
+  TokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[TBADIOptions.BADIOptions.UseIDEEditorColours];
+  iBGColour := TBADIOptions.BADIOptions.BGColour;
   sl := NodeData.FNode.Tokens;
   For i := 0 To sl.Count - 1 Do
     Begin
@@ -86,8 +90,8 @@ Begin
         NodeData.FNode.ForeColour,
         NodeData.FNode.BackColour,
         NodeData.FNode.FontStyles,
-        TBADIOptions.BADIOptions.TokenFontInfo,
-        TBADIOptions.BADIOptions.BGColour,
+        TokenFontInfo,
+        iBGColour,
         Self.Canvas
       );
       Inc(Result, Self.Canvas.TextWidth(sl[i]) + 1);

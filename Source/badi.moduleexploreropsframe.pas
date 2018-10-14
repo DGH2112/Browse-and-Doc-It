@@ -66,6 +66,9 @@ Type
     lbxTokenTypes: TComboBox;
     lblIssueLimitTypes: TLabel;
     lblIssueLimit: TLabel;
+    pnlModuleExplorerOps: TPanel;
+    chkUseIDEEditorColours: TCheckBox;
+    gbxTokenFontInfo: TGroupBox;
     Procedure lbxTokenTypesClick(Sender: TObject);
     procedure cbxBackColourChange(Sender: TObject);
     procedure cbxFontColourChange(Sender: TObject);
@@ -92,6 +95,9 @@ Type
 Implementation
 
 uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   BADI.Constants,
   BADI.Options,
   BADI.ResourceStrings;
@@ -325,6 +331,7 @@ Var
   k: TBADITokenType;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   For j := 0 To cbxTreeFontName.Items.Count - 1 Do
     If cbxTreeFontName.Items[j] = TBADIOptions.BADIOptions.TreeFontName Then
       Begin
@@ -338,7 +345,8 @@ Begin
         Break;
       End;
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
-    FTokenFontInfo[k] := TBADIOptions.BADIOptions.TokenFontInfo[k];
+    FTokenFontInfo[k] := TBADIOptions.BADIOptions.TokenFontInfo[False][k];
+  chkUseIDEEditorColours.Checked := TBADIOptions.BADIOptions.UseIDEEditorColours;
   udTreeFontSize.Position := TBADIOptions.BADIOptions.TreeFontSize;
   udFixedFontSize.Position := TBADIOptions.BADIOptions.FixedFontSize;
   cbxBGColour.Selected := TBADIOptions.BADIOptions.BGColour;
@@ -369,12 +377,14 @@ Var
   TokenFontInfo: TBADITokenFontInfoTokenSet;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   TBADIOptions.BADIOptions.TreeFontName := cbxTreeFontName.Text;
   TBADIOptions.BADIOptions.FixedFontName := cbxFixedFontName.Text;
-  TokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo;
+  TokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[False];
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
     TokenFontInfo[k] := FTokenFontInfo[k];
-  TBADIOptions.BADIOptions.TokenFontInfo := TokenFontInfo;
+  TBADIOptions.BADIOptions.UseIDEEditorColours := chkUseIDEEditorColours.Checked;
+  TBADIOptions.BADIOptions.TokenFontInfo[False] := TokenFontInfo;
   TBADIOptions.BADIOptions.TreeFontSize := udTreeFontSize.Position;
   TBADIOptions.BADIOptions.FixedFontSize := udFixedFontSize.Position;
   TBADIOptions.BADIOptions.BGColour := cbxBGColour.Selected;
@@ -410,3 +420,4 @@ Begin
 End;
 
 End.
+

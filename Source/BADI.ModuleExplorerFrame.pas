@@ -617,7 +617,7 @@ begin
   FINIFileName := TBADIOptions.BADIOptions.INIFileName;
   FNodeInfo := TObjectList.Create(True);
   FHintWin := TBADICustomHintWindow.Create(Self, FExplorer);
-  FHintWin.Color := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+  FHintWin.Color := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours][ttExplorerHighlight].FBackColour;
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
   edtExplorerFilter.Font.Assign(FExplorer.Font);
   ilScopeImages.Clear;
@@ -795,7 +795,7 @@ Begin
       iPos := iLeft;
       iRight := iPos;
       InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
-      TokenFontInfo := FBADIOptions.TokenFontInfo;
+      TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
       iBGColour := FBADIOptions.BGColour;
       For i := 0 To sl.Count - 1 Do
         Begin
@@ -814,7 +814,7 @@ Begin
         FExplorer.Left + iScopeImagesWidth + FExplorer.Margin + FExplorer.TextMargin - 1;
       R.Right := R.Left + iPos;
       FTargetCanvas.Pen.Color := clBlack;
-      HL := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight];
+      HL := TokenFontInfo[ttExplorerHighlight];
       If FNode = FExplorer.FocusedNode Then
         Begin
           FTargetCanvas.Brush.Color := HL.FBackColour;
@@ -962,7 +962,7 @@ Begin
   iLeft := R.Left + iPadding;
   iTextPos := 1;
   InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
-  TokenFontInfo := FBADIOptions.TokenFontInfo;
+  TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
   iBGColour := FBADIOptions.BGColour;
   If edtExplorerFilter.Text <> '' Then
     MC := FFilterRegEx.Matches(FNodeData.FNode.Text);
@@ -974,7 +974,7 @@ Begin
       If FNode = FExplorer.FocusedNode Then
         If FTargetCanvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then
           FTargetCanvas.Brush.Color :=
-            TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+            TokenFontInfo[ttExplorerHighlight].FBackColour;
       If edtExplorerFilter.Text = '' Then
         DrawTextToCanvas(sl[i], R, iTextPos, iTop, iLeft)
       Else

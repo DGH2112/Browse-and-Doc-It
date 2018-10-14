@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @version 1.0
-  @date    09 Apr 2017
+  @date    14 Oct 2018
 
 **)
 Unit BADI.MenuShortcutsFrame;
@@ -42,7 +42,7 @@ Type
     FShortcutUsedEvent : TBADIShortcutUsedEvent;
   Strict Protected
     { Protected declarations }
-    Procedure InstallShortcutUsedCallBack(ShortCutUsed: TBADIShortcutUsedEvent);
+    Procedure InstallShortcutUsedCallBack(Const ShortCutUsed: TBADIShortcutUsedEvent);
   Public
     { Public declarations }
     Procedure LoadSettings;
@@ -54,6 +54,9 @@ Implementation
 {$R *.dfm}
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   Menus,
   BADI.Constants,
   BADI.Options;
@@ -89,6 +92,10 @@ End;
 **)
 Procedure TfmBADIMenuShortcuts.hkMenuShortcutChange(Sender: TObject);
 
+ResourceString
+  strThisShortcutInUseBy = 'This shortcut is in use by: %s';
+  strShortcutNotInUse = 'Shortcut not in use.';
+
 Var
   strActionName : String;
 
@@ -98,11 +105,11 @@ Begin
       If Assigned(FShortcutUsedEvent) And
          FShortcutUsedEvent(hkMenuShortcut.HotKey, strActionName) Then
         Begin
-          lblInformation.Caption := Format('This shortcut is in use by: %s', [strActionName]);
+          lblInformation.Caption := Format(strThisShortcutInUseBy, [strActionName]);
           lblInformation.Font.Color := clRed;
           Exit;
         End;
-      lblInformation.Caption := 'Shortcut not in use.';
+      lblInformation.Caption := strShortcutNotInUse;
       lblInformation.Font.Color := clGreen;
     End Else
       lblInformation.Caption := '';
@@ -110,16 +117,16 @@ End;
 
 (**
 
-  This method assigns an event handler call back in the frame to check that the shortcut is not
-  already in use.
+  This method assigns an event handler call back in the frame to check that the shortcut is not already 
+  in use.
 
   @precon  ShortcutUsed must be a valid method or Nil.
   @postcon The callbeck event handler is set.
 
-  @param   ShortCutUsed as a TBADIShortcutUsedEvent
+  @param   ShortCutUsed as a TBADIShortcutUsedEvent as a constant
 
 **)
-Procedure TfmBADIMenuShortcuts.InstallShortcutUsedCallBack(ShortCutUsed: TBADIShortcutUsedEvent);
+Procedure TfmBADIMenuShortcuts.InstallShortcutUsedCallBack(Const ShortCutUsed: TBADIShortcutUsedEvent);
 
 Begin
   FShortcutUsedEvent := ShortCutUsed;
@@ -140,6 +147,7 @@ Var
   Item: TListItem;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
     If BADIMenus[iBADIMenu].FCaption <> '' Then
       Begin
@@ -191,6 +199,7 @@ Var
   eBADIMenu: TBADIMenu;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   For iBADIMenu := 0 To lvMenuShortcuts.Items.Count - 1 Do
     Begin
       Item := lvMenuShortcuts.Items[iBADIMenu];
@@ -200,3 +209,4 @@ Begin
 End;
 
 End.
+

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.GeneralOptionsFrame;
@@ -52,6 +52,9 @@ Implementation
 {$R *.dfm}
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   BADI.Base.Module,
   BADI.Types,
   BADI.Constants,
@@ -76,6 +79,7 @@ Var
   Group: TListGroup;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   For iGroup := Low(TDocOptionGroup) To High(TDocOptionGroup) Do
     Begin
       Group := lvOptions.Groups.Add;
@@ -108,12 +112,15 @@ Var
   iOption : TDocOption;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   TBADIOptions.BADIOptions.Options := [];
   For iOption := Low(TDocOption) To High(TDocOption) Do
     If lvOptions.Items[Integer(iOption)].Checked Then
       TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options + [iOption];
   TBADIOptions.BADIOptions.UpdateInterval := udUpdateInterval.Position;
   TBADIOptions.BADIOptions.ManagedNodesLife := udManagedNodesLife.Position;
+  TBADIOptions.BADIOptions.SaveSettings;
 End;
 
 End.
+

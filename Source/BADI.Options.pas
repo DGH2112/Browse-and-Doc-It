@@ -81,8 +81,9 @@ Type
     Procedure SetFixedFontName(Const strFontName : String);
     Function  GetFixedFontSize : Integer;
     Procedure SetFixedFontSize(Const iFontSize : Integer);
-    Function  GetTokenFontInfo : TBADITokenFontInfoTokenSet;
-    Procedure SetTokenFontInfo(Const TokenFontInfo : TBADITokenFontInfoTokenSet);
+    Function  GetTokenFontInfo(Const boolUseIDEEditorColours : Boolean) : TBADITokenFontInfoTokenSet;
+    Procedure SetTokenFontInfo(Const boolUseIDEEditorColours : Boolean;
+      Const TokenFontInfo : TBADITokenFontInfoTokenSet);
     Function  GetExcludeDocFiles : TStringList;
     Function  GetMethodDescriptions : TStringList;
     Function  GetScopestoDocument : TScopes;
@@ -805,13 +806,15 @@ End;
   @precon  None.
   @postcon Retursn the record information for the token type.
 
+  @param   boolUseIDEEditorColours as a Boolean as a constant
   @return  a TBADITokenFontInfoTokenSet
 
 **)
-Function TBADIOptions.GetTokenFontInfo : TBADITokenFontInfoTokenSet;
+Function TBADIOptions.GetTokenFontInfo(
+  Const boolUseIDEEditorColours : Boolean) : TBADITokenFontInfoTokenSet;
 
 Begin
-  Result := FTokenFontInfo[FUseIDEEditorColours];
+  Result := FTokenFontInfo[boolUseIDEEditorColours];
 End;
 
 (**
@@ -1028,6 +1031,7 @@ End;
 Procedure TBADIOptions.LoadIDEEditorColours;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadIDEEditorColours', tmoTiming);{$ENDIF}
   If Assigned(FIDEEditorColours) Then
     FTokenFontInfo[True] := FIDEEditorColours.GetIDEEditorColours;
 End;
@@ -1263,6 +1267,7 @@ Var
   iniFile : TMemIniFile;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   iniFile := TMemIniFile.Create(FINIFileName);
   Try
     LoadDocOptions(iniFile);
@@ -1574,6 +1579,7 @@ Begin
         ColorToString(FTokenFontInfo[False, T].FBackColour)
       );
     End;
+  iniFile.WriteBool(strModuleExplorer, strUseIDEEditorColours, FUseIDEEditorColours);
   iniFile.WriteString(strModuleExplorer, strBGColour, ColorToString(FModuleExplorerBGColour));
   iniFile.WriteInteger(strModuleExplorer, strTokenLimit, FTokenLimit);
   iniFile.WriteInteger(strDocumentation, strMaxDocOutputWidth, FMaxDocOutputWidth);
@@ -1617,6 +1623,7 @@ Var
   iniFile : TMemIniFile;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   iniFile := TMemIniFile.Create(FINIFileName);
   Try
     SaveDocOptions(iniFile);
@@ -2016,13 +2023,15 @@ End;
   @precon  None.
   @postcon Sets the indexed Token Font Information record.
 
-  @param   TokenFontInfo as a TBADITokenFontInfoTokenSet as a constant
+  @param   boolUseIDEEditorColours as a Boolean as a constant
+  @param   TokenFontInfo           as a TBADITokenFontInfoTokenSet as a constant
 
 **)
-Procedure TBADIOptions.SetTokenFontInfo(Const TokenFontInfo : TBADITokenFontInfoTokenSet);
+Procedure TBADIOptions.SetTokenFontInfo(Const boolUseIDEEditorColours : Boolean;
+  Const TokenFontInfo : TBADITokenFontInfoTokenSet);
 
 Begin
-  FTokenFontInfo[FUseIDEEditorColours] := TokenFontInfo;
+  FTokenFontInfo[boolUseIDEEditorColours] := TokenFontInfo;
 End;
 
 (**
@@ -2155,3 +2164,4 @@ Begin
 End;
 
 End.
+

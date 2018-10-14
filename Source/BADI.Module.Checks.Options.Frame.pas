@@ -103,6 +103,7 @@ Var
   NodeData : PCheckNodeData;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(AOwner);
   CreateVirtualStringTree;
   FVSTChecks.NodeDataSize := SizeOf(TCheckNodeData);
@@ -191,6 +192,7 @@ Var
   BO: IBADIOptions;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   N := FVSTChecks.GetFirst;
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
@@ -266,6 +268,7 @@ Var
   BO: IBADIOptions;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   N := FVSTChecks.GetFirst();
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
@@ -425,3 +428,4 @@ Begin
 End;
 
 End.
+

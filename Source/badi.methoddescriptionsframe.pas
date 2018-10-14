@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.MethodDescriptionsFrame;
@@ -38,7 +38,7 @@ Type
     procedure btnDeleteDescClick(Sender: TObject);
     procedure btnEditDescClick(Sender: TObject);
     procedure lbxMethodDescriptionsDblClick(Sender: TObject);
-    procedure lbxMethodDescriptionsDrawItem(Control: TWinControl; Index: Integer;
+    procedure lbxMethodDescriptionsDrawItem(Sender: TWinControl; Index: Integer;
       Rect: TRect; State: TOwnerDrawState);
   Private
     { Private declarations }
@@ -53,8 +53,12 @@ Implementation
 {$R *.dfm}
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   BADI.Base.Module,
-  BADI.MethodDescriptionForm, BADI.Options;
+  BADI.MethodDescriptionForm,
+  BADI.Options;
 
 { TfmBADIMethodDescriptionsFrame }
 
@@ -152,16 +156,15 @@ End;
   This is an on draw item event handler for the method descriptions.
 
   @precon  None.
-  @postcon Draws the str=str information in the list box as 2 columns of
-           information without the = sign.
+  @postcon Draws the str=str information in the list box as 2 columns of information without the = sign.
 
-  @param   Control as a TWinControl
-  @param   Index   as an Integer
-  @param   Rect    as a TRect
-  @param   State   as a TOwnerDrawState
+  @param   Sender as a TWinControl
+  @param   Index  as an Integer
+  @param   Rect   as a TRect
+  @param   State  as a TOwnerDrawState
 
 **)
-Procedure TfmBADIMethodDescriptionsFrame.lbxMethodDescriptionsDrawItem(Control: TWinControl;
+Procedure TfmBADIMethodDescriptionsFrame.lbxMethodDescriptionsDrawItem(Sender: TWinControl;
   Index: Integer; Rect: TRect; State: TOwnerDrawState);
 
 Var
@@ -191,6 +194,7 @@ Var
   j: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   For j := 0 To TBADIOptions.BADIOptions.MethodDescriptions.Count - 1 Do
     lbxMethodDescriptions.Items.Add(TBADIOptions.BADIOptions.MethodDescriptions[j]);
 End;
@@ -209,9 +213,11 @@ Var
   j: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   TBADIOptions.BADIOptions.MethodDescriptions.Clear;
   For j := 0 To lbxMethodDescriptions.Items.Count - 1 Do
     TBADIOptions.BADIOptions.MethodDescriptions.Add(lbxMethodDescriptions.Items[j]);
 End;
 
 End.
+

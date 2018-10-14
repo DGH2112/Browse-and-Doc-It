@@ -89,6 +89,7 @@ Type
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
+    Procedure RequiresIDEEditorColoursUpdate;
     // Properties
     (**
       This property contains the basic toggleable options for the application.
@@ -206,6 +207,7 @@ Type
       This gets and sets the background colour for the Module explorer.
       @precon  None.
       @postcon Gets and sets the background colour for the Module explorer.
+      @param   boolUseIDEEditorColours as a Boolean as a constant
       @return  a TColor
     **)
     Property BGColour[Const boolUseIDEEditorColours : Boolean] : TColor Read GetModuleExplorerBGColour 

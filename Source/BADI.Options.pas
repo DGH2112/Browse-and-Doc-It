@@ -60,6 +60,7 @@ Type
     FLowMetricMargin        : Double;
     FHighMetricMargin       : Double;
     FRefactorConstNewLine   : Boolean;
+    FRequiresIDEEditorColoursUpdating: Boolean;
   Strict Protected
     // IBADIOptions
     Function  GetOptions : TDocOptions;
@@ -128,6 +129,7 @@ Type
     Procedure SetUseIDEEditorColours(Const boolUseIDEEditorColours : Boolean);
     Procedure LoadSettings;
     Procedure SaveSettings;
+    Procedure RequiresIDEEditorColoursUpdate;
     Procedure LoadIDEEditorColours;
   Strict Protected
     Procedure LoadDocOptions(Const iniFile: TMemIniFile);
@@ -360,6 +362,7 @@ Begin
   FMethodDescriptions := TStringList.Create;
   FScopesToDocument := [scPublished, scPublic, scProtected, scPrivate];
   FProfilingCode := TStringList.Create;
+  FRequiresIDEEditorColoursUpdating := True;
 End;
 
 (**
@@ -815,6 +818,8 @@ Function TBADIOptions.GetTokenFontInfo(
   Const boolUseIDEEditorColours : Boolean) : TBADITokenFontInfoTokenSet;
 
 Begin
+  If FRequiresIDEEditorColoursUpdating Then
+    LoadIDEEditorColours;
   Result := FTokenFontInfo[boolUseIDEEditorColours];
 End;
 
@@ -1041,6 +1046,7 @@ Begin
       FModuleExplorerBGColour[True] := iBGColour;
       FTokenFontInfo[True][ttTreeHeader] := FTokenFontInfo[False][ttTreeHeader];
     End;
+  FRequiresIDEEditorColoursUpdating := False;
 End;
 
 (**
@@ -1293,7 +1299,6 @@ Begin
     LoadMetrics(iniFile);
     LoadChecks(iniFile);
     FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
-    LoadIDEEditorColours;
   Finally
     iniFile.Free;
   End;
@@ -1374,6 +1379,22 @@ Class Procedure TBADIOptions.Release;
 
 Begin
   FBADIOptionsInstance := Nil;
+End;
+
+(**
+
+  This method registers that the options needs to reload the IDE Editor Colours. This cannot be done in
+  the SaveSettings method as the IDE has not necessarily saved the Editore Colour changes at that time.
+
+  @precon  None.
+  @postcon The marker is updated so that the next call to GetTokenFontInfo will update the cached IDE
+           Editor Colours.
+
+**)
+Procedure TBADIOptions.RequiresIDEEditorColoursUpdate;
+
+Begin
+  FRequiresIDEEditorColoursUpdating := True;
 End;
 
 (**
@@ -1652,7 +1673,6 @@ Begin
   Finally
     iniFile.Free;
   End;
-  LoadIDEEditorColours;
 End;
 
 (**
@@ -2173,4 +2193,3 @@ Begin
 End;
 
 End.
-

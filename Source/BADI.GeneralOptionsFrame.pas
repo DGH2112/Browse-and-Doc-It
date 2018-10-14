@@ -119,7 +119,7 @@ Begin
       TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options + [iOption];
   TBADIOptions.BADIOptions.UpdateInterval := udUpdateInterval.Position;
   TBADIOptions.BADIOptions.ManagedNodesLife := udManagedNodesLife.Position;
-  TBADIOptions.BADIOptions.SaveSettings;
+  TBADIOptions.BADIOptions.RequiresIDEEditorColoursUpdate;
 End;
 
 End.

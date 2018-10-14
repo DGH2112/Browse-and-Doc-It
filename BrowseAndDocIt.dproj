@@ -59,7 +59,7 @@
         <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
         <UsePackages>true</UsePackages>
         <DCC_ExeOutput>.\</DCC_ExeOutput>
-        <DCC_UnitSearchPath>..\..\Library\Virtual Treeview 6.5.0\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\Library\Virtual Treeview 6.5.0 (IDE)\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>

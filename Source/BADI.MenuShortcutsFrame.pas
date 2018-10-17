@@ -32,8 +32,8 @@ Type
   TfmBADIMenuShortcuts = Class(TFrame, IBADIOptionsFrame, IBADIInstallShortcutUsedCallBack)
     lvMenuShortcuts: TListView;
     hkMenuShortcut: THotKey;
-    btnAssign: TBitBtn;
     lblInformation: TLabel;
+    btnAssign: TButton;
     procedure lvMenuShortcutsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
     procedure btnAssignClick(Sender: TObject);
     procedure hkMenuShortcutChange(Sender: TObject);

@@ -2,7 +2,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
   Left = 0
   Top = 0
   Width = 649
-  Height = 699
+  Height = 501
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -13
@@ -14,18 +14,19 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 0
     Top = 0
     Width = 649
-    Height = 699
+    Height = 501
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 112
-    ExplicitTop = 24
+    ExplicitLeft = 120
+    ExplicitTop = 96
+    ExplicitHeight = 699
     DesignSize = (
       649
-      699)
+      501)
     object lblBackgroundColour: TLabel
       Left = 3
-      Top = 540
+      Top = 351
       Width = 107
       Height = 16
       Caption = 'Background &Colour'
@@ -48,7 +49,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     end
     object lblIssueLimit: TLabel
       Left = 3
-      Top = 656
+      Top = 467
       Width = 67
       Height = 16
       Caption = '&Issue Limits'
@@ -56,7 +57,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     end
     object lblIssueLimitTypes: TLabel
       Left = 3
-      Top = 626
+      Top = 437
       Width = 99
       Height = 16
       Caption = '&Issue Limit Types'
@@ -64,14 +65,14 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     end
     object lblTokenLimit: TLabel
       Left = 3
-      Top = 596
+      Top = 407
       Width = 66
       Height = 16
       Caption = '&Token Limit'
     end
     object lblTreeColour: TLabel
       Left = 3
-      Top = 568
+      Top = 379
       Width = 88
       Height = 16
       Caption = 'Treeline &Colour'
@@ -94,12 +95,12 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     end
     object cbxBGColour: TColorBox
       Left = 120
-      Top = 537
+      Top = 348
       Width = 526
       Height = 22
       Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 0
+      TabOrder = 8
     end
     object cbxFixedFontName: TComboBox
       Left = 120
@@ -108,16 +109,16 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       Height = 24
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 1
+      TabOrder = 3
     end
     object cbxLimits: TComboBox
       Left = 120
-      Top = 623
+      Top = 434
       Width = 526
       Height = 24
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 2
+      TabOrder = 12
       OnChange = cbxLimitsChange
     end
     object cbxTreeFontName: TComboBox
@@ -127,63 +128,61 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       Height = 24
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 3
+      TabOrder = 0
     end
     object clbxTreeColour: TColorBox
       Left = 120
-      Top = 565
+      Top = 376
       Width = 526
       Height = 22
       Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 4
+      TabOrder = 9
     end
     object edtFixedFontSize: TEdit
       Left = 120
       Top = 93
-      Width = 504
+      Width = 508
       Height = 24
       Alignment = taRightJustify
       Anchors = [akLeft, akTop, akRight]
       ReadOnly = True
-      TabOrder = 5
+      TabOrder = 4
       Text = '8'
-      ExplicitWidth = 737
     end
     object edtLimits: TEdit
       Left = 120
-      Top = 653
-      Width = 504
+      Top = 464
+      Width = 508
       Height = 24
       Anchors = [akLeft, akTop, akRight]
       ReadOnly = True
-      TabOrder = 6
+      TabOrder = 13
       Text = '0'
     end
     object edtTokenLimit: TEdit
       Left = 120
-      Top = 593
-      Width = 504
+      Top = 404
+      Width = 508
       Height = 24
       Alignment = taRightJustify
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 7
+      TabOrder = 10
       Text = '10'
     end
     object edtTreeFontSize: TEdit
       Left = 120
       Top = 33
-      Width = 504
+      Width = 508
       Height = 24
       Alignment = taRightJustify
       Anchors = [akLeft, akTop, akRight]
       ReadOnly = True
-      TabOrder = 8
+      TabOrder = 1
       Text = '8'
-      ExplicitWidth = 737
     end
     object udFixedFontSize: TUpDown
-      Left = 630
+      Left = 628
       Top = 93
       Width = 16
       Height = 24
@@ -192,20 +191,20 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       Min = 8
       Max = 72
       Position = 8
-      TabOrder = 9
+      TabOrder = 5
     end
     object udLimits: TUpDown
-      Left = 630
-      Top = 653
+      Left = 628
+      Top = 464
       Width = 16
       Height = 24
       Anchors = [akTop, akRight]
       Associate = edtLimits
-      TabOrder = 10
+      TabOrder = 14
     end
     object udTokenLimit: TUpDown
-      Left = 630
-      Top = 593
+      Left = 628
+      Top = 404
       Width = 16
       Height = 24
       Anchors = [akTop, akRight]
@@ -216,7 +215,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       TabOrder = 11
     end
     object udTreeFontSize: TUpDown
-      Left = 630
+      Left = 628
       Top = 33
       Width = 16
       Height = 24
@@ -225,7 +224,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       Min = 8
       Max = 72
       Position = 8
-      TabOrder = 12
+      TabOrder = 2
     end
     object chkUseIDEEditorColours: TCheckBox
       Left = 3
@@ -235,7 +234,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       Alignment = taLeftJustify
       Anchors = [akLeft, akTop, akRight]
       Caption = '&Use IDE Editor Colours'
-      TabOrder = 13
+      TabOrder = 6
     end
     object gbxTokenFontInfo: TGroupBox
       Left = 3
@@ -244,7 +243,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
       Height = 188
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Token Font Information'
-      TabOrder = 14
+      TabOrder = 7
       DesignSize = (
         643
         188)
@@ -310,42 +309,123 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Font Styles'
         TabOrder = 3
-        ExplicitHeight = 98
-        object chkBold: TCheckBox
-          Left = 15
-          Top = 26
-          Width = 58
-          Height = 21
-          Caption = '&Bold'
+        DesignSize = (
+          622
+          66)
+        object GridPanel: TGridPanel
+          Left = 3
+          Top = 16
+          Width = 616
+          Height = 41
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          BevelOuter = bvNone
+          ColumnCollection = <
+            item
+              Value = 24.999999709293510000
+            end
+            item
+              Value = 25.000000211276160000
+            end
+            item
+              Value = 25.000000139723180000
+            end
+            item
+              Value = 24.999999939707150000
+            end>
+          ControlCollection = <
+            item
+              Column = 0
+              Control = chkBold
+              Row = 0
+            end
+            item
+              Column = 1
+              Control = chkItalic
+              Row = 0
+            end
+            item
+              Column = 2
+              Control = chkStrikeout
+              Row = 0
+            end
+            item
+              Column = 3
+              Control = chkUnderline
+              Row = 0
+            end>
+          RowCollection = <
+            item
+              Value = 100.000000000000000000
+            end>
           TabOrder = 0
-          OnClick = chkBoldClick
-        end
-        object chkItalic: TCheckBox
-          Left = 79
-          Top = 26
-          Width = 57
-          Height = 21
-          Caption = '&Italic'
-          TabOrder = 1
-          OnClick = chkItalicClick
-        end
-        object chkUnderline: TCheckBox
-          Left = 151
-          Top = 26
-          Width = 82
-          Height = 21
-          Caption = '&Underline'
-          TabOrder = 2
-          OnClick = chkUnderlineClick
-        end
-        object chkStrikeout: TCheckBox
-          Left = 252
-          Top = 26
-          Width = 82
-          Height = 21
-          Caption = '&Strikeout'
-          TabOrder = 3
-          OnClick = chkStrikeoutClick
+          object chkBold: TCheckBox
+            AlignWithMargins = True
+            Left = 8
+            Top = 3
+            Width = 137
+            Height = 35
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alClient
+            Caption = '&Bold'
+            TabOrder = 0
+            OnClick = chkBoldClick
+            ExplicitLeft = 15
+            ExplicitTop = 26
+            ExplicitWidth = 58
+            ExplicitHeight = 21
+          end
+          object chkItalic: TCheckBox
+            AlignWithMargins = True
+            Left = 161
+            Top = 3
+            Width = 138
+            Height = 35
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alClient
+            Caption = '&Italic'
+            TabOrder = 1
+            OnClick = chkItalicClick
+            ExplicitLeft = 79
+            ExplicitTop = 26
+            ExplicitWidth = 57
+            ExplicitHeight = 21
+          end
+          object chkStrikeout: TCheckBox
+            AlignWithMargins = True
+            Left = 315
+            Top = 3
+            Width = 138
+            Height = 35
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alClient
+            Caption = '&Strikeout'
+            TabOrder = 2
+            OnClick = chkStrikeoutClick
+            ExplicitLeft = 252
+            ExplicitTop = 26
+            ExplicitWidth = 82
+            ExplicitHeight = 21
+          end
+          object chkUnderline: TCheckBox
+            AlignWithMargins = True
+            Left = 469
+            Top = 3
+            Width = 139
+            Height = 35
+            Margins.Left = 8
+            Margins.Right = 8
+            Align = alClient
+            Caption = '&Underline'
+            TabOrder = 3
+            OnClick = chkUnderlineClick
+            ExplicitLeft = 151
+            ExplicitTop = 26
+            ExplicitWidth = 82
+            ExplicitHeight = 21
+          end
         end
       end
     end

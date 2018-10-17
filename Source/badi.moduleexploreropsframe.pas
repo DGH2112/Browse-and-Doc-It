@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Oct 2018
+  @Date    17 Oct 2018
 
 **)
 Unit BADI.ModuleExplorerOpsFrame;
@@ -69,6 +69,7 @@ Type
     pnlModuleExplorerOps: TPanel;
     chkUseIDEEditorColours: TCheckBox;
     gbxTokenFontInfo: TGroupBox;
+    GridPanel: TGridPanel;
     Procedure lbxTokenTypesClick(Sender: TObject);
     procedure cbxBackColourChange(Sender: TObject);
     procedure cbxFontColourChange(Sender: TObject);

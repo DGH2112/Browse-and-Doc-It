@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    17 Oct 2018
 
 **)
 Unit BADI.MethodDescriptionsFrame;
@@ -24,26 +24,44 @@ Uses
   StdCtrls,
   Buttons,
   ComCtrls,
-  BADI.CustomOptionsFrame;
+  BADI.CustomOptionsFrame, System.ImageList, Vcl.ImgList,
+  VirtualTrees,
+  System.Generics.Collections;
 
 Type
   (** This class represents the frame interface. **)
   TfmBADIMethodDescriptionsFrame = Class(TFrame, IBADIOptionsFrame)
-    hctlMethodDescriptions: THeaderControl;
-    lbxMethodDescriptions: TListBox;
-    btnDeleteDesc: TBitBtn;
-    btnEditDesc: TBitBtn;
-    btnAddDesc: TBitBtn;
+    ilButtonIcons: TImageList;
+    btnDeleteDesc: TButton;
+    btnEditDesc: TButton;
+    btnAddDesc: TButton;
+    vstMethodDescriptions: TVirtualStringTree;
     procedure btnAddDescClick(Sender: TObject);
     procedure btnDeleteDescClick(Sender: TObject);
     procedure btnEditDescClick(Sender: TObject);
-    procedure lbxMethodDescriptionsDblClick(Sender: TObject);
-    procedure lbxMethodDescriptionsDrawItem(Sender: TWinControl; Index: Integer;
-      Rect: TRect; State: TOwnerDrawState);
-  Private
-    { Private declarations }
+    procedure vstMethodDescriptionsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+  Strict Private
+    Type
+      (** A record to describe the pattern / description pairs to be displayed. **)
+      TBADIMethodDescRec = Record
+        FPattern     : String;
+        FDescription : String;
+        Constructor Create(Const strPattern, strDescription : String);
+      End;
+      (** A node record for the treeview with a collection index. @nohints  **)
+      TBADINodeData = Record
+        FCollectionIndex : Integer;
+      End;
+      (** A pointer to be above node record. **)
+      PBADINodeData = ^TBADINodeData;
+  Strict Private
+    FMethods : TList<TBADIMethodDescRec>;
+  Strict Protected
+    Procedure PopulateList;
   Public
-    { Public declarations }
+    Constructor Create(AOwner : TComponent); Override;
+    Destructor Destroy; Override;
     Procedure LoadSettings;
     Procedure SaveSettings;
   End;
@@ -60,7 +78,24 @@ Uses
   BADI.MethodDescriptionForm,
   BADI.Options;
 
-{ TfmBADIMethodDescriptionsFrame }
+(**
+
+  A constructor for the TBADIMethodDescRec class.
+
+  @precon  None.
+  @postcon Initialises the record.
+
+  @param   strPattern     as a String as a constant
+  @param   strDescription as a String as a constant
+
+**)
+Constructor TfmBADIMethodDescriptionsFrame.TBADIMethodDescRec.Create(Const strPattern,
+  strDescription: String);
+
+Begin
+  FPattern := strPattern;
+  FDescription := strDescription;
+End;
 
 (**
 
@@ -81,7 +116,12 @@ Var
 
 Begin
   If TfrmMethodDescriptions.Execute(strPattern, strDescription) Then
-    lbxMethodDescriptions.Items.Add(Format('%s=%s', [strPattern, strDescription]));
+    Begin
+      FMethods.Add(TBADIMethodDescrec.Create(strPattern, strDescription));
+      PopulateList;
+      vstMethodDescriptions.FocusedNode := vstMethodDescriptions.GetLast();
+      vstMethodDescriptions.Selected[vstMethodDescriptions.FocusedNode] := True;
+    End;
 End;
 
 (**
@@ -98,9 +138,15 @@ End;
 **)
 Procedure TfmBADIMethodDescriptionsFrame.btnDeleteDescClick(Sender: TObject);
 
+Var
+  Node : PVirtualNode;
+  NodeData : PBADINodeData;
+  
 Begin
-  If lbxMethodDescriptions.ItemIndex > - 1 Then
-    lbxMethodDescriptions.Items.Delete(lbxMethodDescriptions.ItemIndex);
+  Node := vstMethodDescriptions.FocusedNode;
+  NodeData := vstMethodDescriptions.GetNodeData(Node);
+  FMethods.Delete(NodeData.FCollectionIndex);
+  PopulateList;
 End;
 
 (**
@@ -118,66 +164,58 @@ End;
 Procedure TfmBADIMethodDescriptionsFrame.btnEditDescClick(Sender: TObject);
 
 Var
+  Node : PVirtualNode;
+  NodeData : PBADINodeData;
+  R : TBADIMethodDescRec;
   strPattern, strDescription: String;
-  iIndex: Integer;
-
+  
 Begin
-  iIndex := lbxMethodDescriptions.ItemIndex;
-  If iIndex > - 1 Then
+  Node := vstMethodDescriptions.FocusedNode;
+  NodeData := vstMethodDescriptions.GetNodeData(Node);
+  R := FMethods[NodeData.FCollectionIndex];
+  strPattern := R.FPattern;
+  strDescription := R.FDescription;
+  If TfrmMethodDescriptions.Execute(strPattern, strDescription) Then
     Begin
-      strPattern := lbxMethodDescriptions.Items.Names[iIndex];
-      strDescription := lbxMethodDescriptions.Items.ValueFromIndex[iIndex];
-      If TfrmMethodDescriptions.Execute(strPattern, strDescription) Then
-        lbxMethodDescriptions.Items[iIndex] := Format('%s=%s', [strPattern,
-          strDescription]);
+      R.FPattern := strPattern;
+      R.FDescription := strDescription;
+      FMethods[NodeData.FCollectionIndex] := R;
+      PopulateList;
     End;
 End;
 
 (**
 
-
-  This method is an on double click event handler for the Metho Description
-  ListView.
+  A constructor for the TfmBADIMethodDescriptionFrame class.
 
   @precon  None.
-  @postcon Edits the selected item.
+  @postcon Creates a generic list to temporarily store the method patterns and descriptions.
 
+  @nocheck MissingCONSTInParam
 
-  @param   Sender as a TObject
+  @param   AOwner as a TComponent
 
 **)
-Procedure TfmBADIMethodDescriptionsFrame.lbxMethodDescriptionsDblClick(Sender: TObject);
+Constructor TfmBADIMethodDescriptionsFrame.Create(AOwner: TComponent);
+
 Begin
-  btnEditDescClick(Sender);
+  Inherited Create(AOwner);
+  FMethods := TList<TBADIMethodDescRec>.Create;
 End;
 
 (**
 
-  This is an on draw item event handler for the method descriptions.
+  A destructor for the TfmBADIMethodDescriptionFrame class.
 
   @precon  None.
-  @postcon Draws the str=str information in the list box as 2 columns of information without the = sign.
-
-  @param   Sender as a TWinControl
-  @param   Index  as an Integer
-  @param   Rect   as a TRect
-  @param   State  as a TOwnerDrawState
+  @postcon Frees the generic collection.
 
 **)
-Procedure TfmBADIMethodDescriptionsFrame.lbxMethodDescriptionsDrawItem(Sender: TWinControl;
-  Index: Integer; Rect: TRect; State: TOwnerDrawState);
-
-Var
-  lb: TListBox;
-  iPos: Integer;
+Destructor TfmBADIMethodDescriptionsFrame.Destroy;
 
 Begin
-  lb := Sender As TListBox;
-  lb.Canvas.FillRect(Rect);
-  iPos := Pos('=', lb.Items[Index]);
-  lb.Canvas.TextOut(Rect.Left + 4, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
-  lb.Canvas.TextOut(Rect.Left + 154, Rect.Top, Copy(lb.Items[Index], iPos + 1,
-    Length(lb.Items[Index]) - iPos));
+  FMethods.Free;
+  Inherited Destroy;
 End;
 
 (**
@@ -191,12 +229,58 @@ End;
 Procedure TfmBADIMethodDescriptionsFrame.LoadSettings;
 
 Var
-  j: Integer;
+  iMethodDesc: Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
-  For j := 0 To TBADIOptions.BADIOptions.MethodDescriptions.Count - 1 Do
-    lbxMethodDescriptions.Items.Add(TBADIOptions.BADIOptions.MethodDescriptions[j]);
+  For iMethodDesc := 0 To TBADIOptions.BADIOptions.MethodDescriptions.Count - 1 Do
+    FMethods.Add(TBADIMethodDescRec.Create(
+      TBADIOptions.BADIOptions.MethodDescriptions.Names[iMethodDesc],
+      TBADIOptions.BADIOptions.MethodDescriptions.ValueFromIndex[iMethodDesc]
+    ));
+  PopulateList;
+End;
+
+(**
+
+  This method populates the virtual treeview with the list of patterns ands their descriptions.
+
+  @precon  None.
+  @postcon The list of patterns and their descriptions are rendered.
+
+**)
+Procedure TfmBADIMethodDescriptionsFrame.PopulateList;
+
+Var
+  iMethod: Integer;
+  Node : PVirtualNode;
+  NodeData : PBADINodeData;
+  iSelected : Integer;
+
+Begin
+  vstMethodDescriptions.BeginUpdate;
+  Try
+    iSelected := -1;
+    If Assigned(vstMethodDescriptions.FocusedNode) Then
+      Begin
+        NodeData := vstMethodDescriptions.GetNodeData(vstMethodDescriptions.FocusedNode);
+        iSelected := NodeData.FCollectionIndex;
+      End;
+    vstMethodDescriptions.Clear;
+    For iMethod := 0 To FMethods.Count - 1 Do
+      Begin
+        Node := vstMethodDescriptions.AddChild(Nil);
+        NodeData := vstMethodDescriptions.GetNodeData(Node);
+        NodeData.FCollectionIndex := iMethod;
+        If iSelected = iMethod Then
+          Begin
+            vstMethodDescriptions.FocusedNode := Node;
+            vstMethodDescriptions.Selected[Node] := True;
+          End;
+      End;
+  Finally
+    vstMethodDescriptions.EndUpdate;
+  End;
 End;
 
 (**
@@ -210,14 +294,44 @@ End;
 Procedure TfmBADIMethodDescriptionsFrame.SaveSettings;
 
 Var
-  j: Integer;
+  iMethodDesc: Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   TBADIOptions.BADIOptions.MethodDescriptions.Clear;
-  For j := 0 To lbxMethodDescriptions.Items.Count - 1 Do
-    TBADIOptions.BADIOptions.MethodDescriptions.Add(lbxMethodDescriptions.Items[j]);
+  For iMethodDesc := 0 To FMethods.Count - 1 Do
+    TBADIOptions.BADIOptions.MethodDescriptions.Add(Format('%s=%s', [
+      FMethods[iMethodDesc].FPattern,
+      FMethods[iMethodDesc].FDescription
+    ]));
 End;
 
-End.
+(**
 
+  This is an on get text event handler for the Method Descriptions virtual treeview.
+
+  @precon  None.
+  @postcon Returns the text for the columns of data for each record.
+
+  @param   Sender   as a TBaseVirtualTree
+  @param   Node     as a PVirtualNode
+  @param   Column   as a TColumnIndex
+  @param   TextType as a TVSTTextType
+  @param   CellText as a string as a reference
+
+**)
+procedure TfmBADIMethodDescriptionsFrame.vstMethodDescriptionsGetText(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+
+Var
+  NodeData : PBADINodeData;
+  
+begin
+  NodeData := Sender.GetNodeData(Node);
+  Case Column Of
+    0: CellText := FMethods[NodeData.FCollectionIndex].FPattern;
+    1: CellText := FMethods[NodeData.FCollectionIndex].FDescription;
+  End;
+end;
+
+End.

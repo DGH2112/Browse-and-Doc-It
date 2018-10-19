@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    12 Mar 2017
+  @Date    19 Oct 2018
   @Version 1.0
 
 **)
@@ -380,7 +380,7 @@ Begin
                   Result.AddObject(strToken, TObject(LastToken));
                   If Result.Count >= iLimit Then
                     Begin
-                      Result.Add('...');
+                      Result.AddObject('...', TObject(ttSymbol));
                       Exit;
                     End;
                 End;

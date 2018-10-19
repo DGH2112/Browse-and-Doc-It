@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    03 Jan 2018
+  @date    14 Oct 2018
 
 **)
 Unit BADI.Module.Checks.Options.Frame;
@@ -22,6 +22,7 @@ Uses
   Controls,
   Forms,
   Dialogs,
+  VCL.Themes,
   BADI.CustomOptionsFrame,
   VirtualTrees, 
   BADI.CustomVirtualStringTree;
@@ -42,6 +43,7 @@ Type
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     FVSTChecks : TBADIChecksOptionsVirtualStringTree;
+    FStyleServices: TCustomStyleServices;
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -59,10 +61,11 @@ Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
+  ToolsAPI,
   BADI.Types,
   BADI.Constants,
   BADI.Options, 
-  BADI.Functions;
+  BADI.Functions, BADI.Interfaces;
 
 {$R *.dfm}
 
@@ -101,10 +104,19 @@ Var
   eCheckSubOp: TBADIModuleCheckSubOp;
   N, S : PVirtualNode;
   NodeData : PCheckNodeData;
+  {$IFDEF DXE102}
+  ITS : IOTAIDEThemingServices;
+  {$ENDIF}
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(AOwner);
   CreateVirtualStringTree;
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    FStyleServices := ITS.StyleServices;
+  {$ENDIF}
   FVSTChecks.NodeDataSize := SizeOf(TCheckNodeData);
   For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
     Begin
@@ -188,9 +200,10 @@ Procedure TframeBADIModuleChecksOptions.LoadSettings;
 Var
   N : PVirtualNode;
   NodeData : PCheckNodeData;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   N := FVSTChecks.GetFirst;
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
@@ -203,7 +216,7 @@ Begin
           Else
             FVSTChecks.CheckState[N] := csUncheckedNormal;
         ntSubOption:
-          If NodeData.FModuleCheckSubOp In BO.BADIOptions.ModuleCheckSubOptions Then
+          If NodeData.FModuleCheckSubOp In BO.ModuleCheckSubOptions Then
             FVSTChecks.CheckState[N] := csCheckedNormal
           Else
             FVSTChecks.CheckState[N] := csUncheckedNormal;
@@ -263,9 +276,10 @@ Var
   N : PVirtualNode;
   NodeData : PCheckNodeData;
   R : TBADICheckRecord;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   N := FVSTChecks.GetFirst();
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
@@ -419,9 +433,10 @@ Procedure TframeBADIModuleChecksOptions.vstChecksPaintText(Sender: TBaseVirtualT
 Begin
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTChecks.StyleServices) And FVSTChecks.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTChecks.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
 End;
 
 End.
+

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       27 Feb 2018
+  @Date       08 Oct 2018
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -4063,15 +4063,20 @@ Var
   M : TPascalMethod;
 
 Begin
-    M := FunctionHeading(scLocal, Container, False);
-    If M = Nil Then
-      M := ProcedureHeading(scLocal, Container, False);
-    Result := M <> Nil;
-    If M <> Nil Then
+  M := FunctionHeading(scLocal, Container, False);
+  If M = Nil Then
+    M := ProcedureHeading(scLocal, Container, False);
+  Try
+    Result := Assigned(M);
+    If Assigned(M) Then
       Begin
         PortabilityDirective;
         Block(scLocal, M);
       End;
+  Finally
+    If Not Assigned(Container) And Assigned(M) Then
+      M.Free;
+  End;
 End;
 
 (**
@@ -5368,7 +5373,7 @@ Begin
   If Result Then
     Begin
       If Assigned(CurrentMethod) Then
-        If mmsoMethodCCIncIF In BADIOptions.BADIOptions.ModuleMetricSubOptions Then
+        If mmsoMethodCCIncIF In BADIOptions.ModuleMetricSubOptions Then
           Begin
             CurrentMethod.IncIFDepth;
             CurrentMethod.IncCyclometricComplexity;
@@ -5378,8 +5383,8 @@ Begin
       IFExpr := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         Expression(IFExpr, ExprType);
-        If mmsoMethodCCIncIF In BADIOptions.BADIOptions.ModuleMetricSubOptions Then
-          If mmsoMethodCCIncludeExpression In BADIOptions.BADIOptions.ModuleMetricSubOptions Then
+        If mmsoMethodCCIncIF In BADIOptions.ModuleMetricSubOptions Then
+          If mmsoMethodCCIncludeExpression In BADIOptions.ModuleMetricSubOptions Then
             For iToken := 0 To IFExpr.TokenCount - 1 Do
               If IsKeyWord(IFExpr.Tokens[iToken].Token, strCycloMetricComplexityOperators) Then
                 If Assigned(CurrentMethod) Then
@@ -5557,14 +5562,14 @@ Begin
       If Token.UToken = strUNTIL Then
         Begin
           If Assigned(CurrentMethod) Then
-            If mmsoMethodCCIncREPEAT In BADIOptions.BADIOptions.ModuleMetricSubOptions Then
+            If mmsoMethodCCIncREPEAT In BADIOptions.ModuleMetricSubOptions Then
               CurrentMethod.IncCyclometricComplexity;
           NextNonCommentToken;
           ExprType := [petUnknown];
           UntilExpr := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
             Expression(UntilExpr, ExprType);
-            If mmsoMethodCCIncREPEAT In BADIOptions.BADIOptions.ModuleMetricSubOptions Then
+            If mmsoMethodCCIncREPEAT In BADIOptions.ModuleMetricSubOptions Then
               For iToken := 0 To UntilExpr.TokenCount - 1 Do
                 If IsKeyWord(UntilExpr.Tokens[iToken].Token, strCycloMetricComplexityOperators) Then
                   If Assigned(CurrentMethod) Then
@@ -5605,14 +5610,14 @@ Begin
   If Result Then
     Begin
       If Assigned(CurrentMethod) Then
-        If mmsoMethodCCIncWHILE In BADIOptions.BADIOptions.ModuleMetricSubOptions Then
+        If mmsoMethodCCIncWHILE In BADIOptions.ModuleMetricSubOptions Then
           CurrentMethod.IncCyclometricComplexity;
       NextNonCommentToken;
       ExprType := [petUnknown];
       WhileExpr := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         Expression(WhileExpr, ExprType);
-        If mmsoMethodCCIncWHILE In BADIOptions.BADIOptions.ModuleMetricSubOptions Then
+        If mmsoMethodCCIncWHILE In BADIOptions.ModuleMetricSubOptions Then
           For iToken := 0 To WhileExpr.TokenCount - 1 Do
             If IsKeyWord(WhileExpr.Tokens[iToken].Token, strCycloMetricComplexityOperators) Then
               If Assigned(CurrentMethod) Then

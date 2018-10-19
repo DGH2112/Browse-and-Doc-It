@@ -3,6 +3,9 @@
         <ProjectGuid>{BA41C309-29D5-414B-950B-8A1A47C300D0}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
+        <Projects Include="BADIDUnitXTests.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="Test\BrowseAndDocItTests.dproj">
             <Dependencies/>
         </Projects>
@@ -20,6 +23,15 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
+    <Target Name="BADIDUnitXTests">
+        <MSBuild Projects="BADIDUnitXTests.dproj"/>
+    </Target>
+    <Target Name="BADIDUnitXTests:Clean">
+        <MSBuild Projects="BADIDUnitXTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BADIDUnitXTests:Make">
+        <MSBuild Projects="BADIDUnitXTests.dproj" Targets="Make"/>
+    </Target>
     <Target Name="BrowseAndDocItTests">
         <MSBuild Projects="Test\BrowseAndDocItTests.dproj"/>
     </Target>
@@ -48,13 +60,13 @@
         <MSBuild Projects="BrowseAndDocIt.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="BrowseAndDocItTests;BrowseAndDocItTestApp;BrowseAndDocIt"/>
+        <CallTarget Targets="BADIDUnitXTests;BrowseAndDocItTests;BrowseAndDocItTestApp;BrowseAndDocIt"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="BrowseAndDocItTests:Clean;BrowseAndDocItTestApp:Clean;BrowseAndDocIt:Clean"/>
+        <CallTarget Targets="BADIDUnitXTests:Clean;BrowseAndDocItTests:Clean;BrowseAndDocItTestApp:Clean;BrowseAndDocIt:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="BrowseAndDocItTests:Make;BrowseAndDocItTestApp:Make;BrowseAndDocIt:Make"/>
+        <CallTarget Targets="BADIDUnitXTests:Make;BrowseAndDocItTests:Make;BrowseAndDocItTestApp:Make;BrowseAndDocIt:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

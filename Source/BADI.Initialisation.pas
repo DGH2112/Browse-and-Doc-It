@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.Initialisation;
@@ -114,7 +114,7 @@ End;
 Destructor TBADIInitialisation.Destroy;
 
 Begin
-  TBADIOptions.BADIOptions.Free;
+  TBADIOptions.Release;
   TBADIDispatcher.BADIDispatcher.Free;
   Inherited Destroy;
 End;

@@ -4,8 +4,8 @@
   and a label container for tree view headers adn the like.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    03 Jan 2018
+  @Version 1.1
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.ElementContainer;
@@ -15,7 +15,7 @@ Interface
 Uses
   Classes,
   Contnrs,
-  BADI.Options,
+  BADI.Interfaces,
   BADI.Comment,
   BADI.Types,
   BADI.Base.Container,
@@ -40,7 +40,7 @@ Type
     FSorted  : Boolean;
     FReferenced : Boolean;
     FParent : TElementContainer;
-    FBADIOptions : TBADIOptions;
+    FBADIOptions : IBADIOptions;
   Strict Protected
     Function  GetElementCount : Integer;
     Function  GetElements(Const iIndex : Integer) : TElementContainer;
@@ -74,9 +74,9 @@ Type
       This property provide all descendant modules with a single point of access to the options.
       @precon  None.
       @postcon Returns a reference to the BADI Options class.
-      @return  a TBADIOptions
+      @return  a IBADIOptions
     **)
-    Property BADIOptions : TBADIOptions Read FBADIOptions;
+    Property BADIOptions : IBADIOptions Read FBADIOptions;
   Public
     Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
       iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Virtual;
@@ -203,10 +203,12 @@ Uses
   Profiler,
   {$ENDIF}
   SysUtils,
+  BADI.Options,
   BADI.ResourceStrings,
   BADI.DocIssue,
   BADI.Functions,
-  BADI.Constants, BADI.Comment.Tag;
+  BADI.Constants,
+  BADI.Comment.Tag;
 
 Type
   (** A record to describe error, warning, and hint messages. **)
@@ -1156,7 +1158,9 @@ End;
 
 **)
 Destructor TElementContainer.Destroy;
+
 Begin
+  FBADIOptions := Nil;
   FElements.Free;
   Inherited Destroy;
 End;
@@ -1589,7 +1593,7 @@ End;
 Function TLabelContainer.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
-  If doShowChildCountInTitles In BADIOptions.BADIOptions.Options Then
+  If doShowChildCountInTitles In BADIOptions.Options Then
     Result := Format(strTitleCountFmt, [Name, ElementCount])
   Else
     Result := Name;

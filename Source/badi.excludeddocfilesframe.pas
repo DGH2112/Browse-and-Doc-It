@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Apr 2017
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.ExcludedDocFilesFrame;
@@ -42,6 +42,9 @@ Implementation
 {$R *.dfm}
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   BADI.Base.Module,
   BADI.Options;
 
@@ -58,6 +61,7 @@ Uses
 Procedure TfmBADIExcludedDocFilesFrame.LoadSettings;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   mmoExcludeDocFiles.Text := TBADIOptions.BADIOptions.ExcludeDocFiles.Text;
 End;
 
@@ -72,7 +76,9 @@ End;
 Procedure TfmBADIExcludedDocFilesFrame.SaveSettings;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   TBADIOptions.BADIOptions.ExcludeDocFiles.Text := mmoExcludeDocFiles.Text;
 End;
 
 End.
+

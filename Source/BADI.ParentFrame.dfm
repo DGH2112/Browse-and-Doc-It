@@ -19,17 +19,18 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Align = alTop
     Caption = 'Browse and Doc It'
     Font.Charset = ANSI_CHARSET
-    Font.Color = clNavy
+    Font.Color = clWindowText
     Font.Height = -24
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
     Transparent = True
+    ExplicitWidth = 221
   end
   object lblAuthor: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 54
+    Top = 60
     Width = 523
     Height = 16
     Align = alTop
@@ -40,11 +41,13 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
+    ExplicitTop = 54
+    ExplicitWidth = 248
   end
   object lblBuild: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 35
+    Top = 38
     Width = 523
     Height = 16
     Align = alTop
@@ -55,11 +58,13 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
+    ExplicitTop = 35
+    ExplicitWidth = 40
   end
   object lblPleaseSelect: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 260
+    Top = 275
     Width = 523
     Height = 16
     Align = alTop
@@ -71,11 +76,13 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Style = []
     ParentFont = False
     Layout = tlCenter
+    ExplicitTop = 260
+    ExplicitWidth = 220
   end
   object lblInformation: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 92
+    Top = 104
     Width = 523
     Height = 165
     Align = alTop
@@ -91,13 +98,14 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Style = []
     ParentFont = False
     Layout = tlCenter
+    ExplicitTop = 92
   end
   object lblEurekaLog: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 279
+    Top = 297
     Width = 523
-    Height = 58
+    Height = 37
     Align = alClient
     AutoSize = False
     Caption = 'EurekaLog'
@@ -108,14 +116,18 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Style = []
     ParentFont = False
     Layout = tlBottom
+    ExplicitTop = 279
+    ExplicitHeight = 58
   end
   object lblBuildDate: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 73
+    Top = 82
     Width = 523
     Height = 16
     Align = alTop
     Caption = 'lblBuildDate'
+    ExplicitTop = 73
+    ExplicitWidth = 66
   end
 end

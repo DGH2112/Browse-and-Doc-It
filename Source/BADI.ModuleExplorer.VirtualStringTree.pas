@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Nov 2017
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.ModuleExplorer.VirtualStringTree;
@@ -49,8 +49,8 @@ Uses
   @precon  None.
   @postcon Returns the modified node width.
 
-  @nometric MissingCONSTInParam
-  @nohint
+  @nocheck MissingCONSTInParam
+  @nohint  Column
   
   @param   Node   as a PVirtualNode
   @param   Column as a TColumnIndex
@@ -68,18 +68,32 @@ Var
   NodeData: PBADITreeData;
   sl: TStringList;
   i: Integer;
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
+  iBGColour: TColor;
 
 Begin
   Result := iPadding;
   NodeData := GetNodeData(Node);
   //: @note Self.Canvas used to access the treeview canvas as Canvas from the parameters above is
   //:       NIL!
-  InitCanvasFont(Self.Canvas, tpFixed In NodeData.FNode.TagProperties);
+  InitCanvasFont(Self.Canvas, tpFixed In NodeData.FNode.TagProperties, TBADIOptions.BADIOptions);
+  TokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[TBADIOptions.BADIOptions.UseIDEEditorColours];
+  iBGColour := TBADIOptions.BADIOptions.BGColour[TBADIOptions.BADIOptions.UseIDEEditorColours];
   sl := NodeData.FNode.Tokens;
   For i := 0 To sl.Count - 1 Do
     Begin
-      GetFontInfo(sl, i, NodeData.FNode.Title, tpSyntax In NodeData.FNode.TagProperties,
-        NodeData.FNode.ForeColour, NodeData.FNode.BackColour, NodeData.FNode.FontStyles, Self.Canvas);
+      GetFontInfo(
+        sl,
+        i,
+        NodeData.FNode.Title,
+        tpSyntax In NodeData.FNode.TagProperties,
+        NodeData.FNode.ForeColour,
+        NodeData.FNode.BackColour,
+        NodeData.FNode.FontStyles,
+        TokenFontInfo,
+        iBGColour,
+        Self.Canvas
+      );
       Inc(Result, Self.Canvas.TextWidth(sl[i]) + 1);
     End;
 End;

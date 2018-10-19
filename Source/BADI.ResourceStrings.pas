@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    04 Jan 2018
+  @Date    08 Oct 2018
 
 **)
 Unit BADI.ResourceStrings;
@@ -658,6 +658,18 @@ ResourceString
   strTokenTagHeaderText = 'Tag Header Text';
   (** A text string to represents a Tag Text token. **)
   strTokenTagText = 'Tag Text';
+
+  //
+  // Token Sets
+  //
+  (** A resource string for an unthemed IDE. **)
+  strUnthemed = 'Unthemed';
+  (** A resource string for an light themed IDE. **)
+  strLightTheme = 'Light Theme';
+  (** A resource string for an dark themed IDE. **)
+  strDarkTheme = 'Dark Theme';
+  (** A resource string for an custom themed IDE. **)
+  strCustomTheme = 'Custom Theme';
 
   //
   // Menu captions

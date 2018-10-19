@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    03 Jan 2018
+  @date    14 Oct 2018
 
 **)
 Unit BADI.Module.Metrics.Options.Frame;
@@ -27,7 +27,8 @@ Uses
   BADI.CustomVirtualStringTree,
   StdCtrls,
   ExtCtrls,
-  ComCtrls;
+  ComCtrls,
+  VCL.Themes;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -61,6 +62,7 @@ Type
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     FVSTMetrics : TBADIMetricsOptionsVirtualStringTree;
+    FStyleServices: TCustomStyleServices;
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -82,11 +84,12 @@ Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
+  ToolsAPI,
   BADI.Types,
   BADI.Constants,
   BADI.Options, 
   BADI.Functions,
-  Themes;
+  BADI.Interfaces;
 
 {$R *.dfm}
 
@@ -133,10 +136,19 @@ Var
   eMetricSubOp: TBADIModuleMetricSubOp;
   N, S : PVirtualNode;
   NodeData : PMetricNodeData;
+  {$IFDEF DXE102}
+  ITS : IOTAIDEThemingServices;
+  {$ENDIF}
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(AOwner);
   CreateVirtualStringTree;
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    FStyleServices := ITS.StyleServices;
+  {$ENDIF}
   FVSTMetrics.NodeDataSize := SizeOf(TMetricNodeData);
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
     Begin
@@ -229,9 +241,10 @@ Procedure TframeBADIModuleMetricsOptions.LoadSettings;
 Var
   N : PVirtualNode;
   NodeData : PMetricNodeData;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   N := FVSTMetrics.GetFirst;
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
@@ -258,10 +271,10 @@ Begin
       N := FVSTMetrics.GetNext(N);
     End;
   vstMetricsChecked(Nil, Nil);
-  udToxicityPower.Position := BO.BADIOptions.ToxicityPower;
-  cbxToxicitySummation.ItemIndex := Integer(BO.BADIOptions.ToxicitySummartion);
-  udMetricLowerLimit.Position := Trunc(BO.BADIOptions.LowMetricMargin);
-  udMetricUpperLimit.Position := Trunc(BO.BADIOptions.HighMetricMargin);
+  udToxicityPower.Position := BO.ToxicityPower;
+  cbxToxicitySummation.ItemIndex := Integer(BO.ToxicitySummartion);
+  udMetricLowerLimit.Position := Trunc(BO.LowMetricMargin);
+  udMetricUpperLimit.Position := Trunc(BO.HighMetricMargin);
   udMetricLowerLimit.OnChangingEx := udMetricLowerLimitChangingEx;
   udMetricUpperLimit.OnChangingEx := udMetricUpperLimitChangingEx;
 End;
@@ -316,9 +329,10 @@ Var
   N : PVirtualNode;
   NodeData : PMetricNodeData;
   R : TBADIMetricRecord;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   N := FVSTMetrics.GetFirst();
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
@@ -347,10 +361,10 @@ Begin
       End;
       N := FVSTMetrics.GetNext(N);
     End;
-  BO.BADIOptions.ToxicityPower := udToxicityPower.Position;
-  BO.BADIOptions.ToxicitySummartion := TBADIToxicitySummation(cbxToxicitySummation.ItemIndex);
-  BO.BADIOptions.LowMetricMargin := Int(udMetricLowerLimit.Position);
-  BO.BADIOptions.HighMetricMargin := Int(udMetricUpperLimit.Position);
+  BO.ToxicityPower := udToxicityPower.Position;
+  BO.ToxicitySummartion := TBADIToxicitySummation(cbxToxicitySummation.ItemIndex);
+  BO.LowMetricMargin := Int(udMetricLowerLimit.Position);
+  BO.HighMetricMargin := Int(udMetricUpperLimit.Position);
 End;
 
 (**
@@ -610,9 +624,10 @@ Procedure TframeBADIModuleMetricsOptions.vstMetricsPaintText(Sender: TBaseVirtua
 Begin
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
 End;
 
 End.
+

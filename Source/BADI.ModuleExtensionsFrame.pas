@@ -4,7 +4,9 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    02 Apr 2017
+  @Date    17 Oct 2018
+
+  @todo    Replace the TValueListEditor with VST.
 
 **)
 Unit BADI.ModuleExtensionsFrame;
@@ -25,14 +27,16 @@ Uses
   Grids,
   ValEdit;
 
+{$INCLUDE CompilerDefinitions.inc}
+
 Type
   (** A class which represents a frame to edit the module explorer file extensions. **)
   TfmBADIModuleExtensionsFrame = Class(TFrame, IBADIOptionsFrame)
     vleModuleExtensions: TValueListEditor;
   Strict Private
-    { Private declarations }
+  Strict Protected
   Public
-    { Public declarations }
+    Constructor Create(AOwner : TComponent); Override;
     Procedure LoadSettings;
     Procedure SaveSettings;
   End;
@@ -40,12 +44,46 @@ Type
 Implementation
 
 Uses
+  ToolsAPI,
   BADI.Module.Dispatcher,
   BADI.Options;
 
 {$R *.dfm}
 
-{ TfmBADIModuleExtensionsFrame }
+(**
+
+  A constructor for the TfmBADIModuleExtensionsFrame class.
+
+  @precon  None.
+  @postcon Themes the ValueListEditor.
+
+  @nocheck MissingCONSTInParam
+
+  @param   AOwner as a TComponent
+
+**)
+Constructor TfmBADIModuleExtensionsFrame.Create(AOwner: TComponent);
+
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+
+Begin
+  Inherited Create(AOwner);
+  {$IFDEF DXE102}
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      Begin
+        vleModuleExtensions.Ctl3D := False;
+        vleModuleExtensions.DrawingStyle := gdsGradient;
+        vleModuleExtensions.FixedColor := ITS.StyleServices.GetSystemColor(clBtnFace);
+        vleModuleExtensions.Color := ITS.StyleServices.GetSystemColor(clWindow);
+        vleModuleExtensions.GradientStartColor := ITS.StyleServices.GetSystemColor(clBtnFace);
+        vleModuleExtensions.GradientEndColor := ITS.StyleServices.GetSystemColor(clBtnFace);
+        vleModuleExtensions.Font.Color := ITS.StyleServices.GetSystemColor(clWindowText);      End;
+  {$ENDIF}
+End;
 
 (**
 

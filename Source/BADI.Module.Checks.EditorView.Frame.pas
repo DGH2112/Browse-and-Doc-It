@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Jan 2018
+  @Date    19 Oct 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -38,7 +38,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes;
+  UITypes, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -119,9 +119,10 @@ Type
     FMethodCount   : Integer;
     FUnderLimit    : Integer;
     FOverLimit     : Integer;
-    FVSTChecks    : TBADIEditorViewVirtualStringTree;
+    FVSTChecks     : TBADIEditorViewVirtualStringTree;
     {$IFDEF DXE102}
-    FStyleServicesNotifier: Integer;
+    FStyleServices : TCustomStyleServices;
+    FThemingServicesNotifierIndex : Integer;
     {$ENDIF}
   Strict Protected
     Procedure vstChecksGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -148,6 +149,7 @@ Type
     Procedure CreateVirtualStringTree;
     Procedure HideZeroColumns;
     Procedure ExpandIssues;
+    Procedure HookThemingServices(Sender : TObject);
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -208,7 +210,7 @@ Uses
   BADI.Options,
   BADI.Functions,
   ClipBrd, 
-  BADI.StyleServices.Notifier;
+  BADI.IDEThemingNotifier;
 
 {$R *.dfm}
 
@@ -590,11 +592,11 @@ Begin
   CreateVirtualStringTree;
   FVSTChecks.NodeDataSize := SizeOf(TBADICheckRecord);
   LoadBADIImages(ilScopeImages);
+  HookThemingServices(Nil);
   {$IFDEF DXE102}
-  FStyleServicesNotifier := -1;
+  FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    FStyleServicesNotifier :=
-      ITS.AddNotifier(TBADIStyleServicesNotifier.Create(FVSTChecks.UpdateTreeColours));
+    FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(HookThemingServices));
   {$ENDIF}
 End;
 
@@ -682,7 +684,7 @@ End;
 
 **)
 Destructor TframeBADIModuleChecksEditorView.Destroy;
-
+  
 {$IFDEF DXE102}
 Var
   ITS : IOTAIDEThemingServices;
@@ -690,8 +692,10 @@ Var
   
 Begin
   {$IFDEF DXE102}
+  FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    ITS.RemoveNotifier(FStyleServicesNotifier);
+    If FThemingServicesNotifierIndex > -1 Then
+      ITS.RemoveNotifier(FThemingServicesNotifierIndex);
   {$ENDIF}
   Inherited Destroy;
 End;
@@ -865,6 +869,35 @@ Begin
       End Else
         FVSTChecks.Header.Columns[Integer(eColumn)].Options :=
           FVSTChecks.Header.Columns[Integer(eColumn)].Options + [coVisible];
+End;
+
+(**
+
+  This method Hokos the IDEs Style Services if they are available and enabled.
+
+  @precon  None.
+  @postcon The IDEs style services are hooked if available and enabled else its set to nil.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleChecksEditorView.HookThemingServices(Sender : TObject);
+
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+  
+Begin
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      Begin
+        FStyleServices := ITS.StyleServices;
+        ITS.ApplyTheme(Self);
+      End;
+  {$ENDIF}
 End;
 
 (**
@@ -1153,8 +1186,8 @@ Begin
   NodeData := FVSTChecks.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
   {$IFDEF DXE102}
-  If Assigned(FVSTChecks.StyleServices) And FVSTChecks.StyleServices.Enabled Then
-    TargetCanvas.Brush.Color := FVSTChecks.StyleServices.GetSystemColor(clWindow);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
   {$ENDIF}
   Case TBADICheckColumn(Column) Of
     ccHardCodedIntegers..ccMissingCONSTInParemterList:
@@ -1302,8 +1335,8 @@ Begin
   TargetCanvas.Font.Style := [];
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTChecks.StyleServices) And FVSTChecks.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTChecks.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
   Case TBADICheckColumn(Column) Of
     ccHardCodedIntegers..ccTotal: TargetCanvas.Font.Color := clBlack;

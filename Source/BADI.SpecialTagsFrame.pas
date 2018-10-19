@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Jan 2018
+  @Date    14 Oct 2018
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -31,7 +31,7 @@ Uses
   BADI.Types,
   VirtualTrees,
   Themes, 
-  BADI.CustomVirtualStringTree;
+  BADI.CustomVirtualStringTree, System.ImageList, Vcl.ImgList;
 
 Type
   (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)
@@ -39,11 +39,12 @@ Type
 
   (** This is a class to represent the frame interface. **)
   TfmBADISpecialTagsFrame = Class(TFrame, IBADIOptionsFrame)
-    btnDelete: TBitBtn;
-    btnEdit: TBitBtn;
-    btnMoveDown: TBitBtn;
-    btnMoveUp: TBitBtn;
-    btnAdd: TBitBtn;
+    btnDelete: TButton;
+    btnEdit: TButton;
+    btnMoveDown: TButton;
+    btnMoveUp: TButton;
+    btnAdd: TButton;
+    ilButtonIcons: TImageList;
     Procedure btnAddClick(Sender: TObject);
     Procedure btnDeleteClick(Sender: TObject);
     Procedure btnEditClick(Sender: TObject);
@@ -63,6 +64,9 @@ Type
   Strict Private
     FSpecialTags    : TList<TBADISpecialTag>;
     FVSTSpecialTags : TBADISpecialTagsOptionsVirtualStringTree;
+    {$IFDEF DXE102}
+    FStyleServices : TCustomStyleServices;
+    {$ENDIF}
   Strict Protected
     Procedure PopulateTreeView;
     Procedure CreateVirtualStringTree;
@@ -80,9 +84,7 @@ Implementation
 
 
 Uses
-  {$IFDEF TOOLSAPI}
   ToolsAPI,
-  {$ENDIF}
   BADI.Base.Module,
   BADI.SpecialTagForm,
   BADI.Constants,
@@ -205,6 +207,7 @@ Begin
       If NodeData.FSpecialTagIndex < FSpecialTags.Count - 1 Then
         Begin
           FSpecialTags.Exchange(NodeData.FSpecialTagIndex, NodeData.FSpecialTagIndex + 1);
+          FVSTSpecialTags.FocusedNode := FVSTSpecialTags.GetNextSibling(FVSTSpecialTags.FocusedNode);
           PopulateTreeView;
         End;
     End;
@@ -233,6 +236,7 @@ Begin
       If NodeData.FSpecialTagIndex > 0 Then
         Begin
           FSpecialTags.Exchange(NodeData.FSpecialTagIndex, NodeData.FSpecialTagIndex - 1);
+          FVSTSpecialTags.FocusedNode := FVSTSpecialTags.GetPreviousSibling(FVSTSpecialTags.FocusedNode);
           PopulateTreeView;
         End;
     End;
@@ -252,9 +256,20 @@ End;
 **)
 Constructor TfmBADISpecialTagsFrame.Create(AOwner: TComponent);
 
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+
 Begin
   Inherited Create(AOwner);
   CreateVirtualStringTree;
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      FStyleServices := ITS.StyleServices;
+  {$ENDIF}
   FVSTSpecialTags.NodeDataSize := SizeOf(TSpecialTagsNodeData);
   FSpecialTags := TList<TBADISpecialTag>.Create;
   PopulateTreeView;
@@ -465,11 +480,9 @@ Begin
     ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax     In ST.FTagProperties];
   Else
     TargetCanvas.Brush.Color := clWindow;
-    {$IFDEF TOOLSAPI}
     {$IFDEF DXE102}
-    If Assigned(FVSTSpecialTags.StyleServices) And FVSTSpecialTags.StyleServices.Enabled Then
-      TargetCanvas.Brush.Color := FVSTSpecialTags.StyleServices.GetSystemColor(clWindow);
-    {$ENDIF}
+    If Assigned(FStyleServices) Then
+      TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
     {$ENDIF}
     If ST.FBackColour <> clNone Then
       TargetCanvas.Brush.Color := ST.FBackColour;
@@ -648,11 +661,9 @@ Begin
   Case TColumnIndexes(Column) Of
     ciShowInTree..ciSyntax: TargetCanvas.Font.Color := clBlack;
   Else
-    {$IFDEF TOOLAPI}
     {$IFDEF DXE102}
-    If Assigned(FVSTSpecialTags.StyleServices) And FVSTSpecialTags.StyleServices.Enabled Then
-      TargetCanvas.Font.Color := FVSTSpecialTags.StyleServices.GetSystemColor(clWindowText);
-    {$ENDIF}
+    If Assigned(FStyleServices) Then
+      TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
     {$ENDIF}
     If ST.FFontColour <> clNone Then
       TargetCanvas.Font.Color := ST.FFontColour;

@@ -4,70 +4,101 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Feb 2017
+  @Date    17 Oct 2018
 
 **)
-unit BADI.MethodDescriptionForm;
+Unit BADI.MethodDescriptionForm;
 
-interface
+Interface
 
-uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons;
+Uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  Buttons,
+  Vcl.ExtCtrls;
 
-type
+{$INCLUDE CompilerDefinitions.inc}
+
+Type
   (** A class to represent the form interface. **)
-  TfrmMethodDescriptions = class(TForm)
+  TfrmMethodDescriptions = Class(TForm)
     lblPattern: TLabel;
     edtPattern: TEdit;
     lblDescription: TLabel;
     edtDescription: TEdit;
     btnOK: TBitBtn;
     btnCancel: TBitBtn;
-  private
-    { Private declarations }
-  public
-    { Public declarations }
-    Class Function Execute(var strPattern, strDescription : String) : Boolean;
-  end;
+    pnlForm: TPanel;
+  Strict Private
+  Strict Protected
+  Public
+    Class Function Execute(Var strPattern, strDescription: String): Boolean;
+  End;
 
-implementation
+Implementation
 
 {$R *.dfm}
 
-{ TfrmMethodDescriptions }
+Uses
+  ToolsAPI;
 
 (**
 
-  This is the forms main interface method for getting the pattern and
+
+  This is the forms main interface method for getting the pattern and
   description.
 
   @precon  None.
   @postcon If the dialogue is confirmed then the pattern and description are
            returned in the var parameters and the function retuen true.
 
-  @param   strPattern     as a String as a reference
+
+  @param   strPattern     as a String as a reference
   @param   strDescription as a String as a reference
   @return  a Boolean
 
 **)
-class function TfrmMethodDescriptions.Execute(var strPattern,
-  strDescription: String): Boolean;
-begin
-  Result := False;
-  With TfrmMethodDescriptions.Create(Nil) Do
-    Try
-      edtPattern.Text := strPattern;
-      edtDescription.Text := strDescription;
-      If ShowModal = mrOK Then
-        Begin
-          strPattern := edtPattern.Text;
-          strDescription := edtDescription.Text;
-          Result := True;
-        End;
-    Finally
-      Free;
-    End;
-end;
+Class Function TfrmMethodDescriptions.Execute(Var strPattern, strDescription: String): Boolean;
 
-end.
+Var
+  F : TfrmMethodDescriptions;
+  { $IFDEF DXE102
+  ITS : IOTAIDEThemingServices250;
+  {$ENDIF}
+  
+Begin
+  Result := False;
+  { $IFDEF DXE102
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      ITS.RegisterFormClass(TfrmMethodDescriptions);
+  {$ENDIF}
+  F := TfrmMethodDescriptions.Create(Nil);
+  Try
+    { $IFDEF DXE102
+    If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+      If ITS.IDEThemingEnabled Then
+        ITS.ApplyTheme(F);
+    {$ENDIF}
+    F.edtPattern.Text := strPattern;
+    F.edtDescription.Text := strDescription;
+    If F.ShowModal = mrOK Then
+      Begin
+        strPattern := F.edtPattern.Text;
+        strDescription := F.edtDescription.Text;
+        Result := True;
+      End;
+  Finally
+    F.Free;
+  End;
+End;
+
+End.

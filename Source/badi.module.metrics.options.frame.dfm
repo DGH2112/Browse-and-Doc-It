@@ -16,7 +16,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
     Width = 415
     Height = 132
     Align = alBottom
-    BevelInner = bvLowered
+    BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
       415

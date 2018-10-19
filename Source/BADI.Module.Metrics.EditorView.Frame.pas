@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    19 Oct 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -38,7 +38,8 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes, System.ImageList;
+  UITypes, System.ImageList,
+  BADI.IDEThemingNotifier;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -125,6 +126,7 @@ Type
     FOverLimit     : Integer;
     FVSTMetrics    : TBADIEditorViewVirtualStringTree;
     {$IFDEF DXE102}
+    FThemingServicesNotifierIndex : Integer;
     FStyleServices : TCustomStyleServices;
     {$ENDIF}
   Strict Protected
@@ -153,6 +155,7 @@ Type
     Procedure CreateVirtualStringTree;
     Procedure HideZeroColumns;
     Procedure ExpandIssues;
+    Procedure HookStyleServices;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -574,16 +577,17 @@ Constructor TframeBADIModuleMetricsEditorView.Create(AOwner: TComponent);
 Var
   ITS : IOTAIDEThemingServices;
 {$ENDIF}
-  
+
 Begin
   Inherited Create(AOwner);
   CreateVirtualStringTree;
   FVSTMetrics.NodeDataSize := SizeOf(TBADIMetricRecord);
   LoadBADIImages(ilScopeImages);
+  HookStyleServices;
   {$IFDEF DXE102}
-  FStyleServices := Nil;
+  FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    FStyleServices := ITS.StyleServices;
+    FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIStyleServicesNotifier.Create(HookStyleServices));
   {$ENDIF}
 End;
 
@@ -671,7 +675,17 @@ End;
 **)
 Destructor TframeBADIModuleMetricsEditorView.Destroy;
 
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+
 Begin
+  {$IFDEF DXE102}
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If FThemingServicesNotifierIndex > -1 Then
+      ITS.RemoveNotifier(FThemingServicesNotifierIndex);
+  {$ENDIF}
   Inherited Destroy;
 End;
 
@@ -848,6 +862,33 @@ Begin
         FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
           FVSTMetrics.Header.Columns[Integer(eColumn)].Options - [coVisible]
     End;
+End;
+
+(**
+
+  This method Hokos the IDEs Style Services if they are available and enabled.
+
+  @precon  None.
+  @postcon The IDEs style services are hooked if available and enabled else its set to nil.
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.HookStyleServices;
+
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+
+Begin
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      Begin
+        FStyleServices := ITS.StyleServices;
+        ITS.ApplyTheme(Self);
+      End;
+  {$ENDIF}
 End;
 
 (**

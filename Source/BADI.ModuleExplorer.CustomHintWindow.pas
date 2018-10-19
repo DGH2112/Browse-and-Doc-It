@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    19 Oct 2018
 
 **)
 Unit BADI.ModuleExplorer.CustomHintWindow;
@@ -426,7 +426,7 @@ Begin
   Inc(iTop, 1 + iPadding);
   Inc(iBottom, 1 + iPadding);
   Canvas.Refresh;
-  SetTokenFont(Canvas, ttCommentText);
+  SetTokenFont(Canvas, ttPlainText);
   strText := FComment.AsString(MaxInt, False);
   R := Rect(FRect.Left, iTop, Width - iPadding * iMultipler, Height);
   iHeight := DrawText(Canvas.Handle, PChar(strText), -1, R,
@@ -470,7 +470,7 @@ Begin
       If CanDrawSpecialTag(FComment, FBADIOptions.SpecialTags[iSpecialTag].FName) Then
         Begin
           Canvas.Refresh;
-          SetTokenFont(Canvas, ttTagHeaderText);
+          SetTokenFont(Canvas, ttTreeHeader);
           Inc(R.Top, 1 + iPadding);
           strText := FBADIOptions.SpecialTags[iSpecialTag].FDescription;
           Inc(R.Top, DrawText(Canvas.Handle, PChar(strText), -1, R,

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Oct 2018
+  @Date    19 Oct 2018
 
 **)
 Unit BADI.MethodDescriptionsFrame;
@@ -24,7 +24,7 @@ Uses
   StdCtrls,
   Buttons,
   ComCtrls,
-  BADI.CustomOptionsFrame, System.ImageList, Vcl.ImgList,
+  BADI.CustomOptionsFrame,
   VirtualTrees,
   System.Generics.Collections;
 

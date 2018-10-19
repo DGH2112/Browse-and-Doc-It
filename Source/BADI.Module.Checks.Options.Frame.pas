@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    14 Oct 2018
+  @date    19 Oct 2018
 
 **)
 Unit BADI.Module.Checks.Options.Frame;
@@ -43,7 +43,9 @@ Type
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     FVSTChecks : TBADIChecksOptionsVirtualStringTree;
+    {$IFDEF DXE102}
     FStyleServices: TCustomStyleServices;
+    {$ENDIF}
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;

@@ -370,7 +370,6 @@
             <Form>frameBADIModuleChecksOptions</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Source\BADI.StyleServices.Notifier.pas"/>
         <DCCReference Include="Source\BADI.CustomVirtualStringTree.pas"/>
         <DCCReference Include="Source\BADI.Module.Checks.pas"/>
         <DCCReference Include="Source\BADI.Module.Checks.EditorView.Frame.pas">

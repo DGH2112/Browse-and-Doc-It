@@ -210,7 +210,7 @@ Uses
   BADI.Options,
   BADI.Functions,
   ClipBrd, 
-  BADI.StyleServices.Notifier, BADI.IDEThemingNotifier;
+  BADI.IDEThemingNotifier;
 
 {$R *.dfm}
 

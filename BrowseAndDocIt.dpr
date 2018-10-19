@@ -239,7 +239,6 @@ uses
   BADI.Module.Metrics.SubView in 'source\BADI.Module.Metrics.SubView.pas',
   BADI.Module.Metrics.SubView.Frame in 'source\BADI.Module.Metrics.SubView.Frame.pas' {frameBADIModuleMetricsSubView: TFrame},
   BADI.Module.Checks.Options.Frame in 'source\BADI.Module.Checks.Options.Frame.pas' {frameBADIModuleChecksOptions: TFrame},
-  BADI.StyleServices.Notifier in 'Source\BADI.StyleServices.Notifier.pas',
   BADI.CustomVirtualStringTree in 'Source\BADI.CustomVirtualStringTree.pas',
   BADI.Module.Checks in 'Source\BADI.Module.Checks.pas',
   BADI.Module.Checks.EditorView.Frame in 'Source\BADI.Module.Checks.EditorView.Frame.pas' {frameBADIModuleChecksEditorView: TFrame},

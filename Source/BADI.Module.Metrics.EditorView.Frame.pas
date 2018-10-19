@@ -38,8 +38,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes, System.ImageList,
-  BADI.IDEThemingNotifier;
+  UITypes, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -155,7 +154,7 @@ Type
     Procedure CreateVirtualStringTree;
     Procedure HideZeroColumns;
     Procedure ExpandIssues;
-    Procedure HookStyleServices;
+    Procedure HookStyleServices(Sender : TObject);
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -230,7 +229,7 @@ Uses
   BADI.Options,
   BADI.Functions,
   ClipBrd, 
-  BADI.StyleServices.Notifier;
+  BADI.IDEThemingNotifier;
 
 {$R *.dfm}
 
@@ -583,11 +582,11 @@ Begin
   CreateVirtualStringTree;
   FVSTMetrics.NodeDataSize := SizeOf(TBADIMetricRecord);
   LoadBADIImages(ilScopeImages);
-  HookStyleServices;
+  HookStyleServices(Nil);
   {$IFDEF DXE102}
   FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIStyleServicesNotifier.Create(HookStyleServices));
+    FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(HookStyleServices));
   {$ENDIF}
 End;
 
@@ -871,8 +870,10 @@ End;
   @precon  None.
   @postcon The IDEs style services are hooked if available and enabled else its set to nil.
 
+  @param   Sender as a TObject
+
 **)
-Procedure TframeBADIModuleMetricsEditorView.HookStyleServices;
+Procedure TframeBADIModuleMetricsEditorView.HookStyleServices(Sender : TObject);
 
 {$IFDEF DXE102}
 Var

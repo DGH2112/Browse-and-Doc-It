@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Oct 2018
+  @Date    21 Oct 2018
 
 **)
 Unit BADI.ModuleExplorer.CustomHintWindow;
@@ -293,6 +293,8 @@ Begin
       InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
       TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
       iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
+      If iBGColour = clNone Then
+        iBGColour := FBADIOptions.BGColour[False];
       // Start with single line height
       Result.Bottom := Result.Top + iPadding * iMultipler + Canvas.TextHeight(strTextHeightTest);
       For iToken := 0 To sl.Count - 1 Do
@@ -541,6 +543,8 @@ Begin
       InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
       TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
       iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
+      If iBGColour = clNone Then
+        iBGColour := FBADIOptions.BGColour[False];
       sl := NodeData.FNode.Tokens;
       For i := 0 To sl.Count - 1 Do
         Begin

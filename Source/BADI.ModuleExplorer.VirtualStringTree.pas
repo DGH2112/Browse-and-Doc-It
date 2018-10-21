@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    21 Oct 2018
 
 **)
 Unit BADI.ModuleExplorer.VirtualStringTree;
@@ -79,6 +79,8 @@ Begin
   InitCanvasFont(Self.Canvas, tpFixed In NodeData.FNode.TagProperties, TBADIOptions.BADIOptions);
   TokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[TBADIOptions.BADIOptions.UseIDEEditorColours];
   iBGColour := TBADIOptions.BADIOptions.BGColour[TBADIOptions.BADIOptions.UseIDEEditorColours];
+  If iBGColour = clNone Then
+    iBGColour := TBADIOptions.BADIOptions.BGColour[False];
   sl := NodeData.FNode.Tokens;
   For i := 0 To sl.Count - 1 Do
     Begin

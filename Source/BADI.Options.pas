@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    21 Oct 2018
 
 **)
 Unit BADI.Options;
@@ -340,7 +340,6 @@ var
   iTag: Integer;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
   FIDEEditorColours := IDEEditorColours;
   FDefines := TStringList.Create;
@@ -376,7 +375,6 @@ End;
 Destructor TBADIOptions.Destroy;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   SaveSettings;
   FProfilingCode.Free;
   FMethodDescriptions.Free;
@@ -1039,7 +1037,6 @@ var
   iBGColour: TColor;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadIDEEditorColours', tmoTiming);{$ENDIF}
   If Assigned(FIDEEditorColours) Then
     Begin
       FTokenFontInfo[True] := FIDEEditorColours.GetIDEEditorColours(iBGColour);
@@ -1280,7 +1277,6 @@ Var
   iniFile : TMemIniFile;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   iniFile := TMemIniFile.Create(FINIFileName);
   Try
     LoadDocOptions(iniFile);
@@ -1651,7 +1647,6 @@ Var
   iniFile : TMemIniFile;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   iniFile := TMemIniFile.Create(FINIFileName);
   Try
     SaveDocOptions(iniFile);
@@ -2193,3 +2188,4 @@ Begin
 End;
 
 End.
+

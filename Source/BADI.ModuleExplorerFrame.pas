@@ -182,22 +182,24 @@ Type
       Const iValue: Integer);
     Procedure CMMouseLeave(Var Msg : TMessage); Message CM_MOUSELEAVE;
     Procedure DrawSelectedNode(Const sl : TStringList; Const ItemRect : TRect;
-      Const iScopeImagesWidth : Integer; Var iPos : Integer); InLine;
-    Procedure DrawHighlightSelectedItem(Const iColour : TColor; Const ItemRect : TRect); InLine;
-    Procedure DrawTree(Var R : TRect); InLine;
-    Procedure DrawVerticalTreeLine(Const iTreeColour : TColor; Const R : TRect); InLine;
+      Const iScopeImagesWidth : Integer; Var iPos : Integer); {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawHighlightSelectedItem(Const iColour : TColor; Const ItemRect : TRect);
+      {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawTree(Var R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawVerticalTreeLine(Const iTreeColour : TColor; Const R : TRect);
+      {$IFNDEF DEBUG} InLine; {$ENDIF}
     Procedure DrawTopHalfOfNodeConnector(Const iTreeColour : TColor; Const iCentre : Integer;
-      Const R : TRect); InLine;
+      Const R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
     Procedure DrawNodeButton(Const iTreeColour : TColor; Const iCentre : Integer;
-      Const R : TRect); InLine;
-    Procedure DrawImage(Var R : TRect); InLine;
-    Procedure DrawTreeText(Const sl : TStringList; Var R : TRect); InLine;
+      Const R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawImage(Var R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawTreeText(Const sl : TStringList; Var R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
     Procedure DrawTextToCanvas(Const strText : String; Const R : TRect; Var iTextPos, iTop,
-      iLeft : Integer); InLine;
+      iLeft : Integer); {$IFNDEF DEBUG} InLine; {$ENDIF}
     Function  InitMatchResult(Const eMatchType : TMatchType; Const iStart,
-      iLength: Integer) : TMatchResult; InLine;
+      iLength: Integer) : TMatchResult; {$IFNDEF DEBUG} InLine; {$ENDIF}
     Function  IsMatched(Const iIndex, iLength: Integer; Const MC: TMatchCollection): TMatchResult;
-      InLine;
+      {$IFNDEF DEBUG} InLine; {$ENDIF}
     Procedure tvExplorerAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     Procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -796,6 +798,8 @@ Begin
       InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
       TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
       iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
+      If iBGColour = clNone Then
+        iBGColour := FBADIOptions.BGColour[False];
       For i := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
@@ -963,6 +967,8 @@ Begin
   InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
   TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
   iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
+  If iBGColour = clNone Then
+    iBGColour := FBADIOptions.BGColour[False];
   If edtExplorerFilter.Text <> '' Then
     MC := FFilterRegEx.Matches(FNodeData.FNode.Text);
   For i := 0 To sl.Count - 1 Do
@@ -1672,6 +1678,8 @@ Var
 
 Begin
   FExplorer.Color := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
+  If FExplorer.Color = clNone Then
+    FExplorer.Color := FBADIOptions.BGColour[False];
   If Module = Nil Then
     Begin
       strReservedWords := Nil;

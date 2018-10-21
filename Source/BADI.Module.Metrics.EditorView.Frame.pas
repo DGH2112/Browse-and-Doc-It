@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Oct 2018
+  @Date    21 Oct 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -38,7 +38,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes;
+  UITypes, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -95,12 +95,17 @@ Type
   Type
       (** A record to describe the data to be held in a tree node. **)
     TBADIMetricRecord = Record
-      FNodeType              : TBADINodeType;
-      FText                  : String;
-      FImageIndex            : Integer;
-      FMetrics               : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of Double;
-      FIssueCount            : Integer;
-      FMetricOverrides       : TBADIModuleMetrics;
+      FNodeType        : TBADINodeType;
+      FFileName        : String;
+      FText            : String;
+      FImageIndex      : Integer;
+      FMetrics         : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of Double;
+      FIssueCount      : Integer;
+      FMetricOverrides : TBADIModuleMetrics;
+      FIdentLine       : Integer;
+      FIdentColumn     : Integer;
+      FCommentLine     : Integer;
+      FCommentColumn   : Integer;
     End;
     (** A pointer to the above record. **)
     PBADIMetricRecord = ^TBADIMetricRecord;
@@ -155,6 +160,7 @@ Type
     Procedure HideZeroColumns;
     Procedure ExpandIssues;
     Procedure HookStyleServices(Sender : TObject);
+    Procedure vstStatisticsDblClick(Sender : TObject);
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -229,7 +235,8 @@ Uses
   BADI.Options,
   BADI.Functions,
   ClipBrd, 
-  BADI.IDEThemingNotifier;
+  BADI.IDEThemingNotifier,
+  BADI.ToolsAPIUtils;
 
 {$R *.dfm}
 
@@ -624,6 +631,7 @@ Begin
   FVSTMetrics.OnGetText := vstStatisticsGetText;
   FVSTMetrics.OnPaintText := vstStatisticsPaintText;
   FVSTMetrics.OnGetImageIndex := vstStatisticsGetImageIndex;
+  FVSTMetrics.OnDblClick := vstStatisticsDblClick;
   For eColumn := Low(TBADIMetricColumn) To High(TBADIMetricColumn) Do
     Begin
       C := FVSTMetrics.Header.Columns.Add;
@@ -634,6 +642,7 @@ Begin
       C.Text := MetricColumns[eColumn].FName;
       C.Alignment := MetricColumns[eColumn].FAlignment;
     End;
+  FVSTMetrics.Header.Columns[0].Options := FVSTMetrics.Header.Columns[0].Options + [coFixed];
 End;
 
 (**
@@ -986,15 +995,27 @@ Var
   NodeData: PBADIMetricRecord;
   iElement: Integer;
   M: TGenericFunction;
+  Module : TBaseLanguageModule;
 
 Begin
   Result.Create(FVSTMetrics.AddChild(Parent));
   NodeData := FVSTMetrics.GetNodeData(Result.FNode);
   NodeData.FNodeType := ntUnkown;
-  If Not Assigned(Container.Parent) Then
-    NodeData.FNodeType := ntModule;
+  If Container Is TBaseLanguageModule Then
+    Begin
+      Module := Container As TBaseLanguageModule;
+      NodeData.FNodeType := ntModule;
+      NodeData.FFileName := Module.FileName;
+    End;
   NodeData.FText := Container.AsString(True, False);
   NodeData.FImageIndex := BADIImageIndex(Container.ImageIndex, Container.Scope);
+  NodeData.FIdentLine := Container.Line;
+  NodeData.FIdentColumn := Container.Column;
+  If Assigned(Container.Comment) Then
+    Begin
+      NodeData.FCommentLine := Container.Comment.Line;
+      NodeData.FCommentColumn := Container.Comment.Column;
+    ENd;
   If Container Is TGenericFunction Then
     Begin
       M := Container As TGenericFunction;
@@ -1269,6 +1290,50 @@ Procedure TframeBADIModuleMetricsEditorView.vstStatisticsCompareNodes(Sender: TB
 
 Begin
   Result := CompareText(FVSTMetrics.Text[Node1, 0], FVSTMetrics.Text[Node2, 0]);
+End;
+
+(**
+
+  This method attempts to display the method that was double clicked on.
+
+  @precon  None.
+  @postcon The method that was clicked on is displayed if it can be shown.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsDblClick(Sender: TObject);
+
+Var
+  Node : PVirtualNode;
+  NodeData : PBADIMetricRecord;
+  strFileName : String;
+  MS : IOTAModuleServices;
+  Module: IOTAModule;
+  
+Begin
+  Node := FVSTMetrics.FocusedNode;
+  While Assigned(Node) Do
+    Begin
+      NodeData := FVSTMetrics.GetNodeData(Node);
+      If Length(NodeData.FFileName) > 0 Then
+        strFileName := NodeData.FFileName;
+      Node := FVSTMetrics.NodeParent[Node];
+    End;
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      Module := MS.FindModule(strFileName);
+      If Not Assigned(Module) Then
+        Module := MS.OpenModule(strFileName);
+      If Assigned(Module) Then
+        Begin
+          Module.Show;
+          Node := FVSTMetrics.FocusedNode;
+          NodeData := FVSTMetrics.GetNodeData(Node);
+          PositionCursor(NodeData.FIdentLine, NodeData.FIdentColumn, NodeData.FCommentLine,
+            TBADIOptions.BADIOptions.BrowsePosition);
+        End;
+    End;
 End;
 
 (**

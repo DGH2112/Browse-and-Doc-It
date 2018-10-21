@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Jan 2018
+  @Date    21 Oct 2018
   
 **)
 Unit BADI.Module.Checks;
@@ -772,13 +772,17 @@ Procedure TBADIModuleChecksEditorView.DrawPanel(StatusBar: TStatusBar; Panel: TS
     
   Begin
     R := Rect;
+    // Draw Number
     Inc(R.Left, (R.Right - R.Left - iWidth) Div iDivisor);
     Inc(R.Top);
-    StatusBar.Canvas.Font.Color := clBlue; //: @todo Fix when the IDE is fixed.
+    StatusBar.Canvas.Font.Assign(StatusBar.Font);
+    StatusBar.Canvas.Font.Color := clBlue;
     StatusBar.Canvas.Font.Style := [];
     StatusBar.Canvas.TextRect(R, strNum, [tfLeft, tfVerticalCenter]);
+    // Draw Space
     Inc(R.Left, StatusBar.Canvas.TextWidth(strNum));
     StatusBar.Canvas.TextRect(R, strSpace, [tfLeft, tfVerticalCenter]);
+    // Draw Text Label
     StatusBar.Canvas.Font.Color := clWindowText;
     If Assigned(StyleServices) Then
       StatusBar.Canvas.Font.Color := StyleServices.GetSystemColor(clWindowText);

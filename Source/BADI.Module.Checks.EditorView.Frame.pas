@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Oct 2018
+  @Date    21 Oct 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -38,7 +38,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes;
+  UITypes, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -95,13 +95,18 @@ Type
   Type
       (** A record to describe the data to be held in a tree node. **)
     TBADICheckRecord = Record
-      FNodeType              : TBADINodeType;
-      FText                  : String;
-      FImageIndex            : Integer;
-      FChecks                : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of Double;
-      FTotal                 : Double;
-      FIssueCount            : Integer;
-      FCheckOverrides        : TBADIModuleChecks;
+      FNodeType        : TBADINodeType;
+      FFileName        : String;
+      FText            : String;
+      FImageIndex      : Integer;
+      FChecks          : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of Double;
+      FTotal           : Double;
+      FIssueCount      : Integer;
+      FCheckOverrides  : TBADIModuleChecks;
+      FIdentLine       : Integer;
+      FIdentColumn     : Integer;
+      FCommentLine     : Integer;
+      FCommentColumn   : Integer;
     End;
     (** A pointer to the above record. **)
     PBADICheckRecord = ^TBADICheckRecord;
@@ -121,8 +126,8 @@ Type
     FOverLimit     : Integer;
     FVSTChecks     : TBADIEditorViewVirtualStringTree;
     {$IFDEF DXE102}
-    FStyleServices : TCustomStyleServices;
     FThemingServicesNotifierIndex : Integer;
+    FStyleServices : TCustomStyleServices;
     {$ENDIF}
   Strict Protected
     Procedure vstChecksGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -150,6 +155,7 @@ Type
     Procedure HideZeroColumns;
     Procedure ExpandIssues;
     Procedure HookThemingServices(Sender : TObject);
+    Procedure vstChecksDblClick(Sender : TObject);
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -210,7 +216,8 @@ Uses
   BADI.Options,
   BADI.Functions,
   ClipBrd, 
-  BADI.IDEThemingNotifier;
+  BADI.IDEThemingNotifier,
+  BADI.ToolsAPIUtils;
 
 {$R *.dfm}
 
@@ -634,6 +641,7 @@ Begin
   FVSTChecks.OnGetText := vstChecksGetText;
   FVSTChecks.OnPaintText := vstChecksPaintText;
   FVSTChecks.OnGetImageIndex := vstChecksGetImageIndex;
+  FVSTChecks.OnDblClick := vstChecksDblClick;
   For eColumn := Low(TBADICheckColumn) To High(TBADICheckColumn) Do
     Begin
       C := FVSTChecks.Header.Columns.Add;
@@ -970,15 +978,27 @@ Var
   NodeData: PBADICheckRecord;
   iElement: Integer;
   M: TGenericFunction;
+  Module: TBaseLanguageModule;
 
 Begin
   Result.Create(FVSTChecks.AddChild(Parent));
   NodeData := FVSTChecks.GetNodeData(Result.FNode);
   NodeData.FNodeType := ntUnkown;
-  If Not Assigned(Container.Parent) Then
-    NodeData.FNodeType := ntModule;
+  If Container Is TBaseLanguageModule Then
+    Begin
+      Module := Container As TBaseLanguageModule;
+      NodeData.FNodeType := ntModule;
+      NodeData.FFileName := Module.FileName;
+    End;
   NodeData.FText := Container.AsString(True, False);
   NodeData.FImageIndex := BADIImageIndex(Container.ImageIndex, Container.Scope);
+  NodeData.FIdentLine := Container.Line;
+  NodeData.FIdentColumn := Container.Column;
+  If Assigned(Container.Comment) Then
+    Begin
+      NodeData.FCommentLine := Container.Comment.Line;
+      NodeData.FCommentColumn := Container.Comment.Column;
+    ENd;
   If Container Is TGenericFunction Then
     Begin
       M := Container As TGenericFunction;
@@ -1221,6 +1241,50 @@ Procedure TframeBADIModuleChecksEditorView.vstChecksCompareNodes(Sender: TBaseVi
 
 Begin
   Result := CompareText(FVSTChecks.Text[Node1, 0], FVSTChecks.Text[Node2, 0]);
+End;
+
+(**
+
+  This method attempts to display the method that was double clicked on.
+
+  @precon  None.
+  @postcon The method that was clicked on is displayed if it can be shown.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleChecksEditorView.vstChecksDblClick(Sender: TObject);
+
+Var
+  Node : PVirtualNode;
+  NodeData : PBADICheckRecord;
+  strFileName : String;
+  MS : IOTAModuleServices;
+  Module: IOTAModule;
+  
+Begin
+  Node := FVSTChecks.FocusedNode;
+  While Assigned(Node) Do
+    Begin
+      NodeData := FVSTChecks.GetNodeData(Node);
+      If Length(NodeData.FFileName) > 0 Then
+        strFileName := NodeData.FFileName;
+      Node := FVSTChecks.NodeParent[Node];
+    End;
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      Module := MS.FindModule(strFileName);
+      If Not Assigned(Module) Then
+        Module := MS.OpenModule(strFileName);
+      If Assigned(Module) Then
+        Begin
+          Module.Show;
+          Node := FVSTChecks.FocusedNode;
+          NodeData := FVSTChecks.GetNodeData(Node);
+          PositionCursor(NodeData.FIdentLine, NodeData.FIdentColumn, NodeData.FCommentLine,
+            TBADIOptions.BADIOptions.BrowsePosition);
+        End;
+    End;
 End;
 
 (**

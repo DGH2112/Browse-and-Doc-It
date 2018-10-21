@@ -21,6 +21,7 @@ object fmBADIModuleExtensionsFrame: TfmBADIModuleExtensionsFrame
     Anchors = [akLeft, akTop, akRight, akBottom]
     DefaultColWidth = 200
     DefaultRowHeight = 20
+    DrawingStyle = gdsGradient
     FixedCols = 1
     KeyOptions = [keyEdit]
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goEditing, goThumbTracking]

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    14 Oct 2018
+  @Date    21 Oct 2018
 
 **)
 Unit BADI.Types;
@@ -47,7 +47,8 @@ Type
     ttPlainText,
     ttCommentText,
     ttTagHeaderText,
-    ttTagText
+    ttTagText,
+    ttSearchHighlight
   );
   (** An enumerate for the scoping of identifiers. **)
   TScope = (

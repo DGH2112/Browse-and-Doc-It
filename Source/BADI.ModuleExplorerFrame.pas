@@ -154,6 +154,8 @@ Type
     FTargetCanvas      : TCanvas;
     FNode              : PVirtualNode;
     FNodeData          : PBADITreeData;
+    FTokenFontInfo     : TBADITokenFontInfoTokenSet;
+    FBGColour          : TColor;
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -786,8 +788,6 @@ Var
   HL: TTokenFontInfo;
   i: Integer;
   iRight : Integer;
-  TokenFontInfo: TBADITokenFontInfoTokenSet;
-  iBGColour: TColor;
 
 Begin
   If FExplorer.Selected[FNode] Then
@@ -796,15 +796,11 @@ Begin
       iPos := iLeft;
       iRight := iPos;
       InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
-      TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
-      iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
-      If iBGColour = clNone Then
-        iBGColour := FBADIOptions.BGColour[False];
       For i := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
             FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
-            TokenFontInfo, iBGColour, FTargetCanvas);
+            FTokenFontInfo, FBGColour, FTargetCanvas);
           If sl[i] = #13#10 Then
             iRight := iLeft
           Else
@@ -817,7 +813,7 @@ Begin
         FExplorer.Left + iScopeImagesWidth + FExplorer.Margin + FExplorer.TextMargin - 1;
       R.Right := R.Left + iPos;
       FTargetCanvas.Pen.Color := clBlack;
-      HL := TokenFontInfo[ttExplorerHighlight];
+      HL := FTokenFontInfo[ttExplorerHighlight];
       If FNode = FExplorer.FocusedNode Then
         Begin
           FTargetCanvas.Brush.Color := HL.FBackColour;
@@ -949,10 +945,6 @@ Const
   
 Var
   iLeft, iTop : Integer;
-  TokenFontInfo: TBADITokenFontInfoTokenSet;
-  iBGColour: Integer;
-
-Var
   i: Integer;
   iTextPos: Integer;
   MC: TMatchCollection;
@@ -965,21 +957,17 @@ Begin
   iLeft := R.Left + iPadding;
   iTextPos := 1;
   InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
-  TokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
-  iBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
-  If iBGColour = clNone Then
-    iBGColour := FBADIOptions.BGColour[False];
   If edtExplorerFilter.Text <> '' Then
     MC := FFilterRegEx.Matches(FNodeData.FNode.Text);
   For i := 0 To sl.Count - 1 Do
     Begin
       GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
         FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
-        TokenFontInfo, iBGColour, FTargetCanvas);
+        FTokenFontInfo, FBGColour, FTargetCanvas);
       If FNode = FExplorer.FocusedNode Then
-        If FTargetCanvas.Brush.Color = iBGColour Then
+        If FTargetCanvas.Brush.Color = FBGColour Then
           FTargetCanvas.Brush.Color :=
-            TokenFontInfo[ttExplorerHighlight].FBackColour;
+            FTokenFontInfo[ttExplorerHighlight].FBackColour;
       If edtExplorerFilter.Text = '' Then
         DrawTextToCanvas(sl[i], R, iTextPos, iTop, iLeft)
       Else
@@ -990,7 +978,7 @@ Begin
             mtStart:
               Begin
                 iColour := FTargetCanvas.Brush.Color;
-                FTargetCanvas.Brush.Color := clAqua;
+                FTargetCanvas.Brush.Color := FTokenFontInfo[ttSearchHighlight].FForeColour;
                 DrawTextToCanvas(Copy(sl[i], 1, MR.FLength), R, iTextPos, iTop, iLeft);
                 FTargetCanvas.Brush.Color := iColour;
                 DrawTextToCanvas(Copy(sl[i], MR.FLength + 1, Length(sl[i]) - MR.FLength), R,
@@ -998,20 +986,20 @@ Begin
               End;
             mtFull:
               Begin
-                FTargetCanvas.Brush.Color := clAqua;
+                FTargetCanvas.Brush.Color := FTokenFontInfo[ttSearchHighlight].FForeColour;
                 DrawTextToCanvas(sl[i], R, iTextPos, iTop, iLeft)
               End;
             mtEnd:
               Begin
                 DrawTextToCanvas(Copy(sl[i], 1, MR.FStart - 1), R, iTextPos, iTop, iLeft);
-                FTargetCanvas.Brush.Color := clAqua;
+                FTargetCanvas.Brush.Color := FTokenFontInfo[ttSearchHighlight].FForeColour;
                 DrawTextToCanvas(Copy(sl[i], MR.FStart, MR.FLength), R, iTextPos, iTop, iLeft);
               End;
             mtMiddle:
               Begin
                 DrawTextToCanvas(Copy(sl[i], 1, MR.FStart - 1), R, iTextPos, iTop, iLeft);
                 iColour := FTargetCanvas.Brush.Color;
-                FTargetCanvas.Brush.Color := clAqua;
+                FTargetCanvas.Brush.Color := FTokenFontInfo[ttSearchHighlight].FForeColour;
                 DrawTextToCanvas(Copy(sl[i], MR.FStart, MR.FLength), R, iTextPos, iTop, iLeft);
                 FTargetCanvas.Brush.Color := iColour;
                 DrawTextToCanvas(Copy(sl[i], MR.FStart + MR.FLength,
@@ -1677,9 +1665,11 @@ Var
   N : PVirtualNode;
 
 Begin
-  FExplorer.Color := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
-  If FExplorer.Color = clNone Then
-    FExplorer.Color := FBADIOptions.BGColour[False];
+  FTokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
+  FBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
+  If FBGColour = clNone Then
+    FBGColour := FBADIOptions.BGColour[False];
+  FExplorer.Color := FBGColour;
   If Module = Nil Then
     Begin
       strReservedWords := Nil;
@@ -1842,7 +1832,7 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     @param   strText as a String as a constant
 
   **)
-  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String);
+  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String; iColour : TColor);
 
   Const
     iHighlightTextOffset = 18 + 26;
@@ -1859,7 +1849,7 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     For iMatch := 0 To MC.Count - 1 Do
       Begin
         M := MC[iMatch];
-        TargetCanvas.Brush.Color := clAqua;
+        TargetCanvas.Brush.Color := iColour;
         iLeft := TargetCanvas.TextWidth(Copy(strText, 1, M.Index - 1));
         R := CellRect;
         R.Left := iStart + iLeft;
@@ -1877,7 +1867,8 @@ Begin
          (edtExplorerFilter.Text <> '') Then
     Begin
       strText := (Sender As TVirtualStringTree).Text[Node, 0];
-      HighlightText(FFilterRegEx.Matches(strText), strText);
+      HighlightText(FFilterRegEx.Matches(strText), strText,
+        FTokenFontInfo[ttSearchHighlight].FForeColour);
     End;
 End;
 

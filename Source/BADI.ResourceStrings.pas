@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    08 Oct 2018
+  @Date    21 Oct 2018
 
 **)
 Unit BADI.ResourceStrings;
@@ -658,6 +658,8 @@ ResourceString
   strTokenTagHeaderText = 'Tag Header Text';
   (** A text string to represents a Tag Text token. **)
   strTokenTagText = 'Tag Text';
+  (** A text string to represent the search highlight colour. **)
+  strSearchHighlight = 'Search Highlight';
 
   //
   // Token Sets

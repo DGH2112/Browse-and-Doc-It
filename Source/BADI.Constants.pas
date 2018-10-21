@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Oct 2018
+  @Date    21 Oct 2018
 
 **)
 Unit BADI.Constants;
@@ -167,7 +167,8 @@ Const
     (FForeColour : clWindowText; FStyles : [];                     FBackColour: clNone),
     (FForeColour : clNavy;       FStyles : [];                     FBackColour: clNone),
     (FForeColour : clPurple;     FStyles : [fsBold, fsUnderline];  FBackColour: clNone),
-    (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clNone)
+    (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone)
   );
 
   (** This is a list of image resource masks to be placed of the below images to create vesions
@@ -416,7 +417,8 @@ Const
     strTokenPlainText,
     strTokenCommentText,
     strTokenTagHeaderText,
-    strTokenTagText
+    strTokenTagText,
+    strSearchHighlight
   );
 
   (** A constant string to represent the position of the main procedure code in

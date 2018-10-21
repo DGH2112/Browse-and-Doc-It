@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    19 Oct 2018
   
 **)
 Unit BADI.CustomVirtualStringTree;
@@ -66,12 +66,27 @@ Begin
   //: @debug REMOVED FROM 7.0.0 HintAnimation := hatFade;
   HintMode := hmTooltip;
   SelectionBlendFactor := iDefaultBlendFactor;
-  TreeOptions.MiscOptions := [toFullRepaintOnResize, toGridExtensions, toInitOnSave,
-    toToggleOnDblClick, toWheelPanning];
-  TreeOptions.PaintOptions := [toShowButtons, toShowDropmark, toShowHorzGridLines,
-    toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages, toGhostedIfUnfocused,
+  TreeOptions.MiscOptions := [
+    toFullRepaintOnResize,
+    toGridExtensions,
+    toInitOnSave,
+    toToggleOnDblClick,
+    toWheelPanning];
+  TreeOptions.PaintOptions := [
+    toShowButtons,
+    toShowDropmark,
+    toShowHorzGridLines,
+    toShowTreeLines,
+    toShowVertGridLines,
+    toShowRoot,
+    toThemeAware,
+    toUseBlendedImages,
+    toGhostedIfUnfocused,
     toUseBlendedSelection];
-  TreeOptions.SelectionOptions := [toExtendedFocus, toFullRowSelect, toRightClickSelect];
+  TreeOptions.SelectionOptions := [
+    toExtendedFocus,
+    toFullRowSelect,
+    toRightClickSelect];
 End;
 
 End.

@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    19 Oct 2018
+  @Date    21 Oct 2018
   @Author  David Hoyle
   @Version 1.0
 
@@ -38,13 +38,12 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types;
+  BADI.Types, System.Actions, System.ImageList;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
       current module. **)
-  TSelectionChange = Procedure(Const iIdentLine, iIdentCol, iCommentLine,
-    iCommentCol : Integer) Of Object;
+  TSelectionChange = Procedure(Const iIdentLine, iIdentCol, iCommentLine : Integer) Of Object;
 
   (** This is a frame class to contain all the functionality of the module
       explorer so that it can be placed inside any container required and
@@ -1943,11 +1942,9 @@ begin
           NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
           If NodeData.FNode <> Nil Then
             If NodeData.FNode.Comment = Nil Then
-              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col,
-                NodeData.FNode.Line, NodeData.FNode.Col)
+              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line)
             Else
-              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col,
-                NodeData.FNode.Comment.Line, NodeData.FNode.Comment.Column);
+              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);
         End;
   Finally
     FSelectionChanging := False;

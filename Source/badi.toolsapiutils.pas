@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    27 Dec 2017
+  @Date    21 Oct 2018
   @Version 1.0
   @Author  David Hoyle
 
@@ -40,7 +40,9 @@ Type
   Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
   Procedure OutputText(Const Writer : IOTAEditWriter; Const strText : String);
   Procedure PositionCursor(Const Container : TElementContainer; Const iIdentLine, iIdentColumn : Integer;
-    Const BrowsePosition : TBrowsePosition);
+    Const BrowsePosition : TBrowsePosition); Overload;
+  Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
+    Const BrowsePosition : TBrowsePosition); Overload;
 
 Implementation
 
@@ -222,6 +224,100 @@ Begin
   {$ELSE}
   Writer.Insert(PAnsiChar(AnsiString(strText)));
   {$ENDIF}
+End;
+
+(**
+
+  This method move the active editors cursor to the supplied position and centres the cursor on th screen
+  .
+
+  @precon  None.
+  @postcon When a selection is made in the explorer the cursor is placed in the editor.
+
+  @param   iIdentLine     as an Integer as a constant
+  @param   iIdentCol      as an Integer as a constant
+  @param   iCommentLine   as an Integer as a constant
+  @param   BrowsePosition as a TBrowsePosition as a constant
+
+**)
+Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
+  Const BrowsePosition : TBrowsePosition); Overload;
+
+  (**
+
+    This method unfolders the method code at the nearest position to the cursor.
+
+    @precon  EV must be a valid instance.
+    @postcon The method code at the cursor is unfolded.
+
+    @param   EV as an IOTAEditView as a constant
+
+  **)
+  Procedure UnfoldMethod(COnst EV : IOTAEditView);
+
+  Var
+    {$IFDEF D2006}
+    EA: IOTAElideActions;
+    {$ENDIF}
+    
+  Begin
+    {$IFDEF D2006}
+    If Supports(EV, IOTAElideActions, EA) Then
+      EA.UnElideNearestBlock;
+    {$ENDIF}
+  End;
+
+Var
+  SourceEditor: IOTASourceEditor;
+  C           : TOTAEditPos;
+  EV          : IOTAEditView;
+  iLine : Integer;
+
+Begin
+  SourceEditor := ActiveSourceEditor;
+  If Assigned(SourceEditor) Then
+    Begin
+      If SourceEditor.EditViewCount > 0 Then
+        Begin
+          SourceEditor.Module.CurrentEditor.Show;
+          If iIdentCol * iIdentLine > 0 Then
+            Begin
+              SourceEditor.Show;
+              EV := (BorlandIDEServices As IOTAEditorServices).TopView;
+              C.Col  := iIdentCol;
+              C.Line := iIdentLine;
+              UnfoldMethod(EV);
+              EV.CursorPos := C;
+              Case BrowsePosition Of
+                bpCommentTop:
+                  Begin
+                    iLine := iIdentLine;
+                    If iCommentLine > 0 Then
+                      iLine := iCommentLine;
+                    EV.SetTopLeft(iLine, 1);
+                  End;
+                bpCommentCentre:
+                  Begin
+                    iLine := iIdentLine;
+                    If iCommentLine > 0 Then
+                      iLine := iCommentLine;
+                    EV.Center(iLine, 1);
+                  End;
+                bpIdentifierTop: EV.SetTopLeft(C.Line, 1);
+                bpIdentifierCentre: EV.Center(C.Line, 1);
+                bpIdentifierCentreShowAllComment:
+                  Begin
+                    EV.Center(C.Line, 1);
+                    If iCommentLine > 0 Then
+                      If iCommentLine < EV.TopRow Then
+                        EV.SetTopLeft(iCommentLine, 1);
+                  End;
+              End;
+              If C.Line >= EV.TopRow + EV.ViewSize.Height - 1 Then
+                EV.SetTopLeft(C.Line - EV.ViewSize.Height + 1 + 1, 1);  
+            End;
+        End;
+    End;
 End;
 
 (**

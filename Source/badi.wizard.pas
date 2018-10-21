@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    03 Jan 2018
+  @Date    21 Oct 2018
   @Version 1.0
 
 **)
@@ -48,7 +48,7 @@ Type
     Function GetMenuText: String;
     {$HINTS ON}
     // General Methods
-    Procedure SelectionChange(Const iIdentLine, iIdentCol, iCommentLine, iCommentCol: Integer);
+    Procedure SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
     Procedure UpdateMenuShortcuts(Sender : TObject);
@@ -274,16 +274,13 @@ End;
   @param   iIdentLine   as an Integer as a constant
   @param   iIdentCol    as an Integer as a constant
   @param   iCommentLine as an Integer as a constant
-  @param   iCommentCol  as an Integer as a constant
 
 **)
-Procedure TBrowseAndDocItWizard.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine,
-  iCommentCol: Integer);
+Procedure TBrowseAndDocItWizard.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
 
 Begin
   If Assigned(FBADIIDEMenuInstaller) Then
-    FBADIIDEMenuInstaller.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol);
+    FBADIIDEMenuInstaller.SelectionChange(iIdentLine, iIdentCol, iCommentLine);
 End;
 
 (**

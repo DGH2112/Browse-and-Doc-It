@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Oct 2018
+  @Date    27 Oct 2018
 
 **)
 Unit BADI.MethodDescriptionForm;
@@ -48,7 +48,7 @@ Implementation
 {$R *.dfm}
 
 Uses
-  ToolsAPI;
+  ToolsAPI, BADI.ToolsAPIUtils;
 
 (**
 
@@ -70,16 +70,12 @@ Class Function TfrmMethodDescriptions.Execute(Var strPattern, strDescription: St
 
 Var
   F : TfrmMethodDescriptions;
-  { $IFDEF DXE102
-  ITS : IOTAIDEThemingServices250;
-  {$ENDIF}
   
 Begin
   Result := False;
   { $IFDEF DXE102
-  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    If ITS.IDEThemingEnabled Then
-      ITS.RegisterFormClass(TfrmMethodDescriptions);
+  TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmMethodDescriptions);
+  TBADIToolsAPIFunctions.ApplyTheming(Self);
   {$ENDIF}
   F := TfrmMethodDescriptions.Create(Nil);
   Try

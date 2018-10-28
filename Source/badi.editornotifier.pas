@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    27 Feb 2018
+  @Date    27 Oct 2018
   @Author  David Hoyle
 
 **)
@@ -361,13 +361,13 @@ begin
   Result := '';
   strFileName := '';
   boolModified := False;
-  SE := ActiveSourceEditor;
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If Assigned(SE) Then
     Begin
       strFileName := SE.FileName;
       boolModified := SE.Modified;
-      Result := EditorAsString(SE);
-      Project := ActiveProject;
+      Result := TBADIToolsAPIFunctions.EditorAsString(SE);
+      Project := TBADIToolsAPIFunctions.ActiveProject;
       If Assigned(Project) Then
         Begin
           Options := Project.ProjectOptions;
@@ -507,7 +507,7 @@ Var
   Editor : IOTASourceEditor;
 
 begin
-  Editor := ActiveSourceEditor;
+  Editor := TBADIToolsAPIFunctions.ActiveSourceEditor;
   CheckForCursorMovement(Editor);
   CheckFileNameAndSize(Editor);
   If (FLastUpdateTickCount > 0) And

@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    21 Oct 2018
+  @Date    27 Oct 2018
   @Version 1.0
 
 **)
@@ -71,7 +71,7 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   DeskUtil,
-  ToolsAPI;
+  ToolsAPI, BADI.ToolsAPIUtils;
 
 Var
   (** This is a private varaible to hold the singleton instance of the
@@ -357,6 +357,7 @@ Var
 
 Begin
   {$IFDEF DXE102}
+  //TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDockableModuleExplorer);
   If Supports(BorlandIDEServices, IOTAIDEThemingServices250, ITS) Then
     If ITS.IDEThemingEnabled Then
       Begin

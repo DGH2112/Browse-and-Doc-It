@@ -170,11 +170,6 @@ object frmDUnit: TfrmDUnit
     Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'Tahoma'
-    Header.Font.Style = []
     Header.Height = 17
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
@@ -256,8 +251,8 @@ object frmDUnit: TfrmDUnit
     object lblClassName: TLabel
       Left = 0
       Top = 0
-      Width = 184
-      Height = 25
+      Width = 100
+      Height = 16
       Align = alClient
       Caption = '&Class Name Mask'
       FocusControl = edtClassName
@@ -266,8 +261,8 @@ object frmDUnit: TfrmDUnit
       AlignWithMargins = True
       Left = 187
       Top = 0
-      Width = 181
-      Height = 25
+      Width = 112
+      Height = 16
       Margins.Top = 0
       Margins.Right = 0
       Align = alClient

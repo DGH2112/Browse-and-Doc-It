@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    27 Oct 2018
   
 **)
 Unit BADI.Module.Checks.SubView;
@@ -177,8 +177,8 @@ Begin
     If Assigned(AContext) Then
       If EVS.ContextToModule(AContext, OTAModule) Then
         Begin
-          SE := SourceEditor(OTAModule);
-          strSource := EditorAsString(SE);
+          SE := TBADIToolsAPIFunctions.SourceEditor(OTAModule);
+          strSource := TBADIToolsAPIFunctions.EditorAsString(SE);
           Module := TBADIDispatcher.BADIDispatcher.Dispatcher(strSource, SE.FileName, SE.Modified,
             [moParse]);
           Try

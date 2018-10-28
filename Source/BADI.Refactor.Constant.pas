@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Jan 2018
+  @Date    27 Oct 2018
 
 **)
 Unit BADI.Refactor.Constant;
@@ -200,7 +200,7 @@ Const
                     mrYes:
                       Begin
                         Result := True;
-                        PositionCursor(M, S.Elements[iDeclaration].Line,
+                        TBADIToolsAPIFunctions.PositionCursor(M, S.Elements[iDeclaration].Line,
                           S.Elements[iDeclaration].Column, TBADIOptions.BADIOptions.BrowsePosition);                    
                         Break;
                       End;
@@ -240,7 +240,7 @@ Begin
               [mbYes, mbNo, mbCancel], 0) Of
               mrYes:
                 Begin
-                  PositionCursor(Container, Container.Elements[iDeclaration].Line,
+                  TBADIToolsAPIFunctions.PositionCursor(Container, Container.Elements[iDeclaration].Line,
                     Container.Elements[iDeclaration].Column, TBADIOptions.BADIOptions.BrowsePosition);                    
                 End;
               mrNo:
@@ -318,7 +318,8 @@ ResourceString
   strCannotRefactorErrors = 'Cannot refactor as the module has errors!';
 
 Begin
-  FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(FSourceEditor),
+  FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(
+    TBADIToolsAPIFunctions.EditorAsString(FSourceEditor),
     FSourceEditor.FileName, fSourceEditor.Modified, [moParse]);
   Try
     If Not Assigned(FModule.FindElement(strErrors)) Then
@@ -465,20 +466,21 @@ Begin
     ritAppend:
       Begin
         strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
-        OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
+        TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring),
+          CP.CharIndex) + ';'#13#10);
       End;
     ritCreate:
       Begin
         If RII.FPosition = ripAfter Then
           If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            OutputText(UR, #13#10);
-        OutputText(UR, Format(strSection, [CP.CharIndex, '',
+            TBADIToolsAPIFunctions.OutputText(UR, #13#10);
+        TBADIToolsAPIFunctions.OutputText(UR, Format(strSection, [CP.CharIndex, '',
           strSectionKeywords[FRefactoringInfo.RefactoringType]]));
         strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
-        OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
+        TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
         If RII.FPosition = ripBefore Then
           If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            OutputText(UR, #13#10);
+            TBADIToolsAPIFunctions.OutputText(UR, #13#10);
       End;
   End;
 
@@ -507,7 +509,7 @@ Begin
   UR := FSourceEditor.CreateUndoableWriter;
   UR.CopyTo(iIndex);
   UR.DeleteTo(iIndex + FRefactoringInfo.Token.Length);
-  OutputText(UR, FRefactoringInfo.Name);
+  TBADIToolsAPIFunctions.OutputText(UR, FRefactoringInfo.Name);
 End;
 
 (**

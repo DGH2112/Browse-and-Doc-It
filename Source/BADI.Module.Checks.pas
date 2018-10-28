@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Oct 2018
+  @Date    27 Oct 2018
   
 **)
 Unit BADI.Module.Checks;
@@ -882,8 +882,8 @@ Var
   SE: IOTASourceEditor;
 
 Begin
-  SE := SourceEditor(Module);
-  FSource := EditorAsString(SE);
+  SE := TBADIToolsAPIFunctions.SourceEditor(Module);
+  FSource := TBADIToolsAPIFunctions.EditorAsString(SE);
 End;
 
 (**
@@ -1119,7 +1119,7 @@ Var
   SE : IOTASourceEditor;
 
 Begin
-  SE := SourceEditor(Module);
+  SE := TBADIToolsAPIFunctions.SourceEditor(Module);
   FModified := SE.Modified;
   FFileName := Module.FileName;
   If Not FModified Then
@@ -1241,7 +1241,7 @@ Var
   AFrame: TframeBADIModuleChecksEditorView;
 
 Begin
-  P := ActiveProject;
+  P := TBADIToolsAPIFunctions.ActiveProject;
   If Assigned(P) Then
     Begin
       If FLastRenderedList <> RenderedList Then

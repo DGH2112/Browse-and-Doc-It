@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    19 Nov 2017
+  @date    27 Oct 2018
   
 **)
 Unit BADI.RefactorConstantForm;
@@ -24,7 +24,9 @@ Uses
   Dialogs,
   StdCtrls,
   Buttons,
-  BADI.Refactoring.Functions;
+  BADI.Refactoring.Functions, Vcl.ExtCtrls;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** A class to represent the form for editing the refactoring. **)
@@ -40,6 +42,7 @@ Type
     cbxType: TComboBox;
     lblType: TLabel;
     chkNewLine: TCheckBox;
+    pnlFudgePanel: TPanel;
     Procedure btnOKClick(Sender: TObject);
   Strict Private
     FRefactoringInfo : TBADIRefactoringInfo;
@@ -54,8 +57,11 @@ Type
 Implementation
 
 Uses
+  {$IFDEF DXE102}
+  ToolsAPI,
+  {$ENDIF}
   BADI.ResourceStrings, 
-  BADI.ElementContainer;
+  BADI.ElementContainer, BADI.ToolsAPIUtils;
 
 {$R *.dfm}
 
@@ -161,6 +167,10 @@ Begin
     F.edtLiteral.Text := RefactoringInfo.Token.Token;
     F.InitialiseDialogue(RefactoringInfo.Scopes, RefactoringInfo.Types, boolNewLine);
     F.FRefactoringInfo := RefactoringInfo;
+    { $IFDEF DXE102
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmBADIRefactorConstant);
+    TBADIToolsAPIFunctions.ApplyTheming(Self);
+    {$ENDIF}
     If F.ShowModal = mrOK Then
       Begin
         RefactoringInfo.Name := F.edtName.Text;

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jan 2018
+  @Date    27 Oct 2018
 
 **)
 unit BADI.DUnitForm;
@@ -31,7 +31,7 @@ uses
   BADI.Base.Module,
   ImgList,
   ExtCtrls,
-  BADI.ElementContainer;
+  BADI.ElementContainer, System.ImageList;
 
 type
   (** A class to represent the form interface. **)
@@ -73,7 +73,7 @@ type
     {$ENDIF}
     Procedure vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-      Var Ghosted: Boolean; Var ImageIndex: Integer);
+      Var Ghosted: Boolean; Var ImageIndex: TImageIndex);
     Procedure FormDestroy(Sender: TObject);
     Procedure cbxExistingUnitChange(Sender: TObject);
   private
@@ -376,7 +376,8 @@ Begin
         Unt := (BorlandIDEServices As IOTAModuleServices).OpenModule(FDUnitCreator.Units[iUnit]);
         If Unt <> Nil Then
           Begin
-            Module := TPascalModule.CreateParser(EditorAsString(SourceEditor(Unt)),
+            Module := TPascalModule.CreateParser(
+              TBADIToolsAPIFunctions.EditorAsString(TBADIToolsAPIFunctions.SourceEditor(Unt)),
               cbxExistingUnit.Text, Unt.CurrentEditor.Modified, [moParse]);
             Try
               Types := Module.FindElement(strTypesLabel);
@@ -449,7 +450,7 @@ Begin
           If cbxBaseClass.Items.IndexOf(cbxBaseClass.Text) = -1 Then
             cbxBaseClass.Items.Add(cbxBaseClass.Text);
           SaveSettings;
-          strUnitTobeTested := ActiveSourceEditor.FileName;
+          strUnitTobeTested := TBADIToolsAPIFunctions.ActiveSourceEditor.FileName;
           BuildTestCaseList;
           If rdoNewProject.Checked Then
             objDUnitCreator.CreateTestProject(edtNewProjectName.Text)
@@ -498,10 +499,10 @@ begin
   vstTestCases.NodeDataSize := SizeOf(TTreeData);
   vstTestCases.OnGetText := vstTestCasesGetText;
   LoadBADIImages(ilScopeImages);
-  strFileName := ChangeFileExt(ExtractFileName(ActiveProject.FileName), '') +
+  strFileName := ChangeFileExt(ExtractFileName(TBADIToolsAPIFunctions.ActiveProject.FileName), '') +
     'Tests.dpr';
   edtNewProjectName.Text := AddUniqueName(cbxExistingProject.Items, strFileName);
-  strFileName := 'Test' + ExtractFileName(ActiveSourceEditor.FileName);
+  strFileName := 'Test' + ExtractFileName(TBADIToolsAPIFunctions.ActiveSourceEditor.FileName);
   edtNewUnitName.Text := AddUniqueName(cbxExistingUnit.Items, strFileName);
   FImplementedTests := TStringList.Create;
   FImplementedTests.Sorted := True;
@@ -912,12 +913,12 @@ End;
   @param   Kind       as a TVTImageKind
   @param   Column     as a TColumnIndex
   @param   Ghosted    as a Boolean as a reference
-  @param   ImageIndex as an Integer as a reference
+  @param   ImageIndex as an TImageIndex as a reference
 
 **)
 procedure TfrmDUnit.vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-  var Ghosted: Boolean; var ImageIndex: Integer);
+  var Ghosted: Boolean; var ImageIndex: TImageIndex);
 
 Var
   NodeData : ^TTreeData;

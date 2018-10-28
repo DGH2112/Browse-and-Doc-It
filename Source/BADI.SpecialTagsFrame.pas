@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Oct 2018
+  @Date    27 Oct 2018
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -31,7 +31,7 @@ Uses
   BADI.Types,
   VirtualTrees,
   Themes, 
-  BADI.CustomVirtualStringTree;
+  BADI.CustomVirtualStringTree, System.ImageList, Vcl.ImgList;
 
 Type
   (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)

@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    21 Oct 2018
+  @Date    27 Oct 2018
   @Version 1.0
   @Author  David Hoyle
 
@@ -15,10 +15,11 @@ interface
 {$INCLUDE 'CompilerDefinitions.inc'}
 
 Uses
-  SysUtils,
-  Windows,
   ToolsAPI,
-  Classes,
+  System.SysUtils,
+  System.Classes,
+  VCL.Forms,
+  WinAPI.Windows,
   BADI.Types,
   BADI.ElementContainer;
 
@@ -28,21 +29,28 @@ Type
   (** This is a set of messages that can be cleared. **)
   TClearMessages = Set of TClearMessage;
 
-  Function ProjectGroup: IOTAProjectGroup;
-  Function ActiveProject : IOTAProject;
-  Function ProjectModule(Const Project : IOTAProject) : IOTAModule;
-  Function ActiveSourceEditor : IOTASourceEditor;
-  Function SourceEditor(Const Module : IOTAModule) : IOTASourceEditor;
-  Procedure OutputMessage(Const strText : String); Overload;
-  Procedure OutputMessage(Const strFileName, strText, strPrefix : String; Const iLine,
-    iCol : Integer); Overload;
-  Procedure ClearMessages(Const Msg : TClearMessages);
-  Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
-  Procedure OutputText(Const Writer : IOTAEditWriter; Const strText : String);
-  Procedure PositionCursor(Const Container : TElementContainer; Const iIdentLine, iIdentColumn : Integer;
-    Const BrowsePosition : TBrowsePosition); Overload;
-  Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
-    Const BrowsePosition : TBrowsePosition); Overload;
+  (** A record to encapsulate the custom Tools API functions **)
+  TBADIToolsAPIFunctions = Record
+    Class Function ProjectGroup: IOTAProjectGroup; Static;
+    Class Function ActiveProject : IOTAProject; Static;
+    Class Function ProjectModule(Const Project : IOTAProject) : IOTAModule; Static;
+    Class Function ActiveSourceEditor : IOTASourceEditor; Static;
+    Class Function SourceEditor(Const Module : IOTAModule) : IOTASourceEditor; Static;
+    Class Procedure OutputMessage(Const strText : String); Overload; Static;
+    Class Procedure OutputMessage(Const strFileName, strText, strPrefix : String; Const iLine,
+      iCol : Integer); Overload; Static;
+    Class Procedure ClearMessages(Const Msg : TClearMessages); Static;
+    Class Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String; Static;
+    Class Procedure OutputText(Const Writer : IOTAEditWriter; Const strText : String); Static;
+    Class Procedure PositionCursor(Const Container : TElementContainer; Const iIdentLine,
+      iIdentColumn : Integer; Const BrowsePosition : TBrowsePosition); Overload; Static;
+    Class Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
+      Const BrowsePosition : TBrowsePosition); Overload; Static;
+    {$IFDEF DXE102}
+    Class Procedure RegisterFormClassForTheming(Const AFormClass : TCustomFormClass); Static;
+    Class Procedure ApplyTheming(Const Component : TComponent); Static;
+    {$ENDIF}
+  End;
 
 Implementation
 
@@ -61,7 +69,7 @@ Uses
   @return  an IOTAProject
 
 **)
-Function ActiveProject : IOTAProject;
+Class Function TBADIToolsAPIFunctions.ActiveProject : IOTAProject;
 
 var
   G : IOTAProjectGroup;
@@ -69,7 +77,7 @@ var
 Begin
   Result := Nil;
   G := ProjectGroup;
-  If G <> Nil Then
+  If Assigned(G) Then
     Result := G.ActiveProject;
 End;
 
@@ -83,18 +91,40 @@ End;
   @return  an IOTASourceEditor
 
 **)
-Function ActiveSourceEditor : IOTASourceEditor;
+Class Function TBADIToolsAPIFunctions.ActiveSourceEditor : IOTASourceEditor;
 
 Var
-  CM : IOTAModule;
+  MS : IOTAModuleServices;
 
 Begin
   Result := Nil;
-  If BorlandIDEServices = Nil Then
-    Exit;
-  CM := (BorlandIDEServices as IOTAModuleServices).CurrentModule;
-  Result := SourceEditor(CM);
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    If Assigned(MS.CurrentModule) Then
+      Result := SourceEditor(MS.CurrentModule);
 End;
+
+{$IFDEF DXE102}
+(**
+
+  This method apply theming to the given componentif theming is enabled and available.
+
+  @precon  None.
+  @postcon The component is themed if theming is available and enabled.
+
+  @param   Component as a TComponent as a constant
+
+**)
+Class Procedure TBADIToolsAPIFunctions.ApplyTheming(Const Component: TComponent);
+
+Var
+  ITS : IOTAIDEThemingServices;
+  
+Begin
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      ITS.ApplyTheme(Component);
+End;
+{$ENDIF}
 
 (**
 
@@ -110,15 +140,21 @@ End;
   @param   Msg as a TClearMessages as a Constant
 
 **)
-Procedure ClearMessages(Const Msg : TClearMessages);
+Class Procedure TBADIToolsAPIFunctions.ClearMessages(Const Msg : TClearMessages);
 
+Var
+  MS : IOTAMessageServices;
+  
 Begin
-  If cmCompiler In Msg Then
-    (BorlandIDEServices As IOTAMessageServices).ClearCompilerMessages;
-  If cmSearch In Msg Then
-    (BorlandIDEServices As IOTAMessageServices).ClearSearchMessages;
-  If cmTool In Msg Then
-    (BorlandIDEServices As IOTAMessageServices).ClearToolMessages;
+  If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
+    Begin
+      If cmCompiler In Msg Then
+        MS.ClearCompilerMessages;
+      If cmSearch In Msg Then
+        MS.ClearSearchMessages;
+      If cmTool In Msg Then
+        MS.ClearToolMessages;
+    End;
 End;
 
 (**
@@ -132,7 +168,7 @@ End;
   @return  a String
 
 **)
-Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
+Class Function TBADIToolsAPIFunctions.EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
 
 Const
   iBufferCapacity = 8 * 8 * 8;
@@ -173,10 +209,14 @@ End;
   @param   strText as a String as a Constant
 
 **)
-Procedure OutputMessage(Const strText : String);
+Class Procedure TBADIToolsAPIFunctions.OutputMessage(Const strText : String);
 
+Var
+  MS : IOTAMessageServices;
+  
 Begin
-  (BorlandIDEServices As IOTAMessageServices).AddTitleMessage(strText);
+  If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
+    MS.AddTitleMessage(strText);
 End;
 
 (**
@@ -197,12 +237,15 @@ End;
   @param   iCol        as an Integer as a Constant
 
 **)
-Procedure OutputMessage(Const strFileName, strText, strPrefix : String;
+Class Procedure TBADIToolsAPIFunctions.OutputMessage(Const strFileName, strText, strPrefix : String;
   Const iLine, iCol : Integer);
 
+Var
+  MS : IOTAMessageServices;
+  
 Begin
-  (BorlandIDEServices As IOTAMessageServices).AddToolMessage(strFileName,
-    strText, strPrefix, iLine, iCol);
+  If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
+    MS.AddToolMessage(strFileName, strText, strPrefix, iLine, iCol);
 End;
 
 (**
@@ -216,13 +259,13 @@ End;
   @param   strText as a String as a constant
 
 **)
-Procedure OutputText(Const Writer : IOTAEditWriter; Const strText : String);
+Class Procedure TBADIToolsAPIFunctions.OutputText(Const Writer : IOTAEditWriter; Const strText : String);
 
 Begin
   {$IFNDEF D2009}
   Writer.Insert(PAnsiChar(strText));
   {$ELSE}
-  Writer.Insert(PAnsiChar(AnsiString(strText)));
+  Writer.Insert(PAnsiChar(UTF8Encode(strText)));
   {$ENDIF}
 End;
 
@@ -240,8 +283,8 @@ End;
   @param   BrowsePosition as a TBrowsePosition as a constant
 
 **)
-Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
-  Const BrowsePosition : TBrowsePosition); Overload;
+Class Procedure TBADIToolsAPIFunctions.PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
+  Const BrowsePosition : TBrowsePosition);
 
   (**
 
@@ -256,22 +299,81 @@ Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
   Procedure UnfoldMethod(COnst EV : IOTAEditView);
 
   Var
-    {$IFDEF D2006}
     EA: IOTAElideActions;
-    {$ENDIF}
     
   Begin
-    {$IFDEF D2006}
     If Supports(EV, IOTAElideActions, EA) Then
       EA.UnElideNearestBlock;
-    {$ENDIF}
   End;
 
+  (**
+
+    This procedure aligns the method comment at the top of the editor.
+
+    @precon  None.
+    @postcon The code methods comment is aligned to the top of the editor.
+
+    @param   EditView as an IOTAEditView as a constant
+
+  **)
+  Procedure CommentTop(Const EditView : IOTAEditView);
+
+  Var
+    iLine: Integer;
+
+  Begin
+    iLine := iIdentLine;
+    If iCommentLine > 0 Then
+      iLine := iCommentLine;
+    EditView.SetTopLeft(iLine, 1);
+  End;
+
+  (**
+
+    This procedure aligns the method comment in the centre of the editor.
+
+    @precon  None.
+    @postcon The code methods comment is aligned in the centre of the editor.
+
+    @param   EditView as an IOTAEditView as a constant
+
+  **)
+  Procedure CommentCentre(Const EditView : IOTAEditView);
+
+  Var
+    iLine: Integer;
+
+  Begin
+    iLine := iIdentLine;
+    If iCommentLine > 0 Then
+      iLine := iCommentLine;
+    EditView.Center(iLine, 1);
+  End;
+
+  (**
+
+    This procedure aligns the method identifier in the centre of the editor but shows all the comment.
+
+    @precon  None.
+    @postcon The code method identifier in the centre of the editor but shows all the comment.
+
+    @param   C        as a TOTAEditPos as a constant
+    @param   EditView as an IOTAEditView as a constant
+
+  **)
+  Procedure IdentCentreShowAllComment(Const C : TOTAEditPos; Const EditView : IOTAEditView);
+
+  Begin
+    EditView.Center(C.Line, 1);
+    If iCommentLine > 0 Then
+      If iCommentLine < EditView.TopRow Then
+        EditView.SetTopLeft(iCommentLine, 1);
+  End;
+  
 Var
   SourceEditor: IOTASourceEditor;
   C           : TOTAEditPos;
   EV          : IOTAEditView;
-  iLine : Integer;
 
 Begin
   SourceEditor := ActiveSourceEditor;
@@ -289,29 +391,11 @@ Begin
               UnfoldMethod(EV);
               EV.CursorPos := C;
               Case BrowsePosition Of
-                bpCommentTop:
-                  Begin
-                    iLine := iIdentLine;
-                    If iCommentLine > 0 Then
-                      iLine := iCommentLine;
-                    EV.SetTopLeft(iLine, 1);
-                  End;
-                bpCommentCentre:
-                  Begin
-                    iLine := iIdentLine;
-                    If iCommentLine > 0 Then
-                      iLine := iCommentLine;
-                    EV.Center(iLine, 1);
-                  End;
+                bpCommentTop: CommentTop(EV);
+                bpCommentCentre: CommentCentre(EV);
                 bpIdentifierTop: EV.SetTopLeft(C.Line, 1);
                 bpIdentifierCentre: EV.Center(C.Line, 1);
-                bpIdentifierCentreShowAllComment:
-                  Begin
-                    EV.Center(C.Line, 1);
-                    If iCommentLine > 0 Then
-                      If iCommentLine < EV.TopRow Then
-                        EV.SetTopLeft(iCommentLine, 1);
-                  End;
+                bpIdentifierCentreShowAllComment: IdentCentreShowAllComment(C, EV);
               End;
               If C.Line >= EV.TopRow + EV.ViewSize.Height - 1 Then
                 EV.SetTopLeft(C.Line - EV.ViewSize.Height + 1 + 1, 1);  
@@ -333,8 +417,8 @@ End;
   @param   BrowsePosition as a TBrowsePosition as a constant
 
 **)
-Procedure PositionCursor(Const Container : TElementContainer; Const iIdentLine, iIdentColumn : Integer;
-  Const BrowsePosition : TBrowsePosition);
+Class Procedure TBADIToolsAPIFunctions.PositionCursor(Const Container : TElementContainer;
+  Const iIdentLine, iIdentColumn : Integer; Const BrowsePosition : TBrowsePosition);
 
   (**
 
@@ -349,15 +433,91 @@ Procedure PositionCursor(Const Container : TElementContainer; Const iIdentLine, 
   Procedure UnfoldMethod(Const EV : IOTAEditView);
 
   Var
-    {$IFDEF D2006}
     EA: IOTAElideActions;
-    {$ENDIF}
     
   Begin
-    {$IFDEF D2006}
     If Supports(EV, IOTAElideActions, EA) Then
       EA.UnElideNearestBlock;
-    {$ENDIF}
+  End;
+
+  (**
+
+    This procedure aligns the method comment at the top of the editor.
+
+    @precon  None.
+    @postcon The code methods comment is aligned to the top of the editor.
+
+    @param   EditView as an IOTAEditView as a constant
+
+  **)
+  Procedure CommentTop(Const EditView : IOTAEditView);
+
+  Var
+    iLine: Integer;
+
+  Begin
+    iLine := iIdentLine;
+    If Assigned(Container) Then
+      Begin
+        iLine := Container.Line;
+        If Assigned(Container.Comment) Then
+           iLine := Container.Comment.Line;
+      End;
+    EditView.SetTopLeft(iLine, 1);
+  End;
+
+  (**
+
+    This procedure aligns the method comment in the centre of the editor.
+
+    @precon  None.
+    @postcon The code methods comment is aligned in the centre of the editor.
+
+    @param   EditView as an IOTAEditView as a constant
+
+  **)
+  Procedure CommentCentre(Const EditView : IOTAEditView);
+
+  Var
+    iLine: Integer;
+
+  Begin
+    iLine := iIdentLine;
+    If Assigned(Container) Then
+      Begin
+        iLine := Container.Line;
+        If Assigned(Container.Comment) Then
+           iLine := Container.Comment.Line;
+      End;
+    EditView.Center(iLine, 1);
+  End;
+
+  (**
+
+    This procedure aligns the method identifier in the centre of the editor but shows all the comment.
+
+    @precon  None.
+    @postcon The code method identifier in the centre of the editor but shows all the comment.
+
+    @param   EditView as an IOTAEditView as a constant
+
+  **)
+  Procedure IdentCentreShowAllComment(Const EditView : IOTAEditView);
+
+  Var
+    iLine: Integer;
+
+  Begin
+    iLine := iIdentLine;
+    EditView.Center(iLine, 1);
+    If Assigned(Container) Then
+      Begin
+        iLine := Container.Line;
+        If Assigned(Container.Comment) Then
+           iLine := Container.Comment.Line;
+        If iLine < EditView.TopRow Then
+          EditView.SetTopLeft(iLine, 1);
+      End;
   End;
   
 Var
@@ -383,42 +543,11 @@ Begin
               UnfoldMethod(EV);
               EV.CursorPos := C;
               Case BrowsePosition Of
-                bpCommentTop:
-                  Begin
-                    iLine := iIdentLine;
-                    If Assigned(Container) Then
-                      Begin
-                        iLine := Container.Line;
-                        If Assigned(Container.Comment) Then
-                           iLine := Container.Comment.Line;
-                      End;
-                    EV.SetTopLeft(iLine, 1);
-                  End;
-                bpCommentCentre:
-                  Begin
-                    iLine := iIdentLine;
-                    If Assigned(Container) Then
-                      Begin
-                        iLine := Container.Line;
-                        If Assigned(Container.Comment) Then
-                           iLine := Container.Comment.Line;
-                      End;
-                    EV.Center(iLine, 1);
-                  End;
+                bpCommentTop: CommentTop(EV);
+                bpCommentCentre: CommentCentre(EV);
                 bpIdentifierTop: EV.SetTopLeft(iLine, 1);
                 bpIdentifierCentre: EV.Center(iLine, 1);
-                bpIdentifierCentreShowAllComment:
-                  Begin
-                    EV.Center(iLine, 1);
-                    If Assigned(Container) Then
-                      Begin
-                        iLine := Container.Line;
-                        If Assigned(Container.Comment) Then
-                           iLine := Container.Comment.Line;
-                        If iLine < EV.TopRow Then
-                          EV.SetTopLeft(iLine, 1);
-                      End;
-                  End;
+                bpIdentifierCentreShowAllComment: IdentCentreShowAllComment(EV);
               End;
               If C.Line >= EV.TopRow + EV.ViewSize.Height - 1 Then
                 EV.SetTopLeft(C.Line - EV.ViewSize.Height + 1 + 1, 1);  
@@ -437,27 +566,26 @@ End;
   @return  an IOTAProjectGroup
 
 **)
-Function ProjectGroup: IOTAProjectGroup;
+Class Function TBADIToolsAPIFunctions.ProjectGroup: IOTAProjectGroup;
 
 Var
-  AModuleServices: IOTAModuleServices;
+  MS: IOTAModuleServices;
   AModule: IOTAModule;
   i: integer;
   AProjectGroup: IOTAProjectGroup;
 
 Begin
   Result := Nil;
-  AModuleServices := (BorlandIDEServices as IOTAModuleServices);
-  For i := 0 To AModuleServices.ModuleCount - 1 Do
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
     Begin
-      AModule := AModuleServices.Modules[i];
-      If (AModule.QueryInterface(IOTAProjectGroup, AProjectGroup) = S_OK) Then
-       Break;
+      For i := 0 To MS.ModuleCount - 1 Do
+        Begin
+          AModule := MS.Modules[i];
+          If (AModule.QueryInterface(IOTAProjectGroup, AProjectGroup) = S_OK) Then
+           Break;
+        End;
+      Result := AProjectGroup;
     End;
-  Result := AProjectGroup;
-  AModuleServices := Nil;
-  AModule := Nil;
-  AProjectGroup := Nil;
 end;
 
 (**
@@ -472,26 +600,50 @@ end;
   @return  an IOTAModule
 
 **)
-Function ProjectModule(Const Project : IOTAProject) : IOTAModule;
+Class Function TBADIToolsAPIFunctions.ProjectModule(Const Project : IOTAProject) : IOTAModule;
 
 Var
-  AModuleServices: IOTAModuleServices;
+  MS: IOTAModuleServices;
   AModule: IOTAModule;
   i: integer;
   AProject: IOTAProject;
 
 Begin
   Result := Nil;
-  AModuleServices := (BorlandIDEServices as IOTAModuleServices);
-  For i := 0 To AModuleServices.ModuleCount - 1 Do
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
     Begin
-      AModule := AModuleServices.Modules[i];
-      If (AModule.QueryInterface(IOTAProject, AProject) = S_OK) And
-        (Project = AProject) Then
-        Break;
+      For i := 0 To MS.ModuleCount - 1 Do
+        Begin
+          AModule := MS.Modules[i];
+          If (AModule.QueryInterface(IOTAProject, AProject) = S_OK) And (Project = AProject) Then
+            Break;
+        End;
+      Result := AProject;
     End;
-  Result := AProject;
 End;
+
+{$IFDEF DXE102}
+(**
+
+  This method regsiters the given form class for theming is theming is enabled and available.
+
+  @precon  None.
+  @postcon The form is regsitered for theming is available and enabled.
+
+  @param   AFormClass as a TCustomFormClass as a constant
+
+**)
+Class Procedure TBADIToolsAPIFunctions.RegisterFormClassForTheming(Const AFormClass : TCustomFormClass);
+
+Var
+  ITS : IOTAIDEThemingServices250;
+  
+Begin
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      ITS.RegisterFormClass(AFormClass);
+End;
+{$ENDIF}
 
 (**
 
@@ -504,7 +656,7 @@ End;
   @return  an IOTASourceEditor
 
 **)
-Function SourceEditor(Const Module : IOTAModule) : IOTASourceEditor;
+Class Function TBADIToolsAPIFunctions.SourceEditor(Const Module : IOTAModule) : IOTASourceEditor;
 
 Var
   iFileCount : Integer;
@@ -512,7 +664,7 @@ Var
 
 Begin
   Result := Nil;
-  If Module = Nil Then
+  If Not Assigned(Module) Then
     Exit;
   iFileCount := Module.GetModuleFileCount;
   For i := 0 To iFileCount - 1 Do
@@ -520,5 +672,4 @@ Begin
       Break;
 End;
 
-//------------------------------------------------------------------------------------------------------
 End.

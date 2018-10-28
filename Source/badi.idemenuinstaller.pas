@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Oct 2018
+  @Date    27 Oct 2018
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -186,7 +186,7 @@ Var
   SE: IOTASourceEditor;
 
 Begin
-  SE := ActiveSourceEditor;
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csBlock, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csBlock));
 End;
@@ -471,7 +471,7 @@ Var
   DD : TBaseDocumentation;
 
 Begin
-  AProject := ActiveProject;
+  AProject := TBADIToolsAPIFunctions.ActiveProject;
   If AProject <> Nil Then
     If TfrmDocumentationOptions.Execute(ADocType) Then
       Begin
@@ -518,9 +518,9 @@ Var
   D: TDUnitCreator;
 
 Begin
-  If ActiveSourceEditor <> Nil Then
+  If TBADIToolsAPIFunctions.ActiveSourceEditor <> Nil Then
     Begin
-      If ActiveProject <> Nil Then
+      If TBADIToolsAPIFunctions.ActiveProject <> Nil Then
         Begin
           D := TDUnitCreator.Create;
           Try
@@ -557,11 +557,11 @@ Var
   frm: TCustomForm;
 
 Begin
-  If ActiveSourceEditor <> Nil Then
+  If TBADIToolsAPIFunctions.ActiveSourceEditor <> Nil Then
     Begin
-      ActiveSourceEditor.Show;
+      TBADIToolsAPIFunctions.ActiveSourceEditor.Show;
       // IDE hack to focus the editor window because the above line doesn't do it
-      frm   := ActiveSourceEditor.EditViews[0].GetEditWindow.Form;
+      frm   := TBADIToolsAPIFunctions.ActiveSourceEditor.EditViews[0].GetEditWindow.Form;
       For i := 0 To frm.ComponentCount - 1 Do
         If frm.Components[i].ClassName = strTEditControl Then
           Begin
@@ -616,7 +616,7 @@ Begin
   C.CharIndex := 0;
   iBufferPos  := Source.GetEditView(0).CharPosToPos(C);
   Writer.CopyTo(iBufferPos);
-  OutputText(Writer, strComment);
+  TBADIToolsAPIFunctions.OutputText(Writer, strComment);
 End;
 
 (**
@@ -650,7 +650,7 @@ Var
 Begin
   If CommentType = ctNone Then
     Exit;
-  SourceEditor := ActiveSourceEditor;
+  SourceEditor := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If SourceEditor = Nil Then
     Exit;
   If IsTextSelected Then
@@ -669,7 +669,7 @@ Begin
     CharPos.Line      := EditPos.Line;
     CharPos.CharIndex := EditPos.Col;
     Writer.CopyTo(SourceEditor.GetEditView(0).CharPosToPos(CharPos) - 1);
-    OutputText(Writer, BuildBlockComment(CommentType, CommentStyle, iIndent,
+    TBADIToolsAPIFunctions.OutputText(Writer, BuildBlockComment(CommentType, CommentStyle, iIndent,
       strSelectedText));
   Finally
     Writer := Nil;
@@ -723,7 +723,7 @@ Begin
     C.CharIndex := 0;
     iBufferPos  := SE.GetEditView(0).CharPosToPos(C);
     Writer.CopyTo(iBufferPos);
-    OutputText(Writer, strEpilog);
+    TBADIToolsAPIFunctions.OutputText(Writer, strEpilog);
   Finally
     Writer := Nil;
   End;
@@ -733,7 +733,7 @@ Begin
     C.CharIndex := 0;
     iBufferPos  := SE.GetEditView(0).CharPosToPos(C);
     Writer.CopyTo(iBufferPos);
-    OutputText(Writer, strProlog);
+    TBADIToolsAPIFunctions.OutputText(Writer, strProlog);
   Finally
     Writer := Nil;
   End;
@@ -755,7 +755,7 @@ Var
   SE: IOTASourceEditor;
 
 Begin
-  SE := ActiveSourceEditor;
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csInSitu, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csInSitu));
 End;
@@ -778,7 +778,7 @@ Var
 
 Begin
   Result := False;
-  SE     := ActiveSourceEditor;
+  SE     := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If SE <> Nil Then
     Begin
       Reader := SE.CreateReader;
@@ -805,7 +805,7 @@ Var
   SE: IOTASourceEditor;
 
 Begin
-  SE := ActiveSourceEditor;
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csLine, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csLine));
 End;
@@ -842,11 +842,11 @@ Var
   iMaxCommentWidth: Integer;
 
 Begin
-  Source := ActiveSourceEditor;
+  Source := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
-    Source.Modified, [moParse]);
+  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(TBADIToolsAPIFunctions.EditorAsString(Source),
+    Source.FileName, Source.Modified, [moParse]);
   If Module <> Nil Then
     Try
       EditPos := Source.GetEditView(0).CursorPos;
@@ -1013,7 +1013,7 @@ Begin
   Inc(Pt.X, CursorDelta.X);
   C.Col  := Pt.X;
   C.Line := Pt.Y;
-  S := ActiveSourceEditor;
+  S := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If S <> Nil Then
     S.GetEditView(0).CursorPos := C;
 End;
@@ -1092,13 +1092,13 @@ Var
   frm        : TfrmProgress;
 
 Begin
-  SE := ActiveSourceEditor;
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If SE <> Nil Then
     Begin
       If Not SE.EditViews[0].Buffer.IsReadOnly Then
         Begin
-          M := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(SE), SE.FileName,
-            SE.Modified, [moParse, moProfiling]);
+          M := TBADIDispatcher.BADIDispatcher.Dispatcher(TBADIToolsAPIFunctions.EditorAsString(SE),
+            SE.FileName, SE.Modified, [moParse, moProfiling]);
           Try
             ProfileJobs := TfrmProfiling.Execute(M);
             Try
@@ -1173,10 +1173,11 @@ Var
   iMaxCommentWidth: Integer;
 
 Begin
-  Source := ActiveSourceEditor;
+  Source := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
+  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(
+    TBADIToolsAPIFunctions.EditorAsString(Source), Source.FileName,
     Source.Modified, [moParse]);
   If Module <> Nil Then
     Try
@@ -1244,7 +1245,8 @@ Begin
       Begin
         TopView := EditSvrs.TopView;
         Cursor := TopView.CursorPos;
-        TBADIRefactorConstant.Refactor(ActiveSourceEditor, Cursor.Line, Cursor.Col);
+        TBADIRefactorConstant.Refactor(TBADIToolsAPIFunctions.ActiveSourceEditor, Cursor.Line,
+          Cursor.Col);
       End Else
         MessageDlg(strMsg, mtError, [mbOK], 0);
 End;
@@ -1462,7 +1464,7 @@ Begin
   boolVisible     := False;
   iBufferPosStart := 0;
   iBufferPosEnd   := 0;
-  SE              := ActiveSourceEditor;
+  SE              := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If SE <> Nil Then
     Begin
       Reader := SE.CreateReader;
@@ -1519,7 +1521,8 @@ End;
 Procedure TBADIIDEMenuInstaller.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
 
 Begin
-  PositionCursor(iIdentLine, iIdentCol, iCommentLine, TBADIOptions.BADIOptions.BrowsePosition);
+  TBADIToolsAPIFunctions.PositionCursor(iIdentLine, iIdentCol, iCommentLine,
+    TBADIOptions.BADIOptions.BrowsePosition);
 End;
 
 (**
@@ -1549,7 +1552,7 @@ Var
   iIndent        : Integer;
 
 Begin
-  SE := ActiveSourceEditor;
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If SE <> Nil Then
     Begin
       If IsTextSelected Then
@@ -1569,7 +1572,7 @@ Begin
         CommentType := TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csLine);
         iIndent     := EditPos.Col;
         strComment  := BuildBlockComment(CommentType, csLine, iIndent, strAtToDo + strSelectedText);
-        OutputText(Writer, strComment);
+        TBADIToolsAPIFunctions.OutputText(Writer, strComment);
         EditPos.Col := EditPos.Col + iTodoCommentInsPos;
       Finally
         Writer := Nil;

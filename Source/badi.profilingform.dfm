@@ -68,11 +68,7 @@ object frmProfiling: TfrmProfiling
       Height = 445
       Align = alClient
       Header.AutoSizeIndex = 0
-      Header.Font.Charset = DEFAULT_CHARSET
-      Header.Font.Color = clWindowText
-      Header.Font.Height = -11
-      Header.Font.Name = 'Tahoma'
-      Header.Font.Style = []
+      Header.Height = 20
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
       Images = ilScopeImages
       TabOrder = 0
@@ -82,7 +78,7 @@ object frmProfiling: TfrmProfiling
         item
           Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring, coFixed, coSmartResize, coAllowFocus]
           Position = 0
-          Width = 489
+          Width = 493
           WideText = 'Methods'
         end>
     end

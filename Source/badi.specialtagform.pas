@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Oct 2018
+  @Date    27 Oct 2018
 
 **)
 Unit BADI.SpecialTagForm;
@@ -64,7 +64,7 @@ Implementation
 
 Uses
   ToolsAPI,
-  BADI.Constants;
+  BADI.Constants, BADI.ToolsAPIUtils;
 
 {$R *.DFM}
 
@@ -118,23 +118,13 @@ Class Function TfrmSpecialTag.Execute(Var SpecialTag : TBADISpecialTag): Boolean
 
 Var
   frm : TfrmSpecialTag;
-  { $IFDEF DXE102
-  ITS : IOTAIDEThemingServices250;
-  {$ENDIF}
-
 Begin
   Result := False;
-  { $IFDEF DXE102
-  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    If ITS.IDEThemingEnabled Then
-      ITS.RegisterFormClass(TfrmSpecialTag); // <= Blows up IDE
-  {$ENDIF}
   frm := TfrmSpecialTag.Create(Application.MainForm);
   Try
-    { $IFDEF DXE102
-    If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-      If ITS.IDEThemingEnabled Then
-        ITS.ApplyTheme(frm);
+    { $IFDEF DXE102 
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmSpecialTag);
+    TBADIToolsAPIFunctions.ApplyTheming(Self);
     {$ENDIF}
     frm.InitialiseForm(SpecialTag);
     If frm.ShowModal = mrOK Then

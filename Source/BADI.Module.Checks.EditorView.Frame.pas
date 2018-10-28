@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Oct 2018
+  @Date    27 Oct 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -1281,8 +1281,8 @@ Begin
           Module.Show;
           Node := FVSTChecks.FocusedNode;
           NodeData := FVSTChecks.GetNodeData(Node);
-          PositionCursor(NodeData.FIdentLine, NodeData.FIdentColumn, NodeData.FCommentLine,
-            TBADIOptions.BADIOptions.BrowsePosition);
+          TBADIToolsAPIFunctions.PositionCursor(NodeData.FIdentLine, NodeData.FIdentColumn,
+            NodeData.FCommentLine, TBADIOptions.BADIOptions.BrowsePosition);
         End;
     End;
 End;

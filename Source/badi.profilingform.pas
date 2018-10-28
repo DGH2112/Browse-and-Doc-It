@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Dec 2017
+  @Date    27 Oct 2018
 
 **)
 unit BADI.ProfilingForm;
@@ -31,7 +31,7 @@ uses
   ImgList,
   Contnrs,
   ExtCtrls,
-  BADI.ElementContainer;
+  BADI.ElementContainer, System.ImageList;
 
 type
   (** An enumerate to define if the profile job is an insertion or a removal. **)
@@ -137,7 +137,7 @@ type
     {$ENDIF}
     procedure vstMethodsGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-      var Ghosted: Boolean; var ImageIndex: Integer);
+      var Ghosted: Boolean; var ImageIndex: TImageIndex);
     procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
@@ -263,9 +263,6 @@ Class Function TfrmProfiling.Execute(Const Module : TBaseLanguageModule) : TProf
 
 Var
   frm : TfrmProfiling;
-  {$IFDEF DXE102}
-  ITS : IOTAIDEThemingServices;
-  {$ENDIF}
   
 Begin
   Result := Nil;
@@ -273,10 +270,9 @@ Begin
   Try
     frm.InitialiseTreeView(Module);
     frm.mmoCode.Lines.Text := TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName];
-    {$IFDEF DXE102}
-    If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-      If ITS.IDEThemingEnabled Then
-        ITS.ApplyTheme(frm);
+    { $IFDEF DXE102
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmProfiling);
+    TBADIToolsAPIFunctions.ApplyTheming(frm);
     {$ENDIF}
     If frm.ShowModal = mrOK Then
       Begin
@@ -496,20 +492,19 @@ end;
   This is an OnGetImageIndex for the virtual tree view.
 
   @precon  None.
-  @postcon Returns the adjusted image index for scope for the associated module
-           element.
+  @postcon Returns the adjusted image index for scope for the associated module element.
 
   @param   Sender     as a TBaseVirtualTree
   @param   Node       as a PVirtualNode
   @param   Kind       as a TVTImageKind
   @param   Column     as a TColumnIndex
   @param   Ghosted    as a Boolean as a reference
-  @param   ImageIndex as an Integer as a reference
+  @param   ImageIndex as a TImageIndex as a reference
 
 **)
 procedure TfrmProfiling.vstMethodsGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-  var Ghosted: Boolean; var ImageIndex: Integer);
+  var Ghosted: Boolean; var ImageIndex: TImageIndex);
 
 Var
   NodeData : ^TTreeData;

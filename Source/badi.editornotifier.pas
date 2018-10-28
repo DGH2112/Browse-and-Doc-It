@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    27 Oct 2018
+  @Date    28 Oct 2018
   @Author  David Hoyle
 
 **)
@@ -25,7 +25,7 @@ Uses
 Type
   (** This class handles notifications from the editor so that changes in the
       editor can be displayed. **)
-  TEditorNotifier = Class(TNotifierObject, INTAEditServicesNotifier)
+  TEditorNotifier = Class(TNotifierObject, IUnknown, IOTANotifier, INTAEditServicesNotifier)
   Strict Private
     FUpdateTimer : TTimer;
     FLastEditorName : String;

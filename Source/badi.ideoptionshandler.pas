@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    09 Apr 2017
+  @Date    28 Oct 2018
 
 **)
 Unit BADI.IDEOptionsHandler;
@@ -26,7 +26,7 @@ Uses
 Type
   (** A class which implements the INTAAddingOptions interface to added options frames
       to the IDEs options dialogue. **)
-  TBADIIDEOptionsHandler = Class(TInterfacedObject, INTAAddInOptions)
+  TBADIIDEOptionsHandler = Class(TInterfacedObject, IUnknown, INTAAddInOptions)
   Strict Private
     FBADICustomFrameClass : TFrameClass;
     FBADICustomFrame      : TCustomFrame;

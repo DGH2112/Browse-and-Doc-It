@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Oct 2018
+  @Date    28 Oct 2018
   
 **)
 Unit BADI.Module.Checks.SubView;
@@ -20,7 +20,7 @@ Uses
 
 Type
   (** A class to implement the INTACustomEditorSubView interface for a subview for Checks. **)
-  TBADIModuleChecksSubView = Class(TInterfacedObject, INTACustomEditorSubView)
+  TBADIModuleChecksSubView = Class(TInterfacedObject, IInterface, INTACustomEditorSubView)
   Strict Private
   Strict Protected
     // INTACustomEditorSubView

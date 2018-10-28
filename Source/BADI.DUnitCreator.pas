@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Oct 2018
+  @Date    28 Oct 2018
 
 **)
 Unit BADI.DUnitCreator;
@@ -141,7 +141,7 @@ Const
 
 Type
   (** A class to handle the creation of the DUnit project file. **)
-  TProjectCreator = Class(TInterfacedObject, IOTACreator, IOTAProjectCreator
+  TProjectCreator = Class(TInterfacedObject, IUnknown, IOTACreator, IOTAProjectCreator
     {$IFDEF D0005}, IOTAProjectCreator50 {$ENDIF}
     {$IFDEF D2005}, IOTAProjectCreator80 {$ENDIF})
     {$IFDEF D2005} Strict {$ENDIF} Private
@@ -170,7 +170,7 @@ Type
 
   (** This class creates a IOTAFIle interface for generating the project file
       source. **)
-  TProjectCreatorFile = Class(TInterfacedObject, IOTAFile)
+  TProjectCreatorFile = Class(TInterfacedObject, IUnknown, IOTAFile)
     {$IFDEF D2005} Strict {$ENDIF} Private
     FProjectName: String;
   Public
@@ -180,7 +180,7 @@ Type
   End;
 
   (** This class creates the test unit file. **)
-  TUnitCreator = Class(TInterfacedObject, IOTACreator, IOTAModuleCreator)
+  TUnitCreator = Class(TInterfacedObject, IUnknown, IOTACreator, IOTAModuleCreator)
     {$IFDEF D2005} Strict {$ENDIF} Private
     FNewUnitName    : String;
     FOwner          : IOTAProject;
@@ -216,7 +216,7 @@ Type
 
   (** This class creates a IOTAFile interface for generating the unit file
       source. **)
-  TUnitCreatorFile = Class(TInterfacedObject, IOTAFile)
+  TUnitCreatorFile = Class(TInterfacedObject, IUnknown, IOTAFile)
     {$IFDEF D2005} Strict {$ENDIF} Private
     FUnitName       : String;
     FUnitToBeTested : String;

@@ -3,7 +3,7 @@
   This module contains a custom syntax highlighter for the Eidolon MAP files.
 
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    28 Oct 2018
   @Author  David Hoyle
 
 **)
@@ -18,7 +18,8 @@ Uses
 
 Type
   (** A class to define an new IDE Highlighter for Eidolon Map Files **)
-  TEidolonHighlighter = Class(TNotifierObject, IOTANotifier, IOTAHighlighter {$IFDEF D2005}, IOTAHighlighterPreview{$ENDIF})
+  TEidolonHighlighter = Class(TNotifierObject, IUnknown, IOTANotifier, IOTAHighlighter {$IFDEF D2005},
+    IOTAHighlighterPreview{$ENDIF})
   {$IFDEF D2005} Strict {$ENDIF} Private
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public

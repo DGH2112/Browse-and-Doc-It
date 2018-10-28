@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    21 Oct 2018
+  @Date    28 Oct 2018
   @Version 1.0
 
 **)
@@ -29,7 +29,7 @@ Uses
 
 Type
   (** This is the class which defined the Wizard interface. **)
-  TBrowseAndDocItWizard = Class(TNotifierObject, IOTANotifier, IOTAWizard)
+  TBrowseAndDocItWizard = Class(TNotifierObject, IUnknown, IOTANotifier, IOTAWizard)
   Strict Private
     FBADIIDEMenuInstaller    : TBADIIDEMenuInstaller;
     FBADIIDEOptionsInstaller : TBADIIDEOptionsInstaller;

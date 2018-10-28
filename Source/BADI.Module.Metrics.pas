@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Oct 2018
+  @Date    28 Oct 2018
   
 **)
 Unit BADI.Module.Metrics;
@@ -29,8 +29,8 @@ Uses
 
 Type
   (** A class to implement an editor view for displaying module metrics. @nometrics MissingCONSTInParam **)
-  TBADIModuleMetricsEditorView = Class(TInterfacedObject, INTACustomEditorView, INTACustomEditorView150,
-    INTACustomEditorViewStatusPanel)
+  TBADIModuleMetricsEditorView = Class(TInterfacedObject, IInterface, INTACustomEditorView,
+    INTACustomEditorView150, INTACustomEditorViewStatusPanel)
   Strict Private
     Type
       (** This class managed a list of file name and their last modified date so that the view only

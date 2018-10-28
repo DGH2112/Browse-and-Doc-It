@@ -31,7 +31,8 @@ uses
   ImgList,
   Contnrs,
   ExtCtrls,
-  BADI.ElementContainer, System.ImageList;
+  UITypes,
+  BADI.ElementContainer;
 
 type
   (** An enumerate to define if the profile job is an insertion or a removal. **)

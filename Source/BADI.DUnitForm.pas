@@ -31,7 +31,8 @@ uses
   BADI.Base.Module,
   ImgList,
   ExtCtrls,
-  BADI.ElementContainer, System.ImageList;
+  UITypes,
+  BADI.ElementContainer;
 
 type
   (** A class to represent the form interface. **)

@@ -31,7 +31,7 @@ Uses
   BADI.Types,
   VirtualTrees,
   Themes, 
-  BADI.CustomVirtualStringTree, System.ImageList, Vcl.ImgList;
+  BADI.CustomVirtualStringTree;
 
 Type
   (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)

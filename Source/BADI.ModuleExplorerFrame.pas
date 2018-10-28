@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    21 Oct 2018
+  @Date    28 Oct 2018
   @Author  David Hoyle
   @Version 1.0
 
@@ -38,7 +38,7 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types, System.Actions, System.ImageList;
+  BADI.Types;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the

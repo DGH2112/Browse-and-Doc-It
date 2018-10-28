@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Oct 2018
+  @Date    28 Oct 2018
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -84,7 +84,9 @@ Implementation
 
 
 Uses
+  {$IFNDEF STANDALONEAPP}
   ToolsAPI,
+  {$ENDIF}
   BADI.Base.Module,
   BADI.SpecialTagForm,
   BADI.Constants,
@@ -256,19 +258,23 @@ End;
 **)
 Constructor TfmBADISpecialTagsFrame.Create(AOwner: TComponent);
 
+{$IFNDEF STANDALONEAPP}
 {$IFDEF DXE102}
 Var
   ITS : IOTAIDEThemingServices;
+{$ENDIF}
 {$ENDIF}
 
 Begin
   Inherited Create(AOwner);
   CreateVirtualStringTree;
+  {$IFNDEF STANDALONEAPP}
   {$IFDEF DXE102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       FStyleServices := ITS.StyleServices;
+  {$ENDIF}
   {$ENDIF}
   FVSTSpecialTags.NodeDataSize := SizeOf(TSpecialTagsNodeData);
   FSpecialTags := TList<TBADISpecialTag>.Create;

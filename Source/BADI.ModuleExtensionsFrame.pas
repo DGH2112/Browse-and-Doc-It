@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Oct 2018
+  @Date    28 Oct 2018
 
   @todo    Replace the TValueListEditor with VST.
 
@@ -44,7 +44,9 @@ Type
 Implementation
 
 Uses
+  {$IFNDEF STANDALONEAPP}
   ToolsAPI,
+  {$ENDIF}
   BADI.Module.Dispatcher,
   BADI.Options;
 
@@ -64,13 +66,16 @@ Uses
 **)
 Constructor TfmBADIModuleExtensionsFrame.Create(AOwner: TComponent);
 
+{$IFNDEF STANDALONEAPP}
 {$IFDEF DXE102}
 Var
   ITS : IOTAIDEThemingServices;
 {$ENDIF}
+{$ENDIF}
 
 Begin
   Inherited Create(AOwner);
+  {$IFNDEF STANDALONEAPP}
   {$IFDEF DXE102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
@@ -82,6 +87,7 @@ Begin
         vleModuleExtensions.GradientStartColor := ITS.StyleServices.GetSystemColor(clBtnFace);
         vleModuleExtensions.GradientEndColor := ITS.StyleServices.GetSystemColor(clBtnFace);
         vleModuleExtensions.Font.Color := ITS.StyleServices.GetSystemColor(clWindowText);      End;
+  {$ENDIF}
   {$ENDIF}
 End;
 

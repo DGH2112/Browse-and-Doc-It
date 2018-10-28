@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Oct 2018
+  @Date    28 Oct 2018
 
 **)
 Unit BADI.SpecialTagForm;
@@ -63,8 +63,11 @@ Type
 Implementation
 
 Uses
+  {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  BADI.Constants, BADI.ToolsAPIUtils;
+  BADI.ToolsAPIUtils,
+  {$ENDIF}
+  BADI.Constants;
 
 {$R *.DFM}
 

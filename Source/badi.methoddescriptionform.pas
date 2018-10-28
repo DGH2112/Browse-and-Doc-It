@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Oct 2018
+  @Date    28 Oct 2018
 
 **)
 Unit BADI.MethodDescriptionForm;
@@ -47,8 +47,11 @@ Implementation
 
 {$R *.dfm}
 
+{$IFNDEF STANDALONEAPP}
 Uses
-  ToolsAPI, BADI.ToolsAPIUtils;
+  ToolsAPI,
+  BADI.ToolsAPIUtils;
+{$ENDIF}
 
 (**
 

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    14 Oct 2018
+  @Date    05 Dec 2018
 
 **)
 Unit BADI.ElementContainer;
@@ -696,15 +696,17 @@ ResourceString
 Var
   iLine, iCol: Integer;
   strI: String;
+  E : TElementContainer;
 
 Begin
-  iLine := AElement.Line;
-  iCol := AElement.Column;
-  strI := AElement.Identifier;
+  E := AElement;
+  iLine := E.Line;
+  iCol := E.Column;
+  strI := E.Identifier;
   Result := Add(AElement);
-  If Result <> AElement Then
+  If Result <> E Then
     AddIssue(Format(strDuplicateIdentifierFound, [strI, iLine, iCol]), scNone, iLine, iCol, etError,
-      AElement);
+      Result);
 End;
 
 (**

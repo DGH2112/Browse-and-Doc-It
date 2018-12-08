@@ -269,6 +269,11 @@ type
     Procedure TestEmptyFinalizationBlock;
     Procedure TestEmptyMethods;
     Procedure TestMissingCONSTInParameters;
+    Procedure TestInLineVarsDecl;
+    Procedure TestInLineVarsScope;
+    Procedure TestInLineVarsTypeInf;
+    Procedure TestInLineConstDecl;
+    Procedure TestInLineForDecl;
     Procedure TestCodeFailure01;
     Procedure TestCodeFailure02;
     Procedure TestCodeFailure03;
@@ -3796,6 +3801,230 @@ Begin
     '  DoSomethingMore;',
     [ttErrors, ttwarnings],
     []
+  );
+End;
+
+Procedure TestTPascalModule.TestInLineConstDecl;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure test;'#13#10 +
+    'begin'#13#10 +
+    '  const M: Integer = (L + H) div 2;'#13#10 +
+    '  const N = (L + H) div 2;'#13#10 +
+    'end;',
+    [ttErrors],
+    [
+      'Implemented Methods\test\Constants\M|M = (L + H) div 2|scLocal',
+      'Implemented Methods\test\Constants\N|N = (L + H) div 2|scLocal'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestInLineForDecl;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure test;'#13#10 + 
+    'begin'#13#10 +
+    '  for var I : Integer := 1 to 1 do'#13#10 +
+    '    writeln(i);'#13#10 +
+    'end;',
+    [ttErrors],
+    ['Implemented Methods\test\Variables\I|I : Integer|scLocal']
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure test;'#13#10 +
+    'begin'#13#10 +
+    '  for var Item: TItemType in Collection Do'#13#10 +
+    '    WriteLn(Item.ToString);'#13#10 +
+    'end;',
+    [ttErrors],
+    ['Implemented Methods\test\Variables\Item|Item : TItemType|scLocal']
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure test;'#13#10 +
+    'begin'#13#10 +
+    '  for var I := 1 To 10 Do'#13#10 +
+    '    WriteLn(I);'#13#10 +
+    'end;',
+    [ttErrors],
+    ['Implemented Methods\test\Variables\I|I|scLocal']
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure test;'#13#10 +
+    'begin'#13#10 +
+    ' for var Item In Collection Do'#13#10 +
+    '   WriteLn(Item.ToString);'#13#10 +
+    'end;',
+    [ttErrors],
+    ['Implemented Methods\test\Variables\Item|Item|scLocal']
+  );
+End;
+
+Procedure TestTPascalModule.TestInLineVarsDecl;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure Test;'#13#10 + 
+    'begin'#13#10 +
+    '  var I: Integer;'#13#10 +
+    '  I := 22;'#13#10 +
+    '  ShowMessage(I.ToString);'#13#10 +
+    'end;',
+    [ttErrors],
+    ['Implemented Methods\Test\Variables\I|I : Integer|scLocal']
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure Test2;'#13#10 +
+    'begin'#13#10 +
+    '  var I, K: Integer;'#13#10 +
+    '  I := 22;'#13#10 +
+    '  K := I + 10;'#13#10 +
+    '  ShowMessage (K.ToString);'#13#10 +
+    'end;',
+    [ttErrors],
+    [
+      'Implemented Methods\Test2\Variables\I|I : Integer|scLocal',
+      'Implemented Methods\Test2\Variables\K|K : Integer|scLocal'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestInLineVarsScope;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure Test;'#13#10 +
+    'begin'#13#10 +
+    '  var I: Integer := 2;'#13#10 +
+    '  ShowMessage(I.ToString);'#13#10 +
+    'end;',
+    [ttErrors],
+    ['Implemented Methods\Test\Variables\I|I : Integer|scLocal']
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure Test1;'#13#10 +
+    'begin'#13#10 +
+    '  var I: Integer := 22;'#13#10 +
+    '  var J: Integer;'#13#10 +
+    '  J := 22 + I;'#13#10 +
+    '  var K: Integer := I + J;'#13#10 +
+    '  ShowMessage(K.ToString);'#13#10 +
+    'end;',
+    [ttErrors],
+    [
+      'Implemented Methods\Test1\Variables\I|I : Integer|scLocal',
+      'Implemented Methods\Test1\Variables\J|J : Integer|scLocal',
+      'Implemented Methods\Test1\Variables\K|K : Integer|scLocal'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure Test2;'#13#10 +
+    'begin'#13#10 +
+    '  var I: Integer := 22;'#13#10 +
+    '  if I > 10 then'#13#10 +
+    '  begin'#13#10 +
+    '    var J: Integer := 3;'#13#10 +
+    '    ShowMessage(J.ToString);'#13#10 +
+    '  end'#13#10 +
+    '  else'#13#10 +
+    '  begin'#13#10 +
+    '    var K: Integer := 3;'#13#10 +
+    '    ShowMessage(J.ToString);'#13#10 +
+    '  end;'#13#10 +
+    'end;',
+    [ttErrors],
+    [
+      'Implemented Methods\Test2\Variables\I|I : Integer|scLocal',
+      'Implemented Methods\Test2\Variables\J|J : Integer|scLocal',
+      'Implemented Methods\Test2\Variables\K|K : Integer|scLocal'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure Test99;'#13#10 +
+    'begin'#13#10 +
+    '  if (something) then'#13#10 +
+    '  begin'#13#10 +
+    '    var Intf: IInterface := GetInterface;'#13#10 +
+    '    var MRec: TManagedRecord := GetMRecValue;'#13#10 +
+    '    UseIntf(Intf);'#13#10 +
+    '    UseMRec(MRec);'#13#10 +
+    '  end;'#13#10 +
+    'end;',
+    [ttErrors],
+    [
+      'Implemented Methods\Test99\Variables\Intf|Intf : IInterface|scLocal',
+      'Implemented Methods\Test99\Variables\Mrec|MRec : TManagedRecord|scLocal'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestInLineVarsTypeInf;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure Test;'#13#10 + 
+    'begin'#13#10 +
+    '  var I: Integer;'#13#10 +
+    '  I := 22;'#13#10 +
+    '  ShowMessage(I.ToString);'#13#10 +
+    'end;',
+    [ttErrors],
+    ['Implemented Methods\Test\Variables\I|I : Integer|scLocal']
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure NewTest;'#13#10 +
+    'begin'#13#13 +
+    '  var MyDictionary := TDictionary<String, Integer>.Create;'#13#13 +
+    '  MyDictionary.Add(''one'', 1);'#13#13 +
+    '  var APair := MyDictionary.ExtractPair(''one'');'#13#13 +
+    '  ShowMessage(APair.Value.ToString);'#13#13 +
+    'end;',
+    [ttErrors],
+    [
+      'Implemented Methods\NewTest\Variables\MyDictionary|MyDictionary|scLocal',
+      'Implemented Methods\NewTest\Variables\APair|APair|scLocal'
+    ]
   );
 End;
 

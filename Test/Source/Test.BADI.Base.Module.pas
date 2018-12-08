@@ -28,15 +28,16 @@ type
   TIdent = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer);
 
   TElementContainerHelper = Class Helper for TElementContainer
-    Function FirstError : String;
-    Function FirstWarning : String;
-    Function FirstHint : String;
-    Function FirstDocConflict : String;
-    Function FirstCheck : String;
-    Function FirstMetric : String;
-    Function DocConflict(Const iConflict : Integer) : String;
+    Function  FindIssue(Const strTypeName : String; Const slSource : TStringList = Nil) : String;
+    Function  FirstError(Const slSource : TStringList = Nil) : String;
+    Function  FirstWarning(Const slSource : TStringList = Nil) : String;
+    Function  FirstHint(Const slSource : TStringList = Nil) : String;
+    Function  FirstDocConflict(Const slSource : TStringList = Nil) : String;
+    Function  FirstCheck(Const slSource : TStringList = Nil) : String;
+    Function  FirstMetric(Const slSource : TStringList = Nil) : String;
+    Function  DocConflict(Const iConflict : Integer) : String;
     Procedure DeleteDocumentConflicts;
-    Function HeadingCount(Const strHeading : String) : Integer;
+    Function  HeadingCount(Const strHeading : String) : Integer;
   End;
 
   TBaseLanguageModuleHelper = Class Helper For TBaseLanguageModule
@@ -50,7 +51,11 @@ type
 
   TExtendedTestCase = Class(TTestCase)
   Strict Private
+    FSource : TStringList;
   Public
+    Constructor Create(MethodName: String); Overload; Override;
+    Constructor Create(MethodName: String; RunCount: Int64); Overload; Override;
+    Destructor Destroy; Override;
     Procedure CheckEquals(ttExpected, ttActual : TBADITokenType; strMsg : String = ''); Overload;
     Procedure CheckEquals(iiExpected, iiActual : TBADIImageIndex; strMsg : String = ''); Overload;
     Procedure CheckEquals(iiExpected : TBADIImageIndex; iActual : Integer;
@@ -162,6 +167,9 @@ type
 implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   Windows,
   TypInfo,
   BADI.ResourceStrings,
@@ -207,82 +215,66 @@ begin
     End;
 end;
 
-Function TElementContainerHelper.FirstDocConflict: String;
-
-Var
-  E : TElementContainer;
+Function TElementContainerHelper.FirstDocConflict(Const slSource : TStringList = Nil) : String;
 
 Begin
-  Result := '';
-  E := FindElement(strDocumentationConflicts);
-  If Assigned(E) Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
+  Result := FindIssue(strDocumentationConflicts, slSource);
 End;
 
-Function TElementContainerHelper.FirstError: String;
+Function TElementContainerHelper.FirstError(Const slSource : TStringList = Nil) : String;
+
+Begin
+  Result := FindIssue(strErrors, slSource);
+End;
+
+Function TElementContainerHelper.FirstHint(Const slSource : TStringList = Nil) : String;
+
+Begin
+  Result := FindIssue(strHints, slSource);
+End;
+
+Function TElementContainerHelper.FindIssue(Const strTypeName: String;
+  Const slSource: TStringList): String;
 
 Var
   E : TElementContainer;
+  strMsg: String;
+  strLineNo: String;
 
 begin
   Result := '';
-  E := FindElement(strErrors);
-  If E <> Nil Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
-end;
-
-function TElementContainerHelper.FirstHint: String;
-
-Var
-  E : TElementContainer;
-
-begin
-  Result := '';
-  E := FindElement(strHints);
-  If E <> Nil Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
-end;
-
-Function TElementContainerHelper.FirstCheck: String;
-
-Var
-  E: TElementContainer;
-
-Begin
-  Result := '';
-  E := FindElement(strChecks);
+  E := FindElement(strTypeName);
   If Assigned(E) Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
+    Begin
+      E := E.Elements[1];
+      strMsg := E.AsString(True, False);
+      If Assigned(slSource) Then
+        Begin
+          strLineNo := Format('[%4.4d]', [E.Line]);
+          strMsg := strMsg + #13#10 + strLineNo + slSource[Pred(E.Line)];
+          strMsg := strMsg + #13#10 + StringOfChar(#32, Length(strLineNo) + Pred(E.Column)) + '^';
+          
+        End;
+      Result := strMsg + #13#10;
+    End;
 End;
 
-Function TElementContainerHelper.FirstMetric: String;
-
-Var
-  E: TElementContainer;
+Function TElementContainerHelper.FirstCheck(Const slSource : TStringList = Nil) : String;
 
 Begin
-  Result := '';
-  E := FindElement(strMetrics);
-  If Assigned(E) Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
+  Result := FindIssue(strChecks, slSource);
 End;
 
-function TElementContainerHelper.FirstWarning: String;
+Function TElementContainerHelper.FirstMetric(Const slSource : TStringList = Nil) : String;
 
-Var
-  E : TElementContainer;
+Begin
+  Result := FindIssue(strMetrics, slSource);
+End;
+
+Function TElementContainerHelper.FirstWarning(Const slSource : TStringList = Nil) : String;
 
 begin
-  Result := '';
-  E := FindElement(strWarnings);
-  If E <> Nil Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
+  Result := FindIssue(strWarnings, slSource);
 end;
 
 function TElementContainerHelper.HeadingCount(Const strHeading : String): Integer;
@@ -364,23 +356,23 @@ Var
   strValueScope : String;
 
 Begin
-  P := Parser.CreateParser(Format(strTemplate, [strInterface,
-    strImplementation]), 'TestSource.pas', False, [moParse]);
+  FSource.Text := Format(strTemplate, [strInterface, strImplementation]);
+  P := Parser.CreateParser(FSource.Text, 'TestSource.pas', False, [moParse]);
   Try
     If ttErrors In TestTypes Then
-      CheckEquals(iErrors, P.HeadingCount(strErrors), 'ERRORS: ' + P.FirstError);
+      CheckEquals(iErrors, P.HeadingCount(strErrors), 'ERRORS:'#13#10 + P.FirstError(FSource));
     If ttWarnings In TestTypes Then
-      CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS: ' + P.FirstWarning);
+      CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS:'#13#10 + P.FirstWarning);
     If ttHints In TestTypes Then
-      CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS: ' + P.FirstHint);
+      CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS:'#13#10 + P.FirstHint);
     If ttDocConflicts In TestTypes Then
-      CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS: ' +
+      CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS:'#13#10 +
         P.FirstDocConflict);
     If ttChecks In TestTypes Then
-      CheckEquals(iChecks, P.HeadingCount(strChecks), 'CHECKS: ' +
+      CheckEquals(iChecks, P.HeadingCount(strChecks), 'CHECKS:'#13#10 +
         P.FirstCheck);
     If ttMetrics In TestTypes Then
-      CheckEquals(iMetrics, P.HeadingCount(strMetrics), 'METRICS: ' +
+      CheckEquals(iMetrics, P.HeadingCount(strMetrics), 'METRICS:'#1#10 +
         P.FirstMetric);
     For iCheck := Low(strCheckValues) to High(strCheckValues) Do
       If strCheckValues[iCheck] <> '' Then
@@ -521,6 +513,27 @@ Begin
           [iPosition, Copy(strActual, 1, iPosition)]);
       FailNotEquals(strExpected, strActual, strMsg, ReturnAddress);
     End;
+End;
+
+Constructor TExtendedTestCase.Create(MethodName: String);
+
+Begin
+  Inherited Create(MethodName);
+  FSource := TStringList.Create;
+End;
+
+Constructor TExtendedTestCase.Create(MethodName: String; RunCount: Int64);
+
+Begin
+  Inherited Create(MethodName, RunCount);
+  FSource := TStringList.Create;
+End;
+
+Destructor TExtendedTestCase.Destroy;
+
+Begin
+  FSource.Free;
+  Inherited Destroy;
 End;
 
 { TTestElementContainer }

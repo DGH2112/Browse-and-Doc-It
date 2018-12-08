@@ -11,15 +11,14 @@ Program BrowseAndDocItTests;
 
 }
 
-{ $APPTYPE CONSOLE}
-
 {$INCLUDE '..\Source\CompilerDefinitions.inc'}
 
 {$R 'BADIVerInfo.res' '..\BADIVerInfo.RC'}
 
 uses
-  DUnitTestRunner,
+  FastMM4,
   TestInsight.DUnit,
+  //DUnitTestRunner,
   SysUtils,
   Forms,
   Windows,
@@ -237,41 +236,8 @@ uses
 
 {$R *.RES}
 
-//Var
-//  T : TTestResult;
-//  iErrors : Integer;
-//  lpMode : Cardinal;
-
 begin
-//  {$WARN SYMBOL_PLATFORM OFF}
-//  {$IFDEF D2006}
-  ReportMemoryLeaksOnShutdown := DebugHook <> 0;
-//  {$ENDIF}
-//  {$IFDEF EUREKALOG}
-//  SetEurekaLogState(DebugHook = 0);
-//  {$ENDIF}
-//  Application.Initialize;
-//  If IsConsole Then
-//    Begin
-//      //: @debug JclDebug.RemoveIgnoredException(EAbort);
-//      T := TextTestRunner.RunRegisteredTests;
-//      Try
-//        iErrors := T.FailureCount + T.ErrorCount;
-//      Finally
-//        T.Free;
-//      End;
-//      If DebugHook <> 0 Then                                           // Pause in IDE
-//        If GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), lpMode) Then // Check redirection
-//          Begin
-//            Writeln('Press <Enter> to finish...');
-//            Readln;
-//          End;
-//      If iErrors > 0 Then
-//        Halt(iErrors);
-//    End else
-//      GUITestRunner.RunRegisteredTests;
-  //RunRegisteredTests;
-  TestInsight.DUnit.RunRegisteredTests();
+  RunRegisteredTests();
 end.
 
 

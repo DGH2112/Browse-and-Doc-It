@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Oct 2018
+  @Date    08 Dec 2018
   
 **)
 Unit BADI.Module.Metrics;
@@ -539,13 +539,13 @@ End;
 Procedure TBADIModuleMetricsEditorView.ConfigurePanel(StatusBar: TStatusBar; Panel: TStatusPanel);
 
 Const
-  iPanelWidth = 80;
+  iPanelWidth = 100;
 
 Begin
   FModulePanels[TBADIMetricStatusPanel(Panel.Index)] := Panel;
   FModulePanels[TBADIMetricStatusPanel(Panel.Index)].Alignment := taCenter;
   FModulePanels[TBADIMetricStatusPanel(Panel.Index)].Width := iPanelWidth;
-  // Problems with first panel if you do not explicitly set this
+  //: @note Problems with first panel if you do not explicitly set this
   FModulePanels[TBADIMetricStatusPanel(Panel.Index)].Style := psOwnerDraw; // psText; 
 End;
 
@@ -699,10 +699,12 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
     @postcon The background of the status panel is rendered.
 
     @param   strNum        as a String as a constant
-    @param   StyleServices as a TCustomStyleServices as a constant
 
   **)
-  Procedure DrawBackground(Const strNum : String; Const StyleServices : TCustomStyleServices);
+  Procedure DrawBackground(Const strNum : String);
+
+  Const
+    iLightYellow = $80FFFF;
 
   Var
     iColour : TColor;
@@ -710,9 +712,7 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
   Begin
     If TBADIMetricStatusPanel(Panel.Index) In [mspModules..mspLinesOfCode] Then
       Begin
-        iColour := clBtnFace;
-        If Assigned(StyleServices) Then
-          iColour := StyleServices.GetSystemColor(clBtnFace);
+        iColour := iLightYellow;
       End Else
         iColour := iLightGreen;
     If strNum <> '' Then
@@ -762,14 +762,13 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
     @param   strSpace      as a String as a reference
     @param   strText       as a String as a reference
     @param   iWidth        as an Integer as a constant
-    @param   StyleServices as a TCustomStyleServices as a constant
 
   **)
-  Procedure DrawText(Var strNum, strSpace, strText : String; Const iWidth : Integer;
-    Const StyleServices : TCustomStyleServices);
+  Procedure DrawText(Var strNum, strSpace, strText : String; Const iWidth : Integer);
 
   Const
     iDivisor = 2;
+    iTopPadding = 4;
 
   Var
     R : TRect;
@@ -778,45 +777,33 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
     R := Rect;
     // Draw Number
     Inc(R.Left, (R.Right - R.Left - iWidth) Div iDivisor);
-    Inc(R.Top);
+    Inc(R.Top, iTopPadding);
     StatusBar.Canvas.Font.Assign(StatusBar.Font);
     StatusBar.Canvas.Font.Color := clBlue;
     StatusBar.Canvas.Font.Style := [];
-    StatusBar.Canvas.TextRect(R, strNum, [tfLeft, tfVerticalCenter]);
+    StatusBar.Canvas.TextRect(R, strNum, [tfLeft,tfBottom]);
     // Draw Space
     Inc(R.Left, StatusBar.Canvas.TextWidth(strNum));
-    StatusBar.Canvas.TextRect(R, strSpace, [tfLeft, tfVerticalCenter]);
+    StatusBar.Canvas.TextRect(R, strSpace, [tfLeft,tfBottom]);
     // Draw Text Label
     StatusBar.Canvas.Font.Color := clWindowText;
-    If Assigned(StyleServices) Then
-      StatusBar.Canvas.Font.Color := StyleServices.GetSystemColor(clWindowText);
     StatusBar.Canvas.Font.Style := [fsBold];
     Inc(R.Left, StatusBar.Canvas.TextWidth(strSpace));
-    StatusBar.Canvas.TextRect(R, strText, [tfLeft, tfVerticalCenter]);
+    StatusBar.Canvas.TextRect(R, strText, [tfLeft,tfBottom]);
   End;
 
 Var
   strNum, strSpace, strText : String;
   iPos : Integer;
-  StyleServices : TCustomStyleServices;
-  {$IFDEF DXE102}
-  ITS : IOTAIDEThemingServices;
-  {$ENDIF}
   
 Begin
-  StyleServices := Nil;
-  {$IFDEF DXE102}
-  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    If ITS.IDEThemingEnabled Then
-      StyleServices := ITS.StyleServices;
-  {$ENDIF}
   // Split text by first space
   iPos := Pos(#32, Panel.Text);
   strNum := Copy(Panel.Text, 1, Pred(iPos));
   strSpace := #32;
   strText := Copy(Panel.Text, Succ(iPos), Length(Panel.Text) - iPos);
-  DrawBackground(strNum, StyleServices);
-  DrawText(strNum, strSpace, strText, CalcWidth(strNum, strSpace, strText), StyleServices);
+  DrawBackground(strNum);
+  DrawText(strNum, strSpace, strText, CalcWidth(strNum, strSpace, strText));
 End;
 
 (**

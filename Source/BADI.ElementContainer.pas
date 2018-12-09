@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    05 Dec 2018
+  @Date    09 Dec 2018
 
 **)
 Unit BADI.ElementContainer;
@@ -112,6 +112,7 @@ Type
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
     Function  ReferenceSection(Const AToken : TTokenInfo; Const Section: TLabelContainer) : Boolean;
+    Function  ModuleFileName : String;
     (**
       This property returns the number of elements in the collection.
       @precon  None.
@@ -208,7 +209,8 @@ Uses
   BADI.DocIssue,
   BADI.Functions,
   BADI.Constants,
-  BADI.Comment.Tag;
+  BADI.Comment.Tag,
+  BADI.Base.Module;
 
 Type
   (** A record to describe error, warning, and hint messages. **)
@@ -433,6 +435,11 @@ Var
 
 Begin
   Result := isAdded;
+  If BADIOptions.Exclusions.ShouldExclude(ModuleFileName, etChecks) Then
+    Begin
+      Result := isDisabled;
+      Exit;
+    End;
   If Not (doShowChecks In BADIOptions.Options) Or Not BADIOptions.ModuleCheck[eCheck].FEnabled Then
     Begin
       Result := isDisabled;
@@ -607,6 +614,11 @@ Var
 
 Begin
   Result := isAdded;
+  If BADIOptions.Exclusions.ShouldExclude(ModuleFileName, etMetrics) Then
+    Begin
+      Result := isDisabled;
+      Exit;
+    End;
   If Not (doShowMetrics In BADIOptions.Options) Or Not BADIOptions.ModuleMetric[eMetric].FEnabled Then
     Begin
       Result := isDisabled;
@@ -1457,6 +1469,28 @@ Begin
   Else
     Result := iiCheckItem;
   End;
+End;
+
+(**
+
+  This function finds the root module filename.
+
+  @precon  None.
+  @postcon Returns the filename of the root module.
+
+  @return  a String
+
+**)
+Function TElementContainer.ModuleFileName: String;
+
+Var
+  RC : TElementContainer;
+  
+Begin
+  RC := FindRoot;
+  If Assigned(RC) Then
+    If RC Is TBaseLanguageModule Then
+      Result := (RC as TBaseLanguageModule).FileName;
 End;
 
 (**

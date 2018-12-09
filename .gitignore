@@ -76,3 +76,4 @@ Test/EndUserFailureCode/
 TestInsightSettings.ini
 Test/BrowseAndDocItTests_MemoryManager_EventLog.txt
 Test/dunit.ini
+*.gex

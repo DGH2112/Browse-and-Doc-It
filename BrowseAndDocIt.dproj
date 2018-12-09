@@ -3,7 +3,7 @@
         <ProjectGuid>{AD4C15A1-5A9C-4C71-B023-C105C0474BA9}</ProjectGuid>
         <MainSource>BrowseAndDocIt.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">CodeSiteLogging</Config>
+        <Config Condition="'$(Config)'==''">CodeSiteTracing</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -40,7 +40,7 @@
         <Cfg_2>true</Cfg_2>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='CodeSiteLogging' or '$(Cfg_3)'!=''">
+    <PropertyGroup Condition="'$(Config)'=='CodeSiteTracing' or '$(Cfg_3)'!=''">
         <Cfg_3>true</Cfg_3>
         <CfgParent>Cfg_2</CfgParent>
         <Cfg_2>true</Cfg_2>
@@ -72,7 +72,7 @@
         <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
         <UsePackages>true</UsePackages>
         <DCC_ExeOutput>.\</DCC_ExeOutput>
-        <DCC_UnitSearchPath>..\..\Library\Virtual Treeview 6.5.0 (IDE)\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>.\Virtual-Treeview-6.5.0-IDE\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
@@ -399,6 +399,7 @@
         <DCCReference Include="Source\BADI.Module.Checks.SubView.pas"/>
         <DCCReference Include="Source\BADI.IDEEditorColours.pas"/>
         <DCCReference Include="Source\BADI.IDEThemingNotifier.pas"/>
+        <DCCReference Include="Source\BADI.Exclusions.pas"/>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>
@@ -423,7 +424,7 @@
             <Key>Cfg_1</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
-        <BuildConfiguration Include="CodeSiteLogging">
+        <BuildConfiguration Include="CodeSiteTracing">
             <Key>Cfg_3</Key>
             <CfgParent>Cfg_2</CfgParent>
         </BuildConfiguration>
@@ -465,6 +466,12 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="BrowseAndDocIt.dll" Configuration="CodeSiteTracing" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>BrowseAndDocIt.dll</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

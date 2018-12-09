@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Nov 2017
+  @Date    09 Dec 2018
 
 **)
 Unit BADI.Pascal.RecordDecl;
@@ -226,6 +226,8 @@ Begin
     Result := ReferenceSection(AToken, FindElement(strConstantsLabel) As TLabelContainer);
   If Not Result And (FindElement(strClassVarsLabel) <> Nil) Then
     Result := ReferenceSection(AToken, FindElement(strClassVarsLabel) As TLabelContainer);
+  If Not Result Then
+    Result := Inherited ReferenceSymbol(AToken);
 End;
 
 End.

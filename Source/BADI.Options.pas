@@ -1036,7 +1036,7 @@ Begin
         For i := 0 To sl.Count - 1 Do
           Begin
             recExclusion.FExclusionPattern := sl[i];
-            If recExclusion.FExclusionPattern.Length > 0 Then
+            If Length(recExclusion.FExclusionPattern) > 0 Then
               Begin
                 // Remove starting *
                 If recExclusion.FExclusionPattern[1] = '*' Then

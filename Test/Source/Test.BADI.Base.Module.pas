@@ -162,6 +162,7 @@ type
     Procedure TestCompilerConditionStack;
     Procedure TestBytes;
     Procedure TestLines;
+    //Procedure TestMemoryLeak;
   end;
 
 implementation
@@ -780,6 +781,12 @@ procedure TestTBaseLanguageModule.TestLines;
 begin
   CheckEquals(1, FBaseLanguageModule.Lines);
 end;
+
+//Procedure TestTBaseLanguageModule.TestMemoryLeak;
+//
+//Begin
+//  TObject.Create;
+//End;
 
 procedure TestTBaseLanguageModule.TestModified;
 begin

@@ -1589,7 +1589,7 @@ Function TElementContainer.ReferenceSymbol(Const AToken: TTokenInfo): Boolean;
 
 Begin
   Result := False;
-  If FParent <> Nil Then
+  If Assigned(FParent) Then
     Result := FParent.ReferenceSymbol(AToken);
 End;
 

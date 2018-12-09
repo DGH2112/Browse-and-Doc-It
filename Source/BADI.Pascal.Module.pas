@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       08 Dec 2018
+  @Date       09 Dec 2018
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -2867,6 +2867,7 @@ Var
   T : TGenericTypeDecl;
   FTemporaryElements: TElementContainer;
   Fields: TElementContainer;
+  k : Integer;
 
 Begin
   Result := False;
@@ -2896,7 +2897,13 @@ Begin
                     AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name,
                       I[j].Line, I[j].Column]), scNone, I[j].Line, I[j].Column, etError, Self);
                   If T <> Nil Then
-                    P.AddTokens(T)
+                    Begin
+                      P.AddTokens(T);
+                      For k := 0 To T.TokenCount - 1 Do
+                        If T.Tokens[k].TokenType = ttIdentifier Then
+                          If Assigned(Rec.Parent) Then
+                            Rec.ReferenceSymbol(T.Tokens[k]);
+                    End
                   Else
                     ErrorAndSeekToken(strTypeNotFound, '', strSeekableOnErrorTokens, stFirst, Self);
                 End;
@@ -2934,6 +2941,7 @@ Var
   P, tmpP : TField;
   T : TGenericTypeDecl;
   FTemporaryElements: TElementContainer;
+  k : Integer;
 
 begin
   Result := False;
@@ -2959,7 +2967,12 @@ begin
                 AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name,
                   I[j].Line, I[j].Column]), scNone, I[j].Line, I[j].Column, etError, Self);
               If T <> Nil Then
-                P.AddTokens(T)
+                Begin
+                  P.AddTokens(T);
+                  For k := 0 To T.TokenCount - 1 Do
+                    If T.Tokens[k].TokenType = ttIdentifier Then
+                      Cls.ReferenceSymbol(T.Tokens[k]);
+                End
               Else
                 ErrorAndSeekToken(strTypeDeclExpected, '', strSeekableOnErrorTokens, stFirst, Self);
             End;
@@ -3326,6 +3339,7 @@ Begin
   If Token.Token = '<' Then
     Begin
       strIdentifier := strIdentifier + Token.Token;
+      ReferenceSymbol(Token);
       TypeParamDeclList(strIdentifier);
       If Token.Token = '>' Then
         Begin
@@ -7882,8 +7896,9 @@ Begin
           AddToExpression(Result);
           FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
+            AToken.FContainer.ReferenceSymbol(Token);
             T := OrdinalType(TypeToken(Nil, scNone, Nil, FTemporaryElements));
-            If T <> Nil Then
+            If Assigned(T) Then
               Result.AddTokens(T)
             Else
               ErrorAndSeekToken(strOrdinalTypeExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
@@ -8714,10 +8729,11 @@ Begin
       Container.AddToken(Token.Token, Token.TokenType);
       Repeat
         NextNonCommentToken;
+        ReferenceSymbol(Token);
         If IsIdentifier(Token) Or (Token.UToken = strSTRING) Then
           Begin
-            Container.AddToken(Token.Token, Token.TokenType);
             ReferenceSymbol(Token);
+            Container.AddToken(Token.Token, Token.TokenType);
             NextNonCommentToken;
           End Else
           Begin

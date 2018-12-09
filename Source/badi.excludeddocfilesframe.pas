@@ -23,7 +23,6 @@ Uses
   Forms,
   Dialogs,
   StdCtrls,
-  ImageList,
   ImgList,
   VirtualTrees,
   ExtCtrls,

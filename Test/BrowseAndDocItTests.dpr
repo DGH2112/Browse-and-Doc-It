@@ -18,7 +18,6 @@ Program BrowseAndDocItTests;
 uses
   FastMM4,
   TestInsight.DUnit,
-  //DUnitTestRunner,
   SysUtils,
   Forms,
   Windows,
@@ -232,7 +231,8 @@ uses
   BADI.Refactoring.Functions in '..\Source\BADI.Refactoring.Functions.pas',
   Test.BADI.Refactoring.Functions in 'Source\Test.BADI.Refactoring.Functions.pas',
   BADI.Interfaces in '..\Source\BADI.Interfaces.pas',
-  BADI.IDEEditorColours in '..\Source\BADI.IDEEditorColours.pas';
+  BADI.IDEEditorColours in '..\Source\BADI.IDEEditorColours.pas',
+  BADI.Exclusions in '..\Source\BADI.Exclusions.pas';
 
 {$R *.RES}
 

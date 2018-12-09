@@ -362,9 +362,9 @@ Begin
     If ttErrors In TestTypes Then
       CheckEquals(iErrors, P.HeadingCount(strErrors), 'ERRORS:'#13#10 + P.FirstError(FSource));
     If ttWarnings In TestTypes Then
-      CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS:'#13#10 + P.FirstWarning);
+      CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS:'#13#10 + P.FirstWarning(FSource));
     If ttHints In TestTypes Then
-      CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS:'#13#10 + P.FirstHint);
+      CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS:'#13#10 + P.FirstHint(Fsource));
     If ttDocConflicts In TestTypes Then
       CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS:'#13#10 +
         P.FirstDocConflict);

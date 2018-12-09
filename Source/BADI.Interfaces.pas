@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    09 Dec 2018
 
 **)
 Unit BADI.Interfaces;
@@ -18,6 +18,38 @@ Uses
   BADI.Types;
 
 Type
+  (** An interface for the new global exclusions for documents, metrics and checks **)
+  IBADIExclusions = Interface
+  ['{58DC7B95-9F86-4831-9536-16F3DB859228}']
+    // Getters and Setters
+    Function  GetExclusion(Const iIndex : Integer) : TBADIExclusionRec;
+    Procedure SetExclusion(Const iIndex : Integer; Const recValue : TBADIExclusionRec);
+    Function  GetCount : Integer;
+    // General Methods
+    Function  ShouldExclude(Const strFileName : String;
+      Const eExclusionType : TBADIExclusionType) : Boolean;
+    Procedure Add(Const recExclusion : TBADIExclusionRec);
+    Procedure Delete(Const iIndex : Integer);
+    Procedure Clear;
+    // Properties
+    (**
+      This method returns the exclusion record for the given index.
+      @precon  iIndex must be between 0 and Count - 1.
+      @postcon The exclusion record is returned.
+      @param   iIndex as an Integer as a constant
+      @return  a TBADIExclusionRec
+    **)
+    Property Exclusion[Const iIndex : Integer] : TBADIExclusionRec Read GetExclusion Write SetExclusion;
+      Default;
+    (**
+      This property returns the number of items in the collection.
+      @precon  None.
+      @postcon The number of items in the excluions collection is returned.
+      @return  an Integer
+    **)
+    Property Count : Integer Read GetCount;
+  End;
+
   (** An interface for accessing Browse and Doc Its global settings. **)
   IBADIOptions = Interface
   ['{413040CC-BEA3-4C3F-AD10-A2AB656B646B}']
@@ -44,7 +76,7 @@ Type
     Function  GetTokenFontInfo(Const boolUseIDEEditorColours : Boolean) : TBADITokenFontInfoTokenSet;
     Procedure SetTokenFontInfo(Const boolUseIDEEditorColours : Boolean;
       Const eTokenFontInfo : TBADITokenFontInfoTokenSet);
-    Function  GetExcludeDocFiles : TStringList;
+    Function  GetExclusions : IBADIExclusions;
     Function  GetMethodDescriptions : TStringList;
     Function  GetScopestoDocument : TScopes;
     Procedure SetScopesToDocument(Const setScopesToDocument : TScopes);
@@ -181,13 +213,12 @@ Type
     Property TokenFontInfo[Const boolUseIDEEditorColours : Boolean] : TBADITokenFontInfoTokenSet
       Read GetTokenFontInfo Write SetTokenFontInfo;
     (**
-      This properrty holds a list of files / partial or full which should not be
-      documented.
+      This property holds a list of filename exclusions for documentation, metrics and checks.
       @precon  None.
       @postcon Gets and sets the list.
-      @return  a TStringList
+      @return  a IBADIExclusions
     **)
-    Property ExcludeDocFiles : TStringList Read GetExcludeDocFiles;
+    Property Exclusions : IBADIExclusions Read GetExclusions;
     (**
       This property stores a list of method descriptions related to pattern
       matches.

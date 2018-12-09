@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    21 Oct 2018
+  @Date    09 Dec 2018
 
 **)
 Unit BADI.Types;
@@ -582,6 +582,17 @@ Type
 
   (** An enumerate to define how the toxicity metric is combined. **)
   TBADIToxicitySummation = (tsAddBeforePower, tsAddAfterPower);
+
+  (** An enumerate to define the type of exclusion **)
+  TBADIExclusionType = (etDocumentation, etMetrics, etChecks);
+  (** A set of the above exclusion types to be referenced against each exclusion pattern. **)
+  TBADIExclusionTypes = Set Of TBADIExclusionType;
+
+  (** A record to describe the attributes of a exclusions (Document, Metric or Check) **)
+  TBADIExclusionRec = Record
+    FExclusionPattern: String;
+    FExclusions: TBADIExclusionTypes;
+  End;
 
 Implementation
 

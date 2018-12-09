@@ -313,6 +313,7 @@ type
     Procedure TestCodeFailure38;
     Procedure TestCodeFailure39;
     Procedure TestCodeFailure40;
+    Procedure TestCodeFailure41;
   Public
   End;
 
@@ -2310,6 +2311,37 @@ Begin
     [ttErrors, ttWarnings],
     [],
     1
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure41;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TBADIOptions = Class(TInterfacedObject, IBADIOptions) '#13#10 +
+    '  Strict Private '#13#10 +
+    '    Type '#13#10 +
+    '      TBADIExclusion = (deDocumentation, deMetrics, deChecks); '#13#10 +
+    '      TBADIExclusions = Set Of TBADIExclusion; '#13#10 +
+    '      TBADIExclusionRec = Record '#13#10 +
+    '        FExclusionPattern : String; '#13#10 +
+    '        FExclusions       : TBADIExclusions; '#13#10 +
+    '      End; '#13#10 +
+    '  Strict Private '#13#10 +
+    '    FExcludeDocFiles        : TList<TBADIExclusionRec>; '#13#10 +
+    '  Strict Protected '#13#10 +
+    '  Public '#13#10 +
+    '    Constructor Create;'#13#10 +
+    '  End; ',
+    'Constructor TBADIOptions.Create;'#13#10 +
+    'Begin'#13#10 +
+    '  FExcludeDocFiles := TList.Create;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttHints],
+    []
   );
 End;
 

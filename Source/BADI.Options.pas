@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Oct 2018
+  @Date    09 Dec 2018
 
 **)
 Unit BADI.Options;
@@ -15,6 +15,7 @@ Uses
   Classes,
   Graphics,
   Generics.Collections,
+  RegularExpressions,
   IniFiles,
   BADI.Types,
   BADI.Interfaces;
@@ -40,7 +41,7 @@ Type
     FIDEEditorColours       : IBADIIDEEditorColours;
     FTokenFontInfo          : Array[False..True] Of TBADITokenFontInfoTokenSet;
     FUseIDEEditorColours    : Boolean;
-    FExcludeDocFiles        : TStringList;
+    FExclusions             : IBADIExclusions;
     FMethodDescriptions     : TStringList;
     FScopesToDocument       : TScopes;
     FModuleExplorerBGColour : Array[False..True] Of TColor;
@@ -85,7 +86,7 @@ Type
     Function  GetTokenFontInfo(Const boolUseIDEEditorColours : Boolean) : TBADITokenFontInfoTokenSet;
     Procedure SetTokenFontInfo(Const boolUseIDEEditorColours : Boolean;
       Const TokenFontInfo : TBADITokenFontInfoTokenSet);
-    Function  GetExcludeDocFiles : TStringList;
+    Function  GetExclusions : IBADIExclusions;
     Function  GetMethodDescriptions : TStringList;
     Function  GetScopestoDocument : TScopes;
     Procedure SetScopesToDocument(Const setScopes : TScopes);
@@ -131,11 +132,11 @@ Type
     Procedure SaveSettings;
     Procedure RequiresIDEEditorColoursUpdate;
     Procedure LoadIDEEditorColours;
-  Strict Protected
     Procedure LoadDocOptions(Const iniFile: TMemIniFile);
     Procedure LoadSpecialTags(Const iniFile: TMemIniFile);
     Procedure LoadManagedNodes(Const iniFile: TMemIniFile);
     Procedure LoadModuleExplorerOptions(Const iniFile: TMemIniFile);
+    Procedure LoadExclusions(Const iniFile: TMemIniFile);
     Procedure LoadMethodDescriptions(Const iniFile: TMemIniFile);
     Procedure LoadProfilingOptions(Const iniFile: TMemIniFile);
     Procedure LoadLimits(Const iniFile: TMemIniFile);
@@ -147,6 +148,7 @@ Type
     Procedure SaveSpecialTags(Const iniFile: TMemIniFile);
     Procedure SaveManagedNodes(Const iniFile: TMemIniFile);
     Procedure SaveModuleExplorerOptions(Const iniFile: TMemIniFile);
+    Procedure SaveExclusions(Const iniFile: TMemIniFile);
     Procedure SaveMethodDescrpitions(Const iniFile: TMemIniFile);
     Procedure SaveProfilingOptions(Const iniFile: TMemIniFile);
     Procedure SaveLimits(Const iniFile: TMemIniFile);
@@ -168,6 +170,7 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,
+  BADI.Exclusions,
   BADI.Constants,
   BADI.Module.Dispatcher,
   BADI.Functions,
@@ -218,6 +221,8 @@ Const
   strMethodDescriptions = 'MethodDescriptions';
   (** An ini section name for the excluded documentation files. **)
   strExcludeDocFiles = 'ExcludeDocFiles';
+  (** An ini section name for the exclusions for documentation, metrics and check files. **)
+  strExclusions = 'Exclusions';
   (**  An ini section name for documentation options. **)
   strDocumentation = 'Documentation';
   (** An ini key for the module explorer background colour **)
@@ -340,6 +345,7 @@ var
   iTag: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
   FIDEEditorColours := IDEEditorColours;
   FDefines := TStringList.Create;
@@ -357,7 +363,7 @@ Begin
   FExpandedNodes.Duplicates := dupIgnore;
   FINIFileName := BuildRootKey;
   FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
-  FExcludeDocFiles := TStringList.Create;
+  FExclusions := TBADIExclusions.Create;
   FMethodDescriptions := TStringList.Create;
   FScopesToDocument := [scPublished, scPublic, scProtected, scPrivate];
   FProfilingCode := TStringList.Create;
@@ -375,10 +381,10 @@ End;
 Destructor TBADIOptions.Destroy;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   SaveSettings;
   FProfilingCode.Free;
   FMethodDescriptions.Free;
-  FExcludeDocFiles.Free;
   FExpandedNodes.Free;
   FSpecialTags.Free;
   FDefines.Free;
@@ -424,13 +430,13 @@ End;
   @precon  None.
   @postcon Returns a string list of filename / path patterns to be used to ignore documentation.
 
-  @return  a TStringList
+  @return  an IBADIExclusions
 
 **)
-Function TBADIOptions.GetExcludeDocFiles: TStringList;
+Function TBADIOptions.GetExclusions: IBADIExclusions;
 
 Begin
-  Result := FExcludeDocFiles;
+  Result := FExclusions;
 End;
 
 (**
@@ -1004,6 +1010,72 @@ End;
 
 (**
 
+  This method loads the exclusions from the inifile. If old documentation exclusions exist they are
+  migrated to the new system.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The exclusions are loaded.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadExclusions(Const iniFile: TMemIniFile);
+
+Var
+  sl : TStringList;
+  recExclusion: TBADIExclusionRec;
+  i: Integer;
+
+Begin
+  sl := TstringList.Create;
+  Try
+    If iniFile.ValueExists(strSetup, strExcludeDocFiles) Then
+      Begin // Upgrade old exclusions
+        sl.Text := StringReplace(iniFile.ReadString(strSetup, strExcludeDocFiles, ''), '|',
+          #13#10, [rfReplaceAll]);
+        For i := 0 To sl.Count - 1 Do
+          Begin
+            recExclusion.FExclusionPattern := sl[i];
+            If recExclusion.FExclusionPattern.Length > 0 Then
+              Begin
+                // Remove starting *
+                If recExclusion.FExclusionPattern[1] = '*' Then
+                  Delete(recExclusion.FExclusionPattern, 1, 1);
+                // Remove ending *
+                If recExclusion.FExclusionPattern[Length(recExclusion.FExclusionPattern)] = '*' Then
+                  Delete(recExclusion.FExclusionPattern, Length(recExclusion.FExclusionPattern), 1);
+                // Updated inner * to .* for regex
+                recExclusion.FExclusionPattern := StringReplace(recExclusion.FExclusionPattern, '*',
+                   '.*', [rfReplaceAll]);
+                // Updated \ for RegEx
+                recExclusion.FExclusionPattern := StringReplace(recExclusion.FExclusionPattern, '\',
+                   '\\', [rfReplaceAll]);
+              End;
+            recExclusion.FExclusions := [etDocumentation];
+            FExclusions.Add(recExclusion);
+          End;
+        SaveExclusions(iniFile);
+        iniFile.DeleteKey(strSetup, strExcludeDocFiles);
+        iniFile.UpdateFile;
+      End Else
+      Begin // Load new exclusions
+        iniFile.ReadSection(strExclusions, sl);
+        iniFile.ReadSection(strExclusions, sl);
+        For i := 0 To sl.Count - 1 Do
+          Begin
+            recExclusion.FExclusionPattern := sl[i];
+            recExclusion.FExclusions := TBADIExclusionTypes(Byte(iniFile.ReadInteger(strExclusions,
+              sl[i], 0)));
+            FExclusions.Add(recExclusion);
+          End;
+      End;
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
   This method loads the file extensions from the INI file that are associated with the parsers.
 
   @precon  iniFile must be a valid instance.
@@ -1283,8 +1355,7 @@ Begin
     LoadSpecialTags(iniFile);
     LoadManagedNodes(iniFile);
     LoadModuleExplorerOptions(iniFile);
-    FExcludeDocFiles.Text := StringReplace(iniFile.ReadString(strSetup, strExcludeDocFiles, ''), '|',
-      #13#10, [rfReplaceAll]);
+    LoadExclusions(iniFile);
     LoadMethodDescriptions(iniFile);
     FScopesToDocument :=
       TScopes(Byte(iniFile.ReadInteger(strDocumentation, strScopes, Byte(FScopesToDocument))));
@@ -1440,6 +1511,31 @@ Var
 Begin
   For i := Low(TDocOption) To High(TDocOption) Do
     iniFile.WriteBool(strDocOptions, DocOptionInfo[i].FDescription, i In FOptions);
+End;
+
+(**
+
+  This method saves the new exclusions for documentation, metrics and checks to the ini file.
+
+  @precon  iniFile must be a valid iniFile instance.
+  @postcon The exclusions are saved to the ini File.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveExclusions(Const iniFile: TMemIniFile);
+
+Var
+  i : Integer;
+  
+Begin
+  iniFile.EraseSection(strExclusions);
+  For i := 0 To FExclusions.Count - 1 Do
+    iniFile.WriteInteger(
+      strExclusions,
+      FExclusions[i].FExclusionPattern,
+      Byte(FExclusions[i].FExclusions)
+    );
 End;
 
 (**
@@ -1653,8 +1749,7 @@ Begin
     SaveSpecialTags(iniFile);
     SaveManagedNodes(iniFile);
     SaveModuleExplorerOptions(iniFile);
-    iniFile.WriteString(strSetup, strExcludeDocFiles, StringReplace(FExcludeDocFiles.Text, #13#10, '|',
-      [rfReplaceAll]));
+    SaveExclusions(iniFile);
     SaveMethodDescrpitions(iniFile);
     iniFile.WriteInteger(strDocumentation, strScopes, Byte(FScopesToDocument));
     SaveProfilingOptions(iniFile);

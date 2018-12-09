@@ -1,24 +1,12 @@
 //: @stopdocumentation
 Program BrowseAndDocItTests;
-{
-
-  Delphi DUnit Test Project
-  -------------------------
-  This project contains the DUnit test framework and the GUI/Console test runners.
-  Add "CONSOLE_TESTRUNNER" to the conditional defines entry in the project options
-  to use the console test runner.  Otherwise the GUI test runner will be used by
-  default.
-
-}
 
 {$INCLUDE '..\Source\CompilerDefinitions.inc'}
-
 {$R 'BADIVerInfo.res' '..\BADIVerInfo.RC'}
 
 uses
   FastMM4,
   TestInsight.DUnit,
-  //DUnitTestRunner,
   SysUtils,
   Forms,
   Windows,
@@ -232,7 +220,8 @@ uses
   BADI.Refactoring.Functions in '..\Source\BADI.Refactoring.Functions.pas',
   Test.BADI.Refactoring.Functions in 'Source\Test.BADI.Refactoring.Functions.pas',
   BADI.Interfaces in '..\Source\BADI.Interfaces.pas',
-  BADI.IDEEditorColours in '..\Source\BADI.IDEEditorColours.pas';
+  BADI.IDEEditorColours in '..\Source\BADI.IDEEditorColours.pas',
+  BADI.Exclusions in '..\Source\BADI.Exclusions.pas';
 
 {$R *.RES}
 

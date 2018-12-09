@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    08 Oct 2018
+  @Date    09 Dec 2018
   @Version 1.0
   @Author  David Hoyle
 
@@ -530,12 +530,8 @@ Const
       End;
   End;
 
-Var
-  i : Integer;
-
 Begin
-  For i := 0 To BADIOptions.ExcludeDocFiles.Count -1 Do
-    If Like(BADIOptions.ExcludeDocFiles[i], FFileName) Then
+  If BADIOptions.Exclusions.ShouldExclude(FFileName, etDocumentation) Then
       Exit;
   If doShowUndocumentedModule In BADIOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
@@ -716,14 +712,19 @@ Procedure TBaseLanguageModule.ErrorAndSeekToken(Const strMsg, strParam : String;
       If Copy(strText, i, iFmtLen) = '%s' Then Inc(Result);
   End;
 
+Type
+  TBADIErrorSeekType = (estZeroParams, estOneParam, estTwoParams);
+
 Begin
-  Case StringCount(strMsg) Of
-    0: AddIssue(Format(strMsg, [Token.Line, Token.Column]),
-           scGlobal, Token.Line, Token.Column, etError, Container);
-    1: AddIssue(Format(strMsg, [strParam, Token.Line, Token.Column]),
-           scGlobal, Token.Line, Token.Column, etError, Container);
-    2: AddIssue(Format(strMsg, [strParam, Token.Token, Token.Line,
-         Token.Column]), scGlobal, Token.Line, Token.Column, etError, Container);
+  Case TBADIErrorSeekType(StringCount(strMsg)) Of
+    estZeroParams:
+      AddIssue(Format(strMsg, [Token.Line, Token.Column]), scGlobal, Token.Line, Token.Column, etError,
+        Container);
+    estOneParam:
+      AddIssue(Format(strMsg, [strParam, Token.Line, Token.Column]), scGlobal, Token.Line, Token.Column,
+        etError, Container);
+    estTwoParams: AddIssue(Format(strMsg, [strParam, Token.Token, Token.Line, Token.Column]), scGlobal,
+      Token.Line, Token.Column, etError, Container);
   Else
     AddIssue(strNotEnoughStrings, scGlobal, Token.Line, Token.Column, etError, Container);
   End;

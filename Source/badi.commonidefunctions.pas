@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    03 Jan 2018
+  @Date    03 Feb 2019
   @Version 1.0
 
 **)
@@ -16,6 +16,9 @@ Uses
   SysUtils,
   Windows,
   Classes,
+  {$IFDEF EUREKALOG}
+  EBase,
+  {$ENDIF EUREKALOG}
   BADI.Base.Module,
   BADI.ElementContainer,
   BADI.Generic.FunctionDecl,
@@ -104,7 +107,7 @@ ResourceString
 Type
   (** This class defines a thread in which the parsing of the code and
       rendering of the module explorer is done. **)
-  TBrowseAndDocItThread = Class(TThread)
+  TBrowseAndDocItThread = Class( {$IFDEF EUREKALOG} TThreadEx {$ELSE} TThread {$ENDIF EUREKALOG} )
   {$IFDEF D2005} Strict {$ENDIF} Private
     FModule            : TBaseLanguageModule;
     FSource            : String;
@@ -136,9 +139,6 @@ Implementation
 Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
-  {$ENDIF}
-  {$IFDEF EUREKALOG}
-  EBase,
   {$ENDIF}
   BADI.Options,
   BADI.Functions,
@@ -972,8 +972,15 @@ End;
 **)
 Procedure TBrowseAndDocItThread.Execute;
 
+Const
+  strBrowseAndDocItParsingThread = 'BrowseAndDocItParsingThread';
+
 Begin
   Try
+    {$IFDEF EUREKALOG}
+    NameThread(strBrowseAndDocItParsingThread);
+    SetEurekaLogStateInThread(0, True);
+    {$ENDIF EUREKALOG}
     If FFileName <> '' Then
       FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified,
         [moParse, moCheckForDocumentConflicts])

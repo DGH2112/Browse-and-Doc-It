@@ -4,22 +4,9 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Oct 2018
+  @Date    03 Feb 2019
 
   @nocheck EmptyBEGINEND
-
-  @bug      nohint does not always find tags!
-  @bug      Hints do not align the comment of the method!
-  @bug      Literal strings found in external procedure references!
-  @bug      Check and metric table headers do not draw properly (overwriting)!
-
-  @todo     Add optional percentages to the metrics output.
-  @todo     Splits explorer and documentation options.
-  @todo     Add the ability to set individual metric font colours and styles.
-  @todo     Add Checks to documentation
-  @todo     Add Metrics to documentation
-  @todo     Add CHM format to documentation
-  @todo     Create a Word/PDF manual for BADI instead of the web page.
 
 **)
 library BrowseAndDocIt;
@@ -46,11 +33,25 @@ library BrowseAndDocIt;
 
 uses
   ShareMem,
+  {$IFDEF EurekaLog}
+  EMemLeaks,
+  EResLeaks,
+  ESendMailMAPI,
+  ESendMailSMAPI,
+  EDialogWinAPIMSClassic,
+  EDialogWinAPIEurekaLogDetailed,
+  EDialogWinAPIStepsToReproduce,
+  EDebugExports,
+  ExceptionLog7,
+  {$ENDIF EurekaLog}
   SysUtils,
   Classes,
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   {$IFDEF PROFILECODE}
   Profiler in '..\..\Library\Profiler.pas',
-  {$ENDIF }
+  {$ENDIF PROFILECODE}
   BADI.Initialisation in 'Source\BADI.Initialisation.pas',
   BADI.Options in 'Source\BADI.Options.pas',
   BADI.Module.Dispatcher in 'Source\BADI.Module.Dispatcher.pas',
@@ -251,8 +252,19 @@ uses
 {$R *.res}
 
 begin
-
+  {$IFDEF EUREKALOG}
+  SetEurekaLogState(True);
+  CodeSite.Send('IsEurekaLogInstalled', IsEurekaLogInstalled);
+  CodeSite.Send('IsEurekaLogActive', IsEurekaLogActive);
+  {$ENDIF EUREKALOG}
 end.
+
+
+
+
+
+
+
 
 
 

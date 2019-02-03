@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    03 Feb 2019
 
 **)
 Unit BADI.ParentFrame;
@@ -45,9 +45,9 @@ Type
 Implementation
 
 uses
-  {$IFDEF EUREKALOG_VER7}
-  ExceptionLog7,
-  {$ENDIF}
+  {$IFDEF EUREKALOG}
+  EBase,
+  {$ENDIF EUREKALOG}
   BADI.Functions;
 
 {$R *.dfm}
@@ -74,7 +74,7 @@ Const
   {$ENDIF}
   strBuildDateFmt = 'ddd dd/mmm/yyyy hh:nn';
   strBuildDate = 'Build Date: %s';
-  {$IFDEF EUREKALOG_VER7}
+  {$IFDEF EUREKALOG}
   strEurekaLogStatus = 'EurekaLog is compiled into this version:'#13#10 +
     '  Installed:'#9'%s'#13#10 +
     '  Active:'#9#9'%s';
@@ -102,10 +102,10 @@ Begin
   SetLength(strModuleName, iSize);
   FileAge(strModuleName, dtDate);
   lblBuildDate.Caption := Format(strBuildDate, [FormatDateTime(strBuildDateFmt, dtDate)]);
-  {$IFDEF EUREKALOG_VER7}
+  {$IFDEF EUREKALOG}
   lblEurekaLog.Caption := Format(strEurekaLogStatus, [
-    BoolToStr(ExceptionLog7.IsEurekaLogInstalled, True),
-    BoolToStr(ExceptionLog7.IsEurekaLogActive, True)
+    BoolToStr(IsEurekaLogInstalled, True),
+    BoolToStr(IsEurekaLogActive, True)
   ]);
   lblEurekaLog.Font.Color := clGreen;
   {$ELSE}

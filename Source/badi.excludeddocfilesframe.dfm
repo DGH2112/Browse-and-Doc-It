@@ -44,7 +44,7 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
       Columns = <
         item
           Position = 0
-          Width = 180
+          Width = 184
           WideText = 'RegEx Pattern'
         end
         item

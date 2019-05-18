@@ -27,11 +27,10 @@ Uses
   VirtualTrees,
   ExtCtrls,
   Themes,
-  ToolsAPI,
   Generics.Collections,
   BADI.Types,
   BADI.Exclusions,
-  BADI.CustomOptionsFrame;
+  BADI.CustomOptionsFrame, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -85,6 +84,9 @@ Implementation
 Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
+  {$ENDIF}
+  {$IFNDEF STANDALONEAPP}
+  ToolsAPI,
   {$ENDIF}
   RegularExpressions,
   RegularExpressionsCore,
@@ -204,9 +206,11 @@ End;
 **)
 Constructor TfmBADIExcludedDocFilesFrame.Create(AOwner: TComponent);
 
+{$IFNDEF STANDALONEAPP}
 {$IFDEF DXE102}
 Var
   ITS : IOTAIDEThemingServices;
+{$ENDIF}
 {$ENDIF}
 
 Begin
@@ -214,11 +218,13 @@ Begin
   Inherited Create(AOwner);
   FExclusions := TList<TBADIExclusionRec>.Create;
   vstExclusions.NodeDataSize := SizeOf(TBADIExclusionNode);
+  {$IFNDEF STANDALONEAPP}
   {$IFDEF DXE102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       FStyleServices := ITS.StyleServices;
+  {$ENDIF}
   {$ENDIF}
   FCallBackProc := 
     Function(Const astrPatterns : Array Of String) : Boolean

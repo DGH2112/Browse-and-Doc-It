@@ -1291,9 +1291,8 @@ begin
       If Not Whitespace(Nil) Then
         ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       PubIDLiteral(xmlParent);
-      If Not Whitespace(Nil) Then
-        ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
-      SystemLiteral(xmlParent);
+      If Whitespace(Nil) Then
+        SystemLiteral(xmlParent);
     End;
 end;
 

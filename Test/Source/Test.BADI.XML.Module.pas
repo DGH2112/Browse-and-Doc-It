@@ -961,6 +961,19 @@ begin
   Finally
     M.Free;
   End;
+  strCode := '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'#13#10 + 
+    '<Element></Element>'#13#10;
+  M := TXMLModule.CreateParser(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
+    CheckEquals('!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
+  Finally
+    M.Free;
+  End;
 end;
 
 procedure TestTXMLModule.TestDocument;

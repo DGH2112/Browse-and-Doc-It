@@ -4,7 +4,7 @@
         <MainSource>BrowseAndDocItTestApp.dpr</MainSource>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-        <ProjectVersion>18.5</ProjectVersion>
+        <ProjectVersion>18.6</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -44,12 +44,12 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Release>10</VerInfo_Release>
         <DCC_DependencyCheckOutputName>BrowseAndDocItTestAppXE2.exe</DCC_DependencyCheckOutputName>
-        <DCC_UnitSearchPath>$(BDS)\lib\Debug;$(BDS)\Lib\Debug\Indy10;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Library\SynEdit 2.1.0\Source;$(BDSPROJECTSDIR)\Library\Virtual Treeview 7.0.0\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Platform>x86</DCC_Platform>
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
-        <DCC_Define>PROFILECODE;EUREKALOG;EUREKALOG_VER6;$(DCC_Define)</DCC_Define>
+        <DCC_Define>EUREKALOG;STANDALONEAPP;$(DCC_Define)</DCC_Define>
         <DCC_Optimize>false</DCC_Optimize>
         <DCC_UsePackage>vcl;rtl;vclx;dbrtl;vcldb;dbxcds;dbexpress;xmlrtl;vclie;inet;inetdbbde;inetdbxpress;IndyCore;IndySystem;vclactnband;VclSmp;dsnap;bdertl;vcldbx;Rave65VCL;adortl;vclib;ibxpress;IntrawebDB_80_100;Intraweb_80_100;dclOfficeXP;soaprtl;IndyProtocols;teeui;teedb;tee;IDEAutoSave;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_K>false</DCC_K>
@@ -59,8 +59,9 @@
         <DCC_E>false</DCC_E>
         <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-        <DCC_DcuOutput>..\XE2DCUs\</DCC_DcuOutput>
+        <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
+        <DCC_ExeOutput>$(Platform)\$(Config)</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
@@ -89,7 +90,7 @@
         <BT_BuildType>Debug</BT_BuildType>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.10.2624;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(ModuleName);FileDescription=$(ModuleName);ProductName=$(ModuleName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.10.2624;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>
@@ -111,17 +112,12 @@
         <DCCReference Include="Source\BrowseAndDocItTestForm.pas">
             <Form>frmBrowseAndDocItTestForm</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\Library\dghlibrary.pas"/>
         <DCCReference Include="Source\ExclusionsForm.pas">
             <Form>frmExclusions</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\Components\Source\DGHEllipsisLabel.pas"/>
         <DCCReference Include="Source\FolderConfig.pas">
             <Form>frmFolders</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\LIBRARY\DGHSynEdit.pas"/>
-        <DCCReference Include="..\..\..\Components\Source\DGHCustomGraphicsControl.pas"/>
-        <DCCReference Include="..\..\..\Components\Source\DGHMemoryMonitorControl.pas"/>
         <DCCReference Include="..\Source\BADI.Base.Module.pas"/>
         <DCCReference Include="..\Source\BADI.CodeBrowsingFrame.pas">
             <Form>fmBADICodeBrowsingFrame</Form>
@@ -178,7 +174,7 @@
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.ModuleInfo.pas"/>
-        <DCCReference Include="..\Source\BADI.ModuleExlporerOpsFrame.pas">
+        <DCCReference Include="..\Source\BADI.ModuleExplorerOpsFrame.pas">
             <Form>fmBADIModuleExplorerFrame</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -201,21 +197,10 @@
         </DCCReference>
         <DCCReference Include="..\Source\BADI.TokenInfo.pas"/>
         <DCCReference Include="..\Source\BADI.Types.pas"/>
-        <DCCReference Include="..\Source\BADI.VB.Module.Full.pas"/>
-        <DCCReference Include="..\Source\BADI.VB.Module.pas"/>
         <DCCReference Include="..\Source\BADI.VB.ModuleFull.pas"/>
-        <DCCReference Include="..\..\..\Library\ProgressForm.pas">
-            <Form>frmProgress</Form>
-        </DCCReference>
+        <DCCReference Include="..\Source\BADI.VB.Module.pas"/>
         <DCCReference Include="..\Source\BADI.OptionsForm.pas">
             <Form>frmOptions</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\..\Library\CheckForUpdatesOptionsForm.pas">
-            <Form>frmCheckForUpdatesOptions</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\..\Library\UsefulSynEditFunctions.pas"/>
-        <DCCReference Include="..\..\..\Library\SynEditOptionsForm.pas">
-            <Form>frmEditorOptions</Form>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Pascal.ClassDecl.pas"/>
         <DCCReference Include="..\Source\BADI.Pascal.Comment.pas"/>
@@ -332,6 +317,27 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\Source\BADI.Interfaces.pas"/>
+        <DCCReference Include="..\Source\BADI.Exclusions.pas"/>
+        <DCCReference Include="..\Source\BADI.IDEEditorColours.pas"/>
+        <DCCReference Include="..\Source\BADI.ModuleExplorer.VirtualStringTree.pas"/>
+        <DCCReference Include="..\Source\BADI.ModuleExplorer.TreeNodeInfo.pas"/>
+        <DCCReference Include="..\Source\BADI.ModuleExplorer.CustomHintWindow.pas"/>
+        <DCCReference Include="..\Externals\ProgressForm.pas">
+            <Form>frmProgress</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Externals\DGHEllipsisLabel.pas"/>
+        <DCCReference Include="..\Externals\DGHSynEdit.pas"/>
+        <DCCReference Include="..\Externals\DGHCustomGraphicsControl.pas"/>
+        <DCCReference Include="..\Externals\DGHMemoryMonitorControl.pas"/>
+        <DCCReference Include="..\Externals\dghlibrary.pas"/>
+        <DCCReference Include="..\Source\BADI.CustomVirtualStringTree.pas"/>
+        <DCCReference Include="..\Externals\UsefulSynEditFunctions.pas"/>
+        <DCCReference Include="..\Externals\SynEditOptionsForm.pas">
+            <Form>frmEditorOptions</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RcCompile Include="..\Source\BADI.HTMLResources.RC">
             <Form>BADI.HTMLResources.res</Form>
         </RcCompile>
@@ -393,10 +399,11 @@
                     <VersionInfoKeys Name="Comments">Test Application to Browse and Doc It.</VersionInfoKeys>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k240.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp240.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\DataExplorerDBXPluginEnt260.bpl">DBExpress Enterprise Data Explorer Integration</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k260.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp260.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
@@ -427,7 +434,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="BrowseAndDocItTestApp.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\BrowseAndDocItTestApp.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>BrowseAndDocItTestApp.exe</RemoteName>
                         <Overwrite>true</Overwrite>

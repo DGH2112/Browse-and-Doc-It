@@ -131,8 +131,7 @@ Type
     Procedure FormCreate(Sender: TObject);
     Procedure FormDestroy(Sender: TObject);
     Procedure SynEdit1Change(Sender: TObject);
-    Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol: Integer);
+    Procedure SelectionChange(Const iIdentLine, iIdentCol, iCommentLine: Integer);
     Procedure Focus(Sender: TObject);
     Procedure ShowTokensClick(Sender: TObject);
     Procedure SpecialCharactersClick(Sender: TObject);
@@ -1578,11 +1577,9 @@ End;
   @param   iIdentLine   as an Integer
   @param   iIdentCol    as an Integer
   @param   iCommentLine as an Integer
-  @param   iCommentCol  as an Integer
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-  iCommentCol: Integer);
+Procedure TfrmBrowseAndDocItTestForm.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
 
 Begin
   If iIdentLine * iIdentCol > 0 Then

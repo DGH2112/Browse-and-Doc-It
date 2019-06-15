@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       27 Oct 2017
+  @Date       15 Jun 2019
   @Author     David Hoyle
 
 **)
@@ -48,7 +48,7 @@ Type
       Override;
     Procedure TidyUpEmptyElements;
     Function  GetModuleName: String; Override;
-    Function  BuildSection(Const strSectionName : String; iLine,
+    Function  BuildSection(Const strSectionName : String; Const iLine,
       iColumn : Integer) : TLabelContainer;
   Public
     Constructor CreateParser(Const Source, strFileName: String; Const IsModified: Boolean;
@@ -86,6 +86,10 @@ Const
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
   strSeekableOnErrorTokens: Array [1 .. 2] Of String = ('<CR>', '<LF>');
+  (** A constant for the line feed token **)
+  strLineFeed = '<LF>';
+  (** A constant for the carriage return token **)
+  strCarriageReturn = '<CR>';
 
 (**
 
@@ -102,8 +106,7 @@ Const
 Function TINIModule.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
-  Result := ChangeFileExt(Inherited AsString(boolShowIdentifier,
-      boolForDocumentation), '');
+  Result := ChangeFileExt(Inherited AsString(boolShowIdentifier, boolForDocumentation), '');
 End;
 
 (**
@@ -111,16 +114,16 @@ End;
   This method creates the heirarchical sections from the section name given.
 
   @precon  None.
-  @postcon Creates the heirarchical sections from the section name given and returns the
-           most nested level.
+  @postcon Creates the heirarchical sections from the section name given and returns the most nested 
+           level.
 
-  @param   strSectionName as a String as a Constant
-  @param   iLine          as an Integer
-  @param   iColumn        as an Integer
+  @param   strSectionName as a String as a constant
+  @param   iLine          as an Integer as a constant
+  @param   iColumn        as an Integer as a constant
   @return  a TLabelContainer
 
 **)
-Function TINIModule.BuildSection(Const strSectionName: String; iLine,
+Function TINIModule.BuildSection(Const strSectionName: String; Const iLine,
   iColumn : Integer): TLabelContainer;
 
 Var
@@ -193,26 +196,33 @@ End;
 Constructor TINIModule.CreateParser(Const Source, strFileName: String; Const IsModified: Boolean;
       Const ModuleOptions: TModuleOptions);
 
+ResourceString
+  strStart = 'Start';
+  strSections = 'Sections';
+  strTokenize = 'Tokenize';
+  strParse = 'Parse';
+  strRefs = 'Refs';
+
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FSource        := Source;
-  AddTickCount('Start');
+  AddTickCount(strStart);
   CommentClass := TINIComment;
-  FSections := Add(TLabelContainer.Create('Sections', scGlobal, 0, 0, iiModule,
+  FSections := Add(TLabelContainer.Create(strSections, scGlobal, 0, 0, iiModule,
     Nil)) As TLabelContainer;
   TokenizeStream;
-  AddTickCount('Tokenize');
+  AddTickCount(strTokenize);
   If moParse In ModuleOptions Then
     Begin
       ParseTokens;
-      AddTickCount('Parse');
+      AddTickCount(strParse);
       Add(strErrors, iiErrorFolder, scNone, Nil);
       Add(strWarnings, iiWarningFolder, scNone, Nil);
       Add(strHints, iiHintFolder, scNone, Nil);
       Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
-      AddTickCount('Refs');
+      AddTickCount(strRefs);
       TidyUpEmptyElements;
     End;
 End;
@@ -230,6 +240,22 @@ Destructor TINIModule.Destroy;
 
 Begin
   Inherited Destroy;
+End;
+
+(**
+
+  This method returns an array of key words for use in the explorer module.
+
+  @precon  None.
+  @postcon Returns an array of key words for use in the explorer module.
+
+  @return  a TKeyWords
+
+**)
+Function TINIModule.Directives: TKeyWords;
+
+Begin
+  Result := Nil;
 End;
 
 (**
@@ -266,304 +292,6 @@ End;
 
 (**
 
-  This method tokenises the stream of text passed to the constructor and splits
-  it into tokens.
-
-  @precon  None.
-  @postcon Tokenises the stream of text passed to the constructor and splits
-           it into tokens.
-
-**)
-Procedure TINIModule.TokenizeStream;
-
-Type
-  (** State machine for block types. **)
-  TBlockType = (btNoBlock, btLineComment);
-
-Const
-  (** Growth size of the token buffer. **)
-  iTokenCapacity   = 100;
-  strSingleSymbols = [#9, #10, #13, #32, ';', '(', ')', '*', '+', ',', '='];
-  (** A set of characters for single quotes **)
-  strSingleQuotes = [''''];
-  (** A set of characters for double quotes **)
-  strDoubleQuotes = ['"'];
-  (** A set of identifier characters. **)
-  strIdentifiers = ['a' .. 'z', 'A' .. 'Z', '_', '-', '%', #192 .. #214, #216 .. #246,
-    #248 .. #255];
-  (** A set of number characters. **)
-  strNumbers  = ['.', '0' .. '9'];
-  strAllChars = [#32 .. #255];
-  (** A set of characters for general symbols **)
-  strSymbols = (strAllChars - strIdentifiers - strNumbers - strSingleQuotes -
-      strDoubleQuotes);
-
-Var
-  (** Token buffer. **)
-  strToken    : String;
-  CurCharType : TBADITokenType;
-  LastCharType: TBADITokenType;
-  BlockType   : TBlockType;
-  (** Current line number **)
-  iLine: Integer;
-  (** Current column number **)
-  iColumn: Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
-  iStreamPos: Integer;
-  (** Token line **)
-  iTokenLine: Integer;
-  (** Token column **)
-  iTokenColumn: Integer;
-  (** Current character position **)
-  iStreamCount: Integer;
-  Ch          : Char;
-  LastChar    : Char;
-  (** Token size **)
-  iTokenLen: Integer;
-  iChar    : Integer;
-
-  (**
-
-    This INLINE procedure changes the whitepace tokens for more human readable
-    tokens.
-
-    @precon  strToken must be a non-null string.
-    @postcon Changes the whitepace tokens for more human readable
-             tokens.
-
-    @param   strToken as a String as a reference
-
-  **)
-  Procedure ProcessWhiteSpace(Var strToken: String); {$IFDEF D2005} InLine; {$ENDIF}
-  Begin
-    If strToken = #13 Then
-      strToken := '<LF>';
-    If strToken = #10 Then
-      strToken := '<CR>';
-  End;
-
-Begin
-  BlockType    := btNoBlock;
-  iStreamPos   := 0;
-  iTokenLine   := 1;
-  iTokenColumn := 1;
-  CurCharType  := ttUnknown;
-  LastCharType := ttUnknown;
-  iStreamCount := 0;
-  iLine        := 1;
-  iColumn      := 1;
-  LastChar     := #0;
-  strToken     := '';
-
-  iTokenLen := 0;
-  SetLength(strToken, iTokenCapacity);
-
-  Try
-    For iChar := 1 To Length(FSource) Do
-      Begin
-        Ch := FSource[iChar];
-        Inc(iStreamCount);
-        LastCharType := CurCharType;
-
-        If IsInSet(Ch, strWhiteSpace) Then
-          CurCharType := ttWhiteSpace
-        Else If IsInSet(Ch, strLineEnd) Then
-          CurCharType := ttLineEnd
-        Else If IsInSet(Ch, strSymbols) Then
-          CurCharType := ttSymbol
-        Else If IsInSet(Ch, strIdentifiers) Then
-          Begin
-            If (LastCharType = ttNumber) And (IsInSet(Ch, ['A' .. 'F', 'a' .. 'f'])) Then
-              CurCharType := ttNumber
-            Else
-              CurCharType := ttIdentifier;
-          End
-        Else If IsInSet(Ch, strNumbers) Then
-          Begin
-            CurCharType := ttNumber;
-            If LastCharType = ttIdentifier Then
-              CurCharType := ttIdentifier;
-          End
-        Else
-          CurCharType := ttUnknown;
-
-        // Check for line comments
-        If (BlockType = btNoBlock) And (Ch = ';') Then
-          BlockType := btLineComment;
-
-        If (LastCharType <> CurCharType) Or (IsInSet(Ch, strSingleSymbols)) Or
-          (IsInSet(LastChar, strSingleSymbols)) Then
-          Begin
-            If ((BlockType In [btLineComment]) And (CurCharType <> ttLineEnd)) Then
-              Begin
-                Inc(iTokenLen);
-                If iTokenLen > Length(strToken) Then
-                  SetLength(strToken, iTokenCapacity + Length(strToken));
-                strToken[iTokenLen] := Ch;
-              End
-            Else
-              Begin
-                SetLength(strToken, iTokenLen);
-                If iTokenLen > 0 Then
-                  Begin
-                    If BlockType = btLineComment Then
-                      LastCharType := ttLineComment;
-                    ProcessWhiteSpace(strToken);
-                    AddToken(TTokenInfo.Create(strToken, iStreamPos, iTokenLine,
-                        iTokenColumn, Length(strToken), LastCharType));
-                  End;
-               // Store Stream position, line number and column of
-               // token start
-                iStreamPos   := iStreamCount;
-                iTokenLine   := iLine;
-                iTokenColumn := iColumn;
-                BlockType    := btNoBlock;
-                iTokenLen    := 1;
-                SetLength(strToken, iTokenCapacity);
-                strToken[iTokenLen] := Ch;
-              End;
-          End
-        Else
-          Begin
-            Inc(iTokenLen);
-            If iTokenLen > Length(strToken) Then
-              SetLength(strToken, iTokenCapacity + Length(strToken));
-            strToken[iTokenLen] := Ch;
-          End;
-
-        Inc(iColumn);
-        If Ch = #10 Then
-          Begin
-            Inc(iLine);
-            iColumn := 1;
-          End;
-        LastChar := Ch;
-      End;
-    If iTokenLen > 0 Then
-      Begin
-        SetLength(strToken, iTokenLen);
-        ProcessWhiteSpace(strToken);
-        AddToken(TTokenInfo.Create(strToken, iStreamPos, iTokenLine, iTokenColumn,
-            Length(strToken), LastCharType));
-      End;
-    AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
-        ttFileEnd));
-  Except
-    On E: Exception Do
-      AddIssue(E.Message, scGlobal, 0, 0, etError, Self);
-  End
-End;
-
-(**
-
-  This is the method that should be called to parse the previously parse tokens.
-
-  @precon  None.
-  @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
-
-**)
-Procedure TINIModule.ParseTokens;
-Begin
-  Goal;
-End;
-
-(**
-
-  This method returns an array of key words for use in the explorer module.
-
-  @precon  None.
-  @postcon Returns an array of key words for use in the explorer module.
-
-  @return  a TKeyWords
-
-**)
-Function TINIModule.ReservedWords: TKeyWords;
-
-Begin
-  Result := Nil;
-End;
-
-(**
-
-  This method parses the section portion of the INI grammar.
-
-  @precon  None.
-  @postcon Parses the section portion of the INI grammar.
-
-  @return  a Boolean
-
-**)
-Function TINIModule.Section: Boolean;
-
-Begin
-  Result := SectionHeader;
-  If Result Then
-    While KeyValuePair Do;
-  EatLineEnds;
-End;
-
-(**
-
-  This method parses the section header element of the INI grammar.
-
-  @precon  None.
-  @postcon Parses the section header element of the INI grammar.
-
-  @return  a Boolean
-
-**)
-Function TINIModule.SectionHeader: Boolean;
-
-Var
-  strSectionName : String;
-  SectionToken : TTokenInfo;
-
-Begin
-  Result := Token.Token = '[';
-  If Result Then
-    Begin
-      SectionToken := Token;
-      NextNonCommentToken;
-      While Token.Token <> ']' Do
-        Begin
-          strSectionName := strSectionName + Token.Token;
-          NextNonCommentToken;
-        End;
-      If strSectionName <> '' Then
-        Begin
-          FCurrentSection := BuildSection(strSectionName, SectionToken.Line,
-            SectionToken.Column);
-          If Token.Token = ']' Then
-            Begin
-              NextNonCommentToken;
-              EatWhitespace;
-              CheckLineEnd();
-            End Else
-              ErrorAndSeekToken(strLiteralExpected, Token.Token, ['<LF>', '<CR>'], stActual, Self);
-        End Else
-          ErrorAndSeekToken(strLiteralExpected, Token.Token, ['<LF>', '<CR>'], stActual, Self);
-    End;
-End;
-
-(**
-
-  This method returns an array of key words for use in the explorer module.
-
-  @precon  None.
-  @postcon Returns an array of key words for use in the explorer module.
-
-  @return  a TKeyWords
-
-**)
-Function TINIModule.Directives: TKeyWords;
-
-Begin
-  Result := Nil;
-End;
-
-(**
-
   This method tries to get a document comment from the previous token and return a TComment class to the 
   calling routine.
 
@@ -579,6 +307,10 @@ End;
 **)
 Function TINIModule.GetComment(Const CommentPosition: TCommentPosition = cpBeforeCurrentToken) : TComment;
 
+Const
+  iCommentOffset1 = -1;
+  iCommentOffset2 = -2;
+
 Var
   T      : TTokenInfo;
   iOffset: Integer;
@@ -587,16 +319,16 @@ Var
 Begin
   Result := Nil;
   If CommentPosition = cpBeforeCurrentToken Then
-    iOffset := -1
+    iOffset := iCommentOffset1
   Else
-    iOffset := -2;
+    iOffset := iCommentOffset2;
   iToken    := TokenIndex + iOffset;
-  If iToken > -1 Then
+  If iToken > iCommentOffset1 Then
     Begin
-      While (iToken > -1) And ((Tokens[iToken] As TTokenInfo).TokenType
+      While (iToken > iCommentOffset1) And ((Tokens[iToken] As TTokenInfo).TokenType
           In [ttLineEnd, ttLineContinuation]) Do
         Dec(iToken);
-      If iToken > -1 Then
+      If iToken > iCommentOffset1 Then
         Begin;
           T := Tokens[iToken] As TTokenInfo;
           If T.TokenType In [ttLineComment, ttBlockComment] Then
@@ -624,60 +356,6 @@ End;
 
 (**
 
-  This method process conditional compiler directives.
-
-  @precon  None.
-  @postcon Does nothings as conditional compilations is not supported.
-
-  @param   iSkip as an Integer as a reference
-
-**)
-Procedure TINIModule.ProcessCompilerDirective(Var iSkip: Integer);
-
-Begin
-  // Do nothing, i.e. Conditional Compilation is NOT supported.
-End;
-
-(**
-
-  This method does nothing as we are not referencing symbols in XML.
-
-  @precon  None.
-  @postcon Returns false always.
-
-  @param   AToken as a TTokenInfo as a constant
-  @return  a Boolean
-
-**)
-Function TINIModule.ReferenceSymbol(Const AToken: TTokenInfo): Boolean;
-
-Begin
-  Result := False;
-End;
-
-(**
-
-  This method deletes any root elements which dont and items in them.
-
-  @precon  None.
-  @postcon Deletes any root elements which dont and items in them.
-
-**)
-Procedure TINIModule.TidyUpEmptyElements;
-
-Var
-  iElement: Integer;
-
-Begin
-  For iElement := ElementCount DownTo 1 Do
-    If Elements[iElement].ElementCount = 0 Then
-      If Elements[iElement] Is TLabelContainer Then
-        If Pos('Definitions', Elements[iElement].Identifier) = 0 Then
-          DeleteElement(iElement);
-End;
-
-(**
-
   This method is the starting position for the parsing of an Eidolon module. It
   finds the first non comment token and begins the grammar checking from their
   by deligating Syntax.
@@ -685,6 +363,8 @@ End;
   @precon  None.
   @postcon It finds the first non comment token and begins the grammar checking
            from their by deligating Syntax.
+
+  @nocheck EmptyWhile
 
 **)
 Procedure TINIModule.Goal;
@@ -715,7 +395,8 @@ Begin
         // Check for end of file else must be identifier
         While Section Do;
         If Not (Token.TokenType In [ttFileEnd]) Then
-          ErrorAndSeekToken(strExpectedFileEnd, Token.Token, ['<LF>', '<CR>'], stActual, Self);
+          ErrorAndSeekToken(strExpectedFileEnd, Token.Token, [strLineFeed, strCarriageReturn], stActual,
+            Self);
       End;
   Except
     On E: EBADIParserAbort Do
@@ -772,9 +453,356 @@ Begin
             End;
           CheckLineEnd();
         End Else
-          ErrorAndSeekToken(strExpectedKey, Token.Token, ['<LF>', '<CR>'], stActual, Self);
+          ErrorAndSeekToken(strExpectedKey, Token.Token, [strLineFeed, strCarriageReturn], stActual,
+            Self);
     End;
   EatLineEnds;
+End;
+
+(**
+
+  This is the method that should be called to parse the previously parse tokens.
+
+  @precon  None.
+  @postcon Attempts to parse the token list and check it grammatically for
+           Errors while providing delcaration elements for browsing.
+
+**)
+Procedure TINIModule.ParseTokens;
+
+Begin
+  Goal;
+End;
+
+(**
+
+  This method process conditional compiler directives.
+
+  @precon  None.
+  @postcon Does nothings as conditional compilations is not supported.
+
+  @nocheck EmptyMethod
+  @nohint iSkip
+
+  @param   iSkip as an Integer as a reference
+
+**)
+Procedure TINIModule.ProcessCompilerDirective(Var iSkip: Integer);
+
+Begin
+  // Do nothing, i.e. Conditional Compilation is NOT supported.
+End;
+
+(**
+
+  This method does nothing as we are not referencing symbols in XML.
+
+  @precon  None.
+  @postcon Returns false always.
+
+  @nohint  AToken
+
+  @param   AToken as a TTokenInfo as a constant
+  @return  a Boolean
+
+**)
+Function TINIModule.ReferenceSymbol(Const AToken: TTokenInfo): Boolean;
+
+Begin
+  Result := False;
+End;
+
+(**
+
+  This method returns an array of key words for use in the explorer module.
+
+  @precon  None.
+  @postcon Returns an array of key words for use in the explorer module.
+
+  @return  a TKeyWords
+
+**)
+Function TINIModule.ReservedWords: TKeyWords;
+
+Begin
+  Result := Nil;
+End;
+
+(**
+
+  This method parses the section portion of the INI grammar.
+
+  @precon  None.
+  @postcon Parses the section portion of the INI grammar.
+
+  @nocheck EmptyWhile
+
+  @return  a Boolean
+
+**)
+Function TINIModule.Section: Boolean;
+
+Begin
+  Result := SectionHeader;
+  If Result Then
+    While KeyValuePair Do;
+  EatLineEnds;
+End;
+
+(**
+
+  This method parses the section header element of the INI grammar.
+
+  @precon  None.
+  @postcon Parses the section header element of the INI grammar.
+
+  @return  a Boolean
+
+**)
+Function TINIModule.SectionHeader: Boolean;
+
+Var
+  strSectionName : String;
+  SectionToken : TTokenInfo;
+
+Begin
+  Result := Token.Token = '[';
+  If Result Then
+    Begin
+      SectionToken := Token;
+      NextNonCommentToken;
+      While Token.Token <> ']' Do
+        Begin
+          strSectionName := strSectionName + Token.Token;
+          NextNonCommentToken;
+        End;
+      If strSectionName <> '' Then
+        Begin
+          FCurrentSection := BuildSection(strSectionName, SectionToken.Line,
+            SectionToken.Column);
+          If Token.Token = ']' Then
+            Begin
+              NextNonCommentToken;
+              EatWhitespace;
+              CheckLineEnd();
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, Token.Token, [strLineFeed, strCarriageReturn],
+                stActual, Self);
+        End Else
+          ErrorAndSeekToken(strLiteralExpected, Token.Token, [strLineFeed, strCarriageReturn], stActual,
+            Self);
+    End;
+End;
+
+
+(**
+
+  This method deletes any root elements which dont and items in them.
+
+  @precon  None.
+  @postcon Deletes any root elements which dont and items in them.
+
+**)
+Procedure TINIModule.TidyUpEmptyElements;
+
+ResourceString
+  strDefinitions = 'Definitions';
+
+Var
+  iElement: Integer;
+
+Begin
+  For iElement := ElementCount DownTo 1 Do
+    If Elements[iElement].ElementCount = 0 Then
+      If Elements[iElement] Is TLabelContainer Then
+        If Pos(strDefinitions, Elements[iElement].Identifier) = 0 Then
+          DeleteElement(iElement);
+End;
+
+(**
+
+  This method tokenises the stream of text passed to the constructor and splits
+  it into tokens.
+
+  @precon  None.
+  @postcon Tokenises the stream of text passed to the constructor and splits
+           it into tokens.
+
+**)
+Procedure TINIModule.TokenizeStream;
+
+Type
+  (** State machine for block types. **)
+  TBlockType = (btNoBlock, btLineComment);
+
+Const
+  (** Growth size of the token buffer. **)
+  iTokenCapacity   = 100;
+  strSingleSymbols = [#9, #10, #13, #32, ';', '(', ')', '*', '+', ',', '='];
+  (** A set of characters for single quotes **)
+  strSingleQuotes = [''''];
+  (** A set of characters for double quotes **)
+  strDoubleQuotes = ['"'];
+  (** A set of identifier characters. **)
+  strIdentifiers = ['a' .. 'z', 'A' .. 'Z', '_', '-', '%', #192 .. #214, #216 .. #246,
+    #248 .. #255];
+  (** A set of number characters. **)
+  strNumbers  = ['.', '0' .. '9'];
+  strAllChars = [#32 .. #255];
+  (** A set of characters for general symbols **)
+  strSymbols = (strAllChars - strIdentifiers - strNumbers - strSingleQuotes -
+      strDoubleQuotes);
+  strEndFile = '<end-of-file>';
+
+Var
+  (** Token buffer. **)
+  strToken    : String;
+  CurCharType : TBADITokenType;
+  LastCharType: TBADITokenType;
+  BlockType   : TBlockType;
+  (** Current line number **)
+  iLine: Integer;
+  (** Current column number **)
+  iColumn: Integer;
+  (** Token stream position. Fast to inc this than read the stream position. **)
+  iStreamPos: Integer;
+  (** Token line **)
+  iTokenLine: Integer;
+  (** Token column **)
+  iTokenColumn: Integer;
+  (** Current character position **)
+  iStreamCount: Integer;
+  Ch          : Char;
+  LastChar    : Char;
+  (** Token size **)
+  iTokenLen: Integer;
+  iChar    : Integer;
+
+  (**
+
+    This INLINE procedure changes the whitepace tokens for more human readable
+    tokens.
+
+    @precon  strToken must be a non-null string.
+    @postcon Changes the whitepace tokens for more human readable
+             tokens.
+
+    @param   strToken as a String as a reference
+
+  **)
+  Procedure ProcessWhiteSpace(Var strToken: String); {$IFDEF D2005} InLine; {$ENDIF}
+  Begin
+    If strToken = #13 Then
+      strToken := strLineFeed;
+    If strToken = #10 Then
+      strToken := strCarriageReturn;
+  End;
+
+Begin
+  BlockType    := btNoBlock;
+  iStreamPos   := 0;
+  iTokenLine   := 1;
+  iTokenColumn := 1;
+  CurCharType  := ttUnknown;
+  LastCharType := ttUnknown;
+  iStreamCount := 0;
+  iLine        := 1;
+  iColumn      := 1;
+  LastChar     := #0;
+  strToken     := '';
+
+  iTokenLen := 0;
+  SetLength(strToken, iTokenCapacity);
+
+  For iChar := 1 To Length(FSource) Do
+    Begin
+      Ch := FSource[iChar];
+      Inc(iStreamCount);
+      LastCharType := CurCharType;
+
+      If IsInSet(Ch, strWhiteSpace) Then
+        CurCharType := ttWhiteSpace
+      Else If IsInSet(Ch, strLineEnd) Then
+        CurCharType := ttLineEnd
+      Else If IsInSet(Ch, strSymbols) Then
+        CurCharType := ttSymbol
+      Else If IsInSet(Ch, strIdentifiers) Then
+        Begin
+          If (LastCharType = ttNumber) And (IsInSet(Ch, ['A' .. 'F', 'a' .. 'f'])) Then
+            CurCharType := ttNumber
+          Else
+            CurCharType := ttIdentifier;
+        End
+      Else If IsInSet(Ch, strNumbers) Then
+        Begin
+          CurCharType := ttNumber;
+          If LastCharType = ttIdentifier Then
+            CurCharType := ttIdentifier;
+        End
+      Else
+        CurCharType := ttUnknown;
+
+      // Check for line comments
+      If (BlockType = btNoBlock) And (Ch = ';') Then
+        BlockType := btLineComment;
+
+      If (LastCharType <> CurCharType) Or (IsInSet(Ch, strSingleSymbols)) Or
+        (IsInSet(LastChar, strSingleSymbols)) Then
+        Begin
+          If ((BlockType In [btLineComment]) And (CurCharType <> ttLineEnd)) Then
+            Begin
+              Inc(iTokenLen);
+              If iTokenLen > Length(strToken) Then
+                SetLength(strToken, iTokenCapacity + Length(strToken));
+              strToken[iTokenLen] := Ch;
+            End
+          Else
+            Begin
+              SetLength(strToken, iTokenLen);
+              If iTokenLen > 0 Then
+                Begin
+                  If BlockType = btLineComment Then
+                    LastCharType := ttLineComment;
+                  ProcessWhiteSpace(strToken);
+                  AddToken(TTokenInfo.Create(strToken, iStreamPos, iTokenLine,
+                      iTokenColumn, Length(strToken), LastCharType));
+                End;
+             // Store Stream position, line number and column of
+             // token start
+              iStreamPos   := iStreamCount;
+              iTokenLine   := iLine;
+              iTokenColumn := iColumn;
+              BlockType    := btNoBlock;
+              iTokenLen    := 1;
+              SetLength(strToken, iTokenCapacity);
+              strToken[iTokenLen] := Ch;
+            End;
+        End
+      Else
+        Begin
+          Inc(iTokenLen);
+          If iTokenLen > Length(strToken) Then
+            SetLength(strToken, iTokenCapacity + Length(strToken));
+          strToken[iTokenLen] := Ch;
+        End;
+
+      Inc(iColumn);
+      If Ch = #10 Then
+        Begin
+          Inc(iLine);
+          iColumn := 1;
+        End;
+      LastChar := Ch;
+    End;
+  If iTokenLen > 0 Then
+    Begin
+      SetLength(strToken, iTokenLen);
+      ProcessWhiteSpace(strToken);
+      AddToken(TTokenInfo.Create(strToken, iStreamPos, iTokenLine, iTokenColumn,
+          Length(strToken), LastCharType));
+    End;
+  AddToken(TTokenInfo.Create(strEndFile, iStreamPos, iTokenLine, iTokenColumn, 0,
+      ttFileEnd));
 End;
 
 End.

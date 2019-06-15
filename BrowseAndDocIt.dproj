@@ -3,7 +3,7 @@
         <ProjectGuid>{AD4C15A1-5A9C-4C71-B023-C105C0474BA9}</ProjectGuid>
         <MainSource>BrowseAndDocIt.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">CodeSiteTracing</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>VCL</FrameworkType>

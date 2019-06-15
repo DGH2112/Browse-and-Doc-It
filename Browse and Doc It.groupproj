@@ -69,4 +69,30 @@
         <CallTarget Targets="BADIDUnitXTests:Make;BrowseAndDocItTests:Make;BrowseAndDocItTestApp:Make;BrowseAndDocIt:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+    <ItemGroup Condition="'$(BuildGroup)'=='Debug'">
+        <BuildGroupProject Include="Test\BrowseAndDocItTestApp.dproj">
+            <ProjectGuid>{F4BAF5D6-57AA-4EF2-BE38-381774DA4AD1}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Test\BrowseAndDocItTests.dproj">
+            <ProjectGuid>{77CE066E-3A47-45D3-9A15-E1CE209D5008}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="BrowseAndDocIt.dproj">
+            <ProjectGuid>{AD4C15A1-5A9C-4C71-B023-C105C0474BA9}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="BADIDUnitXTests.dproj">
+            <ProjectGuid>{97DFE465-856D-4033-BA9E-7585FED8E445}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
 </Project>

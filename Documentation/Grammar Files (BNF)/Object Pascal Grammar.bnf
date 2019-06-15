@@ -4,7 +4,7 @@
   Defines language capabiltities up to Delphi 10.3 Rio.
 
   @Version 1.0
-  @Date    02 Dec 2018
+  @Date    15 Jun 2019
   @Author  David Hoyle
 
   @usesemicolon
@@ -247,7 +247,11 @@
 
 <Designator>               ::= <QualID> [ <DesignatorSubElement> ]*;
 
-<DesignatorSubElement>     ::= '.' <Ident> | '[' <ExprList> ']' | '^' | '(' <MethodExprList> ')';
+<DesignatorSubElement>     ::= '.' <Ident>              |
+                               '[' <ExprList> ']'       |
+                               '^'                      |
+                               '(' <MethodExprList> ')' |
+                               <TypeArgs>;
 
 <SetConstructor>           ::= '[' [ <SetElement> ( ',' <SetElement> )* ] ']';
 

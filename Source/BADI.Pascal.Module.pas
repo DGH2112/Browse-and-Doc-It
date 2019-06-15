@@ -292,6 +292,13 @@ Type
       @return  a TPascalMethod
     **)
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
+    (**
+      This property returns the modules variables label.
+      @precon  None.
+      @postcon Returns the modules variables label.
+      @return  a TLabelContainer
+    **)
+    Property VariablesLabel : TLabelContainer Read GetVariablesLabel;
   Public
     Constructor CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
       Const ModuleOptions : TModuleOptions); Override;
@@ -3632,6 +3639,25 @@ End;
 
 (**
 
+  This is a getter methods for the VariablesLabel propertry.
+
+  @precon  None.
+  @postcon Returns the modules variable label (creating it if required).
+
+  @return  a TLabelContainer
+
+**)
+Function TPascalModule.GetVariablesLabel: TLabelContainer;
+
+Begin
+  If FVariablesLabel = Nil Then
+    FVariablesLabel := Add(strVarsLabel, iiPublicVariablesLabel, scPrivate,
+      GetComment) As TLabelContainer;
+  Result := FVariablesLabel;
+End;
+
+(**
+
   This method is the starting position for the parsing of an object pascal
   module. It finds the first non comment token and begins the grammar checking
   from their by deligating to the program, library, unit and package methods.
@@ -4041,11 +4067,16 @@ Function TPascalModule.InLineVarDecl: Boolean;
   Var
     tmpV: TVar;
     V: TElementContainer;
+    L: TLabelContainer;
 
   Begin
     tmpV := TVar.Create(Ident.Identifier, scLocal, Ident.Line, Ident.Column, iiPublicVariable,
       Ident.Comment);
-    V := CurrentMethod.VariablesLabel.Add(tmpV);
+    If Assigned(CurrentMethod) Then
+      L := CurrentMethod.VariablesLabel
+    Else
+      L := VariablesLabel;
+    V := L.Add(tmpV);
     If tmpV <> V Then
       AddIssue(Format(strDuplicateIdentifierFound, [Ident.Identifier, Ident.Line, Ident.Column]),
         scNone, Ident.Line, Ident.Column, etError, Self);
@@ -4065,6 +4096,7 @@ Var
   j: Integer;
   ExprType: TPascalExprTypes;
   Expr: TTempCntr;
+  L: TLabelContainer;
 
 Begin
   Result := Token.UToken = strVAR;
@@ -4078,7 +4110,11 @@ Begin
           Begin
             NextNonCommentToken;
             AToken := Token;
-            CurrentMethod.VariablesLabel.ReferenceSymbol(AToken);
+          If Assigned(CurrentMethod) Then
+            L := CurrentMethod.VariablesLabel
+          Else
+            L := VariablesLabel;
+            L.ReferenceSymbol(AToken);
             Tmp := TTempCntr.Create('', scLocal, 0, 0, iiNone, Nil);
             Try
               T := GetTypeDecl(TypeToken(Nil, scNone, Nil, Tmp));
@@ -4351,6 +4387,7 @@ Var
   V: TElementContainer;
   tmpV: TVar;
   Tmp: TTempCntr;
+  L: TLabelContainer;
 
 Begin
   Result := Token.UToken = strVAR;
@@ -4362,7 +4399,11 @@ Begin
           AToken := Token;
           Cmt := GetComment();
           tmpV := TVar.Create(AToken.Token, scLocal, AToken.Line, AToken.Column, iiPublicVariable, Cmt);
-          V := CurrentMethod.VariablesLabel.Add(tmpV);
+          If Assigned(CurrentMethod) Then
+            L := CurrentMethod.VariablesLabel
+          Else
+            L := VariablesLabel;
+          V := L.Add(tmpV);
           If tmpV <> V Then
             AddIssue(Format(strDuplicateIdentifierFound, [AToken.Token, AToken.Line, AToken.Column]),
               scNone, AToken.Line, AToken.Column, etError, Self);
@@ -9263,7 +9304,7 @@ Function TPascalModule.VarSection(Const AScope : TScope; Const Container : TElem
 Var
   V : TLabelContainer;
   LabelScope : TScope;
-  VariablesLabel: TLabelContainer;
+  VarsLabel: TLabelContainer;
 
 Begin
   Result := Token.UToken = strVAR;
@@ -9277,19 +9318,14 @@ Begin
       Else
       If Container Is TRecordDecl Then
         Begin
-          VariablesLabel := (Container As TRecordDecl).FindElement(strVarsLabel) As TLabelContainer;
-          If VariablesLabel = Nil Then
-            VariablesLabel := Container.Add(
+          VarsLabel := (Container As TRecordDecl).FindElement(strVarsLabel) As TLabelContainer;
+          If VarsLabel = Nil Then
+            VarsLabel := Container.Add(
               strVarsLabel, iiPublicVariablesLabel, LabelScope,
               GetComment) As TLabelContainer;
-          V := VariablesLabel;
+          V := VarsLabel;
         End Else
-        Begin
-          If FVariablesLabel = Nil Then
-            FVariablesLabel := Add(strVarsLabel, iiPublicVariablesLabel, LabelScope,
-              GetComment) As TLabelContainer;
-          V := FVariablesLabel;
-        End;
+          V := VariablesLabel;
       NextNonCommentToken;
       While VarDecl(AScope, V, iiPublicVariable) Do
         Begin

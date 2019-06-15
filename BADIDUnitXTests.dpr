@@ -1,4 +1,4 @@
-//: @stopdocumentation
+//: @stopdocumentation @nometrics @nochecks
 program BADIDUnitXTests;
 
 {$IFNDEF TESTINSIGHT}
@@ -154,7 +154,8 @@ uses
   BADI.Refactoring.Functions in 'Source\BADI.Refactoring.Functions.pas',
   BADI.Interfaces in 'Source\BADI.Interfaces.pas',
   BADI.IDEEditorColours in 'Source\BADI.IDEEditorColours.pas',
-  Test.DUnitXUnit1 in 'Test\Source\Test.DUnitXUnit1.pas';
+  Test.DUnitXUnit1 in 'Test\Source\Test.DUnitXUnit1.pas',
+  BADI.Exclusions in 'Source\BADI.Exclusions.pas';
 
 var
   runner : ITestRunner;

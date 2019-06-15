@@ -1,4 +1,4 @@
-//: @nometrics @nochecks
+//: @nodocumentation @nometrics @nochecks
 unit Test.BADI.Pascal.Module;
 {
 
@@ -314,6 +314,7 @@ type
     Procedure TestCodeFailure39;
     Procedure TestCodeFailure40;
     Procedure TestCodeFailure41;
+    Procedure TestCodeFailure42;
   Public
   End;
 
@@ -2341,6 +2342,25 @@ Begin
     '  FExcludeDocFiles := TList.Create;'#13#10 +
     'End;',
     [ttErrors, ttWarnings, ttHints],
+    []
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure42;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Function TXTVirtualTreeHelper.GetSortedColumns('#13#10 +
+    '  Const boolAllColumns : Boolean) : TArray<TXTColumnPosition>;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  System.Generics.Collections.TArray.Sort<TXTColumnPosition>(Result,'#13#10 +
+    '    TXTColumnPositionComparer.Create);'#13#10 +
+    'End;',
+    [ttErrors],
     []
   );
 End;

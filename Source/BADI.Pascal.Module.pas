@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       09 Dec 2018
+  @Date       15 Jun 2019
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -50,7 +50,7 @@ Type
 
   **)
   TPascalModule = Class(TBaseLanguageModule)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FSource                  : String;
     FMethodStack             : TObjectList;
     FTypesLabel              : TLabelContainer;
@@ -64,6 +64,7 @@ Type
     FExternalSyms            : TStringList;
     FModuleType              : TModuleType;
     FSourceCodeForProfiling  : TStringList;
+  Strict Protected
     { Grammar Parsers }
     Procedure Goal;
     Function  OPProgram : Boolean;
@@ -242,7 +243,7 @@ Type
     Function  MethodQualifiers(Const AScope :TScope; Const Container : TElementContainer;
       Const iMethodType : TMethodType; Const boolClassMethod : Boolean; Const C : TComment;
       Const boolIdent : Boolean = True) : TPascalMethod;
-    Procedure TypeArgs(Const Container : TElementContainer);
+    Function  TypeArgs(Const Container : TElementContainer) : Boolean;
     Function  AnonymousMethod(Const Container : TElementContainer) : Boolean;
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
@@ -278,7 +279,7 @@ Type
     Procedure MetricsEmptyBlockAtToken(Const eCheck : TBADIModuleCheck);
     Procedure MetricsCyclometricComplexity(Const Method : TGenericFunction);
     Procedure MetricsMethodToxicity(Const Method : TGenericFunction);
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+    Function  GetVariablesLabel : TLabelContainer;
     function  GetCurrentMethod: TPascalMethod;
     Function  GetModuleName : String; Override;
     Function  GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -2091,7 +2092,7 @@ Begin
       Finally
         Container.Free;
       End;
-      DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
+      DesignatorSubElement(C, ExprType, ['(', '.', '<', '[', '^']);
     End;
 End;
 
@@ -2117,7 +2118,8 @@ var
 
 Begin
   M := CurrentMethod As TPascalMethod;
-  While IsKeyWord(Token.Token, strValidSymbols) Or (IsKeyWord(Token.Token, ['(', '['])) Do // Always check for proc/func
+  // Always check for proc/func
+  While IsKeyWord(Token.Token, strValidSymbols) Or (IsKeyWord(Token.Token, ['(', '<', '['])) Do 
     If Token.Token = '.' Then
       Begin
         AddToExpression(C);
@@ -2189,7 +2191,10 @@ Begin
           AddToExpression(C)
         Else
           ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
-      End;
+      End
+    Else If (Token.Token = '<') Then
+      If Not TypeArgs(C) Then
+        Break;
 End;
 
 (**
@@ -8718,35 +8723,41 @@ End;
   @postcon Parses the TypeArgs element of the grammar for handling generics on type arguments.
 
   @param   Container as a TElementContainer as a constant
+  @return  a Boolean
 
 **)
-Procedure TPascalModule.TypeArgs(Const Container : TElementContainer);
+Function TPascalModule.TypeArgs(Const Container : TElementContainer) : Boolean;
 
 Begin
+  Result := False;
   PushTokenPosition;
   If Token.Token = '<' Then
     Begin
-      Container.AddToken(Token.Token, Token.TokenType);
+      If Assigned(Container) Then
+        Container.AddToken(Token.Token, Token.TokenType);
       Repeat
         NextNonCommentToken;
         ReferenceSymbol(Token);
         If IsIdentifier(Token) Or (Token.UToken = strSTRING) Then
           Begin
             ReferenceSymbol(Token);
-            Container.AddToken(Token.Token, Token.TokenType);
+            If Assigned(Container) Then
+              Container.AddToken(Token.Token, Token.TokenType);
             NextNonCommentToken;
           End Else
           Begin
             PopTokenPosition;
             Exit;
           End;
-        If Token.Token = ',' Then
+        If (Token.Token = ',') And Assigned(Container) Then
           Container.AddToken(Token.Token, Token.TokenType);
       Until Token.Token <> ',';
       If Token.Token = '>' Then
         Begin
-          Container.AddToken(Token.Token, Token.TokenType);
+          If Assigned(Container) Then
+            Container.AddToken(Token.Token, Token.TokenType);
           NextNonCommentToken;
+          Result := True;
         End Else
           PopTokenPosition;
     End;

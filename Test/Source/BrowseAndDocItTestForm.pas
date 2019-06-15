@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    15 Jun 2019
   @Author  David Hoyle
 
 **)
@@ -1002,7 +1002,7 @@ Begin
           ExceptionManager.StandardEurekaNotify(ExceptObject, ExceptAddr)
           {$ELSE}
           FFileName := E.Message;
-          Synchronize(ShowException);
+          //: @debug Synchronize(ShowException);
           {$ENDIF}
         End;
     End;

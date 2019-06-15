@@ -650,8 +650,7 @@ Const
   strNumbers  = ['.', '0' .. '9'];
   strAllChars = [#32 .. #255];
   (** A set of characters for general symbols **)
-  strSymbols = (strAllChars - strIdentifiers - strNumbers - strSingleQuotes -
-      strDoubleQuotes);
+  strSymbols = (strAllChars - strIdentifiers - strNumbers - strSingleQuotes - strDoubleQuotes);
   strEndFile = '<end-of-file>';
 
 Var
@@ -743,7 +742,7 @@ Begin
         CurCharType := ttUnknown;
 
       // Check for line comments
-      If (BlockType = btNoBlock) And (Ch = ';') Then
+      If (BlockType = btNoBlock) And (Ch = ';') And (iColumn = 1) Then
         BlockType := btLineComment;
 
       If (LastCharType <> CurCharType) Or (IsInSet(Ch, strSingleSymbols)) Or

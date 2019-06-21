@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    21 Jun 2019
 
 **)
 Unit BADI.Initialisation;
@@ -24,8 +24,6 @@ Uses
   BADI.BackusNaur.Module,
   BADI.CPP.Module,
   BADI.DFM.Module,
-  BADI.Eidolon.Module,
-  BADI.Eidolon.TLSSchematic.Module,
   BADI.INI.Module,
   BADI.Pascal.Module,
   BADI.VB.Module,
@@ -74,13 +72,11 @@ Type
   End;
 
 Const
-  Modules : Array[0..8] Of TBADIDispatcherRecord = (
+  Modules : Array[0..6] Of TBADIDispatcherRecord = (
     (FModule: TBackusNaurModule;   FExt: '.bnf';                      FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
     (FModule: TPascalModule;       FExt: '.dpk;.dpr;.pas';            FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
     (FModule: TCPPModule;          FExt: '.cpp;.hpp;.c;.h';           FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
     (FModule: TDFMModule;          FExt: '.dfm';                      FCanDoc: False; FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
-    (FModule: TEidolonModule;      FExt: '.map';                      FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPBlock),
-    (FModule: TTLSSchematicModule; FExt: '.schematic';                FCanDoc: False; FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPLine),
     (FModule: TINIModule;          FExt: '.ini;.tli';                 FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPBlock),
     (FModule: TVBModule;           FExt: '.bas;.cls;.frm';            FCanDoc: True;  FBlockCmt: ctVBLine;      FLineCmt: ctVBLine;      FInSituCmt: ctVBLine),
     (FModule: TXMLModule;          FExt: '.dtd;.htm;.html;.xml;.xsd'; FCanDoc: False; FBlockCmt: ctXML;         FLineCmt: ctXML;         FInSituCmt: ctXML)

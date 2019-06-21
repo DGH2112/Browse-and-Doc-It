@@ -78,13 +78,9 @@ uses
   BADI.BackusNaur.Module in 'Source\BADI.BackusNaur.Module.pas',
   BADI.BNFHighlighter in 'Source\BADI.BNFHighlighter.pas',
   BADI.EditorNotifier in 'Source\BADI.EditorNotifier.pas',
-  BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas',
   BADI.XML.Module in 'Source\BADI.XML.Module.pas',
   BADI.DFM.Module in 'Source\BADI.DFM.Module.pas',
-  BADI.Eidolon.Module in 'Source\BADI.Eidolon.Module.pas',
   BADI.ProfilingForm in 'Source\BADI.ProfilingForm.pas' {frmProfiling},
-  BADI.Eidolon.Types in 'Source\BADI.Eidolon.Types.pas',
-  BADI.Eidolon.TLSSchematic.Module in 'Source\BADI.Eidolon.TLSSchematic.Module.pas',
   BADI.InitialiseOTAInterfaces in 'Source\BADI.InitialiseOTAInterfaces.pas',
   BADI.INI.Module in 'Source\BADI.INI.Module.pas',
   BADI.SpecialTagsFrame in 'Source\BADI.SpecialTagsFrame.pas' {fmBADISpecialTagsFrame: TFrame},
@@ -164,41 +160,6 @@ uses
   BADI.DFM.ObjectDecl in 'Source\BADI.DFM.ObjectDecl.pas',
   BADI.DFM.PropertyDecl in 'Source\BADI.DFM.PropertyDecl.pas',
   BADI.DFM.Types in 'Source\BADI.DFM.Types.pas',
-  BADI.Eidolon.Association in 'Source\BADI.Eidolon.Association.pas',
-  BADI.Eidolon.Bar in 'Source\BADI.Eidolon.Bar.pas',
-  BADI.Eidolon.BaseTable in 'Source\BADI.Eidolon.BaseTable.pas',
-  BADI.Eidolon.Comment in 'Source\BADI.Eidolon.Comment.pas',
-  BADI.Eidolon.ConnectionDef in 'Source\BADI.Eidolon.ConnectionDef.pas',
-  BADI.Eidolon.Constants in 'Source\BADI.Eidolon.Constants.pas',
-  BADI.Eidolon.CustomFillSymbol in 'Source\BADI.Eidolon.CustomFillSymbol.pas',
-  BADI.Eidolon.DatabaseDef in 'Source\BADI.Eidolon.DatabaseDef.pas',
-  BADI.Eidolon.DBConnection in 'Source\BADI.Eidolon.DBConnection.pas',
-  BADI.Eidolon.DBTable in 'Source\BADI.Eidolon.DBTable.pas',
-  BADI.Eidolon.Diamond in 'Source\BADI.Eidolon.Diamond.pas',
-  BADI.Eidolon.Ellipse in 'Source\BADI.Eidolon.Ellipse.pas',
-  BADI.Eidolon.FieldDef in 'Source\BADI.Eidolon.FieldDef.pas',
-  BADI.Eidolon.Functions in 'Source\BADI.Eidolon.Functions.pas',
-  BADI.Eidolon.Line in 'Source\BADI.Eidolon.Line.pas',
-  BADI.Eidolon.OutputTable in 'Source\BADI.Eidolon.OutputTable.pas',
-  BADI.Eidolon.Rectangle in 'Source\BADI.Eidolon.Rectangle.pas',
-  BADI.Eidolon.RequirementsTable in 'Source\BADI.Eidolon.RequirementsTable.pas',
-  BADI.Eidolon.ResourceStrings in 'Source\BADI.Eidolon.ResourceStrings.pas',
-  BADI.Eidolon.SuperBar in 'Source\BADI.Eidolon.SuperBar.pas',
-  BADI.Eidolon.Symbol in 'Source\BADI.Eidolon.Symbol.pas',
-  BADI.Eidolon.TableNameDef in 'Source\BADI.Eidolon.TableNameDef.pas',
-  BADI.Eidolon.TextTable in 'Source\BADI.Eidolon.TextTable.pas',
-  BADI.Eidolon.TextTableDef in 'Source\BADI.Eidolon.TextTableDef.pas',
-  BADI.Eidolon.TimeLocationTable in 'Source\BADI.Eidolon.TimeLocationTable.pas',
-  BADI.Eidolon.TLSSchematic.Comment in 'Source\BADI.Eidolon.TLSSchematic.Comment.pas',
-  BADI.Eidolon.TLSSchematic.Constants in 'Source\BADI.Eidolon.TLSSchematic.Constants.pas',
-  BADI.Eidolon.TLSSchematic.NoText in 'Source\BADI.Eidolon.TLSSchematic.NoText.pas',
-  BADI.Eidolon.TLSSchematic.ResourceStrings in 'Source\BADI.Eidolon.TLSSchematic.ResourceStrings.pas',
-  BADI.Eidolon.TLSSchematic.SchematicSetting in 'Source\BADI.Eidolon.TLSSchematic.SchematicSetting.pas',
-  BADI.Eidolon.TLSSchematic.TLSObject in 'Source\BADI.Eidolon.TLSSchematic.TLSObject.pas',
-  BADI.Eidolon.TLSSchematic.TLSRoad in 'Source\BADI.Eidolon.TLSSchematic.TLSRoad.pas',
-  BADI.Eidolon.TLSSchematic.TLSShape in 'Source\BADI.Eidolon.TLSSchematic.TLSShape.pas',
-  BADI.Eidolon.TLSSchematic.TLSStatic in 'Source\BADI.Eidolon.TLSSchematic.TLSStatic.pas',
-  BADI.Eidolon.Triangle in 'Source\BADI.Eidolon.Triangle.pas',
   BADI.INI.Comment in 'Source\BADI.INI.Comment.pas',
   BADI.INI.KeyValuePair in 'Source\BADI.INI.KeyValuePair.pas',
   BADI.VB.Attribute in 'Source\BADI.VB.Attribute.pas',
@@ -247,15 +208,14 @@ uses
   BADI.Module.Checks.SubView in 'Source\BADI.Module.Checks.SubView.pas',
   BADI.IDEEditorColours in 'Source\BADI.IDEEditorColours.pas',
   BADI.IDEThemingNotifier in 'Source\BADI.IDEThemingNotifier.pas',
-  BADI.Exclusions in 'Source\BADI.Exclusions.pas';
+  BADI.Exclusions in 'Source\BADI.Exclusions.pas',
+  BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas';
 
 {$R *.res}
 
 begin
   {$IFDEF EUREKALOG}
   SetEurekaLogState(True);
-  CodeSite.Send('IsEurekaLogInstalled', IsEurekaLogInstalled);
-  CodeSite.Send('IsEurekaLogActive', IsEurekaLogActive);
   {$ENDIF EUREKALOG}
 end.
 

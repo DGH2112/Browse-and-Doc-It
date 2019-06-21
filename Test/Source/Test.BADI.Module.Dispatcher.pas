@@ -45,7 +45,6 @@ Begin
   Check(TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.frm'), 'MyFile.frm');
   Check(Not TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.htm'), 'MyFile.htm');
   Check(Not TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.html'), 'MyFile.html');
-  Check(TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.map'), 'MyFile.map');
   Check(TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.pas'), 'MyFile.pas');
   Check(Not TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.xml'), 'MyFile.xml');
   Check(Not TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.xsd'), 'MyFile.xsd');
@@ -65,7 +64,6 @@ Begin
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.frm'), 'MyFile.frm');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.htm'), 'MyFile.htm');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.html'), 'MyFile.html');
-  Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.map'), 'MyFile.map');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.pas'), 'MyFile.pas');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.xml'), 'MyFile.xml');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.xsd'), 'MyFile.xsd');
@@ -143,12 +141,6 @@ Begin
   Finally
     M.Free;
   End;
-  M := TBADIDispatcher.BADIDispatcher.Dispatcher('', 'MyFile.map', False, []);
-  Try
-    Check(M <> Nil);
-  Finally
-    M.Free;
-  End;
   M := TBADIDispatcher.BADIDispatcher.Dispatcher('', 'MyFile.pas', False, []);
   Try
     Check(M <> Nil);
@@ -205,9 +197,6 @@ Begin
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.html', csBlock),  ctXML, 'MyFile.html - Block');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.html', csLine),   ctXML, 'MyFile.html - Line');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.html', csInSitu), ctXML, 'MyFile.html - InSitu');
-  CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.map',  csBlock),  ctCPPBlock, 'MyFile.map - Block');
-  CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.map',  csLine),   ctCPPLine, 'MyFile.map - Line');
-  CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.map',  csInSitu), ctCPPBlock, 'MyFile.map - InSitu');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.pas',  csBlock),  ctPascalBlock, 'MyFile.pas - Block');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.pas',  csLine),   ctPascalBlock, 'MyFile.pas - Line');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.pas',  csInSitu), ctPascalBlock, 'MyFile.pas - InSitu');

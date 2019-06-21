@@ -138,9 +138,6 @@
             <Form>frmDocumentationOptions</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\Source\BADI.Eidolon.Module.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Module.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Types.pas"/>
         <DCCReference Include="..\Source\BADI.ElementContainer.pas"/>
         <DCCReference Include="..\Source\BADI.ExcludedDocFilesFrame.pas">
             <Form>fmBADIExcludedDocFilesFrame</Form>
@@ -236,41 +233,6 @@
         <DCCReference Include="..\Source\BADI.DFM.ObjectDecl.pas"/>
         <DCCReference Include="..\Source\BADI.DFM.PropertyDecl.pas"/>
         <DCCReference Include="..\Source\BADI.DFM.Types.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Association.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Bar.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.BaseTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Comment.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.ConnectionDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Constants.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.CustomFillSymbol.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DatabaseDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DBConnection.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DBTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Diamond.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Ellipse.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.FieldDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Functions.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Line.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.OutputTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Rectangle.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.RequirementsTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.ResourceStrings.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.SuperBar.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Symbol.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TableNameDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TextTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TextTableDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TimeLocationTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Comment.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Constants.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.NoText.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.ResourceStrings.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.SchematicSetting.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSObject.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSRoad.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSShape.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSStatic.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Triangle.pas"/>
         <DCCReference Include="..\Source\BADI.INI.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.INI.KeyValuePair.pas"/>
         <DCCReference Include="..\Source\BADI.VB.Comment.pas"/>

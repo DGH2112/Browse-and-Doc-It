@@ -1,18 +1,18 @@
 # Browser and Doc It
 
-Author:   David Hoyle (davidghoyle@gmail.com / [link](https://github.com/DGH2112))
+Author:   David Hoyle (davidghoyle@gmail.com / https://github.com/DGH2112)
 
 Version:  1.3a
 
 Date:     03 Feb 2019
 
-Web Site: [link](http://www.davidghoyle.co.uk/WordPress/?page_id=872)
+Web Site: http://www.davidghoyle.co.uk/WordPress/?page_id=872
 
 # GNU GENERAL PUBLIC LICENSE
 
 ## Version 3, 29 June 2007
 
-Copyright (C) 2007 Free Software Foundation, Inc. <[link](https://fsf.org/)>
+Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
 Everyone is permitted to copy and distribute verbatim copies
 of this license document, but changing it is not allowed.
 

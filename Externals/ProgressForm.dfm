@@ -17,7 +17,7 @@ object frmProgress: TfrmProgress
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
-  TextHeight = 16
+  TextHeight = 13
   object pnlPanel1: TPanel
     Left = 0
     Top = 47

@@ -25,10 +25,6 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 8
-    ExplicitTop = 184
-    ExplicitWidth = 576
-    ExplicitHeight = 329
     DesignSize = (
       437
       185)
@@ -95,8 +91,6 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
       Kind = bkCancel
       NumGlyphs = 2
       TabOrder = 6
-      ExplicitLeft = 509
-      ExplicitTop = 631
     end
     object btnOK: TBitBtn
       Left = 273
@@ -108,8 +102,6 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
       NumGlyphs = 2
       TabOrder = 5
       OnClick = btnOKClick
-      ExplicitLeft = 428
-      ExplicitTop = 631
     end
     object cbxScope: TComboBox
       Left = 72

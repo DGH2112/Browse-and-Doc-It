@@ -20,7 +20,7 @@ object frmEditorOptions: TfrmEditorOptions
     544
     468)
   PixelsPerInch = 96
-  TextHeight = 16
+  TextHeight = 13
   object PageControl1: TPageControl
     Left = 10
     Top = 10
@@ -45,12 +45,12 @@ object frmEditorOptions: TfrmEditorOptions
       ExplicitHeight = 0
       DesignSize = (
         516
-        379)
+        382)
       object lblActiveLineColour: TLabel
         Left = 4
         Top = 42
-        Width = 107
-        Height = 16
+        Width = 86
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -61,8 +61,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblEditorFontName: TLabel
         Left = 4
         Top = 76
-        Width = 104
-        Height = 16
+        Width = 82
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -73,8 +73,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblEditorFontSize: TLabel
         Left = 4
         Top = 110
-        Width = 93
-        Height = 16
+        Width = 74
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -85,8 +85,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblRightEdgePosition: TLabel
         Left = 4
         Top = 143
-        Width = 118
-        Height = 16
+        Width = 93
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -97,8 +97,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblRightEdgeColour: TLabel
         Left = 4
         Top = 176
-        Width = 109
-        Height = 16
+        Width = 86
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -109,8 +109,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblForeColour: TLabel
         Left = 4
         Top = 210
-        Width = 156
-        Height = 16
+        Width = 123
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -121,8 +121,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblBackColour: TLabel
         Left = 4
         Top = 245
-        Width = 159
-        Height = 16
+        Width = 127
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -133,8 +133,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblEditorBackgroundColour: TLabel
         Left = 4
         Top = 7
-        Width = 153
-        Height = 16
+        Width = 121
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -145,8 +145,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblTabWidth: TLabel
         Left = 4
         Top = 279
-        Width = 121
-        Height = 16
+        Width = 97
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -358,7 +358,7 @@ object frmEditorOptions: TfrmEditorOptions
       ExplicitHeight = 0
       DesignSize = (
         516
-        379)
+        382)
       object clbOptions: TCheckListBox
         Left = 4
         Top = 4
@@ -379,18 +379,14 @@ object frmEditorOptions: TfrmEditorOptions
       Margins.Bottom = 4
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         516
-        379)
+        382)
       object lblAttrForeColour: TLabel
         Left = 322
         Top = 49
-        Width = 163
-        Height = 16
+        Width = 129
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -401,8 +397,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblAttrBackColour: TLabel
         Left = 327
         Top = 107
-        Width = 166
-        Height = 16
+        Width = 133
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -413,8 +409,8 @@ object frmEditorOptions: TfrmEditorOptions
       object lblAttributes: TLabel
         Left = 4
         Top = 46
-        Width = 55
-        Height = 16
+        Width = 44
+        Height = 13
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -449,6 +445,7 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Right = 4
         Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
+        ItemHeight = 13
         TabOrder = 0
         OnClick = lbAttributesClick
       end

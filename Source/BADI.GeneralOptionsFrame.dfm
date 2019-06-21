@@ -97,10 +97,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     OnFreeNode = vstGeneralOptionsFreeNode
     OnGetText = vstGeneralOptionsGetText
     OnPaintText = vstGeneralOptionsPaintText
-    ExplicitLeft = 160
-    ExplicitTop = 96
-    ExplicitWidth = 200
-    ExplicitHeight = 100
     Columns = <>
   end
 end

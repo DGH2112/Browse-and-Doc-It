@@ -69,9 +69,6 @@ uses
   Classes,
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF DEBUG}
-  {$IFDEF PROFILECODE}
-  Profiler in '..\..\Library\Profiler.pas',
   {$ENDIF PROFILECODE}
   BADI.Initialisation in 'Source\BADI.Initialisation.pas',
   BADI.Options in 'Source\BADI.Options.pas',
@@ -82,7 +79,6 @@ uses
   BADI.ModuleExplorerFrame in 'Source\BADI.ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   BADI.OptionsForm in 'Source\BADI.OptionsForm.pas' {frmOptions},
   BADI.Pascal.Module in 'Source\BADI.Pascal.Module.pas',
-  ProgressForm in '..\..\Library\ProgressForm.pas' {frmProgress},
   BADI.SpecialTagForm in 'Source\BADI.SpecialTagForm.pas' {frmSpecialTag},
   BADI.TokenForm in 'Source\BADI.TokenForm.pas' {frmTokenForm},
   BADI.ToolsAPIUtils in 'Source\BADI.ToolsAPIUtils.pas',
@@ -95,7 +91,6 @@ uses
   BADI.DUnitForm in 'Source\BADI.DUnitForm.pas' {frmDUnit},
   BADI.DUnitCreator in 'Source\BADI.DUnitCreator.pas',
   BADI.CommonIDEFunctions in 'Source\BADI.CommonIDEFunctions.pas',
-  DGHEllipsisLabel in '..\..\Components\DGHControls\Source\DGHEllipsisLabel.pas',
   BADI.BackusNaur.Module in 'Source\BADI.BackusNaur.Module.pas',
   BADI.BNFHighlighter in 'Source\BADI.BNFHighlighter.pas',
   BADI.EditorNotifier in 'Source\BADI.EditorNotifier.pas',
@@ -230,7 +225,8 @@ uses
   BADI.IDEEditorColours in 'Source\BADI.IDEEditorColours.pas',
   BADI.IDEThemingNotifier in 'Source\BADI.IDEThemingNotifier.pas',
   BADI.Exclusions in 'Source\BADI.Exclusions.pas',
-  BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas';
+  BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas',
+  ProgressForm in 'Externals\ProgressForm.pas' {frmProgress};
 
 {$R *.res}
 

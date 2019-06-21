@@ -138,7 +138,6 @@
         <RcCompile Include="Source\BADI.HTMLResources.RC">
             <Form>BADI.HTMLResources.res</Form>
         </RcCompile>
-        <DCCReference Include="..\..\Library\Profiler.pas"/>
         <DCCReference Include="Source\BADI.Initialisation.pas"/>
         <DCCReference Include="Source\BADI.Options.pas"/>
         <DCCReference Include="Source\BADI.Module.Dispatcher.pas"/>
@@ -155,9 +154,6 @@
             <Form>frmOptions</Form>
         </DCCReference>
         <DCCReference Include="Source\BADI.Pascal.Module.pas"/>
-        <DCCReference Include="..\..\Library\ProgressForm.pas">
-            <Form>frmProgress</Form>
-        </DCCReference>
         <DCCReference Include="Source\BADI.SpecialTagForm.pas">
             <Form>frmSpecialTag</Form>
         </DCCReference>
@@ -180,7 +176,6 @@
         </DCCReference>
         <DCCReference Include="Source\BADI.DUnitCreator.pas"/>
         <DCCReference Include="Source\BADI.CommonIDEFunctions.pas"/>
-        <DCCReference Include="..\..\Components\DGHControls\Source\DGHEllipsisLabel.pas"/>
         <DCCReference Include="Source\BADI.BackusNaur.Module.pas"/>
         <DCCReference Include="Source\BADI.BNFHighlighter.pas"/>
         <DCCReference Include="Source\BADI.EditorNotifier.pas"/>
@@ -365,6 +360,10 @@
         <DCCReference Include="Source\BADI.IDEThemingNotifier.pas"/>
         <DCCReference Include="Source\BADI.Exclusions.pas"/>
         <DCCReference Include="Source\BADI.EidolonHighlighter.pas"/>
+        <DCCReference Include="Externals\ProgressForm.pas">
+            <Form>frmProgress</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

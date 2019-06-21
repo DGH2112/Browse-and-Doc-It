@@ -288,7 +288,6 @@
             <Form>frmProgress</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\Externals\DGHEllipsisLabel.pas"/>
         <DCCReference Include="..\Externals\DGHSynEdit.pas"/>
         <DCCReference Include="..\Externals\DGHCustomGraphicsControl.pas"/>
         <DCCReference Include="..\Externals\DGHMemoryMonitorControl.pas"/>

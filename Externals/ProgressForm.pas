@@ -33,7 +33,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, ExtCtrls, DGHEllipsisLabel, StdCtrls, Buttons;
+  ComCtrls, ExtCtrls, StdCtrls, Buttons;
 
 type
   (**
@@ -53,7 +53,7 @@ type
     procedure btnCancelClick(Sender: TObject);
   private
     { Private declarations }
-    FEllipsisLabel : TDGHEllipsisLabel;
+    FEllipsisLabel : TLabel;
   public
     { Public declarations }
     Procedure Init(Const iMax: Integer; Const strTitle, strMsg: String);
@@ -96,9 +96,10 @@ end;
 **)
 procedure TfrmProgress.FormCreate(Sender: TObject);
 begin
-  FEllipsisLabel := TDGHEllipsisLabel.Create(Nil);
+  FEllipsisLabel := TLabel.Create(Nil);
   FEllipsisLabel.Parent := pnlInfo;
   FEllipsisLabel.Align := alClient;
+  FEllipsisLabel.EllipsisPosition := epPathEllipsis;
 end;
 
 (**

@@ -136,7 +136,6 @@ uses
   BADI.ModuleExplorer.TreeNodeInfo in '..\Source\BADI.ModuleExplorer.TreeNodeInfo.pas',
   BADI.ModuleExplorer.CustomHintWindow in '..\Source\BADI.ModuleExplorer.CustomHintWindow.pas',
   ProgressForm in '..\Externals\ProgressForm.pas' {frmProgress},
-  DGHEllipsisLabel in '..\Externals\DGHEllipsisLabel.pas',
   DGHSynEdit in '..\Externals\DGHSynEdit.pas',
   DGHCustomGraphicsControl in '..\Externals\DGHCustomGraphicsControl.pas',
   DGHMemoryMonitorControl in '..\Externals\DGHMemoryMonitorControl.pas',

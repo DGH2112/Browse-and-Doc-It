@@ -51,9 +51,9 @@ Type
     lblAuthor: TLabel;
     lblBuild: TLabel;
     lblPleaseSelect: TLabel;
-    lblInformation: TLabel;
     lblEurekaLog: TLabel;
     lblBuildDate: TLabel;
+    lblInformation: TMemo;
   Private
     { Private declarations }
   Public

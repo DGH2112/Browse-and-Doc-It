@@ -43,10 +43,10 @@ Const
   strSplashScreenName = 'Browse and Doc It %d.%d%s for %s';
   {$IFDEF DEBUG}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
-  strSplashScreenBuild = 'Freeware by David Hoyle (DEBUG Build %d.%d.%d.%d)';
+  strSplashScreenBuild = 'David Hoyle (c) 2019 License GNU GPL 3 (DEBUG Build %d.%d.%d.%d)';
   {$ELSE}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
-  strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
+  strSplashScreenBuild = 'David Hoyle (c) 2019 License GNU GPL 3 (Build %d.%d.%d.%d)';
   {$ENDIF}
 
   (** A default list of symbols which should not have spaces before them. **)

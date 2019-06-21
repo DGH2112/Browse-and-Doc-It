@@ -4,7 +4,7 @@ Author:   David Hoyle (davidghoyle@gmail.com / https://github.com/DGH2112)
 
 Version:  1.3a
 
-Date:     03 Feb 2019
+Date:     21 Jun 2019
 
 Web Site: http://www.davidghoyle.co.uk/WordPress/?page_id=872
 

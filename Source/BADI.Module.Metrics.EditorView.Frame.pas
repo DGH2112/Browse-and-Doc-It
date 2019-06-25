@@ -4,7 +4,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Jan 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -95,12 +115,17 @@ Type
   Type
       (** A record to describe the data to be held in a tree node. **)
     TBADIMetricRecord = Record
-      FNodeType              : TBADINodeType;
-      FText                  : String;
-      FImageIndex            : Integer;
-      FMetrics               : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of Double;
-      FIssueCount            : Integer;
-      FMetricOverrides       : TBADIModuleMetrics;
+      FNodeType        : TBADINodeType;
+      FFileName        : String;
+      FText            : String;
+      FImageIndex      : Integer;
+      FMetrics         : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of Double;
+      FIssueCount      : Integer;
+      FMetricOverrides : TBADIModuleMetrics;
+      FIdentLine       : Integer;
+      FIdentColumn     : Integer;
+      FCommentLine     : Integer;
+      FCommentColumn   : Integer;
     End;
     (** A pointer to the above record. **)
     PBADIMetricRecord = ^TBADIMetricRecord;
@@ -125,7 +150,8 @@ Type
     FOverLimit     : Integer;
     FVSTMetrics    : TBADIEditorViewVirtualStringTree;
     {$IFDEF DXE102}
-    FStyleServicesNotifier: Integer;
+    FThemingServicesNotifierIndex : Integer;
+    FStyleServices : TCustomStyleServices;
     {$ENDIF}
   Strict Protected
     Procedure vstStatisticsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -153,6 +179,8 @@ Type
     Procedure CreateVirtualStringTree;
     Procedure HideZeroColumns;
     Procedure ExpandIssues;
+    Procedure HookStyleServices(Sender : TObject);
+    Procedure vstStatisticsDblClick(Sender : TObject);
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -227,7 +255,8 @@ Uses
   BADI.Options,
   BADI.Functions,
   ClipBrd, 
-  BADI.StyleServices.Notifier;
+  BADI.IDEThemingNotifier,
+  BADI.ToolsAPIUtils;
 
 {$R *.dfm}
 
@@ -574,17 +603,17 @@ Constructor TframeBADIModuleMetricsEditorView.Create(AOwner: TComponent);
 Var
   ITS : IOTAIDEThemingServices;
 {$ENDIF}
-  
+
 Begin
   Inherited Create(AOwner);
   CreateVirtualStringTree;
   FVSTMetrics.NodeDataSize := SizeOf(TBADIMetricRecord);
   LoadBADIImages(ilScopeImages);
+  HookStyleServices(Nil);
   {$IFDEF DXE102}
-  FStyleServicesNotifier := -1;
+  FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    FStyleServicesNotifier :=
-      ITS.AddNotifier(TBADIStyleServicesNotifier.Create(FVSTMetrics.UpdateTreeColours));
+    FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(HookStyleServices));
   {$ENDIF}
 End;
 
@@ -622,6 +651,7 @@ Begin
   FVSTMetrics.OnGetText := vstStatisticsGetText;
   FVSTMetrics.OnPaintText := vstStatisticsPaintText;
   FVSTMetrics.OnGetImageIndex := vstStatisticsGetImageIndex;
+  FVSTMetrics.OnDblClick := vstStatisticsDblClick;
   For eColumn := Low(TBADIMetricColumn) To High(TBADIMetricColumn) Do
     Begin
       C := FVSTMetrics.Header.Columns.Add;
@@ -632,6 +662,7 @@ Begin
       C.Text := MetricColumns[eColumn].FName;
       C.Alignment := MetricColumns[eColumn].FAlignment;
     End;
+  FVSTMetrics.Header.Columns[0].Options := FVSTMetrics.Header.Columns[0].Options + [coFixed];
 End;
 
 (**
@@ -676,11 +707,12 @@ Destructor TframeBADIModuleMetricsEditorView.Destroy;
 Var
   ITS : IOTAIDEThemingServices;
 {$ENDIF}
-  
+
 Begin
   {$IFDEF DXE102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    ITS.RemoveNotifier(FStyleServicesNotifier);
+    If FThemingServicesNotifierIndex > -1 Then
+      ITS.RemoveNotifier(FThemingServicesNotifierIndex);
   {$ENDIF}
   Inherited Destroy;
 End;
@@ -862,6 +894,35 @@ End;
 
 (**
 
+  This method Hokos the IDEs Style Services if they are available and enabled.
+
+  @precon  None.
+  @postcon The IDEs style services are hooked if available and enabled else its set to nil.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.HookStyleServices(Sender : TObject);
+
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+
+Begin
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      Begin
+        FStyleServices := ITS.StyleServices;
+        ITS.ApplyTheme(Self);
+      End;
+  {$ENDIF}
+End;
+
+(**
+
   This method initialises the limits record in the class with the information from the options.
 
   @precon  None.
@@ -954,15 +1015,27 @@ Var
   NodeData: PBADIMetricRecord;
   iElement: Integer;
   M: TGenericFunction;
+  Module : TBaseLanguageModule;
 
 Begin
   Result.Create(FVSTMetrics.AddChild(Parent));
   NodeData := FVSTMetrics.GetNodeData(Result.FNode);
   NodeData.FNodeType := ntUnkown;
-  If Not Assigned(Container.Parent) Then
-    NodeData.FNodeType := ntModule;
+  If Container Is TBaseLanguageModule Then
+    Begin
+      Module := Container As TBaseLanguageModule;
+      NodeData.FNodeType := ntModule;
+      NodeData.FFileName := Module.FileName;
+    End;
   NodeData.FText := Container.AsString(True, False);
   NodeData.FImageIndex := BADIImageIndex(Container.ImageIndex, Container.Scope);
+  NodeData.FIdentLine := Container.Line;
+  NodeData.FIdentColumn := Container.Column;
+  If Assigned(Container.Comment) Then
+    Begin
+      NodeData.FCommentLine := Container.Comment.Line;
+      NodeData.FCommentColumn := Container.Comment.Column;
+    ENd;
   If Container Is TGenericFunction Then
     Begin
       M := Container As TGenericFunction;
@@ -1195,8 +1268,8 @@ Begin
   NodeData := FVSTMetrics.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
   {$IFDEF DXE102}
-  If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
-    TargetCanvas.Brush.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindow);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
   {$ENDIF}
   Case TBADIMetricColumn(Column) Of
     mcLength: TargetCanvas.Brush.Color := Colour(NodeData.FMetrics[mmLongMethods],
@@ -1241,6 +1314,50 @@ End;
 
 (**
 
+  This method attempts to display the method that was double clicked on.
+
+  @precon  None.
+  @postcon The method that was clicked on is displayed if it can be shown.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsDblClick(Sender: TObject);
+
+Var
+  Node : PVirtualNode;
+  NodeData : PBADIMetricRecord;
+  strFileName : String;
+  MS : IOTAModuleServices;
+  Module: IOTAModule;
+  
+Begin
+  Node := FVSTMetrics.FocusedNode;
+  While Assigned(Node) Do
+    Begin
+      NodeData := FVSTMetrics.GetNodeData(Node);
+      If Length(NodeData.FFileName) > 0 Then
+        strFileName := NodeData.FFileName;
+      Node := FVSTMetrics.NodeParent[Node];
+    End;
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      Module := MS.FindModule(strFileName);
+      If Not Assigned(Module) Then
+        Module := MS.OpenModule(strFileName);
+      If Assigned(Module) Then
+        Begin
+          Module.Show;
+          Node := FVSTMetrics.FocusedNode;
+          NodeData := FVSTMetrics.GetNodeData(Node);
+          TBADIToolsAPIFunctions.PositionCursor(NodeData.FIdentLine, NodeData.FIdentColumn,
+            NodeData.FCommentLine, TBADIOptions.BADIOptions.BrowsePosition);
+        End;
+    End;
+End;
+
+(**
+
   This is an on FreeNdoe event handler for the treeview.
 
   @precon  None.
@@ -1250,7 +1367,8 @@ End;
   @param   Node   as a PVirtualNode
 
 **)
-Procedure TframeBADIModuleMetricsEditorView.vstStatisticsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsFreeNode(Sender: TBaseVirtualTree;
+  Node: PVirtualNode);
 
 Var
   NodeData : PBADIMetricRecord;
@@ -1361,8 +1479,8 @@ Begin
   TargetCanvas.Font.Style := [];
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
   Case TBADIMetricColumn(Column) Of
     mcLength..mcToxicity: TargetCanvas.Font.Color := clBlack;

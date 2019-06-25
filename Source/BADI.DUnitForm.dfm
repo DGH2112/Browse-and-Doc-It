@@ -170,11 +170,6 @@ object frmDUnit: TfrmDUnit
     Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'Tahoma'
-    Header.Font.Style = []
     Header.Height = 17
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
@@ -261,18 +256,22 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       Caption = '&Class Name Mask'
       FocusControl = edtClassName
+      ExplicitWidth = 100
+      ExplicitHeight = 16
     end
     object lblMethodName: TLabel
       AlignWithMargins = True
       Left = 187
       Top = 0
       Width = 181
-      Height = 25
+      Height = 22
       Margins.Top = 0
       Margins.Right = 0
       Align = alClient
       Caption = 'Method Name &Mask'
       FocusControl = edtMethodName
+      ExplicitWidth = 112
+      ExplicitHeight = 16
     end
     object edtClassName: TEdit
       Left = 0
@@ -282,6 +281,7 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       TabOrder = 0
       Text = 'edtClassName'
+      ExplicitHeight = 24
     end
     object edtMethodName: TEdit
       AlignWithMargins = True
@@ -295,6 +295,7 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       TabOrder = 1
       Text = 'edtMethodName'
+      ExplicitHeight = 24
     end
   end
   object ilScopeImages: TImageList

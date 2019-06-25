@@ -1,3 +1,32 @@
+(**
+  
+  This module contains DUnit test for the Browse and Doc It code.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  
+**)
 Unit Test.BADI.XML.Module;
 
 Interface
@@ -958,6 +987,19 @@ begin
     CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('!ELEMENT Name ANY', M.Elements[1].Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+  strCode := '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'#13#10 + 
+    '<Element></Element>'#13#10;
+  M := TXMLModule.CreateParser(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
+    CheckEquals('!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;

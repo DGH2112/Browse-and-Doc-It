@@ -5,7 +5,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    03 Jan 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Module.Checks.Options.Frame;
@@ -22,6 +42,7 @@ Uses
   Controls,
   Forms,
   Dialogs,
+  VCL.Themes,
   BADI.CustomOptionsFrame,
   VirtualTrees, 
   BADI.CustomVirtualStringTree;
@@ -42,6 +63,9 @@ Type
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     FVSTChecks : TBADIChecksOptionsVirtualStringTree;
+    {$IFDEF DXE102}
+    FStyleServices: TCustomStyleServices;
+    {$ENDIF}
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -59,10 +83,11 @@ Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
+  ToolsAPI,
   BADI.Types,
   BADI.Constants,
   BADI.Options, 
-  BADI.Functions;
+  BADI.Functions, BADI.Interfaces;
 
 {$R *.dfm}
 
@@ -101,10 +126,19 @@ Var
   eCheckSubOp: TBADIModuleCheckSubOp;
   N, S : PVirtualNode;
   NodeData : PCheckNodeData;
+  {$IFDEF DXE102}
+  ITS : IOTAIDEThemingServices;
+  {$ENDIF}
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(AOwner);
   CreateVirtualStringTree;
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    FStyleServices := ITS.StyleServices;
+  {$ENDIF}
   FVSTChecks.NodeDataSize := SizeOf(TCheckNodeData);
   For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
     Begin
@@ -188,9 +222,10 @@ Procedure TframeBADIModuleChecksOptions.LoadSettings;
 Var
   N : PVirtualNode;
   NodeData : PCheckNodeData;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   N := FVSTChecks.GetFirst;
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
@@ -203,7 +238,7 @@ Begin
           Else
             FVSTChecks.CheckState[N] := csUncheckedNormal;
         ntSubOption:
-          If NodeData.FModuleCheckSubOp In BO.BADIOptions.ModuleCheckSubOptions Then
+          If NodeData.FModuleCheckSubOp In BO.ModuleCheckSubOptions Then
             FVSTChecks.CheckState[N] := csCheckedNormal
           Else
             FVSTChecks.CheckState[N] := csUncheckedNormal;
@@ -263,9 +298,10 @@ Var
   N : PVirtualNode;
   NodeData : PCheckNodeData;
   R : TBADICheckRecord;
-  BO: TBADIOptions;
+  BO: IBADIOptions;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   N := FVSTChecks.GetFirst();
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
@@ -419,9 +455,10 @@ Procedure TframeBADIModuleChecksOptions.vstChecksPaintText(Sender: TBaseVirtualT
 Begin
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTChecks.StyleServices) And FVSTChecks.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTChecks.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
 End;
 
 End.
+

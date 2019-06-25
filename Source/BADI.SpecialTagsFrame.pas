@@ -4,7 +4,27 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Jan 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -31,7 +51,7 @@ Uses
   BADI.Types,
   VirtualTrees,
   Themes, 
-  BADI.CustomVirtualStringTree;
+  BADI.CustomVirtualStringTree, System.ImageList, Vcl.ImgList;
 
 Type
   (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)
@@ -39,11 +59,12 @@ Type
 
   (** This is a class to represent the frame interface. **)
   TfmBADISpecialTagsFrame = Class(TFrame, IBADIOptionsFrame)
-    btnDelete: TBitBtn;
-    btnEdit: TBitBtn;
-    btnMoveDown: TBitBtn;
-    btnMoveUp: TBitBtn;
-    btnAdd: TBitBtn;
+    btnDelete: TButton;
+    btnEdit: TButton;
+    btnMoveDown: TButton;
+    btnMoveUp: TButton;
+    btnAdd: TButton;
+    ilButtonIcons: TImageList;
     Procedure btnAddClick(Sender: TObject);
     Procedure btnDeleteClick(Sender: TObject);
     Procedure btnEditClick(Sender: TObject);
@@ -63,6 +84,9 @@ Type
   Strict Private
     FSpecialTags    : TList<TBADISpecialTag>;
     FVSTSpecialTags : TBADISpecialTagsOptionsVirtualStringTree;
+    {$IFDEF DXE102}
+    FStyleServices : TCustomStyleServices;
+    {$ENDIF}
   Strict Protected
     Procedure PopulateTreeView;
     Procedure CreateVirtualStringTree;
@@ -80,7 +104,7 @@ Implementation
 
 
 Uses
-  {$IFDEF TOOLSAPI}
+  {$IFNDEF STANDALONEAPP}
   ToolsAPI,
   {$ENDIF}
   BADI.Base.Module,
@@ -205,6 +229,7 @@ Begin
       If NodeData.FSpecialTagIndex < FSpecialTags.Count - 1 Then
         Begin
           FSpecialTags.Exchange(NodeData.FSpecialTagIndex, NodeData.FSpecialTagIndex + 1);
+          FVSTSpecialTags.FocusedNode := FVSTSpecialTags.GetNextSibling(FVSTSpecialTags.FocusedNode);
           PopulateTreeView;
         End;
     End;
@@ -233,6 +258,7 @@ Begin
       If NodeData.FSpecialTagIndex > 0 Then
         Begin
           FSpecialTags.Exchange(NodeData.FSpecialTagIndex, NodeData.FSpecialTagIndex - 1);
+          FVSTSpecialTags.FocusedNode := FVSTSpecialTags.GetPreviousSibling(FVSTSpecialTags.FocusedNode);
           PopulateTreeView;
         End;
     End;
@@ -252,9 +278,24 @@ End;
 **)
 Constructor TfmBADISpecialTagsFrame.Create(AOwner: TComponent);
 
+{$IFNDEF STANDALONEAPP}
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+{$ENDIF}
+
 Begin
   Inherited Create(AOwner);
   CreateVirtualStringTree;
+  {$IFNDEF STANDALONEAPP}
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      FStyleServices := ITS.StyleServices;
+  {$ENDIF}
+  {$ENDIF}
   FVSTSpecialTags.NodeDataSize := SizeOf(TSpecialTagsNodeData);
   FSpecialTags := TList<TBADISpecialTag>.Create;
   PopulateTreeView;
@@ -465,11 +506,9 @@ Begin
     ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax     In ST.FTagProperties];
   Else
     TargetCanvas.Brush.Color := clWindow;
-    {$IFDEF TOOLSAPI}
     {$IFDEF DXE102}
-    If Assigned(FVSTSpecialTags.StyleServices) And FVSTSpecialTags.StyleServices.Enabled Then
-      TargetCanvas.Brush.Color := FVSTSpecialTags.StyleServices.GetSystemColor(clWindow);
-    {$ENDIF}
+    If Assigned(FStyleServices) Then
+      TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
     {$ENDIF}
     If ST.FBackColour <> clNone Then
       TargetCanvas.Brush.Color := ST.FBackColour;
@@ -648,11 +687,9 @@ Begin
   Case TColumnIndexes(Column) Of
     ciShowInTree..ciSyntax: TargetCanvas.Font.Color := clBlack;
   Else
-    {$IFDEF TOOLAPI}
     {$IFDEF DXE102}
-    If Assigned(FVSTSpecialTags.StyleServices) And FVSTSpecialTags.StyleServices.Enabled Then
-      TargetCanvas.Font.Color := FVSTSpecialTags.StyleServices.GetSystemColor(clWindowText);
-    {$ENDIF}
+    If Assigned(FStyleServices) Then
+      TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
     {$ENDIF}
     If ST.FFontColour <> clNone Then
       TargetCanvas.Font.Color := ST.FFontColour;

@@ -1,10 +1,10 @@
 /**
 
   Browse and Doc It Object Pascal Grammar.
-  Defines language capabiltities up to Delphi 2006.
+  Defines language capabiltities up to Delphi 10.3 Rio.
 
   @Version 1.0
-  @Date    13 Aug 2016
+  @Date    15 Jun 2019
   @Author  David Hoyle
 
   @usesemicolon
@@ -138,14 +138,12 @@
 
 <SimpleType>               ::= ( <OrdinalType> | <RealType> );
 
-<RealType>                 ::= 'REAL48' | 'REAL' | 'SINGLE' | 'DOUBLE' |
-                               'EXTENDED' | 'CURRENCY' | 'COMP';
+<RealType>                 ::= 'REAL48' | 'REAL' | 'SINGLE' | 'DOUBLE' | 'EXTENDED' | 'CURRENCY' | 'COMP';
 
 <OrdinalType>              ::= ( <SubrangeType> | <EnumeratedType> | <OrdIdent> );
 
-<OrdIdent>                 ::= 'SHORTINT' | 'SMALLINT' | 'INTEGER' | 'BYTE' |
-                               'LONGINT' | 'INT64' | 'WORD' | 'BOOLEAN' | 'CHAR' |
-                               'WIDECHAR' | 'LONGWORD' | 'PCHAR';
+<OrdIdent>                 ::= 'SHORTINT' | 'SMALLINT' | 'INTEGER' | 'BYTE' | 'LONGINT' | 'INT64' |
+                               'WORD' | 'BOOLEAN' | 'CHAR' | 'WIDECHAR' | 'LONGWORD' | 'PCHAR';
 
 <VariantType>              ::= 'VARIANT' | 'OLEVARIANT';
 
@@ -241,8 +239,7 @@
                                <TypeID> '(' <Expression> ')';
 
 //: = not processed in a C onstant Expression.
-<RelOp>                    ::= '>' | '<' | '<=' | '>=' | '<>' | 'IN' | 'IS' |
-                               'AS' | '=';
+<RelOp>                    ::= '>' | '<' | '<=' | '>=' | '<>' | 'IN' | 'IS' | 'AS' | '=';
 
 <AddOp>                    ::= '+' | '-' | 'OR' | 'XOR';
 
@@ -250,7 +247,11 @@
 
 <Designator>               ::= <QualID> [ <DesignatorSubElement> ]*;
 
-<DesignatorSubElement>     ::= '.' <Ident> | '[' <ExprList> ']' | '^' | '(' <MethodExprList> ')';
+<DesignatorSubElement>     ::= '.' <Ident>              |
+                               '[' <ExprList> ']'       |
+                               '^'                      |
+                               '(' <MethodExprList> ')' |
+                               <TypeArgs>;
 
 <SetConstructor>           ::= '[' [ <SetElement> ( ',' <SetElement> )* ] ']';
 
@@ -262,7 +263,13 @@
 
 <Statement>                ::= [ <LabelId> ':' ] [ <SimpleStatement> | <StructStmt> ];
 
-<StmtList>                 ::= <Statement> ( ';' <Statement> )*;
+<InLineVarDecl>            ::= 'VAR' <IdentList> [ ':' <TypeDecl> [ ':=' <Expression> ] ] ';';
+
+<InLineConstDecl>          ::= 'CONST' <Identifier> [ ':' <TypeDecl> ] '=' <Expression> ';';
+
+<StmtList>                 ::= <InLineStatement> ( ';' <InLineStatement> )*;
+
+<InLineStatement>          ::= <Statement> | <InLineVarDecl> | <InLineConstDecl>;
 
 <SimpleStatement>          ::= <Designator> [ '(' <ExprList> ')' ] |
                                <Designator> ':=' <Expression>      |
@@ -298,8 +305,10 @@
 
 <WhileStmt>                ::= 'WHILE' <Expression> 'DO' <Statement>;
 
-<ForStmt>                  ::= 'FOR' <QualID> ':=' <Expression> ( 'TO' | 'DOWNTO' ) <Expression> 'DO' <Statement> |
-                               'FOR' <QualID> 'IN' <Expression> 'DO';
+<ForStmt>                  ::= 'FOR' ( <InLineForVar> | <QualID> ) ':=' <Expression> ( 'TO' | 'DOWNTO' ) <Expression> 'DO' <Statement> |
+                               'FOR' ( <InLineForVar> | <QualID> ) 'IN' <Expression> 'DO';
+
+<InLineForVar>             ::= 'VAR' <Identifier> [ ':' <TypeDecl> ];
 
 <WithStmt>                 ::= 'WITH' <IdentList> 'DO' <Statement>;
 
@@ -348,10 +357,12 @@
 
 <OperatorHeading>          ::= 'CLASS' 'OPERATOR' <RestrictedIdentList> <FormalTypeParamList> [ <FormalParameters> ] ':' ( <SimpleType> | 'STRING' );
 
-<RestrictedIdentList>      ::= 'IMPLICIT' | 'EXPLICIT' | 'NEGATIVE' | 'POSITIVE' | 'INC' | 'DEC' | 'LOGICALNOT' | 'BITWISENOT' | 'TRUNC' | 'ROUND' |
-                               'EQUAL' | 'NOTEQUAL' | 'GREATERTHAN' | 'GREATERTHANOREQUAL' | 'LESSTHAN' | 'LESSTHANOREQUAL' | 'ADD' | 'SUBSTRACT' |
-                               'MULTIPLE' | 'DIVIDE' | 'INTDIVIDE' | 'MODULUS' | 'LEFTSHIFT' | 'RIGHTSHIFT' | 'LOGICALAND' | 'LOGICALOR' |
-                               'LOGICALXOR' | 'BITWISEAND' | 'BITWISEOR' | 'BITWISEXOR';
+<RestrictedIdentList>      ::= 'IMPLICIT' | 'EXPLICIT' | 'NEGATIVE' | 'POSITIVE' | 'INC' | 'DEC' |
+                               'LOGICALNOT' | 'BITWISENOT' | 'TRUNC' | 'ROUND' | 'EQUAL' | 'NOTEQUAL' |
+                               'GREATERTHAN' | 'GREATERTHANOREQUAL' | 'LESSTHAN' | 'LESSTHANOREQUAL' |
+                               'ADD' | 'SUBSTRACT' | 'MULTIPLE' | 'DIVIDE' | 'INTDIVIDE' | 'MODULUS' |
+                               'LEFTSHIFT' | 'RIGHTSHIFT' | 'LOGICALAND' | 'LOGICALOR' | 'LOGICALXOR' |
+                               'BITWISEAND' | 'BITWISEOR' | 'BITWISEXOR';
 
 <FormalParameters>         ::= '(' [ <FormalParam> (';' <FormalParam> )* ] ')';
 
@@ -540,7 +551,7 @@
 
 <NumericChar>              ::= '0'..'9';
 
-<Address>                  ::= '$' <HexNumber> <HexNumber>*;
+<Address>                  ::= '$' <HexNumber>+;
 
 <HexNumber>                ::= <NumericChar> | 'A'..'F';
 

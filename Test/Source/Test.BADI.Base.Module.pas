@@ -1,4 +1,32 @@
-//: @nometrics @nohints
+(**
+  
+  This module contains DUnit test for the Browse and Doc It code.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  
+**)
 unit Test.BADI.Base.Module;
 
 interface
@@ -28,15 +56,16 @@ type
   TIdent = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer);
 
   TElementContainerHelper = Class Helper for TElementContainer
-    Function FirstError : String;
-    Function FirstWarning : String;
-    Function FirstHint : String;
-    Function FirstDocConflict : String;
-    Function FirstCheck : String;
-    Function FirstMetric : String;
-    Function DocConflict(Const iConflict : Integer) : String;
+    Function  FindIssue(Const strTypeName : String; Const slSource : TStringList = Nil) : String;
+    Function  FirstError(Const slSource : TStringList = Nil) : String;
+    Function  FirstWarning(Const slSource : TStringList = Nil) : String;
+    Function  FirstHint(Const slSource : TStringList = Nil) : String;
+    Function  FirstDocConflict(Const slSource : TStringList = Nil) : String;
+    Function  FirstCheck(Const slSource : TStringList = Nil) : String;
+    Function  FirstMetric(Const slSource : TStringList = Nil) : String;
+    Function  DocConflict(Const iConflict : Integer) : String;
     Procedure DeleteDocumentConflicts;
-    Function HeadingCount(Const strHeading : String) : Integer;
+    Function  HeadingCount(Const strHeading : String) : Integer;
   End;
 
   TBaseLanguageModuleHelper = Class Helper For TBaseLanguageModule
@@ -50,7 +79,11 @@ type
 
   TExtendedTestCase = Class(TTestCase)
   Strict Private
+    FSource : TStringList;
   Public
+    Constructor Create(MethodName: String); Overload; Override;
+    Constructor Create(MethodName: String; RunCount: Int64); Overload; Override;
+    Destructor Destroy; Override;
     Procedure CheckEquals(ttExpected, ttActual : TBADITokenType; strMsg : String = ''); Overload;
     Procedure CheckEquals(iiExpected, iiActual : TBADIImageIndex; strMsg : String = ''); Overload;
     Procedure CheckEquals(iiExpected : TBADIImageIndex; iActual : Integer;
@@ -157,11 +190,15 @@ type
     Procedure TestCompilerConditionStack;
     Procedure TestBytes;
     Procedure TestLines;
+    //Procedure TestMemoryLeak;
   end;
 
 implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   Windows,
   TypInfo,
   BADI.ResourceStrings,
@@ -207,82 +244,66 @@ begin
     End;
 end;
 
-Function TElementContainerHelper.FirstDocConflict: String;
-
-Var
-  E : TElementContainer;
+Function TElementContainerHelper.FirstDocConflict(Const slSource : TStringList = Nil) : String;
 
 Begin
-  Result := '';
-  E := FindElement(strDocumentationConflicts);
-  If Assigned(E) Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
+  Result := FindIssue(strDocumentationConflicts, slSource);
 End;
 
-Function TElementContainerHelper.FirstError: String;
+Function TElementContainerHelper.FirstError(Const slSource : TStringList = Nil) : String;
+
+Begin
+  Result := FindIssue(strErrors, slSource);
+End;
+
+Function TElementContainerHelper.FirstHint(Const slSource : TStringList = Nil) : String;
+
+Begin
+  Result := FindIssue(strHints, slSource);
+End;
+
+Function TElementContainerHelper.FindIssue(Const strTypeName: String;
+  Const slSource: TStringList): String;
 
 Var
   E : TElementContainer;
+  strMsg: String;
+  strLineNo: String;
 
 begin
   Result := '';
-  E := FindElement(strErrors);
-  If E <> Nil Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
-end;
-
-function TElementContainerHelper.FirstHint: String;
-
-Var
-  E : TElementContainer;
-
-begin
-  Result := '';
-  E := FindElement(strHints);
-  If E <> Nil Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
-end;
-
-Function TElementContainerHelper.FirstCheck: String;
-
-Var
-  E: TElementContainer;
-
-Begin
-  Result := '';
-  E := FindElement(strChecks);
+  E := FindElement(strTypeName);
   If Assigned(E) Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
+    Begin
+      E := E.Elements[1];
+      strMsg := E.AsString(True, False);
+      If Assigned(slSource) Then
+        Begin
+          strLineNo := Format('[%4.4d]', [E.Line]);
+          strMsg := strMsg + #13#10 + strLineNo + slSource[Pred(E.Line)];
+          strMsg := strMsg + #13#10 + StringOfChar(#32, Length(strLineNo) + Pred(E.Column)) + '^';
+          
+        End;
+      Result := strMsg + #13#10;
+    End;
 End;
 
-Function TElementContainerHelper.FirstMetric: String;
-
-Var
-  E: TElementContainer;
+Function TElementContainerHelper.FirstCheck(Const slSource : TStringList = Nil) : String;
 
 Begin
-  Result := '';
-  E := FindElement(strMetrics);
-  If Assigned(E) Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
+  Result := FindIssue(strChecks, slSource);
 End;
 
-function TElementContainerHelper.FirstWarning: String;
+Function TElementContainerHelper.FirstMetric(Const slSource : TStringList = Nil) : String;
 
-Var
-  E : TElementContainer;
+Begin
+  Result := FindIssue(strMetrics, slSource);
+End;
+
+Function TElementContainerHelper.FirstWarning(Const slSource : TStringList = Nil) : String;
 
 begin
-  Result := '';
-  E := FindElement(strWarnings);
-  If E <> Nil Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
-      #13#10, '(line-end)', [rfReplaceAll]);
+  Result := FindIssue(strWarnings, slSource);
 end;
 
 function TElementContainerHelper.HeadingCount(Const strHeading : String): Integer;
@@ -364,23 +385,23 @@ Var
   strValueScope : String;
 
 Begin
-  P := Parser.CreateParser(Format(strTemplate, [strInterface,
-    strImplementation]), 'TestSource.pas', False, [moParse]);
+  FSource.Text := Format(strTemplate, [strInterface, strImplementation]);
+  P := Parser.CreateParser(FSource.Text, 'TestSource.pas', False, [moParse]);
   Try
     If ttErrors In TestTypes Then
-      CheckEquals(iErrors, P.HeadingCount(strErrors), 'ERRORS: ' + P.FirstError);
+      CheckEquals(iErrors, P.HeadingCount(strErrors), 'ERRORS:'#13#10 + P.FirstError(FSource));
     If ttWarnings In TestTypes Then
-      CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS: ' + P.FirstWarning);
+      CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS:'#13#10 + P.FirstWarning(FSource));
     If ttHints In TestTypes Then
-      CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS: ' + P.FirstHint);
+      CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS:'#13#10 + P.FirstHint(Fsource));
     If ttDocConflicts In TestTypes Then
-      CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS: ' +
+      CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS:'#13#10 +
         P.FirstDocConflict);
     If ttChecks In TestTypes Then
-      CheckEquals(iChecks, P.HeadingCount(strChecks), 'CHECKS: ' +
+      CheckEquals(iChecks, P.HeadingCount(strChecks), 'CHECKS:'#13#10 +
         P.FirstCheck);
     If ttMetrics In TestTypes Then
-      CheckEquals(iMetrics, P.HeadingCount(strMetrics), 'METRICS: ' +
+      CheckEquals(iMetrics, P.HeadingCount(strMetrics), 'METRICS:'#1#10 +
         P.FirstMetric);
     For iCheck := Low(strCheckValues) to High(strCheckValues) Do
       If strCheckValues[iCheck] <> '' Then
@@ -521,6 +542,27 @@ Begin
           [iPosition, Copy(strActual, 1, iPosition)]);
       FailNotEquals(strExpected, strActual, strMsg, ReturnAddress);
     End;
+End;
+
+Constructor TExtendedTestCase.Create(MethodName: String);
+
+Begin
+  Inherited Create(MethodName);
+  FSource := TStringList.Create;
+End;
+
+Constructor TExtendedTestCase.Create(MethodName: String; RunCount: Int64);
+
+Begin
+  Inherited Create(MethodName, RunCount);
+  FSource := TStringList.Create;
+End;
+
+Destructor TExtendedTestCase.Destroy;
+
+Begin
+  FSource.Free;
+  Inherited Destroy;
 End;
 
 { TTestElementContainer }
@@ -767,6 +809,12 @@ procedure TestTBaseLanguageModule.TestLines;
 begin
   CheckEquals(1, FBaseLanguageModule.Lines);
 end;
+
+//Procedure TestTBaseLanguageModule.TestMemoryLeak;
+//
+//Begin
+//  TObject.Create;
+//End;
 
 procedure TestTBaseLanguageModule.TestModified;
 begin

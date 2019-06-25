@@ -2,9 +2,29 @@
 
   This module contain a class which represents a frame for the modue explorer options.
 
-  @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jan 2018
+  @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.ModuleExplorerOpsFrame;
@@ -66,6 +86,10 @@ Type
     lbxTokenTypes: TComboBox;
     lblIssueLimitTypes: TLabel;
     lblIssueLimit: TLabel;
+    pnlModuleExplorerOps: TPanel;
+    chkUseIDEEditorColours: TCheckBox;
+    gbxTokenFontInfo: TGroupBox;
+    GridPanel: TGridPanel;
     Procedure lbxTokenTypesClick(Sender: TObject);
     procedure cbxBackColourChange(Sender: TObject);
     procedure cbxFontColourChange(Sender: TObject);
@@ -92,6 +116,9 @@ Type
 Implementation
 
 uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   BADI.Constants,
   BADI.Options,
   BADI.ResourceStrings;
@@ -325,6 +352,7 @@ Var
   k: TBADITokenType;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   For j := 0 To cbxTreeFontName.Items.Count - 1 Do
     If cbxTreeFontName.Items[j] = TBADIOptions.BADIOptions.TreeFontName Then
       Begin
@@ -338,10 +366,11 @@ Begin
         Break;
       End;
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
-    FTokenFontInfo[k] := TBADIOptions.BADIOptions.TokenFontInfo[k];
+    FTokenFontInfo[k] := TBADIOptions.BADIOptions.TokenFontInfo[False][k];
+  chkUseIDEEditorColours.Checked := TBADIOptions.BADIOptions.UseIDEEditorColours;
   udTreeFontSize.Position := TBADIOptions.BADIOptions.TreeFontSize;
   udFixedFontSize.Position := TBADIOptions.BADIOptions.FixedFontSize;
-  cbxBGColour.Selected := TBADIOptions.BADIOptions.BGColour;
+  cbxBGColour.Selected := TBADIOptions.BADIOptions.BGColour[False];
   udTokenLimit.Position := TBADIOptions.BADIOptions.TokenLimit;
   clbxTreeColour.Selected := TBADIOptions.BADIOptions.TreeColour;
   lbxTokenTypesClick(Nil);
@@ -366,15 +395,20 @@ Procedure TfmBADIModuleExplorerFrame.SaveSettings;
 
 Var
   k: TBADITokenType;
+  TokenFontInfo: TBADITokenFontInfoTokenSet;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   TBADIOptions.BADIOptions.TreeFontName := cbxTreeFontName.Text;
   TBADIOptions.BADIOptions.FixedFontName := cbxFixedFontName.Text;
+  TokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[False];
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
-    TBADIOptions.BADIOptions.TokenFontInfo[k] := FTokenFontInfo[k];
+    TokenFontInfo[k] := FTokenFontInfo[k];
+  TBADIOptions.BADIOptions.UseIDEEditorColours := chkUseIDEEditorColours.Checked;
+  TBADIOptions.BADIOptions.TokenFontInfo[False] := TokenFontInfo;
   TBADIOptions.BADIOptions.TreeFontSize := udTreeFontSize.Position;
   TBADIOptions.BADIOptions.FixedFontSize := udFixedFontSize.Position;
-  TBADIOptions.BADIOptions.BGColour := cbxBGColour.Selected;
+  TBADIOptions.BADIOptions.BGColour[False] := cbxBGColour.Selected;
   TBADIOptions.BADIOptions.TokenLimit := udTokenLimit.Position;
   TBADIOptions.BADIOptions.TreeColour := clbxTreeColour.Selected;
   TBADIOptions.BADIOptions.IssueLimits[ltErrors] := FIssueLimits[ltErrors];
@@ -407,3 +441,4 @@ Begin
 End;
 
 End.
+

@@ -40,8 +40,9 @@ object frmExclusions: TfrmExclusions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 1
     Kind = bkOK
+    NumGlyphs = 2
+    TabOrder = 1
   end
   object btnCancel: TBitBtn
     Left = 405
@@ -49,7 +50,8 @@ object frmExclusions: TfrmExclusions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 2
     Kind = bkCancel
+    NumGlyphs = 2
+    TabOrder = 2
   end
 end

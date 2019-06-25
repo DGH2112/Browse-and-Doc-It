@@ -3,15 +3,35 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    03 Jan 2018
   @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
-unit BADI.DockableModuleExplorer;
+Unit BADI.DockableModuleExplorer;
 
-interface
+Interface
 
-uses
+Uses
   Windows,
   Messages,
   SysUtils,
@@ -23,31 +43,46 @@ uses
   Dialogs,
   DockForm,
   BADI.ModuleExplorerFrame,
-  BADI.Base.Module;
+  BADI.Base.Module,
+  BADI.IDEThemingNotifier;
 
-type
+{$INCLUDE CompilerDefinitions.inc}
+
+Type
+  (** This is a classifier for the dockable form so that it can be registered
+      with the IDE **)
+  TfrmDockableModuleExplorerClass = Class Of TfrmDockableModuleExplorer;
+
   (** This class represents a dockable form that displays the heirarchical
       representation of the modules contents. **)
   TfrmDockableModuleExplorer = Class(TDockableForm)
   Strict Private
-    FModuleExplorerFrame : TframeModuleExplorer;
+    FModuleExplorerFrame: TframeModuleExplorer;
+    {$IFDEF DXE102}
+    FIDEThemingServciesNotifierIndex : Integer;
+    {$ENDIF}
+  Strict Protected
+    Class Procedure ShowDockableForm(Const Form: TfrmDockableModuleExplorer);
+    Class Procedure CreateDockableForm(Var FormVar: TfrmDockableModuleExplorer;
+      Const FormClass: TfrmDockableModuleExplorerClass);
+    Class Procedure FreeDockableForm(Var FormVar: TfrmDockableModuleExplorer);
+    Class Procedure RegisterDockableForm(Const FormClass: TfrmDockableModuleExplorerClass;
+      Var FormVar; Const FormName: String);
+    Class Procedure UnRegisterDockableForm(Var FormVar);
+    Procedure ThemeForm(Sender : TObject);
   Public
-    Constructor Create(AOwner : TComponent); Override;
+    Constructor Create(AOwner: TComponent); Override;
     Destructor Destroy; Override;
     Procedure Focus;
     Class Procedure ShowDockableModuleExplorer;
     Class Procedure RemoveDockableModuleExplorer;
     Class Procedure CreateDockableModuleExplorer;
-    Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule);
-    Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange;
-      Focus, ScopeChange : TNotifyEvent);
+    Class Procedure RenderDocumentTree(Const BaseLanguageModule: TBaseLanguageModule);
+    Class Procedure HookEventHandlers(Const SelectionChangeProc: TSelectionChange;
+      Const Focus, ScopeChange: TNotifyEvent);
   End;
 
-  (** This is a classifier for the dockable form so that it can be registered
-      with the IDE **)
-  TfrmDockableModuleExplorerClass = Class of TfrmDockableModuleExplorer;
-
-implementation
+Implementation
 
 {$R *.dfm}
 
@@ -55,76 +90,47 @@ Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
-  DeskUtil;
+  DeskUtil,
+  ToolsAPI, BADI.ToolsAPIUtils;
 
 Var
   (** This is a private varaible to hold the singleton instance of the
       dockable form. **)
-  FormInstance : TfrmDockableModuleExplorer;
+  FormInstance: TfrmDockableModuleExplorer;
 
 (**
 
-  This procedure makes the dockable module explorer visible.
+  This is the constructor method for the TfrmDockableModuleExplorer class.
 
   @precon  None.
-  @postcon Makes the dockable module explorer visible.
+  @postcon Sets the dockable form up for being saved within the BDS 2006 IDE and
+           then creates a Module Explorer Frame and places inside the form.
 
-  @param   Form as a TfrmDockableModuleExplorer
+  @nocheck MissingConstInParam
 
-**)
-Procedure ShowDockableForm(Form : TfrmDockableModuleExplorer);
-
-Begin
-  If Not Assigned(Form) Then
-    Exit;
-  If Not Form.Floating Then
-    Begin
-      Form.ForceShow;
-      FocusWindow(Form);
-      Form.Focus;
-    End Else
-    Begin
-      Form.Show;
-      Form.Focus;
-    End;
-End;
-
-(**
-
-  This procedure registers the dockable form with the IDE.
-
-  @precon  None.
-  @postcon The dockable form is registered with the IDE.
-
-  @param   FormClass as a TfrmDockableModuleExplorerClass
-  @param   FormVar
-  @param   FormName  as a String as a constant
+  @param   AOwner as a TComponent
 
 **)
-Procedure RegisterDockableForm(FormClass : TfrmDockableModuleExplorerClass;
-  var FormVar; Const FormName : String);
+Constructor TfrmDockableModuleExplorer.Create(AOwner: TComponent);
 
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+  
 Begin
-  If @RegisterFieldAddress <> Nil Then
-    RegisterFieldAddress(FormName, @FormVar);
-  RegisterDesktopFormClass(FormClass, FormName, FormName);
-End;
-
-(**
-
-  This method unregisters the dockable form with the IDE.
-
-  @precon  None.
-  @postcon The dockable form is unregistered with the IDE.
-
-  @param   FormVar
-  @param   FormName as a String as a constant
-
-**)
-Procedure UnRegisterDockableForm(var FormVar; Const FormName : String);
-Begin
-  If @UnRegisterFieldAddress <> Nil Then
-    UnregisterFieldAddress(@FormVar);
+  Inherited Create(AOwner);
+  DeskSection := Name;
+  AutoSave := True;
+  SaveStateNecessary := True;
+  FModuleExplorerFrame := TframeModuleExplorer.Create(Self);
+  FModuleExplorerFrame.Parent := Self;
+  FModuleExplorerFrame.Align := alClient;
+  ThemeForm(Nil);
+  {$IFDEF DXE102}
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    FIDEThemingServciesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(ThemeForm))
+  {$ENDIF}
 End;
 
 (**
@@ -136,58 +142,31 @@ End;
   @postcon The form instance is created.
 
   @param   FormVar   as a TfrmDockableModuleExplorer as a reference
-  @param   FormClass as a TfrmDockableModuleExplorerClass
+  @param   FormClass as a TfrmDockableModuleExplorerClass as a Constant
 
 **)
-Procedure CreateDockableForm(var FormVar : TfrmDockableModuleExplorer;
-  FormClass : TfrmDockableModuleExplorerClass);
+Class Procedure TfrmDockableModuleExplorer.CreateDockableForm(Var FormVar: TfrmDockableModuleExplorer;
+  Const FormClass: TfrmDockableModuleExplorerClass);
+  
 Begin
   TCustomForm(FormVar) := FormClass.Create(Nil);
-  RegisterDockableform(FormClass, FormVar, TCustomForm(FormVar).Name);
+  RegisterDockableForm(FormClass, FormVar, TCustomForm(FormVar).Name);
 End;
 
 (**
 
-  This procedure frees the instance of the dockable form.
+  This is a class method to create the dockable form instance.
 
   @precon  None.
-  @postcon Free the instance of the dockable form.
-
-  @param   FormVar as a TfrmDockableModuleExplorer as a reference
+  @postcon The form instance is created if one is not already present.
 
 **)
-Procedure FreeDockableForm(var FormVar : TfrmDockableModuleExplorer);
+Class Procedure TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
+
 Begin
-  If Assigned(FormVar) Then
-    Begin
-      UnRegisterDockableForm(FormVar, FormVar.Name);
-      FreeAndNil(FormVar);
-    End;
+  If Not Assigned(FormInstance) Then
+    CreateDockableForm(FormInstance, TfrmDockableModuleExplorer);
 End;
-
-{ TfrmDockableModuleExplorer }
-
-(**
-
-  This is the constructor method for the TfrmDockableModuleExplorer class.
-
-  @precon  None.
-  @postcon Sets the dockable form up for being saved within the BDS 2006 IDE and
-           then creates a Module Explorer Frame and places inside the form.
-
-  @param   AOwner as a TComponent
-
-**)
-constructor TfrmDockableModuleExplorer.Create(AOwner: TComponent);
-begin
-  inherited;
-  DeskSection := Name;
-  AutoSave := True;
-  SaveStateNecessary := True;
-  FModuleExplorerFrame := TframeModuleExplorer.Create(Self);
-  FModuleExplorerFrame.Parent := Self;
-  FModuleExplorerFrame.Align := alClient;
-end;
 
 (**
 
@@ -197,12 +176,22 @@ end;
   @postcon Destroys the Module Explorer Frame and ensures the desktop is saved.
 
 **)
-destructor TfrmDockableModuleExplorer.Destroy;
-begin
+Destructor TfrmDockableModuleExplorer.Destroy;
+
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+  
+Begin
+  {$IFDEF DXE102}
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    ITS.RemoveNotifier(FIDEThemingServciesNotifierIndex);
+  {$ENDIF}
   FModuleExplorerFrame.Free;
   SaveStateNecessary := True;
-  inherited;
-end;
+  Inherited;
+End;
 
 (**
 
@@ -215,27 +204,80 @@ end;
 
 
 **)
-procedure TfrmDockableModuleExplorer.Focus;
-begin
+Procedure TfrmDockableModuleExplorer.Focus;
+
+Begin
   If FModuleExplorerFrame <> Nil Then
     If FModuleExplorerFrame.Visible Then
       If FModuleExplorerFrame.Explorer.Visible Then
         FModuleExplorerFrame.Explorer.SetFocus;
-end;
+End;
 
 (**
 
-  This is a class method to create the dockable form instance.
+  This procedure frees the instance of the dockable form.
 
   @precon  None.
-  @postcon The form instance is created if one is not already present.
+  @postcon Free the instance of the dockable form.
+
+  @param   FormVar as a TfrmDockableModuleExplorer as a reference
 
 **)
-class procedure TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-begin
-  If Not Assigned(FormInstance) Then
-    CreateDockableForm(FormInstance, TfrmDockableModuleExplorer);
-end;
+Class Procedure TfrmDockableModuleExplorer.FreeDockableForm(Var FormVar: TfrmDockableModuleExplorer);
+
+Begin
+  If Assigned(FormVar) Then
+    Begin
+      UnRegisterDockableForm(FormVar);
+      FreeAndNil(FormVar);
+    End;
+End;
+
+(**
+
+  This is a class method which accepots even handler from the calling class to hand the dockable module 
+  explorer`s SelectionChange event handler.
+
+  @precon  None.
+  @postcon Sets the SelectionChange event handler for the dockable form.
+
+  @param   SelectionChangeProc as a TSelectionChange as a constant
+  @param   Focus               as a TNotifyEvent as a constant
+  @param   ScopeChange         as a TNotifyEvent as a constant
+
+**)
+Class Procedure TfrmDockableModuleExplorer.HookEventHandlers(Const SelectionChangeProc: TSelectionChange;
+  Const Focus, ScopeChange: TNotifyEvent);
+
+Begin
+  If Assigned(FormInstance) Then
+    Begin
+      FormInstance.FModuleExplorerFrame.OnSelectionChange := SelectionChangeProc;
+      FormInstance.FModuleExplorerFrame.OnFocus := Focus;
+      FormInstance.FModuleExplorerFrame.OnRefresh := ScopeChange;
+    End;
+End;
+
+(**
+
+  This procedure registers the dockable form with the IDE.
+
+  @precon  None.
+  @postcon The dockable form is registered with the IDE.
+
+  @param   FormClass as a TfrmDockableModuleExplorerClass as a Constant
+  @param   FormVar
+  @param   FormName  as a String as a constant
+
+**)
+Class Procedure TfrmDockableModuleExplorer.RegisterDockableForm(
+  Const FormClass: TfrmDockableModuleExplorerClass; Var FormVar; Const FormName: String);
+
+Begin
+  If @RegisterFieldAddress <> Nil Then
+    RegisterFieldAddress(FormName, @FormVar);
+  RegisterDesktopFormClass(FormClass, FormName, FormName);
+End;
 
 (**
 
@@ -245,25 +287,11 @@ end;
   @postcon Removes the instance of the dockable form.
 
 **)
-class procedure TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
-begin
+Class Procedure TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
+
+Begin
   FreeDockableForm(FormInstance);
-end;
-
-(**
-
-  This method is a class method for displaying the dockable form. If the form
-  does not already exist it is created first.
-
-  @precon  None.
-  @postcon Displays the dockable form.
-
-**)
-class procedure TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
-begin
-  CreateDockableModuleExplorer;
-  ShowDockableForm(FormInstance);
-end;
+End;
 
 (**
 
@@ -274,40 +302,107 @@ end;
   @postcon If the form module explorer exists then the passed module is
            rendered.
 
-  @param   BaseLanguageModule    as a TBaseLanguageModule
+  @param   BaseLanguageModule    as a TBaseLanguageModule as a Constant
 
 **)
-class procedure TfrmDockableModuleExplorer.RenderDocumentTree(
-  BaseLanguageModule: TBaseLanguageModule);
-begin
+Class Procedure TfrmDockableModuleExplorer.RenderDocumentTree(
+  Const BaseLanguageModule: TBaseLanguageModule);
+  
+Begin
   If Assigned(FormInstance) Then
     If FormInstance.Visible Then
       FormInstance.FModuleExplorerFrame.RenderModule(BaseLanguageModule);
-end;
+End;
 
 (**
 
-  This is a class method which accepots even handler from the calling class to
-  hand the dockable module explorer`s SelectionChange event handler.
+  This procedure makes the dockable module explorer visible.
 
   @precon  None.
-  @postcon Sets the SelectionChange event handler for the dockable form.
+  @postcon Makes the dockable module explorer visible.
 
-  @param   SelectionChangeProc as a TSelectionChange
-  @param   Focus               as a TNotifyEvent
-  @param   ScopeChange         as a TNotifyEvent
+  @param   Form as a TfrmDockableModuleExplorer as a Constant
 
 **)
-class procedure TfrmDockableModuleExplorer.HookEventHandlers(
-  SelectionChangeProc: TSelectionChange; Focus, ScopeChange : TNotifyEvent);
-begin
-  If Assigned(FormInstance) Then
+Class Procedure TfrmDockableModuleExplorer.ShowDockableForm(Const Form: TfrmDockableModuleExplorer);
+
+Begin
+  If Not Assigned(Form) Then
+    Exit;
+  If Not Form.Floating Then
     Begin
-      FormInstance.FModuleExplorerFrame.OnSelectionChange := SelectionChangeProc;
-      FormInstance.FModuleExplorerFrame.OnFocus := Focus;
-      FormInstance.FModuleExplorerFrame.OnRefresh := ScopeChange;
+      Form.ForceShow;
+      FocusWindow(Form);
+      Form.Focus;
+    End
+  Else
+    Begin
+      Form.Show;
+      Form.Focus;
     End;
-end;
+End;
+
+(**
+
+  This method is a class method for displaying the dockable form. If the form
+  does not already exist it is created first.
+
+  @precon  None.
+  @postcon Displays the dockable form.
+
+**)
+Class Procedure TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
+
+Begin
+  CreateDockableModuleExplorer;
+  ShowDockableForm(FormInstance);
+End;
+
+(**
+
+  This method themes the DockableModule Explorer form.
+
+  @precon  None.
+  @postcon The form is themed.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmDockableModuleExplorer.ThemeForm(Sender : TObject);
+
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices250;
+{$ENDIF}
+
+Begin
+  {$IFDEF DXE102}
+  //TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDockableModuleExplorer);
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices250, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      Begin
+        ITS.RegisterFormClass(TfrmDockableModuleExplorer);
+        ITS.ApplyTheme(Self);
+      End;
+  {$ENDIF}
+End;
+
+(**
+
+  This method unregisters the dockable form with the IDE.
+
+  @precon  None.
+  @postcon The dockable form is unregistered with the IDE.
+
+  @param   FormVar
+
+**)
+Class Procedure TfrmDockableModuleExplorer.UnRegisterDockableForm(Var FormVar);
+
+Begin
+  If @UnRegisterFieldAddress <> Nil Then
+    UnRegisterFieldAddress(@FormVar);
+End;
 
 End.
 

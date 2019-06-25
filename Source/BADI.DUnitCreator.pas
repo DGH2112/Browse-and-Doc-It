@@ -5,7 +5,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    08 May 2017
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.DUnitCreator;
@@ -141,7 +161,7 @@ Const
 
 Type
   (** A class to handle the creation of the DUnit project file. **)
-  TProjectCreator = Class(TInterfacedObject, IOTACreator, IOTAProjectCreator
+  TProjectCreator = Class(TInterfacedObject, IUnknown, IOTACreator, IOTAProjectCreator
     {$IFDEF D0005}, IOTAProjectCreator50 {$ENDIF}
     {$IFDEF D2005}, IOTAProjectCreator80 {$ENDIF})
     {$IFDEF D2005} Strict {$ENDIF} Private
@@ -170,7 +190,7 @@ Type
 
   (** This class creates a IOTAFIle interface for generating the project file
       source. **)
-  TProjectCreatorFile = Class(TInterfacedObject, IOTAFile)
+  TProjectCreatorFile = Class(TInterfacedObject, IUnknown, IOTAFile)
     {$IFDEF D2005} Strict {$ENDIF} Private
     FProjectName: String;
   Public
@@ -180,7 +200,7 @@ Type
   End;
 
   (** This class creates the test unit file. **)
-  TUnitCreator = Class(TInterfacedObject, IOTACreator, IOTAModuleCreator)
+  TUnitCreator = Class(TInterfacedObject, IUnknown, IOTACreator, IOTAModuleCreator)
     {$IFDEF D2005} Strict {$ENDIF} Private
     FNewUnitName    : String;
     FOwner          : IOTAProject;
@@ -216,7 +236,7 @@ Type
 
   (** This class creates a IOTAFile interface for generating the unit file
       source. **)
-  TUnitCreatorFile = Class(TInterfacedObject, IOTAFile)
+  TUnitCreatorFile = Class(TInterfacedObject, IUnknown, IOTAFile)
     {$IFDEF D2005} Strict {$ENDIF} Private
     FUnitName       : String;
     FUnitToBeTested : String;
@@ -267,11 +287,10 @@ Var
 
 Begin
   Result := False;
-
-  S           := SourceEditor(Project.CurrentEditor.Module);
+  S := TBADIToolsAPIFunctions.SourceEditor(Project.CurrentEditor.Module);
   strFileName := Project.CurrentEditor.FileName;
-  M           := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(S), strFileName, True,
-    [moParse]);
+  M := TBADIDispatcher.BADIDispatcher.Dispatcher(TBADIToolsAPIFunctions.EditorAsString(S), strFileName,
+    True, [moParse]);
   Try
     If M <> Nil Then
       Begin
@@ -569,7 +588,7 @@ ResourceString
 
 Begin
   FProject                   := FProjects[iProject];
-  ProjectGroup.ActiveProject := FProject;
+  TBADIToolsAPIFunctions.ProjectGroup.ActiveProject := FProject;
   CheckReadOnlyStatus(FProject, strProjectReadOnly);
 End;
 
@@ -606,7 +625,7 @@ Begin
   iToken := M.FindToken('Implementation');
   If iToken > -1 Then
     Begin
-      SE := SourceEditor(FUnit);
+      SE := TBADIToolsAPIFunctions.SourceEditor(FUnit);
       Try
         Writer := SE.CreateUndoableWriter;
         Try
@@ -626,32 +645,32 @@ Begin
                   If strLastClass <> strTestClass Then
                     Begin
                       If boolEndClass Then
-                        OutputText(Writer, '  End;'#13#10#13#10);
-                      OutputText(Writer, '  //'#13#10);
-                      OutputText(Writer,
+                        TBADIToolsAPIFunctions.OutputText(Writer, '  End;'#13#10#13#10);
+                      TBADIToolsAPIFunctions.OutputText(Writer, '  //'#13#10);
+                      TBADIToolsAPIFunctions.OutputText(Writer,
                         Format('  // Test Class for the %s Class Methods.'#13#10,
                           [strClassToTest]));
-                      OutputText(Writer, '  //'#13#10);
-                      OutputText(Writer, Format('  %s = Class(%s)'#13#10,
+                      TBADIToolsAPIFunctions.OutputText(Writer, '  //'#13#10);
+                      TBADIToolsAPIFunctions.OutputText(Writer, Format('  %s = Class(%s)'#13#10,
                           [strTestClass, strBaseClass]));
-                      OutputText(Writer, '  Strict Private'#13#10);
+                      TBADIToolsAPIFunctions.OutputText(Writer, '  Strict Private'#13#10);
                       If strTestClass <> 'Functions' Then
-                        OutputText(Writer, Format('    F%s : %s;'#13#10, [strClassToTest,
+                        TBADIToolsAPIFunctions.OutputText(Writer, Format('    F%s : %s;'#13#10, [strClassToTest,
                           strClassToTest]));
-                      OutputText(Writer, '  Public'#13#10);
+                      TBADIToolsAPIFunctions.OutputText(Writer, '  Public'#13#10);
                       If strTestClass <> 'Functions' Then
-                        OutputText(Writer, '    Procedure SetUp; Override;'#13#10);
+                        TBADIToolsAPIFunctions.OutputText(Writer, '    Procedure SetUp; Override;'#13#10);
                       If strTestClass <> 'Functions' Then
-                        OutputText(Writer, '    Procedure TearDown; Override;'#13#10);
-                      OutputText(Writer, '  Published'#13#10);
+                        TBADIToolsAPIFunctions.OutputText(Writer, '    Procedure TearDown; Override;'#13#10);
+                      TBADIToolsAPIFunctions.OutputText(Writer, '  Published'#13#10);
                     End;
-                  OutputText(Writer, Format('    Procedure %s;'#13#10, [strMethod]));
+                  TBADIToolsAPIFunctions.OutputText(Writer, Format('    Procedure %s;'#13#10, [strMethod]));
                   boolEndClass := True;
                 End;
               strLastClass := strTestClass;
             End;
           If boolEndClass Then
-            OutputText(Writer, '  End;'#13#10#13#10);
+            TBADIToolsAPIFunctions.OutputText(Writer, '  End;'#13#10#13#10);
         Finally
           Writer := Nil;
         End;
@@ -696,7 +715,7 @@ Begin
     Begin
       If M.Tokens[M.TokenCount - 2].UToken = 'END' Then
         Begin
-          SE := SourceEditor(FUnit);
+          SE := TBADIToolsAPIFunctions.SourceEditor(FUnit);
           Try
             Writer := SE.CreateUndoableWriter;
             Try
@@ -710,7 +729,7 @@ Begin
                   strTestClass := TestClassName(slTestCases[i]);
                   If strLastClass <> strTestClass Then
                     If Not DoesClassExist(M, strTestClass) Then
-                      OutputText(Writer,
+                      TBADIToolsAPIFunctions.OutputText(Writer,
                         Format('  RegisterTest(''%s'', %s.Suite);'#13#10,
                           [strTestSuiteName, strTestClass]));
                   strLastClass := strTestClass;
@@ -767,7 +786,7 @@ Begin
   iToken := M.FindToken('Initialization');
   If iToken > -1 Then
     Begin
-      SE := SourceEditor(FUnit);
+      SE := TBADIToolsAPIFunctions.SourceEditor(FUnit);
       Try
         Writer := SE.CreateUndoableWriter;
         Try
@@ -786,29 +805,29 @@ Begin
                 Begin
                   If Not DoesClassExist(M, strTestClass) Then
                     Begin
-                      OutputText(Writer, '//'#13#10);
-                      OutputText(Writer, Format('// Test methods for the class %s.'#13#10,
+                      TBADIToolsAPIFunctions.OutputText(Writer, '//'#13#10);
+                      TBADIToolsAPIFunctions.OutputText(Writer, Format('// Test methods for the class %s.'#13#10,
                           [strClassToTest]));
-                      OutputText(Writer, '//'#13#10);
+                      TBADIToolsAPIFunctions.OutputText(Writer, '//'#13#10);
                       If strTestClass <> 'Functions' Then
                         Begin
-                          OutputText(Writer, Format('Procedure %s.Setup;'#13#10,
+                          TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.Setup;'#13#10,
                               [strTestClass]));
-                          OutputText(Writer, ''#13#10);
-                          OutputText(Writer, 'Begin'#13#10);
-                          OutputText(Writer,
+                          TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer,
                             Format('  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,
                               [strClassToTest, strClassToTest, strClassToTest]));
-                          OutputText(Writer, 'End;'#13#10);
-                          OutputText(Writer, ''#13#10);
-                          OutputText(Writer, Format('Procedure %s.TearDown;'#13#10,
+                          TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.TearDown;'#13#10,
                               [strTestClass]));
-                          OutputText(Writer, ''#13#10);
-                          OutputText(Writer, 'Begin'#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
                           //: @todo The below need work.
-                          OutputText(Writer, Format('  F%s.Free;'#13#10, [strClassToTest]));
-                          OutputText(Writer, 'End;'#13#10);
-                          OutputText(Writer, ''#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, Format('  F%s.Free;'#13#10, [strClassToTest]));
+                          TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
                         End;
                     End;
                 End;
@@ -819,14 +838,14 @@ Begin
                   Inc(iIndex);
                 End;
               slTestCases[i] := Format('%s=%s', [strTestClass, strTestMethod]);
-              OutputText(Writer, Format('Procedure %s.%s;'#13#10,
+              TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.%s;'#13#10,
                   [strTestClass, strTestMethod]));
-              OutputText(Writer, ''#13#10);
-              OutputText(Writer, 'Begin'#13#10);
-              OutputText(Writer, Format('  //: @todo Implement Check for F%s.%s.'#13#10,
+              TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+              TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
+              TBADIToolsAPIFunctions.OutputText(Writer, Format('  //: @todo Implement Check for F%s.%s.'#13#10,
                   [strClassToTest, strMethodToTest]));
-              OutputText(Writer, 'End;'#13#10);
-              OutputText(Writer, ''#13#10);
+              TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
+              TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
               strLastClass := strTestClass;
             End;
         Finally
@@ -915,7 +934,7 @@ Begin
           TObject(Integer(slTestCases.Objects[iMethod]) + iMethod);
       For iMethod := 0 To slTestCases.Count - 1 Do
         Begin
-          SE := SourceEditor(FUnit);
+          SE := TBADIToolsAPIFunctions.SourceEditor(FUnit);
           Try
             Writer := SE.CreateUndoableWriter;
             Try
@@ -923,7 +942,7 @@ Begin
               CharPos.Line      := Integer(slTestCases.Objects[iMethod]);
               iPos              := SE.EditViews[0].CharPosToPos(CharPos);
               Writer.CopyTo(iPos);
-              OutputText(Writer, Format('    Procedure %s;'#13#10,
+              TBADIToolsAPIFunctions.OutputText(Writer, Format('    Procedure %s;'#13#10,
                   [GetField(slTestCases[iMethod], '=', 2)]));
             Finally
               Writer := Nil;
@@ -1043,7 +1062,7 @@ Var
   SE: IOTASourceEditor;
 
 Begin
-  SE := SourceEditor(Module);
+  SE := TBADIToolsAPIFunctions.SourceEditor(Module);
   If SE <> Nil Then
     Begin
       If SE.EditViewCount > 0 Then
@@ -1122,7 +1141,7 @@ Begin
                 End;
             End;
         End;
-      SE := SourceEditor(FUnit);
+      SE := TBADIToolsAPIFunctions.SourceEditor(FUnit);
       Try
         Writer := SE.CreateUndoableWriter;
         Try
@@ -1130,9 +1149,9 @@ Begin
           iPos := SE.EditViews[0].CharPosToPos(CharPos);
           Writer.CopyTo(iPos);
           If CharPos.CharIndex + Length(strUnitToBeTested) < 80 Then
-            OutputText(Writer, Format(', %s', [strUnitToBeTested]))
+            TBADIToolsAPIFunctions.OutputText(Writer, Format(', %s', [strUnitToBeTested]))
           Else
-            OutputText(Writer, Format(','#13#10#32#32'%s', [strUnitToBeTested]));
+            TBADIToolsAPIFunctions.OutputText(Writer, Format(','#13#10#32#32'%s', [strUnitToBeTested]));
         Finally
           Writer := Nil;
         End;
@@ -1157,8 +1176,9 @@ Constructor TDUnitCreator.Create;
 Begin
   FProjectCount := 0;
   FUnitCount    := 0;
-  With ActiveSourceEditor Do
-    FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(ActiveSourceEditor), FileName,
+  With TBADIToolsAPIFunctions.ActiveSourceEditor Do
+    FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(
+      TBADIToolsAPIFunctions.EditorAsString(TBADIToolsAPIFunctions.ActiveSourceEditor), FileName,
       Modified, [moParse]);
 End;
 
@@ -1304,7 +1324,7 @@ Var
 
 Begin
   Result := False;
-  G      := ProjectGroup;
+  G      := TBADIToolsAPIFunctions.ProjectGroup;
   If G <> Nil Then
     For i := 0 To G.ProjectCount - 1 Do
       If CompareText(ExtractFileName(G.Projects[i].CurrentEditor.FileName),
@@ -1362,7 +1382,7 @@ Var
 Begin
   SetLength(FProjects, iCAPACITY);
   FProjectCount := 0;
-  With ProjectGroup Do
+  With TBADIToolsAPIFunctions.ProjectGroup Do
     Begin
       For i := 0 To ProjectCount - 1 Do
         If IsTestFramework(Projects[i]) Then
@@ -1504,12 +1524,13 @@ Var
 Begin
   FUnit := FUnits[iUnit].OpenModule;
   FUnit.CurrentEditor.Show;
-  SE := SourceEditor(FUnit);
+  SE := TBADIToolsAPIFunctions.SourceEditor(FUnit);
   CheckReadOnlyStatus(FUnit, strUnitReadOnly);
   SE.Show;
   If FUnit <> Nil Then
     Begin
-      M := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(SourceEditor(FUnit)),
+      M := TBADIDispatcher.BADIDispatcher.Dispatcher(
+        TBADIToolsAPIFunctions.EditorAsString(TBADIToolsAPIFunctions.SourceEditor(FUnit)),
         FUnit.FileName, FUnit.CurrentEditor.Modified, [moParse]);
       Try
         AddNewTestSuites(M, slTestCases, strTestSuiteName);
@@ -1629,7 +1650,7 @@ End;
 **)
 Function TProjectCreator.GetOwner: IOTAModule;
 Begin
-  Result := ProjectGroup;
+  Result := TBADIToolsAPIFunctions.ProjectGroup;
 End;
 
 {$IFDEF D2005}

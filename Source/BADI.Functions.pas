@@ -4,7 +4,27 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    03 Jan 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Functions;
@@ -18,6 +38,7 @@ Uses
   Controls,
   Graphics,
   BADI.Types,
+  BADI.Interfaces,
   BADI.Base.Container,
   BADI.Generic.Parameter;
 
@@ -48,10 +69,12 @@ Type
   Function CharCount(Const cChar: Char; Const strText: String;
     Const boolIgnoreQuotes: Boolean = True): Integer;
   Procedure LoadBADIImages(Const ilScopeImages: TImageList);
-  Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean);
-  Procedure GetFontInfo(Const slTokens : TStringList; Const iTokenIndex : Integer;
-    Const boolTitle, boolSyntax : Boolean; Const iForeColour, iBackColour : TColor;
-    Const FontStyles : TFontStyles; Const Canvas : TCanvas);
+  Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean; 
+    Const BADIOptions : IBADIOptions);
+  Procedure GetFontInfo(Const slTokens : TStringList; Const iTokenIndex : Integer; Const boolTitle, 
+    boolSyntax : Boolean; Const iForeColour, iBackColour : TColor; Const FontStyles : TFontStyles;
+    Const TokenFontInfoTokenSet : TBADITokenFontInfoTokenSet; Const iBGColour : TColor;
+    Const Canvas : TCanvas);
   Function BlendColour(Const iBaseColour, iHighlightColour : TColor; Const dblBlend : Double) : TColor;
 
 Implementation
@@ -60,7 +83,6 @@ Uses
   Windows,
   BADI.Constants,
   SHFolder,
-  BADI.Options,
   UITypes;
 
 Function ComputerName : String; Forward;
@@ -758,19 +780,22 @@ End;
   @postcon Sets the font of the passed canvas to the appropiate style and colour for the words stored in
            the string list.
 
-  @param   slTokens    as a TStringList as a constant
-  @param   iTokenIndex as an Integer as a constant
-  @param   boolTitle   as a Boolean as a constant
-  @param   boolSyntax  as a Boolean as a constant
-  @param   iForeColour as a TColor as a constant
-  @param   iBackColour as a TColor as a constant
-  @param   FontStyles  as a TFontStyles as a constant
-  @param   Canvas      as a TCanvas as a constant
+  @param   slTokens              as a TStringList as a constant
+  @param   iTokenIndex           as an Integer as a constant
+  @param   boolTitle             as a Boolean as a constant
+  @param   boolSyntax            as a Boolean as a constant
+  @param   iForeColour           as a TColor as a constant
+  @param   iBackColour           as a TColor as a constant
+  @param   FontStyles            as a TFontStyles as a constant
+  @param   TokenFontInfoTokenSet as a TBADITokenFontInfoTokenSet as a constant
+  @param   iBGColour             as a TColor as a constant
+  @param   Canvas                as a TCanvas as a constant
 
 **)
 Procedure GetFontInfo(Const slTokens : TStringList; Const iTokenIndex : Integer;
   Const boolTitle, boolSyntax : Boolean; Const iForeColour, iBackColour : TColor;
-  Const FontStyles : TFontStyles; Const Canvas : TCanvas);
+  Const FontStyles : TFontStyles; Const TokenFontInfoTokenSet : TBADITokenFontInfoTokenSet;
+  Const iBGColour : TColor; Const Canvas : TCanvas);
   
 Var
   eTokenType: TBADITokenType;
@@ -782,17 +807,17 @@ Begin
     eTokenType := TBADITokenType(slTokens.Objects[iTokenIndex])
   Else
     eTokenType := ttPlainText;
-  Canvas.Font.Color := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FForeColour;
+  Canvas.Font.Color := TokenFontInfoTokenSet[eTokenType].FForeColour;
   If iForeColour <> clNone Then
     Canvas.Font.Color := iForeColour;
-  Canvas.Font.Style := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FStyles;
+  Canvas.Font.Style := TokenFontInfoTokenSet[eTokenType].FStyles;
   If FontStyles <> [] Then
     Canvas.Font.Style := FontStyles;
-  Canvas.Brush.Color := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FBackColour;
+  Canvas.Brush.Color := TokenFontInfoTokenSet[eTokenType].FBackColour;
   If iBackColour <> clNone Then
     Canvas.Brush.Color := iBackColour;
   If Canvas.Brush.Color = clNone Then
-    Canvas.Brush.Color := TBADIOptions.BADIOptions.BGColour;
+    Canvas.Brush.Color := iBGColour;
 End;
 
 (**
@@ -804,19 +829,21 @@ End;
 
   @param   TargetCanvas as a TCanvas as a constant
   @param   boolFixed    as a Boolean as a constant
+  @param   BADIOptions  as an IBADIOptions as a constant
 
 **)
-Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean);
+Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean; 
+  Const BADIOptions : IBADIOptions);
 
 Begin
   If Not boolFixed Then
     Begin
-      TargetCanvas.Font.Name := TBADIOptions.BADIOptions.TreeFontName;
-      TargetCanvas.Font.Size := TBADIOptions.BADIOptions.TreeFontSize;
+      TargetCanvas.Font.Name := BADIOptions.TreeFontName;
+      TargetCanvas.Font.Size := BADIOptions.TreeFontSize;
     End Else
     Begin
-      TargetCanvas.Font.Name := TBADIOptions.BADIOptions.FixedFontName;
-      TargetCanvas.Font.Size := TBADIOptions.BADIOptions.FixedFontSize;
+      TargetCanvas.Font.Name := BADIOptions.FixedFontName;
+      TargetCanvas.Font.Size := BADIOptions.FixedFontSize;
     End;
   TargetCanvas.Font.Style := [];
 End;

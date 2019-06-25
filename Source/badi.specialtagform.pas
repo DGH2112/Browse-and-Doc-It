@@ -5,7 +5,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Nov 2017
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.SpecialTagForm;
@@ -24,7 +44,10 @@ Uses
   StdCtrls,
   Buttons,
   CheckLst,
-  BADI.Types, Vcl.ExtCtrls;
+  BADI.Types,
+  Vcl.ExtCtrls;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** Form for editing special tags **)
@@ -47,17 +70,23 @@ Type
     cbxFontColour: TColorBox;
     cbxBackColour: TColorBox;
     lblBackColour: TLabel;
+    pnlForm: TPanel;
     procedure btnOKClick(Sender: TObject);
-  Private
-    { Private declarations }
+  Strict Private
+  Strict Protected
+    Procedure InitialiseForm(Const SpecialTag : TBADISpecialTag);
+    Procedure FinaliseForm(Var SpecialTag : TBADISpecialTag);
   Public
-    { Public declarations }
     Class Function Execute(Var SpecialTag : TBADISpecialTag): Boolean;
   End;
 
 Implementation
 
 Uses
+  {$IFNDEF STANDALONEAPP}
+  ToolsAPI,
+  BADI.ToolsAPIUtils,
+  {$ENDIF}
   BADI.Constants;
 
 {$R *.DFM}
@@ -112,50 +141,90 @@ Class Function TfrmSpecialTag.Execute(Var SpecialTag : TBADISpecialTag): Boolean
 
 Var
   frm : TfrmSpecialTag;
-  eTagProp : TBADITagProperty;
-  iIndex: Integer;
-
 Begin
-  frm := TfrmSpecialTag.Create(Nil);
+  Result := False;
+  frm := TfrmSpecialTag.Create(Application.MainForm);
   Try
-    Result := False;
-    frm.edtName.Text := SpecialTag.FName;
-    frm.edtDescription.Text := SpecialTag.FDescription;
-    For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
-      Begin
-        iIndex := frm.lbxTagProperties.Items.Add(strTagProperty[eTagProp]);
-        frm.lbxTagProperties.Checked[iIndex] := eTagProp In SpecialTag.FTagProperties;
-      End;
-    frm.chkBold.Checked := fsBold In SpecialTag.FFontStyles;
-    frm.chkItalic.Checked := fsItalic In SpecialTag.FFontStyles;
-    frm.chkUnderlined.Checked := fsUnderline In SpecialTag.FFontStyles;
-    frm.chkStrikeout.Checked := fsStrikeOut In SpecialTag.FFontStyles;
-    frm.cbxFontColour.Selected := SpecialTag.FFontColour;
-    frm.cbxBackColour.Selected := SpecialTag.FBackColour;
+    { $IFDEF DXE102 
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmSpecialTag);
+    TBADIToolsAPIFunctions.ApplyTheming(Self);
+    {$ENDIF}
+    frm.InitialiseForm(SpecialTag);
     If frm.ShowModal = mrOK Then
       Begin
-        SpecialTag.FName := frm.edtName.Text;
-        SpecialTag.FDescription := frm.edtDescription.Text;
-        SpecialTag.FTagProperties := [];
-        For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
-          If frm.lbxTagProperties.Checked[Integer(eTagProp)] Then
-            Include(SpecialTag.FTagProperties, eTagProp);
-        SpecialTag.FFontStyles := [];
-        If frm.chkBold.Checked Then
-          Include(SpecialTag.FFontStyles, fsBold);
-        If frm.chkItalic.Checked Then
-          Include(SpecialTag.FFontStyles, fsItalic);
-        If frm.chkUnderlined.Checked Then
-          Include(SpecialTag.FFontStyles, fsUnderline);
-        If frm.chkStrikeout.Checked Then
-          Include(SpecialTag.FFontStyles, fsStrikeOut);
-        SpecialTag.FFontColour := frm.cbxFontColour.Selected;
-        SpecialTag.FBackColour := frm.cbxBackColour.Selected;
+        frm.FinaliseForm(SpecialTag);
         Result := True
       End;
   Finally
     frm.Free;
   End;
+End;
+
+(**
+
+  This method updates the special tag with the changes made in the form.
+
+  @precon  None.
+  @postcon The special tag is updated.
+
+  @param   SpecialTag as a TBADISpecialTag as a reference
+
+**)
+Procedure TfrmSpecialTag.FinaliseForm(Var SpecialTag : TBADISpecialTag);
+
+Var
+  eTagProp : TBADITagProperty;
+  
+Begin
+  SpecialTag.FName := edtName.Text;
+  SpecialTag.FDescription := edtDescription.Text;
+  SpecialTag.FTagProperties := [];
+  For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
+    If lbxTagProperties.Checked[Integer(eTagProp)] Then
+      Include(SpecialTag.FTagProperties, eTagProp);
+  SpecialTag.FFontStyles := [];
+  If chkBold.Checked Then
+    Include(SpecialTag.FFontStyles, fsBold);
+  If chkItalic.Checked Then
+    Include(SpecialTag.FFontStyles, fsItalic);
+  If chkUnderlined.Checked Then
+    Include(SpecialTag.FFontStyles, fsUnderline);
+  If chkStrikeout.Checked Then
+    Include(SpecialTag.FFontStyles, fsStrikeOut);
+  SpecialTag.FFontColour := cbxFontColour.Selected;
+  SpecialTag.FBackColour := cbxBackColour.Selected;
+End;
+
+(**
+
+  This method intialises the fopm with the information in the special tag.
+
+  @precon  None.
+  @postcon The information for the special tag is set in the form controls.
+
+  @param   SpecialTag as a TBADISpecialTag as a constant
+
+**)
+Procedure TfrmSpecialTag.InitialiseForm(Const SpecialTag : TBADISpecialTag);
+
+Var
+  eTagProp : TBADITagProperty;
+  iIndex: Integer;
+
+Begin
+  edtName.Text := SpecialTag.FName;
+  edtDescription.Text := SpecialTag.FDescription;
+  For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
+    Begin
+      iIndex := lbxTagProperties.Items.Add(strTagProperty[eTagProp]);
+      lbxTagProperties.Checked[iIndex] := eTagProp In SpecialTag.FTagProperties;
+    End;
+  chkBold.Checked := fsBold In SpecialTag.FFontStyles;
+  chkItalic.Checked := fsItalic In SpecialTag.FFontStyles;
+  chkUnderlined.Checked := fsUnderline In SpecialTag.FFontStyles;
+  chkStrikeout.Checked := fsStrikeOut In SpecialTag.FFontStyles;
+  CbxFontColour.Selected := SpecialTag.FFontColour;
+  cbxBackColour.Selected := SpecialTag.FBackColour;
 End;
 
 End.

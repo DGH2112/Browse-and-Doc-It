@@ -4,7 +4,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    10 Dec 2017
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Pascal.MethodDecl;
@@ -22,7 +42,7 @@ Uses
 Type
   (** This is a class that defines method within Object Pascal code. **)
   TPascalMethod = Class(TGenericMethodDecl)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FDirectives           : TStringList;
     FResolved             : Boolean;
     FRecObjClsInt         : TRecordDecl;
@@ -31,8 +51,13 @@ Type
     FConstantsLabel       : TLabelContainer;
     FResourceStringsLabel : TLabelContainer;
     FLabelsLabel          : TLabelContainer;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
     Function GetName : String; Override;
+    Function GetTypesLabel : TLabelContainer;
+    Function GetResourceStringsLabel : TLabelContainer;
+    Function GetConstantsLabel : TLabelContainer;
+    Function GetVariablesLabel : TLabelContainer;
+    Function GetLabelsLabel (Const boolCreate : Boolean): TLabelContainer;
   Public
     Constructor Create(Const MethodType : TMethodType; Const strName : String; Const AScope : TScope;
       Const iLine, iCol : Integer); Override;
@@ -41,6 +66,7 @@ Type
     Function HasDirective(Const strDirective : String) : Boolean;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
+    Function GetQualifiedName : String; Override;
     (**
       Returns the string list of directives associated with the method.
       @precon  None.
@@ -68,47 +94,46 @@ Type
       @postcon Gets or sets the types label for the module.
       @return  a TLabelContainer
     **)
-    Property TypesLabel  : TLabelContainer Read FTypesLabel Write FTypesLabel;
+    Property TypesLabel  : TLabelContainer Read GetTypesLabel;
     (**
       This property gets or sets the Variables label for the module.
       @precon  None.
       @postcon Gets or sets the Variables label for the module.
       @return  a TLabelContainer
     **)
-    Property VariablesLabel : TLabelContainer Read FVariablesLabel
-      Write FVariablesLabel;
+    Property VariablesLabel : TLabelContainer Read GetVariablesLabel;
     (**
       This property gets or sets the Constants label for the module.
       @precon  None.
       @postcon Gets or sets the Constants label for the module.
       @return  a TLabelContainer
     **)
-    Property ConstantsLabel : TLabelContainer Read FConstantsLabel
-      Write FConstantsLabel;
+    Property ConstantsLabel : TLabelContainer Read GetConstantsLabel;
     (**
       This property gets or sets the Resource Strings label for the module.
       @precon  None.
       @postcon Gets or sets the Resource Strings label  for the module.
       @return  a TLabelContainer
     **)
-    Property ResourceStringsLabel : TLabelContainer Read FResourceStringsLabel
-      Write FResourceStringsLabel;
+    Property ResourceStringsLabel : TLabelContainer Read GetResourceStringsLabel;
     (**
       This property gets or sets the Labels label for the module.
       @precon  None.
       @postcon Gets or sets the Labels label for the module.
+      @param   boolCreate as a Boolean as a constant
       @return  a TLabelContainer
     **)
-    Property LabelsLabel : TLabelContainer Read FLabelsLabel Write FLabelsLabel;
+    Property LabelsLabel[Const boolCreate : Boolean] : TLabelContainer Read GetLabelsLabel;
   End;
 
 Implementation
 
 Uses
+  SysUtils,
   BADI.Constants,
   BADI.Pascal.Constants,
   BADI.Pascal.Functions,
-  SysUtils;
+  BADI.ResourceStrings;
 
 (**
 
@@ -219,6 +244,50 @@ end;
 
 (**
 
+  This is a getter method for the ConstantLabel property.
+
+  @precon  None.
+  @postcon Creates a label if it does not already exist and returns the reference.
+
+  @return  a TLabelContainer
+
+**)
+Function TPascalMethod.GetConstantsLabel: TLabelContainer;
+
+Begin
+  If Not Assigned(FConstantsLabel)Then
+    Begin
+      FConstantsLabel := TLabelContainer.Create(strConstantsLabel, scNone, 0, 0, iiPublicConstantsLabel,
+        Nil);
+      Add(FConstantsLabel);
+    End;
+  Result := FConstantsLabel;
+End;
+
+(**
+
+  This is a getter method for the LabelsLabel property.
+
+  @precon  None.
+  @postcon Only creates a label if requested and it does not already exist and returns the reference.
+
+  @param   boolCreate as a Boolean as a constant
+  @return  a TLabelContainer
+
+**)
+Function TPascalMethod.GetLabelsLabel(Const boolCreate : Boolean): TLabelContainer;
+
+Begin
+  If boolCreate And Not Assigned(FLabelsLabel)Then
+    Begin
+      FLabelsLabel := TLabelContainer.Create(strLabelsLabel, scNone, 0, 0, iiPublicLabelsLabel, Nil);
+      Add(FLabelsLabel);
+    End;
+  Result := FLabelsLabel;
+End;
+
+(**
+
   This is a getter method for the Name property.
 
   @precon  None.
@@ -256,6 +325,95 @@ begin
   If HasDirective(strForward) Then
     Result := Result + '!' + strForward;
 end;
+
+(**
+
+  This is a getter method for the QualifiedName property.
+
+  @precon  None.
+  @postcon For anonymous methods, the parent qualified name is pre-pended.
+
+  @return  a String
+
+**)
+Function TPascalMethod.GetQualifiedName: String;
+
+ResourceString
+  strAnonymous = 'Anonymous';
+
+Begin
+  Result := Inherited GetQualifiedName;
+  If Length(Result) = 0 Then
+    Begin
+      Result := strAnonymous;
+      If Assigned(Parent) And (Parent Is TGenericMethodDecl) Then
+        Result := (Parent As TGenericMethodDecl).QualifiedName + '.' + Result;
+    End;
+End;
+
+(**
+
+  This is a getter method for the ResourceStringLabel property.
+
+  @precon  None.
+  @postcon Creates a label if it does not already exist and returns the reference.
+
+  @return  a TLabelContainer
+
+**)
+Function TPascalMethod.GetResourceStringsLabel: TLabelContainer;
+
+Begin
+  If Not Assigned(FResourceStringsLabel)Then
+    Begin
+      FResourceStringsLabel := TLabelContainer.Create(strResourceStringsLabel, scNone, 0, 0,
+        iiPublicResourceStringsLabel, Nil);
+      Add(FResourceStringsLabel);
+    End;
+  Result := FResourceStringsLabel;
+End;
+
+(**
+
+  This is a getter method for the TypeLabel property.
+
+  @precon  None.
+  @postcon Creates a label if it does not already exist and returns the reference.
+
+  @return  a TLabelContainer
+
+**)
+Function TPascalMethod.GetTypesLabel: TLabelContainer;
+
+Begin
+  If Not Assigned(FTypesLabel)Then
+    Begin
+      FTypesLabel := TLabelContainer.Create(strTypesLabel, scNone, 0, 0, iiPublicTypesLabel, Nil);
+      Add(FTypesLabel);
+    End;
+  Result := FTypesLabel;
+End;
+
+(**
+
+  This is a getter method for the VariablesLabel property.
+
+  @precon  None.
+  @postcon Creates a label if it does not already exist and returns the reference.
+
+  @return  a TLabelContainer
+
+**)
+Function TPascalMethod.GetVariablesLabel: TLabelContainer;
+
+Begin
+  If Not Assigned(FVariablesLabel)Then
+    Begin
+      FVariablesLabel := TLabelContainer.Create(strVarsLabel, scNone, 0, 0, iiPublicVariablesLabel, Nil);
+      Add(FVariablesLabel);
+    End;
+  Result := FVariablesLabel;
+End;
 
 (**
 

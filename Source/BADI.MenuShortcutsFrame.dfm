@@ -67,13 +67,15 @@ object fmBADIMenuShortcuts: TfmBADIMenuShortcuts
     TabOrder = 1
     OnChange = hkMenuShortcutChange
   end
-  object btnAssign: TBitBtn
+  object btnAssign: TButton
     Left = 413
     Top = 275
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = '&Assign'
+    DoubleBuffered = True
+    ParentDoubleBuffered = False
     TabOrder = 2
     OnClick = btnAssignClick
   end

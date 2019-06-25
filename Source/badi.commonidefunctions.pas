@@ -4,8 +4,28 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    03 Jan 2018
   @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.CommonIDEFunctions;
@@ -16,6 +36,9 @@ Uses
   SysUtils,
   Windows,
   Classes,
+  {$IFDEF EUREKALOG}
+  EBase,
+  {$ENDIF EUREKALOG}
   BADI.Base.Module,
   BADI.ElementContainer,
   BADI.Generic.FunctionDecl,
@@ -104,7 +127,7 @@ ResourceString
 Type
   (** This class defines a thread in which the parsing of the code and
       rendering of the module explorer is done. **)
-  TBrowseAndDocItThread = Class(TThread)
+  TBrowseAndDocItThread = Class( {$IFDEF EUREKALOG} TThreadEx {$ELSE} TThread {$ENDIF EUREKALOG} )
   {$IFDEF D2005} Strict {$ENDIF} Private
     FModule            : TBaseLanguageModule;
     FSource            : String;
@@ -136,9 +159,6 @@ Implementation
 Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
-  {$ENDIF}
-  {$IFDEF EUREKALOG}
-  EBase,
   {$ENDIF}
   BADI.Options,
   BADI.Functions,
@@ -972,8 +992,15 @@ End;
 **)
 Procedure TBrowseAndDocItThread.Execute;
 
+Const
+  strBrowseAndDocItParsingThread = 'BrowseAndDocItParsingThread';
+
 Begin
   Try
+    {$IFDEF EUREKALOG}
+    NameThread(strBrowseAndDocItParsingThread);
+    SetEurekaLogStateInThread(0, True);
+    {$ENDIF EUREKALOG}
     If FFileName <> '' Then
       FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified,
         [moParse, moCheckForDocumentConflicts])

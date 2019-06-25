@@ -5,7 +5,27 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jan 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 unit BADI.DUnitForm;
@@ -31,7 +51,8 @@ uses
   BADI.Base.Module,
   ImgList,
   ExtCtrls,
-  BADI.ElementContainer;
+  UITypes,
+  BADI.ElementContainer, System.ImageList;
 
 type
   (** A class to represent the form interface. **)
@@ -73,7 +94,7 @@ type
     {$ENDIF}
     Procedure vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-      Var Ghosted: Boolean; Var ImageIndex: Integer);
+      Var Ghosted: Boolean; Var ImageIndex: TImageIndex);
     Procedure FormDestroy(Sender: TObject);
     Procedure cbxExistingUnitChange(Sender: TObject);
   private
@@ -376,7 +397,8 @@ Begin
         Unt := (BorlandIDEServices As IOTAModuleServices).OpenModule(FDUnitCreator.Units[iUnit]);
         If Unt <> Nil Then
           Begin
-            Module := TPascalModule.CreateParser(EditorAsString(SourceEditor(Unt)),
+            Module := TPascalModule.CreateParser(
+              TBADIToolsAPIFunctions.EditorAsString(TBADIToolsAPIFunctions.SourceEditor(Unt)),
               cbxExistingUnit.Text, Unt.CurrentEditor.Modified, [moParse]);
             Try
               Types := Module.FindElement(strTypesLabel);
@@ -449,7 +471,7 @@ Begin
           If cbxBaseClass.Items.IndexOf(cbxBaseClass.Text) = -1 Then
             cbxBaseClass.Items.Add(cbxBaseClass.Text);
           SaveSettings;
-          strUnitTobeTested := ActiveSourceEditor.FileName;
+          strUnitTobeTested := TBADIToolsAPIFunctions.ActiveSourceEditor.FileName;
           BuildTestCaseList;
           If rdoNewProject.Checked Then
             objDUnitCreator.CreateTestProject(edtNewProjectName.Text)
@@ -498,10 +520,10 @@ begin
   vstTestCases.NodeDataSize := SizeOf(TTreeData);
   vstTestCases.OnGetText := vstTestCasesGetText;
   LoadBADIImages(ilScopeImages);
-  strFileName := ChangeFileExt(ExtractFileName(ActiveProject.FileName), '') +
+  strFileName := ChangeFileExt(ExtractFileName(TBADIToolsAPIFunctions.ActiveProject.FileName), '') +
     'Tests.dpr';
   edtNewProjectName.Text := AddUniqueName(cbxExistingProject.Items, strFileName);
-  strFileName := 'Test' + ExtractFileName(ActiveSourceEditor.FileName);
+  strFileName := 'Test' + ExtractFileName(TBADIToolsAPIFunctions.ActiveSourceEditor.FileName);
   edtNewUnitName.Text := AddUniqueName(cbxExistingUnit.Items, strFileName);
   FImplementedTests := TStringList.Create;
   FImplementedTests.Sorted := True;
@@ -912,12 +934,12 @@ End;
   @param   Kind       as a TVTImageKind
   @param   Column     as a TColumnIndex
   @param   Ghosted    as a Boolean as a reference
-  @param   ImageIndex as an Integer as a reference
+  @param   ImageIndex as an TImageIndex as a reference
 
 **)
 procedure TfrmDUnit.vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-  var Ghosted: Boolean; var ImageIndex: Integer);
+  var Ghosted: Boolean; var ImageIndex: TImageIndex);
 
 Var
   NodeData : ^TTreeData;

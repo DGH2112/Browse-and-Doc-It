@@ -1,0 +1,98 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{BA41C309-29D5-414B-950B-8A1A47C300D0}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="BADIDUnitXTests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Test\BrowseAndDocItTests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Test\BrowseAndDocItTestApp.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="BrowseAndDocIt.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="BADIDUnitXTests">
+        <MSBuild Projects="BADIDUnitXTests.dproj"/>
+    </Target>
+    <Target Name="BADIDUnitXTests:Clean">
+        <MSBuild Projects="BADIDUnitXTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BADIDUnitXTests:Make">
+        <MSBuild Projects="BADIDUnitXTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BrowseAndDocItTests">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocItTests:Clean">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocItTests:Make">
+        <MSBuild Projects="Test\BrowseAndDocItTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp:Clean">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocItTestApp:Make">
+        <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BrowseAndDocIt">
+        <MSBuild Projects="BrowseAndDocIt.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocIt:Clean">
+        <MSBuild Projects="BrowseAndDocIt.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocIt:Make">
+        <MSBuild Projects="BrowseAndDocIt.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="BADIDUnitXTests;BrowseAndDocItTests;BrowseAndDocItTestApp;BrowseAndDocIt"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="BADIDUnitXTests:Clean;BrowseAndDocItTests:Clean;BrowseAndDocItTestApp:Clean;BrowseAndDocIt:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="BADIDUnitXTests:Make;BrowseAndDocItTests:Make;BrowseAndDocItTestApp:Make;BrowseAndDocIt:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+    <ItemGroup Condition="'$(BuildGroup)'=='Debug'">
+        <BuildGroupProject Include="Test\BrowseAndDocItTestApp.dproj">
+            <ProjectGuid>{F4BAF5D6-57AA-4EF2-BE38-381774DA4AD1}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Test\BrowseAndDocItTests.dproj">
+            <ProjectGuid>{77CE066E-3A47-45D3-9A15-E1CE209D5008}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="BrowseAndDocIt.dproj">
+            <ProjectGuid>{AD4C15A1-5A9C-4C71-B023-C105C0474BA9}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="BADIDUnitXTests.dproj">
+            <ProjectGuid>{97DFE465-856D-4033-BA9E-7585FED8E445}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
+</Project>

@@ -3,9 +3,29 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    28 Oct 2017
-  @Version 1.0
   @Author  David Hoyle
+  @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Base.Module;
@@ -398,7 +418,7 @@ End;
   @precon  None.
   @postcon Override and default GetAsString method and returns the name of the module.
 
-  @nohint
+  @nohint boolShowIdentifier boolForDocumentation
   
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant
@@ -530,12 +550,8 @@ Const
       End;
   End;
 
-Var
-  i : Integer;
-
 Begin
-  For i := 0 To BADIOptions.ExcludeDocFiles.Count -1 Do
-    If Like(BADIOptions.ExcludeDocFiles[i], FFileName) Then
+  If BADIOptions.Exclusions.ShouldExclude(FFileName, etDocumentation) Then
       Exit;
   If doShowUndocumentedModule In BADIOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
@@ -557,7 +573,7 @@ End;
   @precon  None.
   @postcon Initialise this base class and Tokensizes the passed stream of characters.
 
-  @nohint
+  @nohint  Source
 
   @param   Source        as a String as a constant
   @param   strFileName   as a String as a constant
@@ -716,14 +732,19 @@ Procedure TBaseLanguageModule.ErrorAndSeekToken(Const strMsg, strParam : String;
       If Copy(strText, i, iFmtLen) = '%s' Then Inc(Result);
   End;
 
+Type
+  TBADIErrorSeekType = (estZeroParams, estOneParam, estTwoParams);
+
 Begin
-  Case StringCount(strMsg) Of
-    0: AddIssue(Format(strMsg, [Token.Line, Token.Column]),
-           scGlobal, Token.Line, Token.Column, etError, Container);
-    1: AddIssue(Format(strMsg, [strParam, Token.Line, Token.Column]),
-           scGlobal, Token.Line, Token.Column, etError, Container);
-    2: AddIssue(Format(strMsg, [strParam, Token.Token, Token.Line,
-         Token.Column]), scGlobal, Token.Line, Token.Column, etError, Container);
+  Case TBADIErrorSeekType(StringCount(strMsg)) Of
+    estZeroParams:
+      AddIssue(Format(strMsg, [Token.Line, Token.Column]), scGlobal, Token.Line, Token.Column, etError,
+        Container);
+    estOneParam:
+      AddIssue(Format(strMsg, [strParam, Token.Line, Token.Column]), scGlobal, Token.Line, Token.Column,
+        etError, Container);
+    estTwoParams: AddIssue(Format(strMsg, [strParam, Token.Token, Token.Line, Token.Column]), scGlobal,
+      Token.Line, Token.Column, etError, Container);
   Else
     AddIssue(strNotEnoughStrings, scGlobal, Token.Line, Token.Column, etError, Container);
   End;

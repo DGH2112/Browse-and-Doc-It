@@ -3,8 +3,28 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    03 Jan 2018
   @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Wizard;
@@ -29,7 +49,7 @@ Uses
 
 Type
   (** This is the class which defined the Wizard interface. **)
-  TBrowseAndDocItWizard = Class(TNotifierObject, IOTANotifier, IOTAWizard)
+  TBrowseAndDocItWizard = Class(TNotifierObject, IUnknown, IOTANotifier, IOTAWizard)
   Strict Private
     FBADIIDEMenuInstaller    : TBADIIDEMenuInstaller;
     FBADIIDEOptionsInstaller : TBADIIDEOptionsInstaller;
@@ -48,7 +68,7 @@ Type
     Function GetMenuText: String;
     {$HINTS ON}
     // General Methods
-    Procedure SelectionChange(Const iIdentLine, iIdentCol, iCommentLine, iCommentCol: Integer);
+    Procedure SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
     Procedure UpdateMenuShortcuts(Sender : TObject);
@@ -274,16 +294,13 @@ End;
   @param   iIdentLine   as an Integer as a constant
   @param   iIdentCol    as an Integer as a constant
   @param   iCommentLine as an Integer as a constant
-  @param   iCommentCol  as an Integer as a constant
 
 **)
-Procedure TBrowseAndDocItWizard.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine,
-  iCommentCol: Integer);
+Procedure TBrowseAndDocItWizard.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
 
 Begin
   If Assigned(FBADIIDEMenuInstaller) Then
-    FBADIIDEMenuInstaller.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol);
+    FBADIIDEMenuInstaller.SelectionChange(iIdentLine, iIdentCol, iCommentLine);
 End;
 
 (**

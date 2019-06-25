@@ -1,0 +1,27 @@
+﻿
+
+[Exception Log]
+EurekaLog Version=8000
+_CustomProfile=""
+Activate=1
+csoShowELThreads=1
+DeleteMapAfterCompile=0
+Encrypt Password=""
+Errors Number=5
+idEurekaLog=1
+idEurekaLogDetailed=1
+idMSClassic=1
+idStepsToReproduce=1
+InjectCode=1
+InjectInfo=1
+InjectOptions=1
+loAddDateInLogFileName=1
+loAttemptToUseSharedMM=1
+loEnableMMDebugMode=1
+loNoDuplicateErrors=1
+Output Path="%%AppData%%\\Season's Fall\\"
+ProjectID="{AD4C15A1-5A9C-4C71-B023-C105C0474BA9}"
+seMAPI=1
+Sender Classes="TELMailSimpleMAPISender;TELMailMAPISender"
+seSMAPI=1
+

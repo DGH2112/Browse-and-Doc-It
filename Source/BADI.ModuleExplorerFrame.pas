@@ -3,9 +3,29 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    28 Dec 2017
   @Author  David Hoyle
   @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   @nometric UnsortedModule
 
@@ -32,18 +52,18 @@ Uses
   VirtualTrees,
   StdCtrls,
   RegularExpressions,
+  BADI.Interfaces,
   BADI.Comment,
   BADI.ElementContainer,
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types;
+  BADI.Types, System.Actions, System.ImageList;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
       current module. **)
-  TSelectionChange = Procedure(Const iIdentLine, iIdentCol, iCommentLine,
-    iCommentCol : Integer) Of Object;
+  TSelectionChange = Procedure(Const iIdentLine, iIdentCol, iCommentLine : Integer) Of Object;
 
   (** This is a frame class to contain all the functionality of the module
       explorer so that it can be placed inside any container required and
@@ -136,6 +156,7 @@ Type
       strNodeHeightTest = 'Ag';
   Strict Private
     { Private declarations }
+    FBADIOptions       : IBADIOptions;
     FModule            : PVirtualNode;
     FNodeInfo          : TObjectList;
     FSelectionChange   : TSelectionChange;
@@ -153,6 +174,8 @@ Type
     FTargetCanvas      : TCanvas;
     FNode              : PVirtualNode;
     FNodeData          : PBADITreeData;
+    FTokenFontInfo     : TBADITokenFontInfoTokenSet;
+    FBGColour          : TColor;
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -181,22 +204,24 @@ Type
       Const iValue: Integer);
     Procedure CMMouseLeave(Var Msg : TMessage); Message CM_MOUSELEAVE;
     Procedure DrawSelectedNode(Const sl : TStringList; Const ItemRect : TRect;
-      Const iScopeImagesWidth : Integer; Var iPos : Integer); InLine;
-    Procedure DrawHighlightSelectedItem(Const iColour : TColor; Const ItemRect : TRect); InLine;
-    Procedure DrawTree(Var R : TRect); InLine;
-    Procedure DrawVerticalTreeLine(Const iTreeColour : TColor; Const R : TRect); InLine;
+      Const iScopeImagesWidth : Integer; Var iPos : Integer); {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawHighlightSelectedItem(Const iColour : TColor; Const ItemRect : TRect);
+      {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawTree(Var R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawVerticalTreeLine(Const iTreeColour : TColor; Const R : TRect);
+      {$IFNDEF DEBUG} InLine; {$ENDIF}
     Procedure DrawTopHalfOfNodeConnector(Const iTreeColour : TColor; Const iCentre : Integer;
-      Const R : TRect); InLine;
+      Const R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
     Procedure DrawNodeButton(Const iTreeColour : TColor; Const iCentre : Integer;
-      Const R : TRect); InLine;
-    Procedure DrawImage(Var R : TRect); InLine;
-    Procedure DrawTreeText(Const sl : TStringList; Var R : TRect); InLine;
+      Const R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawImage(Var R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
+    Procedure DrawTreeText(Const sl : TStringList; Var R : TRect); {$IFNDEF DEBUG} InLine; {$ENDIF}
     Procedure DrawTextToCanvas(Const strText : String; Const R : TRect; Var iTextPos, iTop,
-      iLeft : Integer); InLine;
+      iLeft : Integer); {$IFNDEF DEBUG} InLine; {$ENDIF}
     Function  InitMatchResult(Const eMatchType : TMatchType; Const iStart,
-      iLength: Integer) : TMatchResult; InLine;
+      iLength: Integer) : TMatchResult; {$IFNDEF DEBUG} InLine; {$ENDIF}
     Function  IsMatched(Const iIndex, iLength: Integer; Const MC: TMatchCollection): TMatchResult;
-      InLine;
+      {$IFNDEF DEBUG} InLine; {$ENDIF}
     Procedure tvExplorerAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     Procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -317,17 +342,13 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
     @param   AScope as a TScope as a constant
 
   **)
-  Procedure UpdateScopes(Const AScope : TScope); InLine;
-
-  Var
-    O : TBADIOptions;
+  Procedure UpdateScopes(Const AScope : TScope);
 
   Begin
-    O := TBADIOptions.BADIOptions;
-    If AScope In O.ScopesToRender Then
-      O.ScopesToRender := O.ScopesToRender - [AScope]
+    If AScope In FBADIOptions.ScopesToRender Then
+      FBADIOptions.ScopesToRender := FBADIOptions.ScopesToRender - [AScope]
     Else
-      O.ScopesToRender := O.ScopesToRender + [AScope];
+      FBADIOptions.ScopesToRender := FBADIOptions.ScopesToRender + [AScope];
   End;
 
   (**
@@ -340,17 +361,13 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
     @param   Option as a TDocOption as a constant
 
   **)
-  procedure UpdateOptions(Const Option : TDocOption); InLine;
-
-  Var
-    O : TBADIOptions;
+  procedure UpdateOptions(Const Option : TDocOption);
 
   Begin
-    O := TBADIOptions.BADIOptions;
-    If Option In O.Options Then
-      O.Options := O.Options - [Option]
+    If Option In FBADIOptions.Options Then
+      FBADIOptions.Options := FBADIOptions.Options - [Option]
     Else
-      O.Options := O.Options + [Option];
+      FBADIOptions.Options := FBADIOptions.Options + [Option];
   End;
 
 begin
@@ -595,6 +612,7 @@ begin
   {$IFDEF D2009}
   DoubleBuffered := True;
   {$ENDIF}
+  FBADIOptions := TBADIOptions.BADIOptions;
   FExplorer := TBADIVirtualStringTree.Create(Self);
   FExplorer.Parent := Self;
   FExplorer.Align := alClient;
@@ -622,7 +640,7 @@ begin
   FINIFileName := TBADIOptions.BADIOptions.INIFileName;
   FNodeInfo := TObjectList.Create(True);
   FHintWin := TBADICustomHintWindow.Create(Self, FExplorer);
-  FHintWin.Color := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+  FHintWin.Color := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours][ttExplorerHighlight].FBackColour;
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
   edtExplorerFilter.Font.Assign(FExplorer.Font);
   ilScopeImages.Clear;
@@ -797,12 +815,12 @@ Begin
       // Need to amend the width of the rectangle for the custom drawing
       iPos := iLeft;
       iRight := iPos;
-      InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties);
+      InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
       For i := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
             FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
-            FTargetCanvas);
+            FTokenFontInfo, FBGColour, FTargetCanvas);
           If sl[i] = #13#10 Then
             iRight := iLeft
           Else
@@ -815,7 +833,7 @@ Begin
         FExplorer.Left + iScopeImagesWidth + FExplorer.Margin + FExplorer.TextMargin - 1;
       R.Right := R.Left + iPos;
       FTargetCanvas.Pen.Color := clBlack;
-      HL := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight];
+      HL := FTokenFontInfo[ttExplorerHighlight];
       If FNode = FExplorer.FocusedNode Then
         Begin
           FTargetCanvas.Brush.Color := HL.FBackColour;
@@ -947,31 +965,29 @@ Const
   
 Var
   iLeft, iTop : Integer;
-
-Var
   i: Integer;
   iTextPos: Integer;
   MC: TMatchCollection;
   MR: TMatchResult;
-  iColour: Integer;
+  iColour: TColor;
 
 Begin
   R.Left := R.Left + ilScopeImages.Width + FExplorer.TextMargin;
   iTop := R.Top;
   iLeft := R.Left + iPadding;
   iTextPos := 1;
-  InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties);
+  InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
   If edtExplorerFilter.Text <> '' Then
     MC := FFilterRegEx.Matches(FNodeData.FNode.Text);
   For i := 0 To sl.Count - 1 Do
     Begin
       GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
         FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
-        FTargetCanvas);
+        FTokenFontInfo, FBGColour, FTargetCanvas);
       If FNode = FExplorer.FocusedNode Then
-        If FTargetCanvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then
+        If FTargetCanvas.Brush.Color = FBGColour Then
           FTargetCanvas.Brush.Color :=
-            TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+            FTokenFontInfo[ttExplorerHighlight].FBackColour;
       If edtExplorerFilter.Text = '' Then
         DrawTextToCanvas(sl[i], R, iTextPos, iTop, iLeft)
       Else
@@ -982,7 +998,7 @@ Begin
             mtStart:
               Begin
                 iColour := FTargetCanvas.Brush.Color;
-                FTargetCanvas.Brush.Color := clAqua;
+                FTargetCanvas.Brush.Color := FTokenFontInfo[ttSearchHighlight].FForeColour;
                 DrawTextToCanvas(Copy(sl[i], 1, MR.FLength), R, iTextPos, iTop, iLeft);
                 FTargetCanvas.Brush.Color := iColour;
                 DrawTextToCanvas(Copy(sl[i], MR.FLength + 1, Length(sl[i]) - MR.FLength), R,
@@ -990,20 +1006,20 @@ Begin
               End;
             mtFull:
               Begin
-                FTargetCanvas.Brush.Color := clAqua;
+                FTargetCanvas.Brush.Color := FTokenFontInfo[ttSearchHighlight].FForeColour;
                 DrawTextToCanvas(sl[i], R, iTextPos, iTop, iLeft)
               End;
             mtEnd:
               Begin
                 DrawTextToCanvas(Copy(sl[i], 1, MR.FStart - 1), R, iTextPos, iTop, iLeft);
-                FTargetCanvas.Brush.Color := clAqua;
+                FTargetCanvas.Brush.Color := FTokenFontInfo[ttSearchHighlight].FForeColour;
                 DrawTextToCanvas(Copy(sl[i], MR.FStart, MR.FLength), R, iTextPos, iTop, iLeft);
               End;
             mtMiddle:
               Begin
                 DrawTextToCanvas(Copy(sl[i], 1, MR.FStart - 1), R, iTextPos, iTop, iLeft);
                 iColour := FTargetCanvas.Brush.Color;
-                FTargetCanvas.Brush.Color := clAqua;
+                FTargetCanvas.Brush.Color := FTokenFontInfo[ttSearchHighlight].FForeColour;
                 DrawTextToCanvas(Copy(sl[i], MR.FStart, MR.FLength), R, iTextPos, iTop, iLeft);
                 FTargetCanvas.Brush.Color := iColour;
                 DrawTextToCanvas(Copy(sl[i], MR.FStart + MR.FLength,
@@ -1669,7 +1685,11 @@ Var
   N : PVirtualNode;
 
 Begin
-  FExplorer.Color := TBADIOptions.BADIOptions.BGColour;
+  FTokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
+  FBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
+  If FBGColour = clNone Then
+    FBGColour := FBADIOptions.BGColour[False];
+  FExplorer.Color := FBGColour;
   If Module = Nil Then
     Begin
       strReservedWords := Nil;
@@ -1832,7 +1852,7 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     @param   strText as a String as a constant
 
   **)
-  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String);
+  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String; iColour : TColor);
 
   Const
     iHighlightTextOffset = 18 + 26;
@@ -1849,7 +1869,7 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     For iMatch := 0 To MC.Count - 1 Do
       Begin
         M := MC[iMatch];
-        TargetCanvas.Brush.Color := clAqua;
+        TargetCanvas.Brush.Color := iColour;
         iLeft := TargetCanvas.TextWidth(Copy(strText, 1, M.Index - 1));
         R := CellRect;
         R.Left := iStart + iLeft;
@@ -1867,7 +1887,8 @@ Begin
          (edtExplorerFilter.Text <> '') Then
     Begin
       strText := (Sender As TVirtualStringTree).Text[Node, 0];
-      HighlightText(FFilterRegEx.Matches(strText), strText);
+      HighlightText(FFilterRegEx.Matches(strText), strText,
+        FTokenFontInfo[ttSearchHighlight].FForeColour);
     End;
 End;
 
@@ -1940,11 +1961,9 @@ begin
           NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
           If NodeData.FNode <> Nil Then
             If NodeData.FNode.Comment = Nil Then
-              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col,
-                NodeData.FNode.Line, NodeData.FNode.Col)
+              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line)
             Else
-              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col,
-                NodeData.FNode.Comment.Line, NodeData.FNode.Comment.Column);
+              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);
         End;
   Finally
     FSelectionChanging := False;
@@ -2081,7 +2100,7 @@ Begin
   NodeData := Sender.GetNodeData(Node);
   If Assigned(NodeData.FNode) Then
     Begin
-      InitCanvasFont(TargetCanvas, tpFixed In NodeData.FNode.TagProperties);
+      InitCanvasFont(TargetCanvas, tpFixed In NodeData.FNode.TagProperties, FBADIOptions);
       sl := NodeData.FNode.Tokens;
       NodeHeight := 1 + TargetCanvas.TextHeight(strNodeHeightTest) + 1;
       For iToken := 0 To sl.Count - 1 Do

@@ -3,8 +3,28 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    04 Jan 2018
+  @Version 1.1
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Types;
@@ -47,7 +67,8 @@ Type
     ttPlainText,
     ttCommentText,
     ttTagHeaderText,
-    ttTagText
+    ttTagText,
+    ttSearchHighlight
   );
   (** An enumerate for the scoping of identifiers. **)
   TScope = (
@@ -406,6 +427,9 @@ Type
     FBackColour : TColor;
   End;
 
+  (** This is an array of token font info records for each token type **)
+  TBADITokenFontInfoTokenSet = Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
+
   (** An enumerate to define the different types of issues to limit output for. **)
   TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts, ltChecks, ltMetrics);
 
@@ -578,6 +602,17 @@ Type
 
   (** An enumerate to define how the toxicity metric is combined. **)
   TBADIToxicitySummation = (tsAddBeforePower, tsAddAfterPower);
+
+  (** An enumerate to define the type of exclusion **)
+  TBADIExclusionType = (etDocumentation, etMetrics, etChecks);
+  (** A set of the above exclusion types to be referenced against each exclusion pattern. **)
+  TBADIExclusionTypes = Set Of TBADIExclusionType;
+
+  (** A record to describe the attributes of a exclusions (Document, Metric or Check) **)
+  TBADIExclusionRec = Record
+    FExclusionPattern: String;
+    FExclusions: TBADIExclusionTypes;
+  End;
 
 Implementation
 

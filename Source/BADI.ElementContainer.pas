@@ -4,8 +4,28 @@
   and a label container for tree view headers adn the like.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    03 Jan 2018
+  @Version 1.1
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.ElementContainer;
@@ -15,7 +35,7 @@ Interface
 Uses
   Classes,
   Contnrs,
-  BADI.Options,
+  BADI.Interfaces,
   BADI.Comment,
   BADI.Types,
   BADI.Base.Container,
@@ -40,7 +60,7 @@ Type
     FSorted  : Boolean;
     FReferenced : Boolean;
     FParent : TElementContainer;
-    FBADIOptions : TBADIOptions;
+    FBADIOptions : IBADIOptions;
   Strict Protected
     Function  GetElementCount : Integer;
     Function  GetElements(Const iIndex : Integer) : TElementContainer;
@@ -74,9 +94,9 @@ Type
       This property provide all descendant modules with a single point of access to the options.
       @precon  None.
       @postcon Returns a reference to the BADI Options class.
-      @return  a TBADIOptions
+      @return  a IBADIOptions
     **)
-    Property BADIOptions : TBADIOptions Read FBADIOptions;
+    Property BADIOptions : IBADIOptions Read FBADIOptions;
   Public
     Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
       iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Virtual;
@@ -112,6 +132,7 @@ Type
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
     Function  ReferenceSection(Const AToken : TTokenInfo; Const Section: TLabelContainer) : Boolean;
+    Function  ModuleFileName : String;
     (**
       This property returns the number of elements in the collection.
       @precon  None.
@@ -203,10 +224,13 @@ Uses
   Profiler,
   {$ENDIF}
   SysUtils,
+  BADI.Options,
   BADI.ResourceStrings,
   BADI.DocIssue,
   BADI.Functions,
-  BADI.Constants, BADI.Comment.Tag;
+  BADI.Constants,
+  BADI.Comment.Tag,
+  BADI.Base.Module;
 
 Type
   (** A record to describe error, warning, and hint messages. **)
@@ -431,6 +455,11 @@ Var
 
 Begin
   Result := isAdded;
+  If BADIOptions.Exclusions.ShouldExclude(ModuleFileName, etChecks) Then
+    Begin
+      Result := isDisabled;
+      Exit;
+    End;
   If Not (doShowChecks In BADIOptions.Options) Or Not BADIOptions.ModuleCheck[eCheck].FEnabled Then
     Begin
       Result := isDisabled;
@@ -605,6 +634,11 @@ Var
 
 Begin
   Result := isAdded;
+  If BADIOptions.Exclusions.ShouldExclude(ModuleFileName, etMetrics) Then
+    Begin
+      Result := isDisabled;
+      Exit;
+    End;
   If Not (doShowMetrics In BADIOptions.Options) Or Not BADIOptions.ModuleMetric[eMetric].FEnabled Then
     Begin
       Result := isDisabled;
@@ -694,15 +728,17 @@ ResourceString
 Var
   iLine, iCol: Integer;
   strI: String;
+  E : TElementContainer;
 
 Begin
-  iLine := AElement.Line;
-  iCol := AElement.Column;
-  strI := AElement.Identifier;
+  E := AElement;
+  iLine := E.Line;
+  iCol := E.Column;
+  strI := E.Identifier;
   Result := Add(AElement);
-  If Result <> AElement Then
+  If Result <> E Then
     AddIssue(Format(strDuplicateIdentifierFound, [strI, iLine, iCol]), scNone, iLine, iCol, etError,
-      AElement);
+      Result);
 End;
 
 (**
@@ -1156,7 +1192,9 @@ End;
 
 **)
 Destructor TElementContainer.Destroy;
+
 Begin
+  FBADIOptions := Nil;
   FElements.Free;
   Inherited Destroy;
 End;
@@ -1455,6 +1493,28 @@ End;
 
 (**
 
+  This function finds the root module filename.
+
+  @precon  None.
+  @postcon Returns the filename of the root module.
+
+  @return  a String
+
+**)
+Function TElementContainer.ModuleFileName: String;
+
+Var
+  RC : TElementContainer;
+  
+Begin
+  RC := FindRoot;
+  If Assigned(RC) Then
+    If RC Is TBaseLanguageModule Then
+      Result := (RC as TBaseLanguageModule).FileName;
+End;
+
+(**
+
   This method returns the image index for the given metric.
 
   @precon  None.
@@ -1549,7 +1609,7 @@ Function TElementContainer.ReferenceSymbol(Const AToken: TTokenInfo): Boolean;
 
 Begin
   Result := False;
-  If FParent <> Nil Then
+  If Assigned(FParent) Then
     Result := FParent.ReferenceSymbol(AToken);
 End;
 
@@ -1589,7 +1649,7 @@ End;
 Function TLabelContainer.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
-  If doShowChildCountInTitles In BADIOptions.BADIOptions.Options Then
+  If doShowChildCountInTitles In BADIOptions.Options Then
     Result := Format(strTitleCountFmt, [Name, ElementCount])
   Else
     Result := Name;

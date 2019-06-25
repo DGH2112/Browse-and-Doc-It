@@ -4,8 +4,28 @@
   information.
 
   @Author  David Hoyle
-  @Date    02 Jan 2018
   @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.HTMLDocumentation;
@@ -136,7 +156,7 @@ Uses
   BADI.ResourceStrings,
   BADI.Constants,
   BADI.Module.Dispatcher,
-  BADI.Functions;
+  BADI.Functions, BADI.Interfaces;
 
 (**
 
@@ -540,29 +560,33 @@ Var
 
   **)
   Procedure OutputCodeStyles;
+  
   Var
     i : TBADITokenType;
+    Ops: IBADIOptions;
+    TokenFontInfo: TBADITokenFontInfoTokenSet;
 
   Begin
-    With TBADIOptions.BADIOptions Do
-      For i := Low(TBADITokenType) to High(TBADITokenType) Do
-        Begin
-          sl.Add(Format('span.%s {', [StringReplace(strTokenType[i], #32, '', [rfReplaceAll])]));
-          sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FForeColour)]));
-          If (TokenFontInfo[i].FBackColour <> clNone) And
-             (TokenFontInfo[i].FBackColour <> clWindow) Then
-            sl.Add(Format('  background       : #%s;', [HTMLColour(TokenFontInfo[i].FBackColour)]));
-          If fsBold In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-weight      : bold;');
-          If fsItalic In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-style       : italic;');
-          If fsUnderline In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-decoration  : underline;');
-          If fsStrikeout In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-decoration  : line-through;');
-          sl.Add('}');
-          sl.Add('');
-        End;
+    Ops := TBADIOptions.BADIOptions;
+    TokenFontInfo := Ops.TokenFontInfo[Ops.UseIDEEditorColours];
+    For i := Low(TBADITokenType) to High(TBADITokenType) Do
+      Begin
+        sl.Add(Format('span.%s {', [StringReplace(strTokenType[i], #32, '', [rfReplaceAll])]));
+        sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FForeColour)]));
+        If (TokenFontInfo[i].FBackColour <> clNone) And
+           (TokenFontInfo[i].FBackColour <> clWindow) Then
+          sl.Add(Format('  background       : #%s;', [HTMLColour(TokenFontInfo[i].FBackColour)]));
+        If fsBold In TokenFontInfo[i].FStyles Then
+          sl.Add('  font-weight      : bold;');
+        If fsItalic In TokenFontInfo[i].FStyles Then
+          sl.Add('  font-style       : italic;');
+        If fsUnderline In TokenFontInfo[i].FStyles Then
+          sl.Add('  font-decoration  : underline;');
+        If fsStrikeout In TokenFontInfo[i].FStyles Then
+          sl.Add('  font-decoration  : line-through;');
+        sl.Add('}');
+        sl.Add('');
+      End;
   End;
 
 Type
@@ -601,7 +625,7 @@ Begin
           End Else
             sl.LoadFromFile(strFileName + CSSFiles[i].FFileName);
         sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
-          TBADIOptions.BADIOptions.BGColour), []);
+          TBADIOptions.BADIOptions.BGColour[TBADIOptions.BADIOptions.UseIDEEditorColours]), []);
         OutputCodeStyles;
         sl.SaveToFile(FOutputDirectory + 'Styles\' + CSSFiles[i].FFileName);
       End;

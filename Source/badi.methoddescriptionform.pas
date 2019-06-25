@@ -4,70 +4,120 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Feb 2017
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
-unit BADI.MethodDescriptionForm;
+Unit BADI.MethodDescriptionForm;
 
-interface
+Interface
 
-uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons;
+Uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  Buttons,
+  Vcl.ExtCtrls;
 
-type
+{$INCLUDE CompilerDefinitions.inc}
+
+Type
   (** A class to represent the form interface. **)
-  TfrmMethodDescriptions = class(TForm)
+  TfrmMethodDescriptions = Class(TForm)
     lblPattern: TLabel;
     edtPattern: TEdit;
     lblDescription: TLabel;
     edtDescription: TEdit;
     btnOK: TBitBtn;
     btnCancel: TBitBtn;
-  private
-    { Private declarations }
-  public
-    { Public declarations }
-    Class Function Execute(var strPattern, strDescription : String) : Boolean;
-  end;
+    pnlForm: TPanel;
+  Strict Private
+  Strict Protected
+  Public
+    Class Function Execute(Var strPattern, strDescription: String): Boolean;
+  End;
 
-implementation
+Implementation
 
 {$R *.dfm}
 
-{ TfrmMethodDescriptions }
+{$IFNDEF STANDALONEAPP}
+Uses
+  ToolsAPI,
+  BADI.ToolsAPIUtils;
+{$ENDIF}
 
 (**
 
-  This is the forms main interface method for getting the pattern and
+
+  This is the forms main interface method for getting the pattern and
   description.
 
   @precon  None.
   @postcon If the dialogue is confirmed then the pattern and description are
            returned in the var parameters and the function retuen true.
 
-  @param   strPattern     as a String as a reference
+
+  @param   strPattern     as a String as a reference
   @param   strDescription as a String as a reference
   @return  a Boolean
 
 **)
-class function TfrmMethodDescriptions.Execute(var strPattern,
-  strDescription: String): Boolean;
-begin
-  Result := False;
-  With TfrmMethodDescriptions.Create(Nil) Do
-    Try
-      edtPattern.Text := strPattern;
-      edtDescription.Text := strDescription;
-      If ShowModal = mrOK Then
-        Begin
-          strPattern := edtPattern.Text;
-          strDescription := edtDescription.Text;
-          Result := True;
-        End;
-    Finally
-      Free;
-    End;
-end;
+Class Function TfrmMethodDescriptions.Execute(Var strPattern, strDescription: String): Boolean;
 
-end.
+Var
+  F : TfrmMethodDescriptions;
+  
+Begin
+  Result := False;
+  { $IFDEF DXE102
+  TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmMethodDescriptions);
+  TBADIToolsAPIFunctions.ApplyTheming(Self);
+  {$ENDIF}
+  F := TfrmMethodDescriptions.Create(Nil);
+  Try
+    { $IFDEF DXE102
+    If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+      If ITS.IDEThemingEnabled Then
+        ITS.ApplyTheme(F);
+    {$ENDIF}
+    F.edtPattern.Text := strPattern;
+    F.edtDescription.Text := strDescription;
+    If F.ShowModal = mrOK Then
+      Begin
+        strPattern := F.edtPattern.Text;
+        strDescription := F.edtDescription.Text;
+        Result := True;
+      End;
+  Finally
+    F.Free;
+  End;
+End;
+
+End.

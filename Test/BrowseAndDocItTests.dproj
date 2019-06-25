@@ -4,7 +4,7 @@
         <MainSource>BrowseAndDocItTests.dpr</MainSource>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-        <ProjectVersion>18.3</ProjectVersion>
+        <ProjectVersion>18.6</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -16,11 +16,6 @@
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
         <Base_Win32>true</Base_Win32>
-        <CfgParent>Base</CfgParent>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
-        <Base_Win64>true</Base_Win64>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
@@ -60,7 +55,7 @@
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
         <DCC_RangeChecking>true</DCC_RangeChecking>
-        <DCC_Define>CONSOLE_TESTRUNNER;USE_JEDI_JCL;TESTINSIGHT;$(DCC_Define)</DCC_Define>
+        <DCC_Define>TESTINSIGHT;$(DCC_Define)</DCC_Define>
         <DCC_Optimize>false</DCC_Optimize>
         <DCC_F>false</DCC_F>
         <DCC_E>false</DCC_E>
@@ -72,6 +67,7 @@
         <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
         <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
         <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Library (LIVE)\FastMM;$(BDSPROJECTSDIR)\Binaries\CS5\Lib\RX10.3\Win32;$(BDSPROJECTSDIR)\Binaries\TestInsight\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <VerInfo_Release>0</VerInfo_Release>
@@ -85,12 +81,6 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
-        <DCC_UsePackage>vclimg;RaizeComponentsVcl;RaizeComponentsVclDb;$(DCC_UsePackage)</DCC_UsePackage>
-        <Icon_MainIcon>BrowseAndDocItTestsXE2_Icon.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -110,7 +100,8 @@
         <VerInfo_IncludeVerInfo>false</VerInfo_IncludeVerInfo>
         <Manifest_File>None</Manifest_File>
         <DCC_MapFile>3</DCC_MapFile>
-        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_Define>DEBUG;FASTMM;FULLDEBUGMODE;LOGMEMORYLEAKTOFILE;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <VerInfo_Release>0</VerInfo_Release>
@@ -134,8 +125,6 @@
         <DCCReference Include="..\Source\BADI.BackusNaur.Module.pas"/>
         <DCCReference Include="..\Source\BADI.CPP.Module.pas"/>
         <DCCReference Include="..\Source\BADI.DFM.Module.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Module.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Module.pas"/>
         <DCCReference Include="..\Source\BADI.INI.Module.pas"/>
         <DCCReference Include="..\Source\BADI.Pascal.Module.pas"/>
         <DCCReference Include="..\Source\BADI.VB.Module.pas"/>
@@ -153,10 +142,8 @@
         <DCCReference Include="..\Source\BADI.Generic.Tokenizer.pas"/>
         <DCCReference Include="Source\Test.BADI.XML.Module.pas"/>
         <DCCReference Include="Source\Test.BADI.DFM.Module.pas"/>
-        <DCCReference Include="Source\Test.BADI.Eidolon.Module.pas"/>
         <DCCReference Include="Source\Test.BADI.Module.Dispatcher.pas"/>
         <DCCReference Include="..\Source\BADI.CommonIDEFunctions.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Types.pas"/>
         <DCCReference Include="..\Source\BADI.Base.Container.pas"/>
         <DCCReference Include="..\Source\BADI.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.Comment.Tag.pas"/>
@@ -249,15 +236,6 @@
         <DCCReference Include="Source\Test.BADI.DFM.PropertyDecl.pas"/>
         <DCCReference Include="..\Source\BADI.INI.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.INI.KeyValuePair.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSShape.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSRoad.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSObject.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.SchematicSetting.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.NoText.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Comment.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSStatic.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.ResourceStrings.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Constants.pas"/>
         <DCCReference Include="..\Source\BADI.XML.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.XML.BaseElement.pas"/>
         <DCCReference Include="..\Source\BADI.XML.DocType.pas"/>
@@ -273,33 +251,6 @@
         <DCCReference Include="Source\Test.BADI.XML.XMLDocType.pas"/>
         <DCCReference Include="Source\Test.BADI.XML.XMLElemDecl.pas"/>
         <DCCReference Include="Source\Test.BADI.XML.XMLElement.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Comment.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Constants.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.FieldDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.BaseTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TextTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DBConnection.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DBTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.OutputTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Association.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.RequirementsTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Symbol.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TimeLocationTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TextTableDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DatabaseDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.ConnectionDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TableNameDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Line.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.CustomFillSymbol.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Rectangle.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Bar.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.SuperBar.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Diamond.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Triangle.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Ellipse.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.ResourceStrings.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Functions.pas"/>
-        <DCCReference Include="Source\Test.BADI.Eidolon.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.VB.Attribute.pas"/>
         <DCCReference Include="..\Source\BADI.VB.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.VB.ConstantDecl.pas"/>
@@ -338,6 +289,9 @@
         <DCCReference Include="Source\Test.BADI.VB.Attribute.pas"/>
         <DCCReference Include="..\Source\BADI.Refactoring.Functions.pas"/>
         <DCCReference Include="Source\Test.BADI.Refactoring.Functions.pas"/>
+        <DCCReference Include="..\Source\BADI.Interfaces.pas"/>
+        <DCCReference Include="..\Source\BADI.IDEEditorColours.pas"/>
+        <DCCReference Include="..\Source\BADI.Exclusions.pas"/>
         <None Include="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage"/>
         <None Include="..\Source\CompilerDefinitions.inc"/>
         <BuildConfiguration Include="Debug">
@@ -394,15 +348,14 @@
                     <VersionInfoKeys Name="Comments">Test for Browse and Doc It</VersionInfoKeys>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp250.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k250.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k260.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp260.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
                 <DeployFile LocalName="BrowseAndDocItTests.exe" Configuration="Debug" Class="ProjectOutput">
@@ -438,13 +391,18 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>0</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidClassesDexFile">
                     <Platform Name="Android">
                         <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidFileProvider">
+                    <Platform Name="Android">
+                        <RemoteDir>res\xml</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -481,6 +439,12 @@
                 <DeployClass Name="AndroidSplashStyles">
                     <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV21">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v21</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -562,6 +526,11 @@
                         <Operation>1</Operation>
                         <Extensions>.framework</Extensions>
                     </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
                     </Platform>
@@ -580,6 +549,11 @@
                         <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
                         <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
@@ -607,6 +581,11 @@
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
                     </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
                         <Extensions>.bpl</Extensions>
@@ -626,6 +605,10 @@
                         <Operation>0</Operation>
                     </Platform>
                     <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
                         <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
                         <Operation>0</Operation>
                     </Platform>
@@ -765,8 +748,18 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="ProjectOSXDebug">
+                    <Platform Name="OSX64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="ProjectOSXEntitlements">
                     <Platform Name="OSX32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
                         <RemoteDir>..\</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -776,9 +769,17 @@
                         <RemoteDir>Contents</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
                     <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
                         <RemoteDir>Contents\Resources</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -801,6 +802,10 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
                         <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -843,6 +848,7 @@
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <UnitTesting>

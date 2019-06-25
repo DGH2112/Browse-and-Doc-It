@@ -4,7 +4,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Jan 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -95,13 +115,18 @@ Type
   Type
       (** A record to describe the data to be held in a tree node. **)
     TBADICheckRecord = Record
-      FNodeType              : TBADINodeType;
-      FText                  : String;
-      FImageIndex            : Integer;
-      FChecks                : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of Double;
-      FTotal                 : Double;
-      FIssueCount            : Integer;
-      FCheckOverrides        : TBADIModuleChecks;
+      FNodeType        : TBADINodeType;
+      FFileName        : String;
+      FText            : String;
+      FImageIndex      : Integer;
+      FChecks          : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of Double;
+      FTotal           : Double;
+      FIssueCount      : Integer;
+      FCheckOverrides  : TBADIModuleChecks;
+      FIdentLine       : Integer;
+      FIdentColumn     : Integer;
+      FCommentLine     : Integer;
+      FCommentColumn   : Integer;
     End;
     (** A pointer to the above record. **)
     PBADICheckRecord = ^TBADICheckRecord;
@@ -119,9 +144,10 @@ Type
     FMethodCount   : Integer;
     FUnderLimit    : Integer;
     FOverLimit     : Integer;
-    FVSTChecks    : TBADIEditorViewVirtualStringTree;
+    FVSTChecks     : TBADIEditorViewVirtualStringTree;
     {$IFDEF DXE102}
-    FStyleServicesNotifier: Integer;
+    FThemingServicesNotifierIndex : Integer;
+    FStyleServices : TCustomStyleServices;
     {$ENDIF}
   Strict Protected
     Procedure vstChecksGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -148,6 +174,8 @@ Type
     Procedure CreateVirtualStringTree;
     Procedure HideZeroColumns;
     Procedure ExpandIssues;
+    Procedure HookThemingServices(Sender : TObject);
+    Procedure vstChecksDblClick(Sender : TObject);
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -208,7 +236,8 @@ Uses
   BADI.Options,
   BADI.Functions,
   ClipBrd, 
-  BADI.StyleServices.Notifier;
+  BADI.IDEThemingNotifier,
+  BADI.ToolsAPIUtils;
 
 {$R *.dfm}
 
@@ -590,11 +619,11 @@ Begin
   CreateVirtualStringTree;
   FVSTChecks.NodeDataSize := SizeOf(TBADICheckRecord);
   LoadBADIImages(ilScopeImages);
+  HookThemingServices(Nil);
   {$IFDEF DXE102}
-  FStyleServicesNotifier := -1;
+  FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    FStyleServicesNotifier :=
-      ITS.AddNotifier(TBADIStyleServicesNotifier.Create(FVSTChecks.UpdateTreeColours));
+    FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(HookThemingServices));
   {$ENDIF}
 End;
 
@@ -632,6 +661,7 @@ Begin
   FVSTChecks.OnGetText := vstChecksGetText;
   FVSTChecks.OnPaintText := vstChecksPaintText;
   FVSTChecks.OnGetImageIndex := vstChecksGetImageIndex;
+  FVSTChecks.OnDblClick := vstChecksDblClick;
   For eColumn := Low(TBADICheckColumn) To High(TBADICheckColumn) Do
     Begin
       C := FVSTChecks.Header.Columns.Add;
@@ -682,7 +712,7 @@ End;
 
 **)
 Destructor TframeBADIModuleChecksEditorView.Destroy;
-
+  
 {$IFDEF DXE102}
 Var
   ITS : IOTAIDEThemingServices;
@@ -690,8 +720,10 @@ Var
   
 Begin
   {$IFDEF DXE102}
+  FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-    ITS.RemoveNotifier(FStyleServicesNotifier);
+    If FThemingServicesNotifierIndex > -1 Then
+      ITS.RemoveNotifier(FThemingServicesNotifierIndex);
   {$ENDIF}
   Inherited Destroy;
 End;
@@ -869,6 +901,35 @@ End;
 
 (**
 
+  This method Hokos the IDEs Style Services if they are available and enabled.
+
+  @precon  None.
+  @postcon The IDEs style services are hooked if available and enabled else its set to nil.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleChecksEditorView.HookThemingServices(Sender : TObject);
+
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+  
+Begin
+  {$IFDEF DXE102}
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      Begin
+        FStyleServices := ITS.StyleServices;
+        ITS.ApplyTheme(Self);
+      End;
+  {$ENDIF}
+End;
+
+(**
+
   This method processes the given function and returns its method information.
 
   @precon  None.
@@ -937,15 +998,27 @@ Var
   NodeData: PBADICheckRecord;
   iElement: Integer;
   M: TGenericFunction;
+  Module: TBaseLanguageModule;
 
 Begin
   Result.Create(FVSTChecks.AddChild(Parent));
   NodeData := FVSTChecks.GetNodeData(Result.FNode);
   NodeData.FNodeType := ntUnkown;
-  If Not Assigned(Container.Parent) Then
-    NodeData.FNodeType := ntModule;
+  If Container Is TBaseLanguageModule Then
+    Begin
+      Module := Container As TBaseLanguageModule;
+      NodeData.FNodeType := ntModule;
+      NodeData.FFileName := Module.FileName;
+    End;
   NodeData.FText := Container.AsString(True, False);
   NodeData.FImageIndex := BADIImageIndex(Container.ImageIndex, Container.Scope);
+  NodeData.FIdentLine := Container.Line;
+  NodeData.FIdentColumn := Container.Column;
+  If Assigned(Container.Comment) Then
+    Begin
+      NodeData.FCommentLine := Container.Comment.Line;
+      NodeData.FCommentColumn := Container.Comment.Column;
+    ENd;
   If Container Is TGenericFunction Then
     Begin
       M := Container As TGenericFunction;
@@ -1153,8 +1226,8 @@ Begin
   NodeData := FVSTChecks.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
   {$IFDEF DXE102}
-  If Assigned(FVSTChecks.StyleServices) And FVSTChecks.StyleServices.Enabled Then
-    TargetCanvas.Brush.Color := FVSTChecks.StyleServices.GetSystemColor(clWindow);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
   {$ENDIF}
   Case TBADICheckColumn(Column) Of
     ccHardCodedIntegers..ccMissingCONSTInParemterList:
@@ -1188,6 +1261,50 @@ Procedure TframeBADIModuleChecksEditorView.vstChecksCompareNodes(Sender: TBaseVi
 
 Begin
   Result := CompareText(FVSTChecks.Text[Node1, 0], FVSTChecks.Text[Node2, 0]);
+End;
+
+(**
+
+  This method attempts to display the method that was double clicked on.
+
+  @precon  None.
+  @postcon The method that was clicked on is displayed if it can be shown.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleChecksEditorView.vstChecksDblClick(Sender: TObject);
+
+Var
+  Node : PVirtualNode;
+  NodeData : PBADICheckRecord;
+  strFileName : String;
+  MS : IOTAModuleServices;
+  Module: IOTAModule;
+  
+Begin
+  Node := FVSTChecks.FocusedNode;
+  While Assigned(Node) Do
+    Begin
+      NodeData := FVSTChecks.GetNodeData(Node);
+      If Length(NodeData.FFileName) > 0 Then
+        strFileName := NodeData.FFileName;
+      Node := FVSTChecks.NodeParent[Node];
+    End;
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      Module := MS.FindModule(strFileName);
+      If Not Assigned(Module) Then
+        Module := MS.OpenModule(strFileName);
+      If Assigned(Module) Then
+        Begin
+          Module.Show;
+          Node := FVSTChecks.FocusedNode;
+          NodeData := FVSTChecks.GetNodeData(Node);
+          TBADIToolsAPIFunctions.PositionCursor(NodeData.FIdentLine, NodeData.FIdentColumn,
+            NodeData.FCommentLine, TBADIOptions.BADIOptions.BrowsePosition);
+        End;
+    End;
 End;
 
 (**
@@ -1302,8 +1419,8 @@ Begin
   TargetCanvas.Font.Style := [];
   TargetCanvas.Font.Color := clWindowText;
   {$IFDEF DXE102}
-  If Assigned(FVSTChecks.StyleServices) And FVSTChecks.StyleServices.Enabled Then
-    TargetCanvas.Font.Color := FVSTChecks.StyleServices.GetSystemColor(clWindowText);
+  If Assigned(FStyleServices) Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
   Case TBADICheckColumn(Column) Of
     ccHardCodedIntegers..ccTotal: TargetCanvas.Font.Color := clBlack;

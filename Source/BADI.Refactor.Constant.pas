@@ -4,7 +4,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Jan 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Refactor.Constant;
@@ -200,7 +220,7 @@ Const
                     mrYes:
                       Begin
                         Result := True;
-                        PositionCursor(M, S.Elements[iDeclaration].Line,
+                        TBADIToolsAPIFunctions.PositionCursor(M, S.Elements[iDeclaration].Line,
                           S.Elements[iDeclaration].Column, TBADIOptions.BADIOptions.BrowsePosition);                    
                         Break;
                       End;
@@ -240,7 +260,7 @@ Begin
               [mbYes, mbNo, mbCancel], 0) Of
               mrYes:
                 Begin
-                  PositionCursor(Container, Container.Elements[iDeclaration].Line,
+                  TBADIToolsAPIFunctions.PositionCursor(Container, Container.Elements[iDeclaration].Line,
                     Container.Elements[iDeclaration].Column, TBADIOptions.BADIOptions.BrowsePosition);                    
                 End;
               mrNo:
@@ -318,7 +338,8 @@ ResourceString
   strCannotRefactorErrors = 'Cannot refactor as the module has errors!';
 
 Begin
-  FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(FSourceEditor),
+  FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(
+    TBADIToolsAPIFunctions.EditorAsString(FSourceEditor),
     FSourceEditor.FileName, fSourceEditor.Modified, [moParse]);
   Try
     If Not Assigned(FModule.FindElement(strErrors)) Then
@@ -465,20 +486,21 @@ Begin
     ritAppend:
       Begin
         strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
-        OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
+        TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring),
+          CP.CharIndex) + ';'#13#10);
       End;
     ritCreate:
       Begin
         If RII.FPosition = ripAfter Then
           If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            OutputText(UR, #13#10);
-        OutputText(UR, Format(strSection, [CP.CharIndex, '',
+            TBADIToolsAPIFunctions.OutputText(UR, #13#10);
+        TBADIToolsAPIFunctions.OutputText(UR, Format(strSection, [CP.CharIndex, '',
           strSectionKeywords[FRefactoringInfo.RefactoringType]]));
         strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
-        OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
+        TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
         If RII.FPosition = ripBefore Then
           If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            OutputText(UR, #13#10);
+            TBADIToolsAPIFunctions.OutputText(UR, #13#10);
       End;
   End;
 
@@ -507,7 +529,7 @@ Begin
   UR := FSourceEditor.CreateUndoableWriter;
   UR.CopyTo(iIndex);
   UR.DeleteTo(iIndex + FRefactoringInfo.Token.Length);
-  OutputText(UR, FRefactoringInfo.Name);
+  TBADIToolsAPIFunctions.OutputText(UR, FRefactoringInfo.Name);
 End;
 
 (**

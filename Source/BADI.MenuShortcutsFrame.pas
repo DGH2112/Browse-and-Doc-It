@@ -4,7 +4,27 @@
 
   @Author  David Hoyle
   @version 1.0
-  @date    09 Apr 2017
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.MenuShortcutsFrame;
@@ -32,8 +52,8 @@ Type
   TfmBADIMenuShortcuts = Class(TFrame, IBADIOptionsFrame, IBADIInstallShortcutUsedCallBack)
     lvMenuShortcuts: TListView;
     hkMenuShortcut: THotKey;
-    btnAssign: TBitBtn;
     lblInformation: TLabel;
+    btnAssign: TButton;
     procedure lvMenuShortcutsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
     procedure btnAssignClick(Sender: TObject);
     procedure hkMenuShortcutChange(Sender: TObject);
@@ -42,7 +62,7 @@ Type
     FShortcutUsedEvent : TBADIShortcutUsedEvent;
   Strict Protected
     { Protected declarations }
-    Procedure InstallShortcutUsedCallBack(ShortCutUsed: TBADIShortcutUsedEvent);
+    Procedure InstallShortcutUsedCallBack(Const ShortCutUsed: TBADIShortcutUsedEvent);
   Public
     { Public declarations }
     Procedure LoadSettings;
@@ -54,6 +74,9 @@ Implementation
 {$R *.dfm}
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   Menus,
   BADI.Constants,
   BADI.Options;
@@ -89,6 +112,10 @@ End;
 **)
 Procedure TfmBADIMenuShortcuts.hkMenuShortcutChange(Sender: TObject);
 
+ResourceString
+  strThisShortcutInUseBy = 'This shortcut is in use by: %s';
+  strShortcutNotInUse = 'Shortcut not in use.';
+
 Var
   strActionName : String;
 
@@ -98,11 +125,11 @@ Begin
       If Assigned(FShortcutUsedEvent) And
          FShortcutUsedEvent(hkMenuShortcut.HotKey, strActionName) Then
         Begin
-          lblInformation.Caption := Format('This shortcut is in use by: %s', [strActionName]);
+          lblInformation.Caption := Format(strThisShortcutInUseBy, [strActionName]);
           lblInformation.Font.Color := clRed;
           Exit;
         End;
-      lblInformation.Caption := 'Shortcut not in use.';
+      lblInformation.Caption := strShortcutNotInUse;
       lblInformation.Font.Color := clGreen;
     End Else
       lblInformation.Caption := '';
@@ -110,16 +137,16 @@ End;
 
 (**
 
-  This method assigns an event handler call back in the frame to check that the shortcut is not
-  already in use.
+  This method assigns an event handler call back in the frame to check that the shortcut is not already 
+  in use.
 
   @precon  ShortcutUsed must be a valid method or Nil.
   @postcon The callbeck event handler is set.
 
-  @param   ShortCutUsed as a TBADIShortcutUsedEvent
+  @param   ShortCutUsed as a TBADIShortcutUsedEvent as a constant
 
 **)
-Procedure TfmBADIMenuShortcuts.InstallShortcutUsedCallBack(ShortCutUsed: TBADIShortcutUsedEvent);
+Procedure TfmBADIMenuShortcuts.InstallShortcutUsedCallBack(Const ShortCutUsed: TBADIShortcutUsedEvent);
 
 Begin
   FShortcutUsedEvent := ShortCutUsed;
@@ -140,6 +167,7 @@ Var
   Item: TListItem;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
     If BADIMenus[iBADIMenu].FCaption <> '' Then
       Begin
@@ -191,6 +219,7 @@ Var
   eBADIMenu: TBADIMenu;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
   For iBADIMenu := 0 To lvMenuShortcuts.Items.Count - 1 Do
     Begin
       Item := lvMenuShortcuts.Items[iBADIMenu];
@@ -200,3 +229,4 @@ Begin
 End;
 
 End.
+

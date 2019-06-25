@@ -4,7 +4,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    04 Jan 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Constants;
@@ -23,10 +43,10 @@ Const
   strSplashScreenName = 'Browse and Doc It %d.%d%s for %s';
   {$IFDEF DEBUG}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
-  strSplashScreenBuild = 'Freeware by David Hoyle (DEBUG Build %d.%d.%d.%d)';
+  strSplashScreenBuild = 'David Hoyle (c) 2019 License GNU GPL 3 (DEBUG Build %d.%d.%d.%d)';
   {$ELSE}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
-  strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
+  strSplashScreenBuild = 'David Hoyle (c) 2019 License GNU GPL 3 (Build %d.%d.%d.%d)';
   {$ENDIF}
 
   (** A default list of symbols which should not have spaces before them. **)
@@ -142,32 +162,33 @@ Const
   );
 
   (** This is a default set of font information for the application. **)
-  strTokenTypeInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo = (
-    (FForeColour : clRed;        FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clMaroon;     FStyles : [fsBold];               FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clWindow),
+  strTokenTypeInfo : TBADITokenFontInfoTokenSet = (
+    (FForeColour : clRed;        FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clMaroon;     FStyles : [fsBold];               FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
     (FForeColour : clInfoText;   FStyles : [];                     FBackColour: clInfoBk),
-    (FForeColour : clWindowText; FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clNavy;       FStyles : [];                     FBackColour: clWindow),
-    (FForeColour : clPurple;     FStyles : [fsBold, fsUnderline];  FBackColour: clWindow),
-    (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clWindow)
+    (FForeColour : clWindowText; FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clNavy;       FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clPurple;     FStyles : [fsBold, fsUnderline];  FBackColour: clNone),
+    (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone)
   );
 
   (** This is a list of image resource masks to be placed of the below images to create vesions
@@ -416,7 +437,8 @@ Const
     strTokenPlainText,
     strTokenCommentText,
     strTokenTagHeaderText,
-    strTokenTagText
+    strTokenTagText,
+    strSearchHighlight
   );
 
   (** A constant string to represent the position of the main procedure code in

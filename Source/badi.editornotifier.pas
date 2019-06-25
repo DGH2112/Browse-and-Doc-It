@@ -3,9 +3,29 @@
   This module contains an editor notifier that monitors the coed for changes
   and in turn refreshes the module explorer.
 
-  @Version 1.0
-  @Date    03 Jan 2018
   @Author  David Hoyle
+  @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.EditorNotifier;
@@ -25,7 +45,7 @@ Uses
 Type
   (** This class handles notifications from the editor so that changes in the
       editor can be displayed. **)
-  TEditorNotifier = Class(TNotifierObject, INTAEditServicesNotifier)
+  TEditorNotifier = Class(TNotifierObject, IUnknown, IOTANotifier, INTAEditServicesNotifier)
   Strict Private
     FUpdateTimer : TTimer;
     FLastEditorName : String;
@@ -42,20 +62,14 @@ Type
     Procedure CheckForCursorMovement(Const Editor : IOTASourceEditor);
     Procedure CheckFileNameAndSize(Const Editor : IOTASourceEditor);
     // INTAEditServicesNotifier
-    //: @nometric MissingCONSTInParam
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
-    //: @nometric MissingCONSTInParam
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
     procedure WindowActivated(const EditWindow: INTAEditWindow);
-    //: @nometric MissingCONSTInParam
     procedure WindowCommand(const EditWindow: INTAEditWindow; Command, Param: Integer; var Handled: Boolean);
     procedure EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
     procedure EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
-    //: @nometric MissingCONSTInParam
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    //: @nometric MissingCONSTInParam
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    //: @nometric MissingCONSTInParam
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
   Public
     Constructor Create;
@@ -66,7 +80,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,
@@ -178,8 +192,8 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow DockForm
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
@@ -197,8 +211,8 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow DockForm
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
@@ -217,8 +231,8 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow DockForm
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
@@ -317,6 +331,9 @@ Const
   {$IFDEF VER320} // Delphi XE10.2 Tokyo
   strCompilerVersion = 'VER320';
   {$ENDIF}
+  {$IFDEF VER330} // Delphi XE10.3 Carnival
+  strCompilerVersion = 'VER320';
+  {$ENDIF}
   {$IFNDEF D0001}
     {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
   {$ENDIF}
@@ -364,13 +381,13 @@ begin
   Result := '';
   strFileName := '';
   boolModified := False;
-  SE := ActiveSourceEditor;
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If Assigned(SE) Then
     Begin
       strFileName := SE.FileName;
       boolModified := SE.Modified;
-      Result := EditorAsString(SE);
-      Project := ActiveProject;
+      Result := TBADIToolsAPIFunctions.EditorAsString(SE);
+      Project := TBADIToolsAPIFunctions.ActiveProject;
       If Assigned(Project) Then
         Begin
           Options := Project.ProjectOptions;
@@ -390,18 +407,20 @@ end;
   @precon  None.
   @postcon Refreshes the module explorer IF the last parser was sucessful.
 
-  @nohint
+  @nohint  EditWindow EditView
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   EditView   as an IOTAEditView as a constant
 
 **)
-procedure TEditorNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
-  const EditView: IOTAEditView);
-begin
+Procedure TEditorNotifier.EditorViewActivated(Const EditWindow: INTAEditWindow;
+  Const EditView: IOTAEditView);
+
+Begin
+  FUpdateTimer.Enabled := True;
   FLastParserResult := True;
   FLastUpdateTickCount := 1;
-end;
+End;
 
 (**
 
@@ -411,7 +430,7 @@ end;
   @precon  None.
   @postcon Logs the last time the editor was updated.
 
-  @nohint
+  @nohint  EditWindow EditView
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   EditView   as an IOTAEditView as a constant
@@ -508,13 +527,13 @@ Var
   Editor : IOTASourceEditor;
 
 begin
-  Editor := ActiveSourceEditor;
+  Editor := TBADIToolsAPIFunctions.ActiveSourceEditor;
   CheckForCursorMovement(Editor);
   CheckFileNameAndSize(Editor);
   If (FLastUpdateTickCount > 0) And
     (GetTickCount > FLastUpdateTickCount + TBADIOptions.BADIOptions.UpdateInterval) Then
     Begin
-      If (Application <> Nil) And (Application.MainForm <> Nil) And Application.MainForm.Visible Then
+      If Assigned(Application) And Assigned(Application.MainForm) And Application.MainForm.Visible Then
         Begin
           FLastUpdateTickCount := 0;
           FUpdateTimer.Enabled := False;
@@ -531,8 +550,8 @@ end;
   This an impementation of the WindowActivated method for the Editor Notifier
   interface.
 
-  @nohint
-  @nometric EmptyMethod
+  @nohint  EditWindow
+  @nocheck EmptyMethod
 
   @precon  None.
   @postcon Not used.
@@ -552,8 +571,8 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow Command Param Handled
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   Command    as an Integer
@@ -573,8 +592,8 @@ end;
   @precon  None.
   @postcon None.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow Operation
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow as an INTAEditWindow as a constant
   @param   Operation  as a TOperation
@@ -592,8 +611,8 @@ end;
   @precon  None.
   @postcon None.
 
-  @nohint
-  @nometric MissingCONSTInParam EmptyMethod
+  @nohint  EditWindow Show LoadedFromDesktop
+  @nocheck MissingCONSTInParam EmptyMethod
 
   @param   EditWindow        as an INTAEditWindow as a constant
   @param   Show              as a Boolean

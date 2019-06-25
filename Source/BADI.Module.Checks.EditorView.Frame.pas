@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    25 Jun 2019
 
   @license
 
@@ -58,7 +58,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes, System.ImageList;
+  UITypes;
 
 {$INCLUDE CompilerDefinitions.inc}
 

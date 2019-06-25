@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    25 Jun 2019
 
   @license
 
@@ -46,7 +46,7 @@ Uses
   ComCtrls,
   BADI.CustomOptionsFrame,
   VirtualTrees,
-  System.Generics.Collections, System.ImageList, Vcl.ImgList;
+  System.Generics.Collections;
 
 Type
   (** This class represents the frame interface. **)

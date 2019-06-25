@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    25 Jun 2019
 
   @license
 
@@ -52,7 +52,7 @@ uses
   ImgList,
   ExtCtrls,
   UITypes,
-  BADI.ElementContainer, System.ImageList;
+  BADI.ElementContainer;
 
 type
   (** A class to represent the form interface. **)

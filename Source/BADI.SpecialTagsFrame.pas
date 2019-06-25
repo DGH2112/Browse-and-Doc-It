@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    25 Jun 2019
 
   @license
 
@@ -51,7 +51,7 @@ Uses
   BADI.Types,
   VirtualTrees,
   Themes, 
-  BADI.CustomVirtualStringTree, System.ImageList, Vcl.ImgList;
+  BADI.CustomVirtualStringTree;
 
 Type
   (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)

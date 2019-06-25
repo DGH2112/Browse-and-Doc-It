@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    25 Jun 2019
 
   @license
 
@@ -50,7 +50,7 @@ Uses
   Generics.Collections,
   BADI.Types,
   BADI.Exclusions,
-  BADI.CustomOptionsFrame, System.ImageList;
+  BADI.CustomOptionsFrame;
 
 {$INCLUDE CompilerDefinitions.inc}
 

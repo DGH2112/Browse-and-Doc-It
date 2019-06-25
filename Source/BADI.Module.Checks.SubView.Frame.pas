@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    25 Jun 2019
 
   @license
 
@@ -48,7 +48,7 @@ Uses
   PlatformDefaultStyleActnCtrls,
   ActnPopup,
   ExtCtrls,
-  ImgList, System.ImageList;
+  ImgList;
 
 Type
   (** A frame to display the module checks in a subview. **)

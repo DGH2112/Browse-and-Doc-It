@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    25 Jun 2019
 
   @license
 
@@ -51,7 +51,7 @@ Uses
   ActnList,
   Menus,
   PlatformDefaultStyleActnCtrls,
-  ActnPopup, System.ImageList;
+  ActnPopup;
 
 Type
   (** A descendant class for the subview frame. **)

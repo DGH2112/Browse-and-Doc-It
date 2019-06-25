@@ -6,7 +6,27 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Oct 2018
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
 Unit BADI.Initialisation;
@@ -24,8 +44,6 @@ Uses
   BADI.BackusNaur.Module,
   BADI.CPP.Module,
   BADI.DFM.Module,
-  BADI.Eidolon.Module,
-  BADI.Eidolon.TLSSchematic.Module,
   BADI.INI.Module,
   BADI.Pascal.Module,
   BADI.VB.Module,
@@ -74,13 +92,11 @@ Type
   End;
 
 Const
-  Modules : Array[0..8] Of TBADIDispatcherRecord = (
+  Modules : Array[0..6] Of TBADIDispatcherRecord = (
     (FModule: TBackusNaurModule;   FExt: '.bnf';                      FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
     (FModule: TPascalModule;       FExt: '.dpk;.dpr;.pas';            FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
     (FModule: TCPPModule;          FExt: '.cpp;.hpp;.c;.h';           FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
     (FModule: TDFMModule;          FExt: '.dfm';                      FCanDoc: False; FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
-    (FModule: TEidolonModule;      FExt: '.map';                      FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPBlock),
-    (FModule: TTLSSchematicModule; FExt: '.schematic';                FCanDoc: False; FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPLine),
     (FModule: TINIModule;          FExt: '.ini;.tli';                 FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPBlock),
     (FModule: TVBModule;           FExt: '.bas;.cls;.frm';            FCanDoc: True;  FBlockCmt: ctVBLine;      FLineCmt: ctVBLine;      FInSituCmt: ctVBLine),
     (FModule: TXMLModule;          FExt: '.dtd;.htm;.html;.xml;.xsd'; FCanDoc: False; FBlockCmt: ctXML;         FLineCmt: ctXML;         FInSituCmt: ctXML)

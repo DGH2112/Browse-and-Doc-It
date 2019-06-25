@@ -81,7 +81,6 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-        <DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Binaries\CS5\Lib\RX10.3\Win32;$(BDSPROJECTSDIR)\Binaries\TestInsight\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -126,8 +125,6 @@
         <DCCReference Include="..\Source\BADI.BackusNaur.Module.pas"/>
         <DCCReference Include="..\Source\BADI.CPP.Module.pas"/>
         <DCCReference Include="..\Source\BADI.DFM.Module.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Module.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Module.pas"/>
         <DCCReference Include="..\Source\BADI.INI.Module.pas"/>
         <DCCReference Include="..\Source\BADI.Pascal.Module.pas"/>
         <DCCReference Include="..\Source\BADI.VB.Module.pas"/>
@@ -145,10 +142,8 @@
         <DCCReference Include="..\Source\BADI.Generic.Tokenizer.pas"/>
         <DCCReference Include="Source\Test.BADI.XML.Module.pas"/>
         <DCCReference Include="Source\Test.BADI.DFM.Module.pas"/>
-        <DCCReference Include="Source\Test.BADI.Eidolon.Module.pas"/>
         <DCCReference Include="Source\Test.BADI.Module.Dispatcher.pas"/>
         <DCCReference Include="..\Source\BADI.CommonIDEFunctions.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Types.pas"/>
         <DCCReference Include="..\Source\BADI.Base.Container.pas"/>
         <DCCReference Include="..\Source\BADI.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.Comment.Tag.pas"/>
@@ -241,15 +236,6 @@
         <DCCReference Include="Source\Test.BADI.DFM.PropertyDecl.pas"/>
         <DCCReference Include="..\Source\BADI.INI.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.INI.KeyValuePair.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSShape.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSRoad.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSObject.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.SchematicSetting.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.NoText.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Comment.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.TLSStatic.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.ResourceStrings.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TLSSchematic.Constants.pas"/>
         <DCCReference Include="..\Source\BADI.XML.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.XML.BaseElement.pas"/>
         <DCCReference Include="..\Source\BADI.XML.DocType.pas"/>
@@ -265,33 +251,6 @@
         <DCCReference Include="Source\Test.BADI.XML.XMLDocType.pas"/>
         <DCCReference Include="Source\Test.BADI.XML.XMLElemDecl.pas"/>
         <DCCReference Include="Source\Test.BADI.XML.XMLElement.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Comment.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Constants.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.FieldDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.BaseTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TextTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DBConnection.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DBTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.OutputTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Association.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.RequirementsTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Symbol.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TimeLocationTable.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TextTableDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.DatabaseDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.ConnectionDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.TableNameDef.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Line.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.CustomFillSymbol.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Rectangle.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Bar.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.SuperBar.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Diamond.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Triangle.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Ellipse.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.ResourceStrings.pas"/>
-        <DCCReference Include="..\Source\BADI.Eidolon.Functions.pas"/>
-        <DCCReference Include="Source\Test.BADI.Eidolon.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.VB.Attribute.pas"/>
         <DCCReference Include="..\Source\BADI.VB.Comment.pas"/>
         <DCCReference Include="..\Source\BADI.VB.ConstantDecl.pas"/>
@@ -399,15 +358,15 @@
                 <Platform value="Win32">True</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="BrowseAndDocItTests.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>BrowseAndDocItTests.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

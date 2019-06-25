@@ -27,7 +27,6 @@ object fmBADIMethodDescriptionsFrame: TfmBADIMethodDescriptionsFrame
     ParentDoubleBuffered = False
     TabOrder = 3
     OnClick = btnDeleteDescClick
-    ExplicitTop = 314
   end
   object btnEditDesc: TButton
     Left = 412
@@ -43,7 +42,6 @@ object fmBADIMethodDescriptionsFrame: TfmBADIMethodDescriptionsFrame
     ParentDoubleBuffered = False
     TabOrder = 2
     OnClick = btnEditDescClick
-    ExplicitTop = 314
   end
   object btnAddDesc: TButton
     Left = 331
@@ -59,7 +57,6 @@ object fmBADIMethodDescriptionsFrame: TfmBADIMethodDescriptionsFrame
     ParentDoubleBuffered = False
     TabOrder = 1
     OnClick = btnAddDescClick
-    ExplicitTop = 314
   end
   object vstMethodDescriptions: TVirtualStringTree
     Left = 3
@@ -73,7 +70,6 @@ object fmBADIMethodDescriptionsFrame: TfmBADIMethodDescriptionsFrame
     TreeOptions.PaintOptions = [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnGetText = vstMethodDescriptionsGetText
-    ExplicitHeight = 305
     Columns = <
       item
         Position = 0
@@ -90,7 +86,7 @@ object fmBADIMethodDescriptionsFrame: TfmBADIMethodDescriptionsFrame
     Left = 80
     Top = 284
     Bitmap = {
-      494C010105001800240010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010105001800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000FF000000000000000000000000000000

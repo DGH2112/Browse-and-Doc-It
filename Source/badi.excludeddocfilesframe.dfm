@@ -18,8 +18,6 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 160
-    ExplicitTop = -3
     DesignSize = (
       422
       295)
@@ -44,7 +42,7 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
       Columns = <
         item
           Position = 0
-          Width = 184
+          Width = 180
           WideText = 'RegEx Pattern'
         end
         item

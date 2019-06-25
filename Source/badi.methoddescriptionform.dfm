@@ -2,7 +2,7 @@ object frmMethodDescriptions: TfrmMethodDescriptions
   Left = 529
   Top = 589
   Caption = 'Method Descriptions'
-  ClientHeight = 100
+  ClientHeight = 96
   ClientWidth = 624
   Color = clBtnFace
   Constraints.MaxHeight = 135
@@ -21,13 +21,13 @@ object frmMethodDescriptions: TfrmMethodDescriptions
     Left = 0
     Top = 0
     Width = 624
-    Height = 100
+    Height = 96
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
       624
-      100)
+      96)
     object lblDescription: TLabel
       Left = 8
       Top = 54

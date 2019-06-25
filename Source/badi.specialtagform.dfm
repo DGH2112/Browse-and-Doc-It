@@ -23,10 +23,6 @@ object frmSpecialTag: TfrmSpecialTag
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 152
-    ExplicitTop = 160
-    ExplicitWidth = 185
-    ExplicitHeight = 41
     DesignSize = (
       479
       331)

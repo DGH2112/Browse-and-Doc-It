@@ -78,7 +78,7 @@ object frmProfiling: TfrmProfiling
         item
           Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring, coFixed, coSmartResize, coAllowFocus]
           Position = 0
-          Width = 493
+          Width = 489
           WideText = 'Methods'
         end>
     end

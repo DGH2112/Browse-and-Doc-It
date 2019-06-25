@@ -1,3 +1,32 @@
+(**
+  
+  This module contains DUnit test for the Browse and Doc It code.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  
+**)
 Unit Test.BADI.Module.Dispatcher;
 
 Interface
@@ -45,7 +74,6 @@ Begin
   Check(TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.frm'), 'MyFile.frm');
   Check(Not TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.htm'), 'MyFile.htm');
   Check(Not TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.html'), 'MyFile.html');
-  Check(TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.map'), 'MyFile.map');
   Check(TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.pas'), 'MyFile.pas');
   Check(Not TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.xml'), 'MyFile.xml');
   Check(Not TBADIDispatcher.BADIDispatcher.CanDocumentDocument('MyFile.xsd'), 'MyFile.xsd');
@@ -65,7 +93,6 @@ Begin
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.frm'), 'MyFile.frm');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.htm'), 'MyFile.htm');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.html'), 'MyFile.html');
-  Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.map'), 'MyFile.map');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.pas'), 'MyFile.pas');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.xml'), 'MyFile.xml');
   Check(TBADIDispatcher.BADIDispatcher.CanParseDocument('MyFile.xsd'), 'MyFile.xsd');
@@ -143,12 +170,6 @@ Begin
   Finally
     M.Free;
   End;
-  M := TBADIDispatcher.BADIDispatcher.Dispatcher('', 'MyFile.map', False, []);
-  Try
-    Check(M <> Nil);
-  Finally
-    M.Free;
-  End;
   M := TBADIDispatcher.BADIDispatcher.Dispatcher('', 'MyFile.pas', False, []);
   Try
     Check(M <> Nil);
@@ -205,9 +226,6 @@ Begin
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.html', csBlock),  ctXML, 'MyFile.html - Block');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.html', csLine),   ctXML, 'MyFile.html - Line');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.html', csInSitu), ctXML, 'MyFile.html - InSitu');
-  CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.map',  csBlock),  ctCPPBlock, 'MyFile.map - Block');
-  CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.map',  csLine),   ctCPPLine, 'MyFile.map - Line');
-  CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.map',  csInSitu), ctCPPBlock, 'MyFile.map - InSitu');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.pas',  csBlock),  ctPascalBlock, 'MyFile.pas - Block');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.pas',  csLine),   ctPascalBlock, 'MyFile.pas - Line');
   CheckEquals(TBADIDispatcher.BADIDispatcher.GetCommentType('MyFile.pas',  csInSitu), ctPascalBlock, 'MyFile.pas - InSitu');

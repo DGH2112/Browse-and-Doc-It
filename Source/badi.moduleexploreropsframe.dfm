@@ -18,9 +18,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 120
-    ExplicitTop = 96
-    ExplicitHeight = 699
     DesignSize = (
       649
       501)
@@ -370,10 +367,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             Caption = '&Bold'
             TabOrder = 0
             OnClick = chkBoldClick
-            ExplicitLeft = 15
-            ExplicitTop = 26
-            ExplicitWidth = 58
-            ExplicitHeight = 21
           end
           object chkItalic: TCheckBox
             AlignWithMargins = True
@@ -387,10 +380,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             Caption = '&Italic'
             TabOrder = 1
             OnClick = chkItalicClick
-            ExplicitLeft = 79
-            ExplicitTop = 26
-            ExplicitWidth = 57
-            ExplicitHeight = 21
           end
           object chkStrikeout: TCheckBox
             AlignWithMargins = True
@@ -404,10 +393,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             Caption = '&Strikeout'
             TabOrder = 2
             OnClick = chkStrikeoutClick
-            ExplicitLeft = 252
-            ExplicitTop = 26
-            ExplicitWidth = 82
-            ExplicitHeight = 21
           end
           object chkUnderline: TCheckBox
             AlignWithMargins = True
@@ -421,10 +406,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             Caption = '&Underline'
             TabOrder = 3
             OnClick = chkUnderlineClick
-            ExplicitLeft = 151
-            ExplicitTop = 26
-            ExplicitWidth = 82
-            ExplicitHeight = 21
           end
         end
       end

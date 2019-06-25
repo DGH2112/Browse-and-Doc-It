@@ -1,10 +1,31 @@
 (**
 
-  This module defines a DLL which can be loaded by the RAD Studio IDE.
+  This module defines a RAD Studio plug-in DLL which provides the ability to
+  browse, check and document your code.
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Feb 2019
+  @Date    21 Jun 2019
+
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   @nocheck EmptyBEGINEND
 
@@ -48,9 +69,6 @@ uses
   Classes,
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF DEBUG}
-  {$IFDEF PROFILECODE}
-  Profiler in '..\..\Library\Profiler.pas',
   {$ENDIF PROFILECODE}
   BADI.Initialisation in 'Source\BADI.Initialisation.pas',
   BADI.Options in 'Source\BADI.Options.pas',
@@ -61,7 +79,6 @@ uses
   BADI.ModuleExplorerFrame in 'Source\BADI.ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   BADI.OptionsForm in 'Source\BADI.OptionsForm.pas' {frmOptions},
   BADI.Pascal.Module in 'Source\BADI.Pascal.Module.pas',
-  ProgressForm in '..\..\Library\ProgressForm.pas' {frmProgress},
   BADI.SpecialTagForm in 'Source\BADI.SpecialTagForm.pas' {frmSpecialTag},
   BADI.TokenForm in 'Source\BADI.TokenForm.pas' {frmTokenForm},
   BADI.ToolsAPIUtils in 'Source\BADI.ToolsAPIUtils.pas',
@@ -74,17 +91,12 @@ uses
   BADI.DUnitForm in 'Source\BADI.DUnitForm.pas' {frmDUnit},
   BADI.DUnitCreator in 'Source\BADI.DUnitCreator.pas',
   BADI.CommonIDEFunctions in 'Source\BADI.CommonIDEFunctions.pas',
-  DGHEllipsisLabel in '..\..\Components\DGHControls\Source\DGHEllipsisLabel.pas',
   BADI.BackusNaur.Module in 'Source\BADI.BackusNaur.Module.pas',
   BADI.BNFHighlighter in 'Source\BADI.BNFHighlighter.pas',
   BADI.EditorNotifier in 'Source\BADI.EditorNotifier.pas',
-  BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas',
   BADI.XML.Module in 'Source\BADI.XML.Module.pas',
   BADI.DFM.Module in 'Source\BADI.DFM.Module.pas',
-  BADI.Eidolon.Module in 'Source\BADI.Eidolon.Module.pas',
   BADI.ProfilingForm in 'Source\BADI.ProfilingForm.pas' {frmProfiling},
-  BADI.Eidolon.Types in 'Source\BADI.Eidolon.Types.pas',
-  BADI.Eidolon.TLSSchematic.Module in 'Source\BADI.Eidolon.TLSSchematic.Module.pas',
   BADI.InitialiseOTAInterfaces in 'Source\BADI.InitialiseOTAInterfaces.pas',
   BADI.INI.Module in 'Source\BADI.INI.Module.pas',
   BADI.SpecialTagsFrame in 'Source\BADI.SpecialTagsFrame.pas' {fmBADISpecialTagsFrame: TFrame},
@@ -164,41 +176,6 @@ uses
   BADI.DFM.ObjectDecl in 'Source\BADI.DFM.ObjectDecl.pas',
   BADI.DFM.PropertyDecl in 'Source\BADI.DFM.PropertyDecl.pas',
   BADI.DFM.Types in 'Source\BADI.DFM.Types.pas',
-  BADI.Eidolon.Association in 'Source\BADI.Eidolon.Association.pas',
-  BADI.Eidolon.Bar in 'Source\BADI.Eidolon.Bar.pas',
-  BADI.Eidolon.BaseTable in 'Source\BADI.Eidolon.BaseTable.pas',
-  BADI.Eidolon.Comment in 'Source\BADI.Eidolon.Comment.pas',
-  BADI.Eidolon.ConnectionDef in 'Source\BADI.Eidolon.ConnectionDef.pas',
-  BADI.Eidolon.Constants in 'Source\BADI.Eidolon.Constants.pas',
-  BADI.Eidolon.CustomFillSymbol in 'Source\BADI.Eidolon.CustomFillSymbol.pas',
-  BADI.Eidolon.DatabaseDef in 'Source\BADI.Eidolon.DatabaseDef.pas',
-  BADI.Eidolon.DBConnection in 'Source\BADI.Eidolon.DBConnection.pas',
-  BADI.Eidolon.DBTable in 'Source\BADI.Eidolon.DBTable.pas',
-  BADI.Eidolon.Diamond in 'Source\BADI.Eidolon.Diamond.pas',
-  BADI.Eidolon.Ellipse in 'Source\BADI.Eidolon.Ellipse.pas',
-  BADI.Eidolon.FieldDef in 'Source\BADI.Eidolon.FieldDef.pas',
-  BADI.Eidolon.Functions in 'Source\BADI.Eidolon.Functions.pas',
-  BADI.Eidolon.Line in 'Source\BADI.Eidolon.Line.pas',
-  BADI.Eidolon.OutputTable in 'Source\BADI.Eidolon.OutputTable.pas',
-  BADI.Eidolon.Rectangle in 'Source\BADI.Eidolon.Rectangle.pas',
-  BADI.Eidolon.RequirementsTable in 'Source\BADI.Eidolon.RequirementsTable.pas',
-  BADI.Eidolon.ResourceStrings in 'Source\BADI.Eidolon.ResourceStrings.pas',
-  BADI.Eidolon.SuperBar in 'Source\BADI.Eidolon.SuperBar.pas',
-  BADI.Eidolon.Symbol in 'Source\BADI.Eidolon.Symbol.pas',
-  BADI.Eidolon.TableNameDef in 'Source\BADI.Eidolon.TableNameDef.pas',
-  BADI.Eidolon.TextTable in 'Source\BADI.Eidolon.TextTable.pas',
-  BADI.Eidolon.TextTableDef in 'Source\BADI.Eidolon.TextTableDef.pas',
-  BADI.Eidolon.TimeLocationTable in 'Source\BADI.Eidolon.TimeLocationTable.pas',
-  BADI.Eidolon.TLSSchematic.Comment in 'Source\BADI.Eidolon.TLSSchematic.Comment.pas',
-  BADI.Eidolon.TLSSchematic.Constants in 'Source\BADI.Eidolon.TLSSchematic.Constants.pas',
-  BADI.Eidolon.TLSSchematic.NoText in 'Source\BADI.Eidolon.TLSSchematic.NoText.pas',
-  BADI.Eidolon.TLSSchematic.ResourceStrings in 'Source\BADI.Eidolon.TLSSchematic.ResourceStrings.pas',
-  BADI.Eidolon.TLSSchematic.SchematicSetting in 'Source\BADI.Eidolon.TLSSchematic.SchematicSetting.pas',
-  BADI.Eidolon.TLSSchematic.TLSObject in 'Source\BADI.Eidolon.TLSSchematic.TLSObject.pas',
-  BADI.Eidolon.TLSSchematic.TLSRoad in 'Source\BADI.Eidolon.TLSSchematic.TLSRoad.pas',
-  BADI.Eidolon.TLSSchematic.TLSShape in 'Source\BADI.Eidolon.TLSSchematic.TLSShape.pas',
-  BADI.Eidolon.TLSSchematic.TLSStatic in 'Source\BADI.Eidolon.TLSSchematic.TLSStatic.pas',
-  BADI.Eidolon.Triangle in 'Source\BADI.Eidolon.Triangle.pas',
   BADI.INI.Comment in 'Source\BADI.INI.Comment.pas',
   BADI.INI.KeyValuePair in 'Source\BADI.INI.KeyValuePair.pas',
   BADI.VB.Attribute in 'Source\BADI.VB.Attribute.pas',
@@ -247,15 +224,15 @@ uses
   BADI.Module.Checks.SubView in 'Source\BADI.Module.Checks.SubView.pas',
   BADI.IDEEditorColours in 'Source\BADI.IDEEditorColours.pas',
   BADI.IDEThemingNotifier in 'Source\BADI.IDEThemingNotifier.pas',
-  BADI.Exclusions in 'Source\BADI.Exclusions.pas';
+  BADI.Exclusions in 'Source\BADI.Exclusions.pas',
+  BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas',
+  ProgressForm in 'Externals\ProgressForm.pas' {frmProgress};
 
 {$R *.res}
 
 begin
   {$IFDEF EUREKALOG}
   SetEurekaLogState(True);
-  CodeSite.Send('IsEurekaLogInstalled', IsEurekaLogInstalled);
-  CodeSite.Send('IsEurekaLogActive', IsEurekaLogActive);
   {$ENDIF EUREKALOG}
 end.
 

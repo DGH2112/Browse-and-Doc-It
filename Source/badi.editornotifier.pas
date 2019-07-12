@@ -541,6 +541,7 @@ begin
           FUpdateTimer.Enabled := False;
           If Not FLastParserResult Then
             Case MessageDlg(strMsg, mtWarning, [mbYes, mbNo, mbCancel], 0) Of
+              mrYes:    FLastParserResult := True;
               mrNo:     Exit;
               mrCancel: Abort;
             End;

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    25 Jun 2019
+  @Date    12 Jul 2019
 
   @license
 
@@ -58,7 +58,7 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types;
+  BADI.Types, System.Actions, System.ImageList;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
@@ -276,6 +276,9 @@ Type
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   Types,
   Math,
   BADI.Generic.Tokenizer,
@@ -1850,9 +1853,10 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
 
     @param   MC      as a TMatchCollection as a constant
     @param   strText as a String as a constant
+    @param   iColour as a TColor as a constant
 
   **)
-  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String; iColour : TColor);
+  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String; Const iColour : TColor);
 
   Const
     iHighlightTextOffset = 18 + 26;

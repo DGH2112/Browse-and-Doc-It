@@ -540,8 +540,10 @@ begin
           FLastUpdateTickCount := 0;
           FUpdateTimer.Enabled := False;
           If Not FLastParserResult Then
-            If MessageDlg(strMsg, mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-              Exit;
+            Case MessageDlg(strMsg, mtWarning, [mbYes, mbNo, mbCancel], 0) Of
+              mrNo:     Exit;
+              mrCancel: Abort;
+            End;
           FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
         End;
     End;

@@ -335,7 +335,8 @@ type
     Procedure TestCodeFailure41;
     Procedure TestCodeFailure42;
     Procedure TestCodeFailure43;
-    Procedure TestCodeFaliure44;
+    Procedure TestCodeFailure44;
+    Procedure TestCodeFailure45;
   Public
   End;
 
@@ -2408,7 +2409,7 @@ Begin
   );
 End;
 
-procedure TestTPascalModule.TestCodeFaliure44;
+Procedure TestTPascalModule.TestCodeFailure44;
 
 Begin
   TestGrammarForErrors(
@@ -2422,6 +2423,22 @@ Begin
     '  WriteLn(s);'#13#10 +
     'End;',
     [ttErrors, ttWarnings, ttHints, ttChecks],
+    []
+  );
+End;
+
+procedure GetAdaptersInfo; stdcall; external 'GetAdaptersInfo';
+
+Procedure TestTPascalModule.TestCodeFailure45;
+
+Begin
+  
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure GetAdaptersInfo; stdcall; external ''GetAdaptersInfo'';',
+    [ttErrors..ttHints, ttChecks],
     []
   );
 End;

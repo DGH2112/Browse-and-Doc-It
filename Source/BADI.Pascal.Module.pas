@@ -2342,7 +2342,7 @@ Begin
         M.ForwardDecl := True;
       If Token.UToken = strABSTRACT THEN
         M.ForwardDecl := True;
-      C := TIdentList.Create('', scLocal, 0, 0, iiNone, Nil);
+      C := TConstant.Create('', scLocal, 0, 0, iiNone, Nil);
       Try
         If Token.UToken = strMESSAGE Then
           Begin

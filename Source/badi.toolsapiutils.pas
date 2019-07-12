@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    12 Jul 2019
 
   @license
 
@@ -74,10 +74,11 @@ Type
 
 Implementation
 
-{$IFDEF D2009}
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   Character;
-{$ENDIF}
 
 (**
 
@@ -114,13 +115,12 @@ End;
 Class Function TBADIToolsAPIFunctions.ActiveSourceEditor : IOTASourceEditor;
 
 Var
-  MS : IOTAModuleServices;
+  ES : IOTAEditorServices;
 
 Begin
   Result := Nil;
-  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
-    If Assigned(MS.CurrentModule) Then
-      Result := SourceEditor(MS.CurrentModule);
+  If Supports(BorlandIDEServices, IOTAEditorServices, ES) Then
+    Result := ES.TopBuffer;
 End;
 
 {$IFDEF DXE102}

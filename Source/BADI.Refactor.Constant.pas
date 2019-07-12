@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    12 Jul 2019
 
   @license
 
@@ -460,6 +460,7 @@ Const
   strDeclaration = '%*s%s = ';
 
 Var
+  EditorSvcs : IOTAEditorServices;
   iIndex: Integer;
   CP : TOTACharPos;
   RII: TBADIRefactoringInsertionInfo;
@@ -467,41 +468,44 @@ Var
   strRefactoring : String;
 
 Begin
-  Case FRefactoringInfo.Scope Of
-    scLocal: RII := RefactorLocal;
-    scPrivate: RII := RefactorImplementation;
-    scPublic: RII := RefactorInterface;
-  End;
-  CP.Line := RII.FLine;
-  CP.CharIndex := 0;
-  iIndex := FSourceEditor.EditViews[0].CharPosToPos(CP);
-  Case FRefactoringInfo.Scope Of
-    scLocal: CP.CharIndex := FindIndentOfFirstTokenOnLine(FModule, FRefactoringInfo.Method.Line) - 1;
-    scPrivate: CP.CharIndex := FRefactoringInfo.ImplementationToken.Column - 1;
-    scPublic: CP.CharIndex := FRefactoringInfo.InterfaceToken.Column - 1;
-  End;
-  UR := FSourceEditor.CreateUndoableWriter;
-  UR.CopyTo(iIndex);
-  Case RII.FType Of
-    ritAppend:
-      Begin
-        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
-        TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring),
-          CP.CharIndex) + ';'#13#10);
+  If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+    Begin
+      Case FRefactoringInfo.Scope Of
+        scLocal: RII := RefactorLocal;
+        scPrivate: RII := RefactorImplementation;
+        scPublic: RII := RefactorInterface;
       End;
-    ritCreate:
-      Begin
-        If RII.FPosition = ripAfter Then
-          If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            TBADIToolsAPIFunctions.OutputText(UR, #13#10);
-        TBADIToolsAPIFunctions.OutputText(UR, Format(strSection, [CP.CharIndex, '',
-          strSectionKeywords[FRefactoringInfo.RefactoringType]]));
-        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
-        TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
-        If RII.FPosition = ripBefore Then
-          If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            TBADIToolsAPIFunctions.OutputText(UR, #13#10);
+      CP.Line := RII.FLine;
+      CP.CharIndex := 0;
+      iIndex := EditorSvcs.TopView.CharPosToPos(CP);
+      Case FRefactoringInfo.Scope Of
+        scLocal: CP.CharIndex := FindIndentOfFirstTokenOnLine(FModule, FRefactoringInfo.Method.Line) - 1;
+        scPrivate: CP.CharIndex := FRefactoringInfo.ImplementationToken.Column - 1;
+        scPublic: CP.CharIndex := FRefactoringInfo.InterfaceToken.Column - 1;
       End;
+      UR := FSourceEditor.CreateUndoableWriter;
+      UR.CopyTo(iIndex);
+      Case RII.FType Of
+        ritAppend:
+          Begin
+            strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
+            TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring),
+              CP.CharIndex) + ';'#13#10);
+          End;
+        ritCreate:
+          Begin
+            If RII.FPosition = ripAfter Then
+              If TBADIOptions.BADIOptions.RefactorConstNewLine Then
+                TBADIToolsAPIFunctions.OutputText(UR, #13#10);
+            TBADIToolsAPIFunctions.OutputText(UR, Format(strSection, [CP.CharIndex, '',
+              strSectionKeywords[FRefactoringInfo.RefactoringType]]));
+            strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
+            TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
+            If RII.FPosition = ripBefore Then
+              If TBADIOptions.BADIOptions.RefactorConstNewLine Then
+                TBADIToolsAPIFunctions.OutputText(UR, #13#10);
+          End;
+    End;
   End;
 
 End;
@@ -518,18 +522,22 @@ End;
 Procedure TBADIRefactorConstant.ReplaceToken;
 
 Var
+  EditorSvcs : IOTAEditorServices;
   CharPos: TOTACharPos;
   UR: IOTAEditWriter;
   iIndex: Integer;
 
 Begin
-  CharPos.Line := FRefactoringInfo.Token.Line;
-  CharPos.CharIndex := FRefactoringInfo.Token.Column - 1;
-  iIndex := FSourceEditor.EditViews[0].CharPosToPos(CharPos);
-  UR := FSourceEditor.CreateUndoableWriter;
-  UR.CopyTo(iIndex);
-  UR.DeleteTo(iIndex + FRefactoringInfo.Token.Length);
-  TBADIToolsAPIFunctions.OutputText(UR, FRefactoringInfo.Name);
+  If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+    Begin
+      CharPos.Line := FRefactoringInfo.Token.Line;
+      CharPos.CharIndex := FRefactoringInfo.Token.Column - 1;
+      iIndex := EditorSvcs.TopView.CharPosToPos(CharPos);
+      UR := FSourceEditor.CreateUndoableWriter;
+      UR.CopyTo(iIndex);
+      UR.DeleteTo(iIndex + FRefactoringInfo.Token.Length);
+      TBADIToolsAPIFunctions.OutputText(UR, FRefactoringInfo.Name);
+    End;
 End;
 
 (**

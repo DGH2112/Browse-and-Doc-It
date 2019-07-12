@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    12 Jul 2019
 
   @license
 
@@ -51,7 +51,7 @@ Type
   (** A class to handle the creation of the DUnit files. **)
   TDUnitCreator = Class
   Private
-    Procedure CheckReadOnlyStatus(Module: IOTAModule; Const strModuleReadOnly: String);
+    Procedure CheckReadOnlyStatus(Const Module: IOTAModule; Const strModuleReadOnly: String);
     {$IFDEF D2005} Strict {$ENDIF} Private
     FProjects    : TProjectsArray;
     FProjectCount: Integer;
@@ -62,49 +62,49 @@ Type
     FUnit        : IOTAModule;
     FErrors      : TErrorProc;
     {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure AddProject(Project: IOTAProject);
-    Procedure AddUnit(AUnit: IOTAModuleInfo);
-    Procedure AddNewTestSuites(M: TBaseLanguageModule; slTestCases: TStrings;
+    Procedure AddProject(Const Project: IOTAProject);
+    Procedure AddUnit(Const AUnit: IOTAModuleInfo);
+    Procedure AddNewTestSuites(Const M: TBaseLanguageModule; Const slTestCases: TStrings;
       Const strTestSuiteName: String);
-    Procedure AddNewTestImplementations(M: TBaseLanguageModule; slTestCases: TStrings;
-      Const strClassNameMask, strMethodNameMask : String);
-    Procedure AddNewTestClasses(M: TBaseLanguageModule; slTestCases: TStrings;
+    Procedure AddNewTestImplementations(Const M: TBaseLanguageModule;
+      Const slTestCases: TStrings; Const strClassNameMask, strMethodNameMask : String);
+    Procedure AddNewTestClasses(Const M: TBaseLanguageModule; Const slTestCases: TStrings;
       Const strBaseClass, strClassNameMask: String);
-    Function DoesClassExist(M: TBaseLanguageModule; Const strClassName: String): Boolean;
-    Function DoesMethodExist(M: TBaseLanguageModule;
+    Function DoesClassExist(Const M: TBaseLanguageModule; Const strClassName: String): Boolean;
+    Function DoesMethodExist(Const M: TBaseLanguageModule;
       Const strClassName, strMethodName: String): Boolean;
     Procedure RaiseError(Const strMsg: String);
-    Procedure AddUnitToBeTestedToUsesClause(M: TBaseLanguageModule;
+    Procedure AddUnitToBeTestedToUsesClause(Const M: TBaseLanguageModule;
       Const strUnitToBeTested: String);
-    Procedure AddNewTestMethodsToClass(M: TBaseLanguageModule; slTestCases: TStringList);
+    Procedure AddNewTestMethodsToClass(Const M: TBaseLanguageModule; Const slTestCases: TStringList);
   Public
     Constructor Create;
     Destructor Destroy; Override;
     Procedure GetExistingDUnitProjects;
     Procedure CreateTestProject(Const strNewProjectName: String);
-    Procedure ActivateProject(iProject: Integer);
-    Function GetProject(iProject: Integer): String;
+    Procedure ActivateProject(Const iProject: Integer);
+    Function GetProject(Const iProject: Integer): String;
     Function GetProjectCount: Integer;
-    Function GetUnit(iUnit: Integer): String;
+    Function GetUnit(Const iUnit: Integer): String;
     Function GetUnitCount: Integer;
-    Procedure GetExistingDUnitUnits(iProject: Integer);
+    Procedure GetExistingDUnitUnits(Const iProject: Integer);
     Procedure CreateTestUnit(Const strNewUnitName, strUnitToBeTested: String;
-      slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassnameMask,
+      Const slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassnameMask,
       strMethodNameMask: String);
-    Procedure UpdateTestUnit(iUnit: Integer; Const strUnitToBeTested: String;
-      slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassNameMask,
+    Procedure UpdateTestUnit(Const iUnit: Integer; Const strUnitToBeTested: String;
+      Const slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassNameMask,
       strMethodNameMask : String);
     Function DoesProjectExist(Const strProjectName: String): Boolean;
-    Function DoesUnitExist(iProject: Integer; Const strUnitName: String): Boolean;
+    Function DoesUnitExist(Const iProject: Integer; Const strUnitName: String): Boolean;
     Procedure AddUnitToBeTested(Const strFileName: String);
     (**
       This property returns the indexed project reference.
       @precon  None.
       @postcon Returns the indexed project reference.
-      @param   iProject as       an Integer
+      @param   iProject as an Integer as a constant
       @return  a String
     **)
-    Property Projects[iProject: Integer]: String Read GetProject;
+    Property Projects[Const iProject: Integer]: String Read GetProject;
     (**
       This property returns the number of projects referenced.
       @precon  None.
@@ -116,10 +116,10 @@ Type
       This property returns the indexed unit reference.
       @precon  None.
       @postcon Returns the indexed unit reference.
-      @param   iUnit as       an Integer
+      @param   iUnit as an Integer as a constant
       @return  a String
     **)
-    Property Units[iUnit: Integer]: String Read GetUnit;
+    Property Units[Const iUnit: Integer]: String Read GetUnit;
     (**
       This property returns the number of units referenced.
       @precon  None.
@@ -194,7 +194,7 @@ Type
     {$IFDEF D2005} Strict {$ENDIF} Private
     FProjectName: String;
   Public
-    Constructor Create(strProjectName: String);
+    Constructor Create(Const strProjectName: String);
     Function GetAge: TDateTime;
     Function GetSource: String;
   End;
@@ -211,9 +211,9 @@ Type
     FClassNameMask  : String;
     FMethodNameMask : String;
   Public
-    Constructor Create(strNewUnitName, strUnitToBeTested: String;
-      slTestCases: TStringList; Owner: IOTAProject;
-      strBaseClass, strTestSuiteName, strClassNameMask, strMethodNameMask: String);
+    Constructor Create(Const strNewUnitName, strUnitToBeTested: String; Const slTestCases: TStringList;
+      Const Owner: IOTAProject; Const strBaseClass, strTestSuiteName, strClassNameMask,
+      strMethodNameMask: String);
     Function GetCreatorType: String;
     Function GetExisting: Boolean;
     Function GetFileSystem: String;
@@ -246,90 +246,12 @@ Type
     FClassNameMask  : String;
     FMethodNameMask : String;
   Public
-    Constructor Create(strUnitName, strUnitToBeTested: String; slTestCases: TStringList;
-      strBaseClass, strTestSuiteName, strClassNameMask, strMethodNameMask: String);
+    Constructor Create(Const strUnitName, strUnitToBeTested: String; Const slTestCases: TStringList;
+      Const strBaseClass, strTestSuiteName, strClassNameMask, strMethodNameMask: String);
     Function GetAge: TDateTime;
     Function GetSource: String;
   End;
 
-{ TDUnitCreator }
-
-(**
-
-  This function returns true if the project file contains the unit
-  TestFramework.
-
-  @precon  Project must be a valid instance of a project.
-  @postcon Returns true if the project file contains the unit
-           TestFramework.
-
-  @param   Project as an IOTAProject
-  @return  a Boolean
-
-**)
-Function IsTestFramework(Project: IOTAProject): Boolean;
-
-Const
-  strTestUnits : Array[1..5] Of String = (
-    'guitestrunner',
-    'testframework',
-    'testinsight.dunit',
-    'testinsight.dunit2',
-    'texttestrunner'
-  );
-
-Var
-  S          : IOTASourceEditor;
-  M          : TBaseLanguageModule;
-  E          : TElementContainer;
-  strFileName: String;
-  iUnit: Integer;
-
-Begin
-  Result := False;
-  S := TBADIToolsAPIFunctions.SourceEditor(Project.CurrentEditor.Module);
-  strFileName := Project.CurrentEditor.FileName;
-  M := TBADIDispatcher.BADIDispatcher.Dispatcher(TBADIToolsAPIFunctions.EditorAsString(S), strFileName,
-    True, [moParse]);
-  Try
-    If M <> Nil Then
-      Begin
-        E := M.FindElement(strUses);
-        If E <> Nil Then
-          For iUnit := 1 To E.ElementCount Do
-            Begin
-              If IsKeyWord(LowerCase(E.Elements[iUnit].Identifier), strTestUnits) Then
-                Begin
-                  Result := True;
-                  Exit;
-                End;
-            End;
-      End;
-  Finally
-    M.Free;
-  End;
-End;
-
-(**
-
-  This function gets the class name from the test cases string list and if the
-  class is null returns "Functions".
-
-  @precon  None.
-  @postcon Gets the class name from the test cases string list and if the
-           class is null returns "Functions".
-
-  @param   strText as a String as a constant
-  @return  a String
-
-**)
-Function TestClassName(Const strText: String): String;
-
-Begin
-  Result := GetField(strText, '=', 1);
-  If Result = '' Then
-    Result := 'Functions';
-End;
 
 (**
 
@@ -389,20 +311,102 @@ End;
 
 (**
 
-  This function returns the code associated and to be inserted into the new unit for the classes
-  which implement the tests selected.
+  This function returns true if the project file contains the unit TestFramework.
+
+  @precon  Project must be a valid instance of a project.
+  @postcon Returns true if the project file contains the unit TestFramework.
+
+  @param   Project as an IOTAProject as a constant
+  @return  a Boolean
+
+**)
+Function IsTestFramework(Const Project: IOTAProject): Boolean;
+
+Const
+  strTestUnits : Array[1..5] Of String = (
+    'guitestrunner',
+    'testframework',
+    'testinsight.dunit',
+    'testinsight.dunit2',
+    'texttestrunner'
+  );
+
+Var
+  S          : IOTASourceEditor;
+  M          : TBaseLanguageModule;
+  E          : TElementContainer;
+  strFileName: String;
+  iUnit: Integer;
+
+Begin
+  Result := False;
+  S := TBADIToolsAPIFunctions.SourceEditor(Project.CurrentEditor.Module);
+  strFileName := Project.CurrentEditor.FileName;
+  M := TBADIDispatcher.BADIDispatcher.Dispatcher(TBADIToolsAPIFunctions.EditorAsString(S), strFileName,
+    True, [moParse]);
+  Try
+    If M <> Nil Then
+      Begin
+        E := M.FindElement(strUses);
+        If E <> Nil Then
+          For iUnit := 1 To E.ElementCount Do
+            Begin
+              If IsKeyWord(LowerCase(E.Elements[iUnit].Identifier), strTestUnits) Then
+                Begin
+                  Result := True;
+                  Exit;
+                End;
+            End;
+      End;
+  Finally
+    M.Free;
+  End;
+End;
+
+(**
+
+  This is a custom sort method for the Test Cases string list. If orders the
+  items first by line number (stored in Objects[]) and then by text.
+
+  @precon  None.
+  @postcon Orders the items first by line number (stored in Objects[]) and then
+           by text.
+
+  @nocheck MissingCONSTInParam
+
+  @param   List   as a TStringList
+  @param   Index1 as an Integer
+  @param   Index2 as an Integer
+  @return  an Integer
+
+**)
+Function SortClassEndTokens(List: TStringList; Index1, Index2: Integer): Integer;
+
+Begin
+  Result := Integer(List.Objects[Index1]) - Integer(List.Objects[Index2]);
+  If Result = 0 Then
+    Result := CompareText(List[Index1], List[Index2]);
+End;
+
+Function TestClassName(Const strText: String): String; Forward;
+
+(**
+
+  This function returns the code associated and to be inserted into the new unit for the classes which 
+  implement the tests selected.
 
   @precon  slTestCases must be a valid instance of a string list .
-  @postcon Returns the code associated and to be inserted into the new unit for the classes which
+  @postcon Returns the code associated and to be inserted into the new unit for the classes which 
            implement the tests selected .
 
-  @param   slTestCases      as a TStringList
+  @param   slTestCases      as a TStringList as a constant
   @param   strBaseClass     as a String as a constant
   @param   strClassNameMask as a String as a constant
   @return  a String
 
 **)
-Function TestClasses(slTestCases: TStringList; Const strBaseClass, strClassNameMask : String): String;
+Function TestClasses(Const slTestCases: TStringList; Const strBaseClass,
+  strClassNameMask : String): String;
 
 Var
   strLastClass    : String;
@@ -446,18 +450,42 @@ End;
 
 (**
 
+  This function gets the class name from the test cases string list and if the
+  class is null returns "Functions".
+
+  @precon  None.
+  @postcon Gets the class name from the test cases string list and if the
+           class is null returns "Functions".
+
+  @param   strText as a String as a constant
+  @return  a String
+
+**)
+Function TestClassName(Const strText: String): String;
+
+Const
+  strFunctions = 'Functions';
+
+Begin
+  Result := GetField(strText, '=', 1);
+  If Result = '' Then
+    Result := strFunctions;
+End;
+
+(**
+
   This function returns the implementation methods for the selected test cases.
 
   @precon  slTestCases must be a valid instance of a string list.
   @postcon Returns the implementation methods for the selected test cases.
 
-  @param   slTestCases       as a TStringList
+  @param   slTestCases       as a TStringList as a constant
   @param   strClassNameMask  as a String as a constant
   @param   strMethodNameMask as a String as a constant
   @return  a String
 
 **)
-Function TestImplementation(slTestCases: TStringList; Const strClassNameMask,
+Function TestImplementation(Const slTestCases: TStringList; Const strClassNameMask,
   strMethodNameMask : String): String;
 
 Var
@@ -512,19 +540,17 @@ End;
 
 (**
 
-  This function returns the initialisation code for the newly recreated test
-  methods.
+  This function returns the initialisation code for the newly recreated test methods.
 
   @precon  slTestCases must be a valid instance of a string list .
-  @postcon Returns the initialisation code for the newly recreated test methods
-           .
+  @postcon Returns the initialisation code for the newly recreated test methods .
 
-  @param   slTestCases      as a TStringList
+  @param   slTestCases      as a TStringList as a constant
   @param   strTestSuiteName as a String as a constant
   @return  a String
 
 **)
-Function TestSuites(slTestCases: TStringList; Const strTestSuiteName: String): String;
+Function TestSuites(Const slTestCases: TStringList; Const strTestSuiteName: String): String;
 
 Var
   i           : Integer;
@@ -550,38 +576,15 @@ End;
 
 (**
 
-  This is a custom sort method for the Test Cases string list. If orders the
-  items first by line number (stored in Objects[]) and then by text.
-
-  @precon  None.
-  @postcon Orders the items first by line number (stored in Objects[]) and then
-           by text.
-
-  @param   List   as a TStringList
-  @param   Index1 as an Integer
-  @param   Index2 as an Integer
-  @return  an Integer
-
-**)
-Function SortClassEndTokens(List: TStringList; Index1, Index2: Integer): Integer;
-
-Begin
-  Result := Integer(List.Objects[Index1]) - Integer(List.Objects[Index2]);
-  If Result = 0 Then
-    Result := CompareText(List[Index1], List[Index2]);
-End;
-
-(**
-
   This method makes the indexed project the active project.
 
   @precon  iProject must be a valid index into the project array.
   @postcon Makes the indexed project the active project.
 
-  @param   iProject as an Integer
+  @param   iProject as an Integer as a constant
 
 **)
-Procedure TDUnitCreator.ActivateProject(iProject: Integer);
+Procedure TDUnitCreator.ActivateProject(Const iProject: Integer);
 
 ResourceString
   strProjectReadOnly = 'Project source module is read only!';
@@ -599,16 +602,17 @@ End;
   @precon  M and slTestCases must be valid instances.
   @postcon Adds new test classes to the interface of the existing source module.
 
-  @param   M                as a TBaseLanguageModule
-  @param   slTestCases      as a TStrings
+  @param   M                as a TBaseLanguageModule as a constant
+  @param   slTestCases      as a TStrings as a constant
   @param   strBaseClass     as a String as a constant
   @param   strClassNameMask as a String as a constant
 
 **)
-Procedure TDUnitCreator.AddNewTestClasses(M: TBaseLanguageModule; slTestCases: TStrings;
+Procedure TDUnitCreator.AddNewTestClasses(Const M: TBaseLanguageModule; Const slTestCases: TStrings;
   Const strBaseClass, strClassNameMask: String);
 
 Var
+  EditorSvcs  : IOTAEditorServices;
   i           : Integer;
   SE          : IOTASourceEditor;
   Writer      : IOTAEditWriter;
@@ -631,46 +635,49 @@ Begin
         Try
           CharPos.CharIndex := 0;
           CharPos.Line      := M.Tokens[iToken].Line;
-          iPos              := SE.EditViews[0].CharPosToPos(CharPos);
-          Writer.CopyTo(iPos);
-          strLastClass := '';
-          boolEndClass := False;
-          For i        := 0 To slTestCases.Count - 1 Do
+          If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
             Begin
-              strTestClass  := TestClassName(slTestCases[i]);
-              strClassToTest := GetClassToTest(strTestClass, strClassNameMask);
-              strMethod := GetField(slTestCases[i], '=', 2);
-              If Not DoesClassExist(M, strTestClass) Then
+              iPos              := EditorSvcs.TopView.CharPosToPos(CharPos);
+              Writer.CopyTo(iPos);
+              strLastClass := '';
+              boolEndClass := False;
+              For i        := 0 To slTestCases.Count - 1 Do
                 Begin
-                  If strLastClass <> strTestClass Then
+                  strTestClass  := TestClassName(slTestCases[i]);
+                  strClassToTest := GetClassToTest(strTestClass, strClassNameMask);
+                  strMethod := GetField(slTestCases[i], '=', 2);
+                  If Not DoesClassExist(M, strTestClass) Then
                     Begin
-                      If boolEndClass Then
-                        TBADIToolsAPIFunctions.OutputText(Writer, '  End;'#13#10#13#10);
-                      TBADIToolsAPIFunctions.OutputText(Writer, '  //'#13#10);
-                      TBADIToolsAPIFunctions.OutputText(Writer,
-                        Format('  // Test Class for the %s Class Methods.'#13#10,
-                          [strClassToTest]));
-                      TBADIToolsAPIFunctions.OutputText(Writer, '  //'#13#10);
-                      TBADIToolsAPIFunctions.OutputText(Writer, Format('  %s = Class(%s)'#13#10,
-                          [strTestClass, strBaseClass]));
-                      TBADIToolsAPIFunctions.OutputText(Writer, '  Strict Private'#13#10);
-                      If strTestClass <> 'Functions' Then
-                        TBADIToolsAPIFunctions.OutputText(Writer, Format('    F%s : %s;'#13#10, [strClassToTest,
-                          strClassToTest]));
-                      TBADIToolsAPIFunctions.OutputText(Writer, '  Public'#13#10);
-                      If strTestClass <> 'Functions' Then
-                        TBADIToolsAPIFunctions.OutputText(Writer, '    Procedure SetUp; Override;'#13#10);
-                      If strTestClass <> 'Functions' Then
-                        TBADIToolsAPIFunctions.OutputText(Writer, '    Procedure TearDown; Override;'#13#10);
-                      TBADIToolsAPIFunctions.OutputText(Writer, '  Published'#13#10);
+                      If strLastClass <> strTestClass Then
+                        Begin
+                          If boolEndClass Then
+                            TBADIToolsAPIFunctions.OutputText(Writer, '  End;'#13#10#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, '  //'#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer,
+                            Format('  // Test Class for the %s Class Methods.'#13#10,
+                              [strClassToTest]));
+                          TBADIToolsAPIFunctions.OutputText(Writer, '  //'#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, Format('  %s = Class(%s)'#13#10,
+                              [strTestClass, strBaseClass]));
+                          TBADIToolsAPIFunctions.OutputText(Writer, '  Strict Private'#13#10);
+                          If strTestClass <> 'Functions' Then
+                            TBADIToolsAPIFunctions.OutputText(Writer, Format('    F%s : %s;'#13#10, [strClassToTest,
+                              strClassToTest]));
+                          TBADIToolsAPIFunctions.OutputText(Writer, '  Public'#13#10);
+                          If strTestClass <> 'Functions' Then
+                            TBADIToolsAPIFunctions.OutputText(Writer, '    Procedure SetUp; Override;'#13#10);
+                          If strTestClass <> 'Functions' Then
+                            TBADIToolsAPIFunctions.OutputText(Writer, '    Procedure TearDown; Override;'#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, '  Published'#13#10);
+                        End;
+                      TBADIToolsAPIFunctions.OutputText(Writer, Format('    Procedure %s;'#13#10, [strMethod]));
+                      boolEndClass := True;
                     End;
-                  TBADIToolsAPIFunctions.OutputText(Writer, Format('    Procedure %s;'#13#10, [strMethod]));
-                  boolEndClass := True;
+                  strLastClass := strTestClass;
                 End;
-              strLastClass := strTestClass;
+              If boolEndClass Then
+                TBADIToolsAPIFunctions.OutputText(Writer, '  End;'#13#10#13#10);
             End;
-          If boolEndClass Then
-            TBADIToolsAPIFunctions.OutputText(Writer, '  End;'#13#10#13#10);
         Finally
           Writer := Nil;
         End;
@@ -682,93 +689,26 @@ End;
 
 (**
 
-  This method adds new test suites to the initialisatio section assuming that the file has an
-  initialisatin section.
-
-  @precon  M must be a valid language module .
-  @postcon Adds new test suites to the initialisatio section assuming that the file has an
-           initialisatin section .
-
-  @param   M                as a TBaseLanguageModule
-  @param   slTestCases      as a TStrings
-  @param   strTestSuiteName as a String as a constant
-
-**)
-Procedure TDUnitCreator.AddNewTestSuites(M: TBaseLanguageModule; slTestCases: TStrings;
-  Const strTestSuiteName: String);
-
-ResourceString
-  strFinalEndNotFound = 'Final reserved word ''End'' not found.';
-  strFinalPeriodNotFound = 'Final period (.) not found.';
-
-Var
-  i            : Integer;
-  SE           : IOTASourceEditor;
-  Writer       : IOTAEditWriter;
-  strLastClass : String;
-  iPos         : Integer;
-  CharPos      : TOTACharPos;
-  strTestClass : String;
-
-Begin
-  If M.Tokens[M.TokenCount - 1].Token = '.' Then
-    Begin
-      If M.Tokens[M.TokenCount - 2].UToken = 'END' Then
-        Begin
-          SE := TBADIToolsAPIFunctions.SourceEditor(FUnit);
-          Try
-            Writer := SE.CreateUndoableWriter;
-            Try
-              CharPos.CharIndex := 0;
-              CharPos.Line      := M.Tokens[M.TokenCount - 2].Line;
-              iPos              := SE.EditViews[0].CharPosToPos(CharPos);
-              Writer.CopyTo(iPos);
-              strLastClass := '';
-              For i        := 0 To slTestCases.Count - 1 Do
-                Begin
-                  strTestClass := TestClassName(slTestCases[i]);
-                  If strLastClass <> strTestClass Then
-                    If Not DoesClassExist(M, strTestClass) Then
-                      TBADIToolsAPIFunctions.OutputText(Writer,
-                        Format('  RegisterTest(''%s'', %s.Suite);'#13#10,
-                          [strTestSuiteName, strTestClass]));
-                  strLastClass := strTestClass;
-                End;
-            Finally
-              Writer := Nil;
-            End;
-          Finally
-            SE := Nil;
-          End;
-        End
-      Else
-        RaiseError(strFinalEndNotFound);
-    End
-  Else
-    RaiseError(strFinalPeriodNotFound);
-End;
-
-(**
-
   This method adds new method implementations to the existing source file.
 
   @precon  M and slTestCases must be valid instances.
   @postcon Adds new method implementations to the existing source file.
 
-  @note    This method modifies the slTestCases method names IF a name clash is found with existing
-           methods in the class. This means that there are no checks to be made when insert these
+  @note    This method modifies the slTestCases method names IF a name clash is found with existing 
+           methods in the class. This means that there are no checks to be made when insert these 
            methods into the existing class delcarations.
 
-  @param   M                 as a TBaseLanguageModule
-  @param   slTestCases       as a TStrings
+  @param   M                 as a TBaseLanguageModule as a constant
+  @param   slTestCases       as a TStrings as a constant
   @param   strClassNameMask  as a String as a constant
   @param   strMethodNameMask as a String as a constant
 
 **)
-Procedure TDUnitCreator.AddNewTestImplementations(M: TBaseLanguageModule;
-  slTestCases: TStrings; Const strClassNameMask, strMethodNameMask : String);
+Procedure TDUnitCreator.AddNewTestImplementations(Const M: TBaseLanguageModule;
+  Const slTestCases: TStrings; Const strClassNameMask, strMethodNameMask : String);
 
 Var
+  EditorSvcs      : IOTAEditorServices;
   i               : Integer;
   SE              : IOTASourceEditor;
   Writer          : IOTAEditWriter;
@@ -792,61 +732,64 @@ Begin
         Try
           CharPos.CharIndex := 0;
           CharPos.Line      := M.Tokens[iToken].Line;
-          iPos              := SE.EditViews[0].CharPosToPos(CharPos);
-          Writer.CopyTo(iPos);
-          strLastClass := '';
-          For i        := 0 To slTestCases.Count - 1 Do
+          If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
             Begin
-              strTestClass  := TestClassName(slTestCases[i]);
-              strClassToTest := GetClassToTest(strTestClass, strClassNameMask);
-              strTestMethod := GetField(slTestCases[i], '=', 2);
-              strMethodToTest := GetMethodToTest(strTestMethod, strMethodNameMask);
-              If strLastClass <> strTestClass Then
+              iPos              := EditorSvcs.TopView.CharPosToPos(CharPos);
+              Writer.CopyTo(iPos);
+              strLastClass := '';
+              For i        := 0 To slTestCases.Count - 1 Do
                 Begin
-                  If Not DoesClassExist(M, strTestClass) Then
+                  strTestClass  := TestClassName(slTestCases[i]);
+                  strClassToTest := GetClassToTest(strTestClass, strClassNameMask);
+                  strTestMethod := GetField(slTestCases[i], '=', 2);
+                  strMethodToTest := GetMethodToTest(strTestMethod, strMethodNameMask);
+                  If strLastClass <> strTestClass Then
                     Begin
-                      TBADIToolsAPIFunctions.OutputText(Writer, '//'#13#10);
-                      TBADIToolsAPIFunctions.OutputText(Writer, Format('// Test methods for the class %s.'#13#10,
-                          [strClassToTest]));
-                      TBADIToolsAPIFunctions.OutputText(Writer, '//'#13#10);
-                      If strTestClass <> 'Functions' Then
+                      If Not DoesClassExist(M, strTestClass) Then
                         Begin
-                          TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.Setup;'#13#10,
-                              [strTestClass]));
-                          TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
-                          TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
-                          TBADIToolsAPIFunctions.OutputText(Writer,
-                            Format('  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,
-                              [strClassToTest, strClassToTest, strClassToTest]));
-                          TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
-                          TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
-                          TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.TearDown;'#13#10,
-                              [strTestClass]));
-                          TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
-                          TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
-                          //: @todo The below need work.
-                          TBADIToolsAPIFunctions.OutputText(Writer, Format('  F%s.Free;'#13#10, [strClassToTest]));
-                          TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
-                          TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, '//'#13#10);
+                          TBADIToolsAPIFunctions.OutputText(Writer, Format('// Test methods for the class %s.'#13#10,
+                              [strClassToTest]));
+                          TBADIToolsAPIFunctions.OutputText(Writer, '//'#13#10);
+                          If strTestClass <> 'Functions' Then
+                            Begin
+                              TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.Setup;'#13#10,
+                                  [strTestClass]));
+                              TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                              TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
+                              TBADIToolsAPIFunctions.OutputText(Writer,
+                                Format('  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,
+                                  [strClassToTest, strClassToTest, strClassToTest]));
+                              TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
+                              TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                              TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.TearDown;'#13#10,
+                                  [strTestClass]));
+                              TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                              TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
+                              //: @todo The below need work.
+                              TBADIToolsAPIFunctions.OutputText(Writer, Format('  F%s.Free;'#13#10, [strClassToTest]));
+                              TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
+                              TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                            End;
                         End;
                     End;
+                  iIndex := 1;
+                  While DoesMethodExist(M, strTestClass, strTestMethod) Do
+                    Begin
+                      strTestMethod := Format('%s%d', [GetField(slTestCases[i], '=', 2), iIndex]);
+                      Inc(iIndex);
+                    End;
+                  slTestCases[i] := Format('%s=%s', [strTestClass, strTestMethod]);
+                  TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.%s;'#13#10,
+                      [strTestClass, strTestMethod]));
+                  TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                  TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
+                  TBADIToolsAPIFunctions.OutputText(Writer, Format('  //: @todo Implement Check for F%s.%s.'#13#10,
+                      [strClassToTest, strMethodToTest]));
+                  TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
+                  TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
+                  strLastClass := strTestClass;
                 End;
-              iIndex := 1;
-              While DoesMethodExist(M, strTestClass, strTestMethod) Do
-                Begin
-                  strTestMethod := Format('%s%d', [GetField(slTestCases[i], '=', 2), iIndex]);
-                  Inc(iIndex);
-                End;
-              slTestCases[i] := Format('%s=%s', [strTestClass, strTestMethod]);
-              TBADIToolsAPIFunctions.OutputText(Writer, Format('Procedure %s.%s;'#13#10,
-                  [strTestClass, strTestMethod]));
-              TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
-              TBADIToolsAPIFunctions.OutputText(Writer, 'Begin'#13#10);
-              TBADIToolsAPIFunctions.OutputText(Writer, Format('  //: @todo Implement Check for F%s.%s.'#13#10,
-                  [strClassToTest, strMethodToTest]));
-              TBADIToolsAPIFunctions.OutputText(Writer, 'End;'#13#10);
-              TBADIToolsAPIFunctions.OutputText(Writer, ''#13#10);
-              strLastClass := strTestClass;
             End;
         Finally
           Writer := Nil;
@@ -859,18 +802,18 @@ End;
 
 (**
 
-  This method adds new test cases to existing class at the end of the class.
-  The assumption is that the last section of the class is Published.
+  This method adds new test cases to existing class at the end of the class. The assumption is that the 
+  last section of the class is Published.
 
   @precon  M and slTestCases must eb valid instances.
   @postcon Adds new test cases to existing class at the end of the class.
 
-  @param   M           as a TBaseLanguageModule
-  @param   slTestCases as a TStringList
+  @param   M           as a TBaseLanguageModule as a constant
+  @param   slTestCases as a TStringList as a constant
 
 **)
-Procedure TDUnitCreator.AddNewTestMethodsToClass(M: TBaseLanguageModule;
-  slTestCases: TStringList);
+Procedure TDUnitCreator.AddNewTestMethodsToClass(Const M: TBaseLanguageModule;
+  Const slTestCases: TStringList);
 
 Var
   SE      : IOTASourceEditor;
@@ -883,19 +826,17 @@ Var
 
   (**
 
-    This function attempts to find the 'End' of the class as an insertion point
-    for the new methods. The assumption is that the last section of the class
-    is Published.
+    This function attempts to find the 'End' of the class as an insertion point for the new methods. The 
+    assumption is that the last section of the class is Published.
 
     @precon  None.
-    @postcon Attempts to find the 'End' of the class as an insertion point
-             for the new methods.
+    @postcon Attempts to find the 'End' of the class as an insertion point for the new methods.
 
-    @param   strClassName as a String
-    @return  an Integer     
+    @param   strClassName as a String as a constant
+    @return  an Integer
 
   **)
-  Function FindEndOfClass(strClassName: String): Integer;
+  Function FindEndOfClass(Const strClassName: String): Integer;
 
   Var
     C: TElementContainer;
@@ -912,6 +853,9 @@ Var
             Break;
           End;
   End;
+
+Var
+  EditorSvcs : IOTAEditorServices;
 
 Begin
   T := M.FindElement(strTypesLabel);
@@ -940,10 +884,13 @@ Begin
             Try
               CharPos.CharIndex := 0;
               CharPos.Line      := Integer(slTestCases.Objects[iMethod]);
-              iPos              := SE.EditViews[0].CharPosToPos(CharPos);
-              Writer.CopyTo(iPos);
-              TBADIToolsAPIFunctions.OutputText(Writer, Format('    Procedure %s;'#13#10,
-                  [GetField(slTestCases[iMethod], '=', 2)]));
+              If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+                Begin
+                  iPos := EditorSvcs.TopView.CharPosToPos(CharPos);
+                  Writer.CopyTo(iPos);
+                  TBADIToolsAPIFunctions.OutputText(Writer, Format('    Procedure %s;'#13#10,
+                      [GetField(slTestCases[iMethod], '=', 2)]));
+                End;
             Finally
               Writer := Nil;
             End;
@@ -958,15 +905,87 @@ End;
 
 (**
 
+  This method adds new test suites to the initialisatio section assuming that the file has an 
+  initialisatin section.
+
+  @precon  M must be a valid language module .
+  @postcon Adds new test suites to the initialisatio section assuming that the file has an initialisatin
+           section .
+
+  @param   M                as a TBaseLanguageModule as a constant
+  @param   slTestCases      as a TStrings as a constant
+  @param   strTestSuiteName as a String as a constant
+
+**)
+Procedure TDUnitCreator.AddNewTestSuites(Const M: TBaseLanguageModule; Const slTestCases: TStrings;
+  Const strTestSuiteName: String);
+
+ResourceString
+  strFinalEndNotFound = 'Final reserved word ''End'' not found.';
+  strFinalPeriodNotFound = 'Final period (.) not found.';
+
+Var
+  EditorSvcs   : IOTAEditorServices;
+  i            : Integer;
+  SE           : IOTASourceEditor;
+  Writer       : IOTAEditWriter;
+  strLastClass : String;
+  iPos         : Integer;
+  CharPos      : TOTACharPos;
+  strTestClass : String;
+
+Begin
+  If M.Tokens[M.TokenCount - 1].Token = '.' Then
+    Begin
+      If M.Tokens[M.TokenCount - 2].UToken = 'END' Then
+        Begin
+          SE := TBADIToolsAPIFunctions.SourceEditor(FUnit);
+          Try
+            Writer := SE.CreateUndoableWriter;
+            Try
+              CharPos.CharIndex := 0;
+              CharPos.Line      := M.Tokens[M.TokenCount - 2].Line;
+              If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+                Begin
+                  iPos              := EditorSvcs.TopView.CharPosToPos(CharPos);
+                  Writer.CopyTo(iPos);
+                  strLastClass := '';
+                  For i        := 0 To slTestCases.Count - 1 Do
+                    Begin
+                      strTestClass := TestClassName(slTestCases[i]);
+                      If strLastClass <> strTestClass Then
+                        If Not DoesClassExist(M, strTestClass) Then
+                          TBADIToolsAPIFunctions.OutputText(Writer,
+                            Format('  RegisterTest(''%s'', %s.Suite);'#13#10,
+                              [strTestSuiteName, strTestClass]));
+                      strLastClass := strTestClass;
+                    End;
+                End;
+            Finally
+              Writer := Nil;
+            End;
+          Finally
+            SE := Nil;
+          End;
+        End
+      Else
+        RaiseError(strFinalEndNotFound);
+    End
+  Else
+    RaiseError(strFinalPeriodNotFound);
+End;
+
+(**
+
   This method adds the given project to the project array.
 
   @precon  None.
   @postcon Adds the given project to the project array.
 
-  @param   Project as an IOTAProject
+  @param   Project as an IOTAProject as a constant
 
 **)
-Procedure TDUnitCreator.AddProject(Project: IOTAProject);
+Procedure TDUnitCreator.AddProject(Const Project: IOTAProject);
 
 Var
   T: TProjectsArray;
@@ -991,10 +1010,10 @@ End;
   @precon  None.
   @postcon Adds the given unit to the unit array.
 
-  @param   AUnit as an IOTAModuleInfo
+  @param   AUnit as an IOTAModuleInfo as a constant
 
 **)
-Procedure TDUnitCreator.AddUnit(AUnit: IOTAModuleInfo);
+Procedure TDUnitCreator.AddUnit(Const AUnit: IOTAModuleInfo);
 
 Var
   T: TUnitsArray;
@@ -1044,58 +1063,16 @@ End;
 
 (**
 
-  This method checks if the given module is readonly. If so outputs a message and
-  aborts.
-
-  @precon  Module must be a valid instance.
-  @postcon Checks if the given module is readonly. If so outputs a message and
-           aborts.
-
-  @param   Module            as an IOTAModule
-  @param   strModuleReadOnly as a string as a constant
-
-**)
-Procedure TDUnitCreator.CheckReadOnlyStatus(Module: IOTAModule;
-  Const strModuleReadOnly: String);
-
-Var
-  SE: IOTASourceEditor;
-
-Begin
-  SE := TBADIToolsAPIFunctions.SourceEditor(Module);
-  If SE <> Nil Then
-    Begin
-      If SE.EditViewCount > 0 Then
-        Begin
-          If SE.EditViews[0] <> Nil Then
-            Begin
-              If SE.EditViews[0].Buffer <> Nil Then
-                Begin
-                  If SE.EditViews[0].Buffer.IsReadOnly Then
-                    Begin
-                      RaiseError(strModuleReadOnly);
-                      Abort;
-                    End;
-                End;
-            End;
-        End;
-    End;
-End;
-
-(**
-
-  This method inserts the unit to be tested into the uses clause IF it does not
-  already exist.
+  This method inserts the unit to be tested into the uses clause IF it does not already exist.
 
   @precon  M must be a valid instance.
-  @postcon Inserts the unit to be tested into the uses clause IF it does not
-           already exist.
+  @postcon Inserts the unit to be tested into the uses clause IF it does not already exist.
 
-  @param   M                 as a TBaseLanguageModule
+  @param   M                 as a TBaseLanguageModule as a constant
   @param   strUnitToBeTested as a String as a constant
 
 **)
-Procedure TDUnitCreator.AddUnitToBeTestedToUsesClause(M: TBaseLanguageModule;
+Procedure TDUnitCreator.AddUnitToBeTestedToUsesClause(Const M: TBaseLanguageModule;
   Const strUnitToBeTested: String);
 
 ResourceString
@@ -1103,6 +1080,7 @@ ResourceString
   strInterfaceNotFound = 'Interface not found!';
 
 Var
+  EditorSvcs : IOTAEditorServices;
   U        : TElementContainer;
   iToken   : Integer;
   i        : Integer;
@@ -1146,12 +1124,15 @@ Begin
         Writer := SE.CreateUndoableWriter;
         Try
           Dec(CharPos.CharIndex, 1);
-          iPos := SE.EditViews[0].CharPosToPos(CharPos);
-          Writer.CopyTo(iPos);
-          If CharPos.CharIndex + Length(strUnitToBeTested) < 80 Then
-            TBADIToolsAPIFunctions.OutputText(Writer, Format(', %s', [strUnitToBeTested]))
-          Else
-            TBADIToolsAPIFunctions.OutputText(Writer, Format(','#13#10#32#32'%s', [strUnitToBeTested]));
+          If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+            Begin
+              iPos := EditorSvcs.TopView.CharPosToPos(CharPos);
+              Writer.CopyTo(iPos);
+              If CharPos.CharIndex + Length(strUnitToBeTested) < 80 Then
+                TBADIToolsAPIFunctions.OutputText(Writer, Format(', %s', [strUnitToBeTested]))
+              Else
+                TBADIToolsAPIFunctions.OutputText(Writer, Format(','#13#10#32#32'%s', [strUnitToBeTested]));
+            End;
         Finally
           Writer := Nil;
         End;
@@ -1165,6 +1146,36 @@ End;
 
 (**
 
+  This method checks if the given module is readonly. If so outputs a message and aborts.
+
+  @precon  Module must be a valid instance.
+  @postcon Checks if the given module is readonly. If so outputs a message and aborts.
+
+  @param   Module            as an IOTAModule as a constant
+  @param   strModuleReadOnly as a String as a constant
+
+**)
+Procedure TDUnitCreator.CheckReadOnlyStatus(Const Module: IOTAModule;
+  Const strModuleReadOnly: String);
+
+Var
+  SE: IOTASourceEditor;
+
+Begin
+  SE := TBADIToolsAPIFunctions.SourceEditor(Module);
+  If Assigned(SE) Then
+    If SE.EditViewCount > 0 Then
+      If Assigned(SE.EditViews[0]) Then
+        If Assigned(SE.EditViews[0].Buffer) Then
+          If SE.EditViews[0].Buffer.IsReadOnly Then
+            Begin
+              RaiseError(strModuleReadOnly);
+              Abort;
+            End;
+End;
+
+(**
+
   This is a constructor for the TDUnitCreator class.
 
   @precon  None.
@@ -1173,13 +1184,21 @@ End;
 **)
 Constructor TDUnitCreator.Create;
 
+Var
+  SE: IOTASourceEditor;
+
 Begin
   FProjectCount := 0;
   FUnitCount    := 0;
-  With TBADIToolsAPIFunctions.ActiveSourceEditor Do
-    FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(
-      TBADIToolsAPIFunctions.EditorAsString(TBADIToolsAPIFunctions.ActiveSourceEditor), FileName,
-      Modified, [moParse]);
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
+  FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(
+    TBADIToolsAPIFunctions.EditorAsString(
+      TBADIToolsAPIFunctions.ActiveSourceEditor
+    ),
+    SE.FileName,
+    SE.Modified,
+    [moParse]
+  );
 End;
 
 (**
@@ -1211,7 +1230,7 @@ End;
 
   @param   strNewUnitName    as a String as a constant
   @param   strUnitToBeTested as a String as a constant
-  @param   slTestCases       as a TStringList
+  @param   slTestCases       as a TStringList as a constant
   @param   strBaseClass      as a String as a constant
   @param   strTestSuiteName  as a String as a constant
   @param   strClassnameMask  as a String as a constant
@@ -1219,7 +1238,7 @@ End;
 
 **)
 Procedure TDUnitCreator.CreateTestUnit(Const strNewUnitName, strUnitToBeTested: String;
-  slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassnameMask,
+  Const slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassnameMask,
   strMethodNameMask: String);
 
 Begin
@@ -1247,16 +1266,16 @@ End;
 (**
 
   This method returns true IF the named class exists in the given module.
-  
+
   @precon  M must be valid language module.
   @postcon Returns true IF the named class exists in the given module.
-  
-  @param   M            as a TBaseLanguageModule
+
+  @param   M            as a TBaseLanguageModule as a constant
   @param   strClassName as a String as a constant
   @return  a Boolean
-  
+
 **)
-Function TDUnitCreator.DoesClassExist(M: TBaseLanguageModule;
+Function TDUnitCreator.DoesClassExist(Const M: TBaseLanguageModule;
   Const strClassName: String): Boolean;
 
 Var
@@ -1276,13 +1295,13 @@ End;
   @precon  None.
   @postcon Returns true IF the given method name exists in the class.
 
-  @param   M             as a TBaseLanguageModule
+  @param   M             as a TBaseLanguageModule as a constant
   @param   strClassName  as a String as a constant
   @param   strMethodName as a String as a constant
   @return  a Boolean
 
 **)
-Function TDUnitCreator.DoesMethodExist(M: TBaseLanguageModule;
+Function TDUnitCreator.DoesMethodExist(Const M: TBaseLanguageModule;
   Const strClassName, strMethodName: String): Boolean;
 
 Var
@@ -1337,19 +1356,17 @@ End;
 
 (**
 
-  This method returns true if the indexed project contains a nuit with the given
-  name.
+  This method returns true if the indexed project contains a nuit with the given name.
 
   @precon  iProjecy must be a valid index into the project array.
-  @postcon Returns true if the indexed project contains a nuit with the given
-           name.
+  @postcon Returns true if the indexed project contains a nuit with the given name.
 
-  @param   iProject    as an Integer
+  @param   iProject    as an Integer as a constant
   @param   strUnitName as a String as a constant
   @return  a Boolean
 
 **)
-Function TDUnitCreator.DoesUnitExist(iProject: Integer; Const strUnitName: String): Boolean;
+Function TDUnitCreator.DoesUnitExist(Const iProject: Integer; Const strUnitName: String): Boolean;
 
 Var
   P: IOTAProject;
@@ -1378,16 +1395,15 @@ Procedure TDUnitCreator.GetExistingDUnitProjects;
 
 Var
   i: Integer;
+  PG: IOTAProjectGroup;
 
 Begin
   SetLength(FProjects, iCAPACITY);
   FProjectCount := 0;
-  With TBADIToolsAPIFunctions.ProjectGroup Do
-    Begin
-      For i := 0 To ProjectCount - 1 Do
-        If IsTestFramework(Projects[i]) Then
-          AddProject(Projects[i]);
-    End;
+  PG := TBADIToolsAPIFunctions.ProjectGroup;
+  For i := 0 To ProjectCount - 1 Do
+    If IsTestFramework(PG.Projects[i]) Then
+      AddProject(PG.Projects[i]);
 End;
 
 (**
@@ -1397,10 +1413,10 @@ End;
   @precon  None .
   @postcon Adds DUnit test units to the project unit list .
 
-  @param   iProject as an Integer
+  @param   iProject as an Integer as a constant
 
 **)
-Procedure TDUnitCreator.GetExistingDUnitUnits(iProject: Integer);
+Procedure TDUnitCreator.GetExistingDUnitUnits(Const iProject: Integer);
 Var
   i: Integer;
 Begin
@@ -1421,11 +1437,12 @@ End;
   @precon  iProject must be a valid index into the project array.
   @postcon Returns the indexed project.
 
-  @param   iProject as an Integer
+  @param   iProject as an Integer as a constant
   @return  a String
 
 **)
-Function TDUnitCreator.GetProject(iProject: Integer): String;
+Function TDUnitCreator.GetProject(Const iProject: Integer): String;
+
 Begin
   Result := IOTAProject(FProjects[iProject]).CurrentEditor.FileName;
 End;
@@ -1452,11 +1469,12 @@ End;
   @precon  iUnit must be a valid index into the Unit array.
   @postcon Returns the indexed Unit from the array.
 
-  @param   iUnit as an Integer
-  @return  a string
+  @param   iUnit as an Integer as a constant
+  @return  a String
 
 **)
-Function TDUnitCreator.GetUnit(iUnit: Integer): String;
+Function TDUnitCreator.GetUnit(Const iUnit: Integer): String;
+
 Begin
   Result := IOTAModuleInfo(FUnits[iUnit]).FileName;
 End;
@@ -1500,17 +1518,17 @@ End;
   @precon  None.
   @postcon Updates an existing unit file with the newly selected test cases.
 
-  @param   iUnit             as an Integer
+  @param   iUnit             as an Integer as a constant
   @param   strUnitToBeTested as a String as a constant
-  @param   slTestCases       as a TStringList
+  @param   slTestCases       as a TStringList as a constant
   @param   strBaseClass      as a String as a constant
   @param   strTestSuiteName  as a String as a constant
   @param   strClassNameMask  as a String as a constant
   @param   strMethodNameMask as a String as a constant
 
 **)
-Procedure TDUnitCreator.UpdateTestUnit(iUnit: Integer; Const strUnitToBeTested: String;
-  slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassNameMask,
+Procedure TDUnitCreator.UpdateTestUnit(Const iUnit: Integer; Const strUnitToBeTested: String;
+  Const slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassNameMask,
   strMethodNameMask : String);
 
 ResourceString
@@ -1708,6 +1726,8 @@ End;
   @precon  None.
   @postcon Determines that there are no new modules.
 
+  @nocheck EmptyMethod
+
 **)
 Procedure TProjectCreator.NewDefaultModule;
 Begin
@@ -1722,10 +1742,14 @@ End;
   @precon  None.
   @postcon None.
 
+  @nohint  Project
+  @nocheck EmptyMethod
+
   @param   Project as an IOTAProject as a constant
 
 **)
 Procedure TProjectCreator.NewDefaultProjectModule(Const Project: IOTAProject);
+
 Begin
 End;
 {$ENDIF}
@@ -1737,11 +1761,14 @@ End;
   @precon  None.
   @postcon Determines that there are no new options.
 
+  @nohint  ProjectName
+
   @param   ProjectName as a string  as a constant
   @return  an IOTAFile
 
 **)
 Function TProjectCreator.NewOptionSource(Const ProjectName: String): IOTAFile;
+
 Begin
   Result := Nil;
 End;
@@ -1753,10 +1780,14 @@ End;
   @precon  None.
   @postcon Determines that there is no new project resource.
 
+  @nohint  Project
+  @nocheck EmptyMethod
+
   @param   Project as an IOTAProject as a constant
 
 **)
 Procedure TProjectCreator.NewProjectResource(Const Project: IOTAProject);
+
 Begin
 End;
 
@@ -1766,6 +1797,8 @@ End;
 
   @precon  None.
   @postcon Creates the new project source file from a resource stream.
+
+  @nohint  ProjectName
 
   @param   ProjectName as a string as a constant
   @return  an IOTAFile
@@ -1786,18 +1819,18 @@ End;
   @precon  None .
   @postcon Sets the project file name and the project owner .
 
-  @param   strNewUnitName    as a String
-  @param   strUnitToBeTested as a String
-  @param   slTestCases       as a TStringList
-  @param   Owner             as an IOTAProject
-  @param   strBaseClass      as a String
-  @param   strTestSuiteName  as a String
-  @param   strClassNameMask  as a String
-  @param   strMethodNameMask as a String
+  @param   strNewUnitName    as a String as a constant
+  @param   strUnitToBeTested as a String as a constant
+  @param   slTestCases       as a TStringList as a constant
+  @param   Owner             as an IOTAProject as a constant
+  @param   strBaseClass      as a String as a constant
+  @param   strTestSuiteName  as a String as a constant
+  @param   strClassNameMask  as a String as a constant
+  @param   strMethodNameMask as a String as a constant
 
 **)
-Constructor TUnitCreator.Create(strNewUnitName, strUnitToBeTested: String;
-  slTestCases: TStringList; Owner: IOTAProject; strBaseClass, strTestSuiteName,
+Constructor TUnitCreator.Create(Const strNewUnitName, strUnitToBeTested: String;
+  Const slTestCases: TStringList; Const Owner: IOTAProject; Const strBaseClass, strTestSuiteName,
   strClassNameMask, strMethodNameMask: String);
 
 Begin
@@ -1818,10 +1851,14 @@ End;
   @precon  None.
   @postcon Not used in a unit.
 
+  @nohint  FormEditor
+  @nocheck EmptyMethod
+
   @param   FormEditor as an IOTAFormEditor as a constant
 
 **)
 Procedure TUnitCreator.FormCreated(Const FormEditor: IOTAFormEditor);
+
 Begin
 End;
 
@@ -1836,6 +1873,7 @@ End;
 
 **)
 Function TUnitCreator.GetAncestorName: String;
+
 Begin
   Result := '';
 End;
@@ -1851,6 +1889,7 @@ End;
 
 **)
 Function TUnitCreator.GetCreatorType: String;
+
 Begin
   Result := sUnit;
 End;
@@ -1865,6 +1904,7 @@ End;
 
 **)
 Function TUnitCreator.GetExisting: Boolean;
+
 Begin
   Result := False;
 End;
@@ -2011,12 +2051,15 @@ End;
   @precon  None.
   @postcon Not used in a unit file.
 
+  @nohint  FormIdent AncestorIdent
+
   @param   FormIdent     as a string as a constant
   @param   AncestorIdent as a string as a constant
   @return  an IOTAFile
 
 **)
 Function TUnitCreator.NewFormFile(Const FormIdent, AncestorIdent: String): IOTAFile;
+
 Begin
   Result := Nil;
 End;
@@ -2028,14 +2071,16 @@ End;
   @precon  None.
   @postcon Generates the source code for this new unit file.
 
+  @nohint  FormIdent AncestorIdent
+
   @param   ModuleIdent   as a string as a constant
   @param   FormIdent     as a string as a constant
   @param   AncestorIdent as a string as a constant
   @return  an IOTAFile
 
 **)
-Function TUnitCreator.NewImplSource(Const ModuleIdent, FormIdent, AncestorIdent: String)
-  : IOTAFile;
+Function TUnitCreator.NewImplSource(Const ModuleIdent, FormIdent, AncestorIdent: String) : IOTAFile;
+  
 Begin
   Result := TUnitCreatorFile.Create(ModuleIdent, FUnitToBeTested, FTestCases, FBaseClass,
     FTestSuiteName, FClassNameMask, FMethodNameMask);
@@ -2047,6 +2092,8 @@ End;
 
   @precon  None.
   @postcon Not used in Delphi.
+
+  @nohint  FormIdent AncestorIdent ModuleIdent
 
   @param   ModuleIdent   as a string as a constant
   @param   FormIdent     as a string as a constant
@@ -2069,10 +2116,10 @@ End;
   @precon  None.
   @postcon Sets the project file name.
 
-  @param   strProjectName as a String
+  @param   strProjectName as a String as a constant
 
 **)
-Constructor TProjectCreatorFile.Create(strProjectName: String);
+Constructor TProjectCreatorFile.Create(Const strProjectName: String);
 Begin
   FProjectName := strProjectName;
 End;
@@ -2142,17 +2189,17 @@ End;
   @precon  None .
   @postcon Creates an instance of the class .
 
-  @param   strUnitName       as a String
-  @param   strUnitToBeTested as a String
-  @param   slTestCases       as a TStringList
-  @param   strBaseClass      as a String
-  @param   strTestSuiteName  as a String
-  @param   strClassNameMask  as a String
-  @param   strMethodNameMask as a String
+  @param   strUnitName       as a String as a constant
+  @param   strUnitToBeTested as a String as a constant
+  @param   slTestCases       as a TStringList as a constant
+  @param   strBaseClass      as a String as a constant
+  @param   strTestSuiteName  as a String as a constant
+  @param   strClassNameMask  as a String as a constant
+  @param   strMethodNameMask as a String as a constant
 
 **)
-Constructor TUnitCreatorFile.Create(strUnitName, strUnitToBeTested: String;
-  slTestCases: TStringList; strBaseClass, strTestSuiteName, strClassNameMask,
+Constructor TUnitCreatorFile.Create(Const strUnitName, strUnitToBeTested: String;
+  Const slTestCases: TStringList; Const strBaseClass, strTestSuiteName, strClassNameMask,
   strMethodNameMask: String);
 
 Begin

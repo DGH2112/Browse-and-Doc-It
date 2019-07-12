@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    12 Jul 2019
 
   @license
 
@@ -127,13 +127,15 @@ End;
 Procedure TEditorNotifier.CheckForCursorMovement(Const Editor : IOTASourceEditor);
 
 Var
+  EditorSvcs : IOTAEditorServices;
   P : TOTAEditPos;
 
 Begin
   If Assigned(Editor) Then
     Begin
       If Editor.GetEditViewCount > 0 Then
-        P := Editor.GetEditView(0).CursorPos;
+        If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+          P := EditorSvcs.TopView.CursorPos;
       If FLastUpdateTickCount > 0 Then
         If (P.Col <> FLastCursorPos.Col) Or (P.Line <> FLastCursorPos.Line) Then
           Begin

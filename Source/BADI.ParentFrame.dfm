@@ -74,7 +74,6 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Style = []
     ParentFont = False
     Layout = tlCenter
-    ExplicitTop = 275
     ExplicitWidth = 220
   end
   object lblEurekaLog: TLabel
@@ -149,7 +148,5 @@ object fmBADIParentFrame: TfmBADIParentFrame
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 0
-    ExplicitWidth = 523
-    ExplicitHeight = 165
   end
 end

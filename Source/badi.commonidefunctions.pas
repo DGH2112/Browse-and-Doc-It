@@ -33,9 +33,6 @@ Unit BADI.CommonIDEFunctions;
 Interface
 
 Uses
-  {$IFDEF DEBUG}
-  CodeSiteLogging,
-  {$ENDIF}
   SysUtils,
   Windows,
   Classes,
@@ -160,7 +157,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   BADI.Options,

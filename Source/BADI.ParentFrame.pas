@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    12 Jul 2019
 
   @license
 
@@ -65,14 +65,16 @@ Type
 Implementation
 
 uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   {$IFDEF EUREKALOG}
   EBase,
   {$ENDIF EUREKALOG}
-  BADI.Functions;
+  BADI.Functions,
+  BADI.Options;
 
 {$R *.dfm}
-
-{ TfmBADIParentFrame }
 
 (**
 
@@ -109,6 +111,7 @@ Var
   iSize : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
   lblBADI.Caption := Format(strBrowseAndDocIt, [iMajor, iMinor, strBugFix[Succ(iBugFix)]]);
   {$IFDEF DEBUG}
@@ -146,7 +149,10 @@ End;
 **)
 Procedure TfmBADIParentFrame.SaveSettings;
 
-Begin //FI:W519
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
+  TBADIOptions.BADIOptions.SaveSettings;
 End;
 
 End.
+

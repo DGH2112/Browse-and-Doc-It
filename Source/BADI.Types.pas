@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    21 Jun 2019
+  @Date    12 Jul 2019
 
   @license
 
@@ -614,9 +614,19 @@ Type
     FExclusions: TBADIExclusionTypes;
   End;
 
-Implementation
+  (** An enumerate to define the Abtract Syntax Tree Labels that a module can use. **)
+  TBADIASTLabel = (
+    alTypesLabel,
+    alConstantsLabel,
+    alResourceStringsLabel,
+    alVariablesLabel,         
+    alThreadVarsLabel,        
+    alExportedHeadingsLabel,  
+    alExportsHeadingsLabel,
+    alImplementedMethodsLabel
+  );
 
-{ TBADISpecialTag }
+Implementation
 
 (**
 

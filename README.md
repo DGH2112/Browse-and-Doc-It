@@ -3,21 +3,16 @@
 
 Author:   David Hoyle
 
-Version:  1.3.0.
+Version:  1.3a
 
-Date:     03 Feb 2019
+Date:     25 Jun 2019
 
 Web Page: [Browse and Doc It](http://www.davidghoyle.co.uk/WordPress/?page_id=872)
 
-
-
 ## Overview
 
-This is an Embarcadero RAD Studio plug-in to provide code browsing and documentation support. This
-current build provide support for the following version of RAD Studio:
+This is an Embarcadero RAD Studio plug-in to provide code browsing and documentation support. This current build provide support for the following version of RAD Studio:
 
- * XE;
- * XE2;
  * XE3;
  * XE4;
  * XE5;
@@ -35,12 +30,9 @@ current build provide support for the following version of RAD Studio:
 
  ## Project State
 
- The 1.3 version is still a Beta as there are a number of issues to still sort out along with updating
- the documentation to explain the usage of the checks and metrics (I'm hoping for the interim that they
- are self explanatory).
+ The 1.3a version is still a Beta as there are a number of issues to still sort out along with updating the documentation to explain the usage of the checks and metrics (I'm hoping for the interim that they are self explanatory).
 
  ## Source Code and Binaries
 
-The binaries for this plug-in can be downloaded from the above web page and the source code is available
-from [GitHub](https://github.com/DGH2112/Browse-and-Doc-It).
+The binaries for this plug-in can be downloaded from the above web page and the source code is available from [GitHub](https://github.com/DGH2112/Browse-and-Doc-It).
 

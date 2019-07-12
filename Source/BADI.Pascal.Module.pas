@@ -2,9 +2,9 @@
 
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
-  @Author     David Hoyle
-  @Version    2.0
-  @Date    21 Jun 2019
+  @Author  David Hoyle
+  @Version 2.0
+  @Date    12 Jul 2019
 
   @license
 
@@ -73,14 +73,7 @@ Type
   Strict Private
     FSource                  : String;
     FMethodStack             : TObjectList;
-    FTypesLabel              : TLabelContainer;
-    FConstantsLabel          : TLabelContainer;
-    FResourceStringsLabel    : TLabelContainer;
-    FVariablesLabel          : TLabelContainer;
-    FThreadVarsLabel         : TLabelContainer;
-    FExportedHeadingsLabel   : TLabelContainer;
-    FExportsHeadingsLabel    : TLabelContainer;
-    FImplementedMethodsLabel : TLabelContainer;
+    FASTLabels               : Array[TBADIASTLabel] Of TLabelContainer;
     FExternalSyms            : TStringList;
     FModuleType              : TModuleType;
     FSourceCodeForProfiling  : TStringList;
@@ -299,7 +292,7 @@ Type
     Procedure MetricsEmptyBlockAtToken(Const eCheck : TBADIModuleCheck);
     Procedure MetricsCyclometricComplexity(Const Method : TGenericFunction);
     Procedure MetricsMethodToxicity(Const Method : TGenericFunction);
-    Function  GetVariablesLabel : TLabelContainer;
+    Function  GetASTLabel(Const eLabel : TBADIASTLabel) : TLabelContainer;
     function  GetCurrentMethod: TPascalMethod;
     Function  GetModuleName : String; Override;
     Function  GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -313,12 +306,13 @@ Type
     **)
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
     (**
-      This property returns the modules variables label.
+      This property returns the module labels.
       @precon  None.
-      @postcon Returns the modules variables label.
+      @postcon Returns the module labels.
+      @param   eLabel as a TBADIASTLabel as a constant
       @return  a TLabelContainer
     **)
-    Property VariablesLabel : TLabelContainer Read GetVariablesLabel;
+    Property ASTLabel[Const eLabel : TBADIASTLabel] : TLabelContainer Read GetASTLabel;
   Public
     Constructor CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
       Const ModuleOptions : TModuleOptions); Override;
@@ -496,12 +490,8 @@ begin
       If C = Nil Then
         Begin
           If Method.Identifier <> '' Then
-            Begin
-              If FImplementedMethodsLabel = Nil Then
-                FImplementedMethodsLabel := Add(strImplementedMethodsLabel,
-                  iiImplementedMethods, scNone, Nil) As TLabelContainer;
-              C := FImplementedMethodsLabel;
-            End Else
+            C := ASTLabel[alImplementedMethodsLabel]
+          Else
             Begin
               If Assigned(CurrentMethod) Then
                 Begin
@@ -513,8 +503,8 @@ begin
             End;
           iIcon := iiUnknownClsObj;
           AScope := scNone;
-          E := FTypesLabel;
-          If E <> Nil Then
+          E := FASTLabels[alTypesLabel];
+          If Assigned(E) Then
             For iCls := 0 To Method.ClassNames.Count - 1 Do
               If E <> Nil Then
                 Begin
@@ -1134,17 +1124,17 @@ Var
 begin
   ResolveScopeOfImplementedExportedMethods;
   ResolveScopeOfImplementedExportsMethods;
-  ResolveScopeOfImplementedMethods(FImplementedMethodsLabel);
+  ResolveScopeOfImplementedMethods(FASTLabels[alImplementedMethodsLabel]);
   ResolveForwardImplementedMethods;
   // Only resolved methods IF there are no other errors.
   Errors := FindElement(strErrors) As TLabelContainer;
   If Errors <> Nil Then
     If Errors.ElementCount > 0 Then
       Exit;
-  FindUnresolvedRecordObjectAndClassMethods(FTypesLabel);
+  FindUnresolvedRecordObjectAndClassMethods(FASTLabels[alTypesLabel]);
   FindUnresolvedExportedMethods;
   {FindUnresolvedExportsMethods;}
-  FindUnresolvedImplementedClassMethods(FImplementedMethodsLabel);
+  FindUnresolvedImplementedClassMethods(FASTLabels[alImplementedMethodsLabel]);
 end;
 
 (**
@@ -1872,12 +1862,7 @@ Begin
               GetComment) As TLabelContainer;
           C := ConstantsLabel;
         End Else
-        Begin
-          If FConstantsLabel = Nil Then
-            FConstantsLabel := Add(strConstantsLabel, iiPublicConstantsLabel,
-              LabelScope, GetComment) As TLabelContainer;
-          C := FConstantsLabel;
-        End;
+          C := ASTLabel[alConstantsLabel];
       NextNonCommentToken;
       RTTIAttributes;
       While ConstantDecl(AScope, C) Do
@@ -1952,14 +1937,14 @@ Var
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
-  FTypesLabel              := Nil;
-  FConstantsLabel          := Nil;
-  FResourceStringsLabel    := Nil;
-  FVariablesLabel          := Nil;
-  FThreadVarsLabel         := Nil;
-  FExportedHeadingsLabel   := Nil;
-  FExportsHeadingsLabel    := Nil;
-  FImplementedMethodsLabel := Nil;
+  FASTLabels[alTypesLabel]              := Nil;
+  FASTLabels[alConstantsLabel]          := Nil;
+  FASTLabels[alResourceStringsLabel]    := Nil;
+  FASTLabels[alVariablesLabel]          := Nil;
+  FASTLabels[alThreadVarsLabel]         := Nil;
+  FASTLabels[alExportedHeadingsLabel]   := Nil;
+  FASTLabels[alExportsHeadingsLabel]    := Nil;
+  FASTLabels[alImplementedMethodsLabel] := Nil;
   FModuleType := mtUnit;
   FExternalSyms := TStringList.Create;
   FExternalSyms.Sorted := True;
@@ -2681,12 +2666,9 @@ Begin
   Result := Token.UToken = strEXPORTS;
   If Result Then
     Begin
-      If FExportsHeadingsLabel = Nil Then
-        FExportsHeadingsLabel := Add(strExportsLabel,
-          iiExportedFunctionsLabel, scNone, Nil) As TLabelContainer;
       NextNonCommentToken;
       Repeat
-        ExportsItem(FExportsHeadingsLabel);
+        ExportsItem(ASTLabel[alExportsHeadingsLabel]);
       Until Not IsToken(',', Nil);
       If Token.Token = ';' Then
         NextNonCommentToken
@@ -3133,11 +3115,11 @@ var
   iIndex : Integer;
 
 begin
-  If FExportedHeadingsLabel <> Nil Then
-    For k := 1 To FExportedHeadingsLabel.ElementCount Do
-      If FExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
+  If Assigned(FASTLabels[alExportedHeadingsLabel]) Then
+    For k := 1 To FASTLabels[alExportedHeadingsLabel].ElementCount Do
+      If FASTLabels[alExportedHeadingsLabel].Elements[k] Is TPascalMethod Then
         Begin
-          Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
+          Method := FASTLabels[alExportedHeadingsLabel].Elements[k] As TPascalMethod;
           If Not Method.Resolved And Not FExternalSyms.Find(Method.Identifier, iIndex) Then
             AddIssue(Format(strUnSatisfiedForwardReference, [Method.Identifier]),
               scNone, Method.Line, Method.Column, etWarning, Method);
@@ -3542,6 +3524,43 @@ End;
 
 (**
 
+  This is a getter methods for the VariablesLabel propertry.
+
+  @precon  None.
+  @postcon Returns the modules variable label (creating it if required).
+
+  @refactor Move this up to the TBaseModule class.
+
+  @param   eLabel as a TBADIASTLabel as a constant
+  @return  a TLabelContainer
+
+**)
+Function TPascalModule.GetASTLabel(Const eLabel : TBADIASTLabel): TLabelContainer;
+
+Var
+  strLabel : String;
+  
+Begin
+  If Not Assigned(FASTLabels[eLabel]) Then
+    Begin
+      Case eLabel Of
+        alTypesLabel:              strLabel := strTypesLabel;
+        alConstantsLabel:          strLabel := strConstantsLabel;
+        alResourceStringsLabel:    strLabel := strResourceStringsLabel;
+        alVariablesLabel:          strLabel := strVarsLabel;
+        alThreadVarsLabel:         strLabel := strThreadVarsLabel;
+        alExportedHeadingsLabel:   strLabel := strExportedHeadingsLabel;
+        alExportsHeadingsLabel:    strLabel := strExportsLabel;
+        alImplementedMethodsLabel: strLabel := strImplementedMethodsLabel;
+      End;
+      FASTLabels[eLabel] := Add(strLabel, iiPublicVariablesLabel, scPrivate,
+        GetComment) As TLabelContainer;
+    End;
+  Result := FASTLabels[eLabel];
+End;
+
+(**
+
   This method tries to get a document comment from the previous token and return a TComment class to the 
   calling routine.
 
@@ -3655,25 +3674,6 @@ Begin
   If Result = Nil Then
     Result := OPType(AToken);
   PortabilityDirective;
-End;
-
-(**
-
-  This is a getter methods for the VariablesLabel propertry.
-
-  @precon  None.
-  @postcon Returns the modules variable label (creating it if required).
-
-  @return  a TLabelContainer
-
-**)
-Function TPascalModule.GetVariablesLabel: TLabelContainer;
-
-Begin
-  If FVariablesLabel = Nil Then
-    FVariablesLabel := Add(strVarsLabel, iiPublicVariablesLabel, scPrivate,
-      GetComment) As TLabelContainer;
-  Result := FVariablesLabel;
 End;
 
 (**
@@ -4005,7 +4005,10 @@ Begin
           Cmt := GetComment();
           tmpC := TConstant.Create(AToken.Token, scLocal, AToken.Line, AToken.Column, iiPublicConstant,
             Cmt);
-          C := CurrentMethod.ConstantsLabel.Add(tmpC);
+          If Assigned(CurrentMethod) Then
+            C := CurrentMethod.ConstantsLabel.Add(tmpC)
+          Else
+            C := ASTLabel[alConstantsLabel].Add(tmpC);
           If tmpC <> C Then
             AddIssue(Format(strDuplicateIdentifierFound, [AToken.Token, AToken.Line, AToken.Column]),
               scNone, AToken.Line, AToken.Column, etError, Self);
@@ -4013,7 +4016,8 @@ Begin
           If Token.Token = ':' Then
             Begin
               NextNonCommentToken;
-              CurrentMethod.ConstantsLabel.ReferenceSymbol(AToken);
+              If Assigned(CurrentMethod) Then
+                CurrentMethod.ConstantsLabel.ReferenceSymbol(AToken);
               Tmp := TTempCntr.Create('', scLocal, 0, 0, iiNone, Nil);
               Try
                 GetTypeDecl(TypeToken(Nil, scNone, Nil, Tmp));
@@ -4095,7 +4099,7 @@ Function TPascalModule.InLineVarDecl: Boolean;
     If Assigned(CurrentMethod) Then
       L := CurrentMethod.VariablesLabel
     Else
-      L := VariablesLabel;
+      L := ASTLabel[alVariablesLabel];
     V := L.Add(tmpV);
     If tmpV <> V Then
       AddIssue(Format(strDuplicateIdentifierFound, [Ident.Identifier, Ident.Line, Ident.Column]),
@@ -4133,7 +4137,7 @@ Begin
           If Assigned(CurrentMethod) Then
             L := CurrentMethod.VariablesLabel
           Else
-            L := VariablesLabel;
+            L := ASTLabel[alVariablesLabel];
             L.ReferenceSymbol(AToken);
             Tmp := TTempCntr.Create('', scLocal, 0, 0, iiNone, Nil);
             Try
@@ -4176,9 +4180,6 @@ End;
 Procedure TPascalModule.InterfaceDecl;
 
 Begin
-  If FExportedHeadingsLabel = Nil Then
-    FExportedHeadingsLabel := Add(strExportedHeadingsLabel,
-      iiExportedHeadingslabel, scNone, Nil) As TLabelContainer;
   Repeat
     {Loop doing nothing};
   Until Not (
@@ -4187,7 +4188,7 @@ Begin
     TypeSection(scPublic, Self) Or
     VarSection(scPublic, Self) Or
     ThreadVarSection(scPublic, Self) Or
-    ExportedHeading(FExportedHeadingsLabel) Or
+    ExportedHeading(ASTLabel[alExportedHeadingsLabel]) Or
     ExportsStmt
   );
 End;
@@ -4422,7 +4423,7 @@ Begin
           If Assigned(CurrentMethod) Then
             L := CurrentMethod.VariablesLabel
           Else
-            L := VariablesLabel;
+            L := ASTLabel[alVariablesLabel];
           V := L.Add(tmpV);
           If tmpV <> V Then
             AddIssue(Format(strDuplicateIdentifierFound, [AToken.Token, AToken.Line, AToken.Column]),
@@ -5197,14 +5198,14 @@ Var
   iContainer: Integer;
 
 Begin
-  If BADIOptions.ModuleCheck[mcUnsortedMethod].FEnabled And Assigned(FImplementedMethodsLabel) Then
+  If BADIOptions.ModuleCheck[mcUnsortedMethod].FEnabled And Assigned(FASTLabels[alImplementedMethodsLabel]) Then
     Begin
-      CheckForUnsortedMethods(FImplementedMethodsLabel);
-      For iContainer := 1 To FImplementedMethodsLabel.ElementCount Do
-        If Not (FImplementedMethodsLabel.Elements[iContainer] Is TGenericFunction) Then
-          CheckForUnsortedMethods(FImplementedMethodsLabel.Elements[iContainer])
+      CheckForUnsortedMethods(FASTLabels[alImplementedMethodsLabel]);
+      For iContainer := 1 To FASTLabels[alImplementedMethodsLabel].ElementCount Do
+        If Not (FASTLabels[alImplementedMethodsLabel].Elements[iContainer] Is TGenericFunction) Then
+          CheckForUnsortedMethods(FASTLabels[alImplementedMethodsLabel].Elements[iContainer])
         Else
-          CheckForUnsortedMethods(FImplementedMethodsLabel.Elements[iContainer]);
+          CheckForUnsortedMethods(FASTLabels[alImplementedMethodsLabel].Elements[iContainer]);
     End;
 End;
 
@@ -7404,25 +7405,25 @@ Var
   boolFound: Boolean;
 
 begin
-  Result := ReferenceSection(AToken, FVariablesLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alVariablesLabel]);
   If Result Then
     Exit;
-  Result := ReferenceSection(AToken, FConstantsLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alConstantsLabel]);
   If Result Then
     Exit;
-  Result := ReferenceSection(AToken, FResourceStringsLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alResourceStringsLabel]);
   If Result Then
     Exit;
-  Result := ReferenceSection(AToken, FTypesLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alTypesLabel]);
   If Result Then
     Exit;
-  Result := ReferenceSection(AToken, FThreadVarsLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alThreadVarsLabel]);
   If Result Then
     Exit;
   // Check Module Local Methods
   boolFound := False;
-  E := FImplementedMethodsLabel;
-  If E <> Nil Then
+  E := FASTLabels[alImplementedMethodsLabel];
+  If Assigned(E) Then
     For i := 1 To E.ElementCount Do
       If CompareText(E[i].Identifier, AToken.Token) = 0 Then
         Begin
@@ -7600,16 +7601,16 @@ Var
   ImplementedMethod: TPascalMethod;
 
 Begin
-  If Assigned(FImplementedMethodsLabel) Then
-    For iElement := 1 To FImplementedMethodsLabel.ElementCount Do
-      If FImplementedMethodsLabel.Elements[iElement] Is TPascalMethod Then
+  If Assigned(FASTLabels[alImplementedMethodsLabel]) Then
+    For iElement := 1 To FASTLabels[alImplementedMethodsLabel].ElementCount Do
+      If FASTLabels[alImplementedMethodsLabel].Elements[iElement] Is TPascalMethod Then
         Begin
-          ForwardMethod := FImplementedMethodsLabel.Elements[iElement] As TPascalMethod;
+          ForwardMethod := FASTLabels[alImplementedMethodsLabel].Elements[iElement] As TPascalMethod;
           If ForwardMethod.ForwardDecl Then
-            For iImplementation := 1 To FImplementedMethodsLabel.ElementCount Do
-              If FImplementedMethodsLabel.Elements[iImplementation] Is TPascalMethod Then
+            For iImplementation := 1 To FASTLabels[alImplementedMethodsLabel].ElementCount Do
+              If FASTLabels[alImplementedMethodsLabel].Elements[iImplementation] Is TPascalMethod Then
                 Begin
-                  ImplementedMethod := FImplementedMethodsLabel.Elements[iImplementation] As TPascalMethod;
+                  ImplementedMethod := FASTLabels[alImplementedMethodsLabel].Elements[iImplementation] As TPascalMethod;
                   If ForwardMethod <> ImplementedMethod Then
                     If CompareText(Copy(ForwardMethod.Name, 1, Length(ImplementedMethod.Name)),
                       ImplementedMethod.Name) = 0 Then
@@ -7637,12 +7638,12 @@ var
   k: Integer;
 
 begin
-  If (FExportedHeadingsLabel <> Nil) And (FImplementedMethodsLabel <> Nil) Then
-    For k := 1 To FExportedHeadingsLabel.ElementCount Do
-      If FExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
+  If Assigned(FASTLabels[alExportedHeadingsLabel]) And Assigned(FASTLabels[alImplementedMethodsLabel]) Then
+    For k := 1 To FASTLabels[alExportedHeadingsLabel].ElementCount Do
+      If FASTLabels[alExportedHeadingsLabel].Elements[k] Is TPascalMethod Then
         Begin
-          Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
-          ImplementedMethod := FImplementedMethodsLabel.FindElement(Method.Name);
+          Method := FASTLabels[alExportedHeadingsLabel].Elements[k] As TPascalMethod;
+          ImplementedMethod := FASTLabels[alImplementedMethodsLabel].FindElement(Method.Name);
           If (ImplementedMethod <> Nil) And (ImplementedMethod Is TPascalMethod) Then
             Begin
               Method.Resolved := True;
@@ -7670,12 +7671,12 @@ var
   k: Integer;
 
 begin
-  If (FExportsHeadingsLabel <> Nil) And (FImplementedMethodsLabel <> Nil) Then
-    For k := 1 To FExportsHeadingsLabel.ElementCount Do
-      If FExportsHeadingsLabel.Elements[k] Is TExportsItem Then
+  If Assigned(FASTLabels[alExportsHeadingsLabel]) And Assigned(FASTLabels[alImplementedMethodsLabel]) Then
+    For k := 1 To FASTLabels[alExportsHeadingsLabel].ElementCount Do
+      If FASTLabels[alExportsHeadingsLabel].Elements[k] Is TExportsItem Then
         Begin
-          Method := FExportsHeadingsLabel.Elements[k] As TExportsItem;
-          ImplementedMethod := FImplementedMethodsLabel.FindElement(
+          Method := FASTLabels[alExportsHeadingsLabel].Elements[k] As TExportsItem;
+          ImplementedMethod := FASTLabels[alImplementedMethodsLabel].FindElement(
             Method.Identifier, ftIdentifier);
           If (ImplementedMethod <> Nil) And (ImplementedMethod Is TPascalMethod) Then
             Begin
@@ -7815,12 +7816,7 @@ Begin
       If CurrentMethod <> Nil Then
         R := CurrentMethod.ResourceStringsLabel
       Else
-        Begin
-          If FResourceStringsLabel = Nil Then
-            FResourceStringsLabel := Add(strResourceStringsLabel,
-              iiPublicResourceStringsLabel, scPublic, GetComment) As TLabelContainer;
-          R := FResourceStringsLabel;
-        End;
+        R := ASTLabel[alResourceStringsLabel];
       NextNonCommentToken;
       Repeat
         {Loop do nothing}
@@ -8450,11 +8446,8 @@ Begin
       Result := Token.UToken = strTHREADVAR;
       If Result Then
         Begin
-          If FThreadVarsLabel = Nil Then
-            FThreadVarsLabel := Add(strThreadVarsLabel, iiPublicThreadVarsLabel,
-              scNone, GetComment) As TLabelContainer;
           NextNonCommentToken;
-          While ThreadVarDecl(AScope, FThreadVarsLabel) Do
+          While ThreadVarDecl(AScope, ASTLabel[alThreadVarsLabel]) Do
             Begin
               If Token.Token <> ';' Then
                 ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stFirst, Self)
@@ -9072,12 +9065,7 @@ Begin
               iiPublicTypesLabel, LabelScope, GetComment) As TLabelContainer;
           TL := TypesLabel;
         End Else
-        Begin
-          If FTypesLabel = Nil Then
-            FTypesLabel := Add(strTypesLabel, iiPublicTypesLabel, LabelScope,
-              GetComment) As TLabelContainer;
-          TL := FTypesLabel;
-        End;
+          TL := ASTLabel[alTypesLabel];
       NextNonCommentToken;
       While TypeDecl(AScope, TL) Do
         If Token.Token = ';' Then
@@ -9345,7 +9333,7 @@ Begin
               GetComment) As TLabelContainer;
           V := VarsLabel;
         End Else
-          V := VariablesLabel;
+          V := ASTLabel[alVariablesLabel];
       NextNonCommentToken;
       While VarDecl(AScope, V, iiPublicVariable) Do
         Begin

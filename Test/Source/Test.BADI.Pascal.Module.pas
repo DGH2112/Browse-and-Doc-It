@@ -334,6 +334,7 @@ type
     Procedure TestCodeFailure40;
     Procedure TestCodeFailure41;
     Procedure TestCodeFailure42;
+    Procedure TestCodeFailure43;
   Public
   End;
 
@@ -2379,6 +2380,28 @@ Begin
     '  System.Generics.Collections.TArray.Sort<TXTColumnPosition>(Result,'#13#10 +
     '    TXTColumnPositionComparer.Create);'#13#10 +
     'End;',
+    [ttErrors],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure43;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  var i : Integer := 1;'#13#10 +
+    '  var j := 1',
+    [ttErrors],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  const s = ''Hello'';',
     [ttErrors],
     []
   );

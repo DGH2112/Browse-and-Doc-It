@@ -3989,7 +3989,7 @@ Var
   Tmp : TElementContainer;
   AToken: TTokenInfo;
   ExprType: TPascalExprTypes;
-  Expr: TTempCntr;
+  Expr: TConstant;
   tmpC: TConstant;
   C: TElementContainer;
   Cmt: TComment;
@@ -4034,7 +4034,7 @@ Begin
             Begin
               NextNonCommentToken;
               ExprType := [petUnknown];
-              Expr := TTempCntr.Create('', scNone, 0 ,0, iiNone, Nil);
+              Expr := TConstant.Create('', scNone, 0 ,0, iiNone, Nil);
               Try
                 Expression(Expr, ExprType);
                 C.AddTokens(Expr);

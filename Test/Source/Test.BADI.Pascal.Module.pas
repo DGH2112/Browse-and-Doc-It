@@ -335,6 +335,7 @@ type
     Procedure TestCodeFailure41;
     Procedure TestCodeFailure42;
     Procedure TestCodeFailure43;
+    Procedure TestCodeFaliure44;
   Public
   End;
 
@@ -2403,6 +2404,24 @@ Begin
     '',
     '  const s = ''Hello'';',
     [ttErrors],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFaliure44;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure Hello();',
+    'Procedure Hello();'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  const s = ''Hello'';'#13#10 +
+    '  WriteLn(s);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttHints, ttChecks],
     []
   );
 End;

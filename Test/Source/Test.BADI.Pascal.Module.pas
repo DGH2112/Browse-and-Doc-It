@@ -337,6 +337,8 @@ type
     Procedure TestCodeFailure43;
     Procedure TestCodeFailure44;
     Procedure TestCodeFailure45;
+    Procedure TestCodeFailure46;
+    Procedure TestCodeFailure47;
   Public
   End;
 
@@ -2427,8 +2429,6 @@ Begin
   );
 End;
 
-procedure GetAdaptersInfo; stdcall; external 'GetAdaptersInfo';
-
 Procedure TestTPascalModule.TestCodeFailure45;
 
 Begin
@@ -2439,6 +2439,81 @@ Begin
     '',
     'procedure GetAdaptersInfo; stdcall; external ''GetAdaptersInfo'';',
     [ttErrors..ttHints, ttChecks],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure46;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '{$IFDEF PROFILECODE}'#13#10 +
+    'Type'#13#10 +
+    '  TProfiler = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '    FStackTop      : Integer;'#13#10 +
+    '    FRootProfile   : TProfile;'#13#10 +
+    '    FCurrentProfile: TProfile;'#13#10 +
+    '    {$IFNDEF CONSOLE}'#13#10 +
+    '    FProgressForm  : TForm;'#13#10 +
+    '    FLabel         : TLabel;'#13#10 +
+    '    {$ENDIF}'#13#10 +
+    '  Strict Protected'#13#10 +
+    '    Procedure DumpProfileInformation;'#13#10 +
+    '    {$IFNDEF CONSOLE}'#13#10 +
+    '    Procedure Msg(strMsg: String; boolForce : Boolean = False);'#13#10 +
+    '    {$ENDIF}'#13#10 +
+    '  Public'#13#10 +
+    '    Constructor Create;'#13#10 +
+    '    Destructor Destroy; Override;'#13#10 +
+    '    Procedure Start(strMethodName: String);'#13#10 +
+    '    Procedure Stop;'#13#10 +
+    '  End;'#13#10 +
+    '{$ENDIF}',
+    '',
+    [ttErrors],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure47;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Const strTokenTypeInfo : TBADITokenFontInfoTokenSet = ('#13#10 +
+    '  (FForeColour : clRed;        FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clMaroon;     FStyles : [fsBold];               FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clInfoText;   FStyles : [];                     FBackColour: clInfoBk),'#13#10 +
+    '  (FForeColour : clWindowText; FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clNavy;       FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clPurple;     FStyles : [fsBold, fsUnderline];  FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone)'#13#10 +
+    ');',
+    [ttErrors],
     []
   );
 End;

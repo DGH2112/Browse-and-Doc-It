@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 2.0
-  @Date    12 Jul 2019
+  @Date    14 Jul 2019
 
   @license
 
@@ -6973,25 +6973,70 @@ Function TPascalModule.RecordConstant(Const C : TElementContainer;
 
 Var
   ExprType : TPascalExprTypes;
+  iStartDimension: Integer;
+  AT: TArrayType;
 
 Begin
   Result := Token.Token = '(';
   If Result Then
     Begin
       AddToExpression(C);
-      Repeat
-        If Not RecordFieldConstant(C, T) Then
-          If Token.Token <> ')' Then
-            Begin // If not handled treat as ConstExpr
-              ExprType := [petUnknown, petConstExpr];
-              ConstExpr(C, ExprType);
-            End;
-      Until Not IsToken(';', C) And Not IsToken(',', C);
-      If Token.Token = ')' Then
-        AddToExpression(C)
-      Else
-        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+      If Token.Token = '(' Then // Constant Array
+        Begin
+          iStartDimension := 1;
+          AT := TArrayType.Create('', scLocal, Token.Line, Token.Column, iiPublicType, Nil);
+          Try
+            AT.AddDimension;
+            Repeat
+              If iStartDimension < AT.Dimensions Then
+                ArrayElement(C, iStartDimension + 1, AT)
+              Else
+                TypedConstant(C, Nil)
+            Until Not IsToken(',', C);
+            If Token.Token = ')' Then
+              AddToExpression(C)
+            Else
+              ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+          Finally
+            AT.Free;
+          End;
+        End Else
+        Begin
+          Repeat
+            If Not RecordFieldConstant(C, T) Then
+              If Token.Token <> ')' Then
+                Begin // If not handled treat as ConstExpr
+                  ExprType := [petUnknown, petConstExpr];
+                  ConstExpr(C, ExprType);
+                End;
+          Until Not IsToken(';', C) And Not IsToken(',', C);
+          If Token.Token = ')' Then
+            AddToExpression(C)
+          Else
+            ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+        End;
     End;
+  {
+  If iStartDimension <= AT.Dimensions Then
+    If Token.Token = '(' Then
+      Begin
+        AddToExpression(C);
+        Repeat
+          If iStartDimension < AT.Dimensions Then
+            ArrayElement(C, iStartDimension + 1, AT)
+          Else
+            TypedConstant(C, Nil)
+        Until Not IsToken(',', C);
+        If Token.Token = ')' Then
+          AddToExpression(C)
+        Else
+          ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+      End Else
+      Begin // If not '(' handle as ConstExpr
+        ExprType := [petUnknown, petConstExpr];
+        ConstExpr(C, ExprType);
+      End;
+  }
 End;
 
 (**

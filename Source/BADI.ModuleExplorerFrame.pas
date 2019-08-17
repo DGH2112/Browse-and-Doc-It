@@ -110,7 +110,6 @@ Type
     actConstants: TAction;
     actVariables: TAction;
     actTypes: TAction;
-    edtExplorerFilter: TEdit;
     btnChecks: TToolButton;
     actChecks: TAction;
     actMetrics: TAction;
@@ -169,6 +168,7 @@ Type
     FRendering         : Boolean;
     FRefresh           : TNotifyEvent;
     FExplorer          : TBADIVirtualStringTree;
+    FExplorerFilter    : String;
     FFilterRegEx       : TRegEx;
     FMouseEnter        : Boolean;
     FTargetCanvas      : TCanvas;
@@ -240,12 +240,20 @@ Type
       TargetCanvas: TCanvas; Node: PVirtualNode; Var NodeHeight: Integer);
     Procedure FocusFollowedNode;
     Procedure tvExplorerNodeExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    Procedure SetExplorerFilter(Const strValue : String);
+    (**
+      This property gets and set the filter text for the explorer view.
+      @precon  None.
+      @postcon Gets and set the filter text for the explorer view.
+      @return  a String
+    **)
+    Property ExplorerFilter : String Read FExplorerFilter Write SetExplorerFilter;
   Public
     { Public declarations }
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
-    procedure RenderModule(Const Module : TBaseLanguageModule);
+    Procedure RenderModule(Const Module : TBaseLanguageModule);
     Procedure FollowEditorCursor(Const iLine : Integer);
     (**
       This is an event for the selection change in the browser tree.
@@ -658,7 +666,6 @@ begin
   FHintWin := TBADICustomHintWindow.Create(Self, FExplorer);
   FHintWin.Color := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours][ttExplorerHighlight].FBackColour;
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
-  edtExplorerFilter.Font.Assign(FExplorer.Font);
   ilScopeImages.Clear;
   LoadBADIImages(ilScopeImages);
   FExplorer.OnGetText := tvExplorerGetText;
@@ -993,7 +1000,7 @@ Begin
   iLeft := R.Left + iPadding;
   iTextPos := 1;
   InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
-  If edtExplorerFilter.Text <> '' Then
+  If ExplorerFilter <> '' Then
     MC := FFilterRegEx.Matches(FNodeData.FNode.Text);
   For i := 0 To sl.Count - 1 Do
     Begin
@@ -1004,7 +1011,7 @@ Begin
         If FTargetCanvas.Brush.Color = FBGColour Then
           FTargetCanvas.Brush.Color :=
             FTokenFontInfo[ttExplorerHighlight].FBackColour;
-      If edtExplorerFilter.Text = '' Then
+      If ExplorerFilter = '' Then
         DrawTextToCanvas(sl[i], R, iTextPos, iTop, iLeft)
       Else
         Begin
@@ -1113,7 +1120,7 @@ Begin
   Case Key Of
     #27:
       Begin
-        edtExplorerFilter.Clear;
+        ExplorerFilter := '';
         Key := #0;
       End;
   End;
@@ -1272,11 +1279,9 @@ Var
   N : PVirtualNode;
 
 Begin
-  stbStatusBar.SimplePanel := False;
   Try
-    If edtExplorerFilter.Text <> '' Then
-      FFilterRegEx := TRegEx.Create(edtExplorerFilter.Text, [roIgnoreCase, roCompiled,
-        roSingleLine]);
+    If ExplorerFilter <> '' Then
+      FFilterRegEx := TRegEx.Create(ExplorerFilter, [roIgnoreCase, roCompiled, roSingleLine]);
   Except
     On E : ERegularExpressionError Do
       Begin
@@ -1321,7 +1326,7 @@ Var
 
 Begin
   NodeData := Sender.GetNodeData(Node);
-  If edtExplorerFilter.Text <> '' Then
+  If ExplorerFilter <> '' Then
     Begin
       Sender.IsVisible[Node] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
       If Sender.IsVisible[Node] Then
@@ -1803,7 +1808,7 @@ Begin
     strSelection := GetNodePath(FExplorer.FocusedNode);
     FExplorer.BeginUpdate;
     Try
-      edtExplorerFilter.Text := '';
+      ExplorerFilter := '';
       FFollowNode := Nil;
       FExplorer.Clear;
       FNodeInfo.Clear;
@@ -1884,6 +1889,29 @@ Begin
         End;
       Node := FExplorer.GetNextSibling(Node);
     End;
+End;
+
+(**
+
+  This is a setter method for the ExplorerFilter property.
+
+  @precon  None.
+  @postcon Sets the FExplorerFilter field and determiens whether a simple panel is to be displayed for
+           the filter text information.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TframeModuleExplorer.SetExplorerFilter(Const strValue: String);
+
+ResourceString
+  strFilteringFor = 'Filtering for "%s"...';
+
+Begin
+  FExplorerFilter := strValue;
+  stbStatusBar.SimplePanel := FExplorerFilter.Length > 0;
+  If stbStatusBar.SimplePanel Then
+    stbStatusBar.SimpleText := Format(strFilteringFor, [FExplorerFilter])
 End;
 
 (**
@@ -1975,8 +2003,7 @@ Var
   strText: String;
 
 Begin
-  If Not (doCustomDrawing In TBADIOptions.BADIOptions.Options) And
-         (edtExplorerFilter.Text <> '') Then
+  If Not (doCustomDrawing In TBADIOptions.BADIOptions.Options) And (ExplorerFilter <> '') Then
     Begin
       strText := (Sender As TVirtualStringTree).Text[Node, 0];
       HighlightText(FFilterRegEx.Matches(strText), strText,
@@ -2140,8 +2167,8 @@ Begin
   Case Key Of
     #08:
       Begin
-        edtExplorerFilter.Text :=
-          Copy(edtExplorerFilter.Text, 1, Length(edtExplorerFilter.Text) - 1);
+        ExplorerFilter := Copy(ExplorerFilter, 1, Length(ExplorerFilter) - 1);
+        edtExplorerFilterChange(Sender);
         Key := #0;
       End;
     #13:
@@ -2156,12 +2183,14 @@ Begin
       End;
     #27:
       Begin
-        edtExplorerFilter.Clear;
+        ExplorerFilter := '';
+        edtExplorerFilterChange(Sender);
         Key := #0;
       End;
     #32..#128:
       Begin
-        edtExplorerFilter.Text := edtExplorerFilter.Text + Key;
+        ExplorerFilter := ExplorerFilter + Key;
+        edtExplorerFilterChange(Sender);
         Key := #0;
       End;
   End;

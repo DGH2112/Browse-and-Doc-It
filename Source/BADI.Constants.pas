@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    14 Aug 2019
 
   @license
 
@@ -83,6 +83,7 @@ Const
     (FDescription : strDrawSynHighModuleExplorer;             FEnabled : False; FGroup: dogGeneral),
     (FDescription : strShowCommentsInTheHints;                FEnabled : False; FGroup: dogGeneral),
     (FDescription : strShowChildCountinTitles;                FEnabled : False; FGroup: dogGeneral),
+    (FDescription : strFollowEditorCursor;                    FEnabled : False; FGroup: dogGeneral),
 
     (FDescription : strShowErrors;                            FEnabled : True;  FGroup: dogErrors),
     (FDescription : strExpandErrors;                          FEnabled:   True; FGroup: dogErrors),

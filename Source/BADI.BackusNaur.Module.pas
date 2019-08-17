@@ -4,7 +4,7 @@
 
   @Version    1.0
   @Author     David Hoyle
-  @Date       21 Jun 2019
+  @Date       17 Aug 2019
 
   @license
 
@@ -240,17 +240,15 @@ end;
 
   This is the constructor method for the TBackusnaurModule class.
 
-  @precon  Source is a valid TStream descendant containing as stream of text,
-           that is the contents of a source code module and Filename is the
-           file name of the module being parsed and IsModified determines if
-           the source code module has been modified since the last save to
-           disk.
+  @precon  Source is a valid TStream descendant containing as stream of text, that is the contents of a 
+           source code module and Filename is the file name of the module being parsed and IsModified 
+           determines if the source code module has been modified since the last save to disk.
   @postcon Creates an instance of the module parser.
 
   @param   Source        as a String as a constant
   @param   strFileName   as a String as a constant
-  @param   IsModified    as a Boolean
-  @param   ModuleOptions as a TModuleOptions
+  @param   IsModified    as a Boolean as a constant
+  @param   ModuleOptions as a TModuleOptions as a constant
 
 **)
 Constructor TBackusNaurModule.CreateParser(Const Source, strFileName : String;
@@ -277,10 +275,10 @@ Begin
     Begin
       ParseTokens;
       AddTickCount('Parse');
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
       CheckRules;

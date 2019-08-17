@@ -13,7 +13,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="BrowseAndDocIt.dproj">
-            <Dependencies/>
+            <Dependencies>Test\BrowseAndDocItTests.dproj</Dependencies>
         </Projects>
     </ItemGroup>
     <ProjectExtensions>
@@ -50,13 +50,13 @@
     <Target Name="BrowseAndDocItTestApp:Make">
         <MSBuild Projects="Test\BrowseAndDocItTestApp.dproj" Targets="Make"/>
     </Target>
-    <Target Name="BrowseAndDocIt">
+    <Target Name="BrowseAndDocIt" DependsOnTargets="BrowseAndDocItTests">
         <MSBuild Projects="BrowseAndDocIt.dproj"/>
     </Target>
-    <Target Name="BrowseAndDocIt:Clean">
+    <Target Name="BrowseAndDocIt:Clean" DependsOnTargets="BrowseAndDocItTests:Clean">
         <MSBuild Projects="BrowseAndDocIt.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BrowseAndDocIt:Make">
+    <Target Name="BrowseAndDocIt:Make" DependsOnTargets="BrowseAndDocItTests:Make">
         <MSBuild Projects="BrowseAndDocIt.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">

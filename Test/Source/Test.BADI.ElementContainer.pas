@@ -103,7 +103,7 @@ End;
 Procedure TestTElementContainer.TestAdd1;
 
 Begin
-  FElementContainer.Add('Hello', iiUsesItem, scPrivate, Nil);
+  FElementContainer.Add('Hello', iiUsesItem, scPrivate);
   CheckEquals(1, FElementContainer.ElementCount);
   CheckEquals('Hello', FElementContainer.Elements[1].Identifier);
 End;

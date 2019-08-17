@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    21 Jul 2019
 
   @license
 
@@ -36,7 +36,7 @@ Interface
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   BADI.Types,

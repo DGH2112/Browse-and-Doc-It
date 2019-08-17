@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    21 Jun 2019
+  @Date    17 Aug 2019
 
   @license
 
@@ -106,7 +106,8 @@ Type
     Function  Add(Const Token : TTokenInfo; Const AScope : TScope; Const AImageIndex : TBADIImageIndex;
       Const AComment : TComment) : TElementContainer; Overload; Virtual;
     Function  Add(Const strToken : String; Const AImageIndex : TBADIImageIndex;
-      Const AScope : TScope; Const AComment : TComment) : TElementContainer; Overload; Virtual;
+      Const AScope : TScope; Const iLine : Integer = 0; Const iColumn : Integer = 0;
+      Const AComment : TComment = Nil) : TElementContainer; Overload; Virtual;
     Function  AddUnique(Const AElement : TElementContainer) : TElementContainer; Virtual;
     Procedure AddTokens(Const AElement : TElementContainer); Virtual;
     Function  FindElement(Const strName : String;
@@ -291,12 +292,15 @@ Const
   @param   strToken    as a String as a constant
   @param   AImageIndex as a TBADIImageIndex as a constant
   @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
   @param   AComment    as a TComment as a constant
   @return  a TElementContainer
 
 **)
 Function TElementContainer.Add(Const strToken: String; Const AImageIndex: TBADIImageIndex;
-  Const AScope: TScope; Const AComment: TComment): TElementContainer;
+  Const AScope: TScope; Const iLine : Integer; Const iColumn : Integer;
+  Const AComment: TComment): TElementContainer;
 
 Var
   i: Integer;
@@ -306,7 +310,7 @@ Begin
   i := Find(strToken);
   If i < 0 Then
     Begin
-      Result := TLabelContainer.Create(strToken, AScope, 0, 0, AImageIndex, AComment);
+      Result := TLabelContainer.Create(strToken, AScope, iLine, iColumn, AImageIndex, AComment);
       Result.FParent := Self;
       FElements.Insert(Abs(i) - 1, Result);
     End
@@ -356,7 +360,7 @@ Begin
         Result.Comment.Assign(AElement.Comment);
       If Not AElement.ClassNameIs(Result.ClassName) Then
         Begin
-          E := FindRoot.Add(strErrors, iiErrorFolder, scNone, Nil);
+          E := FindRoot.Add(strErrors, iiErrorFolder, scNone);
           E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName, Result.ClassName,
             AElement.Name]), scNone, AElement.Line, AElement.Column, etError));
           Raise EBADIParserAbort.Create(strParsingAborted);

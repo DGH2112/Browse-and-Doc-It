@@ -18,9 +18,9 @@ object frameModuleExplorer: TframeModuleExplorer
   OnEnter = FrameEnter
   object stbStatusBar: TStatusBar
     Left = 0
-    Top = 394
+    Top = 391
     Width = 408
-    Height = 19
+    Height = 22
     Panels = <
       item
         Width = 65
@@ -34,8 +34,10 @@ object frameModuleExplorer: TframeModuleExplorer
       item
         Width = 50
       end>
+    ParentFont = True
     ParentShowHint = False
     ShowHint = True
+    UseSystemFont = False
   end
   object tbrExplorerScope: TToolBar
     Left = 0
@@ -162,17 +164,6 @@ object frameModuleExplorer: TframeModuleExplorer
       Top = 0
       Action = actTypes
     end
-  end
-  object edtExplorerFilter: TEdit
-    Left = 0
-    Top = 22
-    Width = 408
-    Height = 24
-    Align = alTop
-    TabOrder = 1
-    OnChange = edtExplorerFilterChange
-    OnKeyPress = edtExplorerFilterKeyPress
-    OnMouseActivate = edtExplorerFilterMouseActivate
   end
   object ilScopeImages: TImageList
     Left = 29

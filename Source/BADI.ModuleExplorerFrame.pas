@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Jul 2019
+  @Date    17 Aug 2019
 
   @license
 
@@ -176,6 +176,7 @@ Type
     FNodeData          : PBADITreeData;
     FTokenFontInfo     : TBADITokenFontInfoTokenSet;
     FBGColour          : TColor;
+    FFollowNode        : PVirtualNode;
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -237,12 +238,15 @@ Type
       Var CustomDraw: Boolean);
     Procedure tvExplorerMeasureItem(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; Var NodeHeight: Integer);
+    Procedure FocusFollowedNode;
+    Procedure tvExplorerNodeExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
   Public
     { Public declarations }
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
     procedure RenderModule(Const Module : TBaseLanguageModule);
+    Procedure FollowEditorCursor(Const iLine : Integer);
     (**
       This is an event for the selection change in the browser tree.
       @precon  None.
@@ -291,7 +295,8 @@ Uses
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.ModuleExplorer.TreeNodeInfo,
-  SysUtils;
+  SysUtils,
+  BADI.DocIssue;
 
 Resourcestring
   (** A format pattern for the bytes statusbar text. **)
@@ -496,14 +501,14 @@ Var
   NodeData : PBADITreeData;
   N : TBADITreeNodeInfo;
 
-begin
+Begin
   Result := FExplorer.AddChild(Parent);
   FExplorer.MultiLine[Result] := True;
   NodeData := FExplorer.GetNodeData(Result);
   N := TBADITreeNodeInfo.Create(strText, strName, iLevel, iImageIndex, boolTitle);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
-end;
+End;
 
 (**
 
@@ -530,6 +535,12 @@ begin
   Result := FExplorer.AddChild(Parent);
   FExplorer.MultiLine[Result] := True;
   NodeData := FExplorer.GetNodeData(Result);
+  If Element Is TDocumentConflict Then
+    NodeData.FNodeType := ntDocConflict
+  Else If Element Is TDocIssue Then
+    NodeData.FNodeType := ntDocIssue
+  Else
+    NodeData.FNodeType := ntElement;
   N := TBADITreeNodeInfo.Create(Element, iLevel);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
@@ -638,6 +649,8 @@ begin
   FExplorer.OnKeyPress := tvExplorerKeyPress;
   FExplorer.OnMeasureItem := tvExplorerMeasureItem;
   FExplorer.OnMouseMove := tvExplorerMouseMove;
+  FExplorer.OnExpanded := tvExplorerNodeExpanded;
+  FExplorer.OnCollapsed := tvExplorerNodeExpanded;
   FMouseEnter := False;
   FExplorer.NodeDataSize := SizeOf(TBADITreeData);
   FINIFileName := TBADIOptions.BADIOptions.INIFileName;
@@ -1271,6 +1284,7 @@ Begin
         stbStatusBar.SimplePanel := True;
       End;
   End;
+  FFollowNode := Nil;
   FExplorer.BeginUpdate;
   Try
     N := FExplorer.RootNode.FirstChild;
@@ -1312,6 +1326,12 @@ Begin
       Sender.IsVisible[Node] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
       If Sender.IsVisible[Node] Then
         Begin
+          If Not Assigned(FFollowNode) Then
+            Begin
+              FFollowNode := Node;
+              FExplorer.FocusedNode := FFollowNode;
+              FExplorer.ScrollIntoView(FFollowNode, True);
+            End;
           N := FExplorer.NodeParent[Node];
           While N <> Nil Do
             Begin
@@ -1376,6 +1396,73 @@ Begin
   Result := Nil;
   If strText <> '' Then
     Result := FindNode(FModule);
+End;
+
+(**
+
+  This method attempts to focus the FFollowNode in the treeview.
+
+  @precon  None.
+  @postcon If the FFollowNode is not visible the ifrst visible parent node is focused.
+
+**)
+Procedure TframeModuleExplorer.FocusFollowedNode;
+
+Var
+  Node: PVirtualNode;
+
+Begin
+  If Assigned(FFollowNode) And
+    ((FFollowNode <> Explorer.FocusedNode) Or Not Explorer.FullyVisible[Explorer.FocusedNode]) Then
+    Begin
+      Node := FFollowNode;
+      While Not Explorer.FullyVisible[Node] Do
+        Node := Explorer.NodeParent[Node];
+      If Assigned(Node) Then
+        Begin
+          Explorer.FocusedNode := Node;
+          Explorer.ScrollIntoView(Node, True);
+        End;
+    End;
+End;
+
+(**
+
+  This method attempts to focus the node (element) which contains the cursor line provided.
+
+  @precon  None.
+  @postcon If found the elements or its first visibel parent is focused.
+
+  @param   iLine as an Integer as a constant
+
+**)
+Procedure TframeModuleExplorer.FollowEditorCursor(Const iLine: Integer);
+
+Var
+  Node : PVirtualNode;
+  NodeData : PBADITreeData;
+  iNodeLine, iFollowLine : Integer;
+  
+Begin
+  iFollowLine := 0;
+  Node := Explorer.GetFirst();
+  While Assigned(Node) Do
+    Begin
+      NodeData := Explorer.GetNodeData(Node);
+      If NodeData.FNodeType = ntElement Then
+        Begin
+          iNodeLine := NodeData.FNode.Line;
+          If Assigned(NodeData.FNode.Comment) And (NodeData.FNode.Comment.Line > 0) Then
+            iNodeLine := NodeData.FNode.Comment.Line;
+          If (iLine >= iNodeLine) And (iNodeLine > iFollowLine) Then
+            Begin
+              FFollowNode := Node;
+              iFollowLine := iNodeLine;
+            End;
+        End;
+      Node := Explorer.GetNext(Node);
+    End;
+  FocusFollowedNode;
 End;
 
 (**
@@ -1717,6 +1804,7 @@ Begin
     FExplorer.BeginUpdate;
     Try
       edtExplorerFilter.Text := '';
+      FFollowNode := Nil;
       FExplorer.Clear;
       FNodeInfo.Clear;
       If Module = Nil Then
@@ -2179,6 +2267,23 @@ end;
 
 (**
 
+  This is an on node expanded / collapsed event handler for the explorer view.
+
+  @precon  None.
+  @postcon Attempts tto re-focus the followed node when nodes are expanded or collapsed.
+
+  @param   Sender as a TBaseVirtualTree
+  @param   Node   as a PVirtualNode
+
+**)
+Procedure TframeModuleExplorer.tvExplorerNodeExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
+
+Begin
+  FocusFollowedNode;
+End;
+
+(**
+
   This method update the status of the module explorer statusbar.
 
   @precon  M must be a valid instance of a TBaseLanguageModule.
@@ -2232,6 +2337,6 @@ begin
     End;
 end;
 
-
-//----------------------------------------------------------------------------------------
 End.
+
+

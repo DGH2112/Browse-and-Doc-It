@@ -4,9 +4,9 @@
 
   @note       This unit ONLY tokenizes C++ at the moment - the parser HAS NOT BEEN WRITTEN!
 
-  @Author     David Hoyle
-  @Version    1.0
-  @Date    21 Jun 2019
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    17 Aug 2019
 
   @license
 
@@ -2134,10 +2134,10 @@ Begin
       AddTickCount('Parse');
       CheckUnResolvedMethods;
       AddTickCount('Resolve');
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
       AddTickCount('Refs');

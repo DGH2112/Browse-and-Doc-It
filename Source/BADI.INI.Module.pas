@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    17 Aug 2019
 
   @license
 
@@ -236,10 +236,10 @@ Begin
     Begin
       ParseTokens;
       AddTickCount(strParse);
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
       AddTickCount(strRefs);

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Jul 2019
+  @Date    17 Aug 2019
 
   @license
 
@@ -59,7 +59,7 @@ Type
     Function  EditorInfo(var strFileName : String; var boolModified : Boolean) : String;
     Procedure RenderDocument(Const Module: TBaseLanguageModule);
     Procedure ExceptionMsg(Const strExceptionMsg : String);
-    Procedure CheckForCursorMovement(Const Editor : IOTASourceEditor);
+    Function CheckForCursorMovement(Const Editor : IOTASourceEditor) : TOTAEditPos;
     Procedure CheckFileNameAndSize(Const Editor : IOTASourceEditor);
     // INTAEditServicesNotifier
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
@@ -90,7 +90,7 @@ Uses
   Windows,
   Forms,
   BADI.Options,
-  Controls;
+  Controls, BADI.Types;
 
 (**
 
@@ -105,6 +105,7 @@ Uses
 Procedure TEditorNotifier.CheckFileNameAndSize(Const Editor : IOTASourceEditor);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckFileNameAndSize', tmoTiming);{$ENDIF}
   If Assigned(Editor) Then
     If Editor.FileName <> FLastEditorName Then
       Begin
@@ -118,30 +119,33 @@ End;
   This method checks for cursor movement when the timer is called.
 
   @precon  Editor must be a valid instance.
-  @postcon If the cursor has moved since last time the cursor position is updated and the
+  @postcon If the cursor has moved since last time the cursor position is updated and the 
            FLastUpdateTickCount is also updated.
 
   @param   Editor as an IOTASourceEditor as a constant
+  @return  a TOTAEditPos
 
 **)
-Procedure TEditorNotifier.CheckForCursorMovement(Const Editor : IOTASourceEditor);
+Function TEditorNotifier.CheckForCursorMovement(Const Editor : IOTASourceEditor) : TOTAEditPos;
 
 Var
   EditorSvcs : IOTAEditorServices;
-  P : TOTAEditPos;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckForCursorMovement', tmoTiming);{$ENDIF}
   If Assigned(Editor) Then
     Begin
       If Editor.GetEditViewCount > 0 Then
         If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
-          P := EditorSvcs.TopView.CursorPos;
-      If FLastUpdateTickCount > 0 Then
-        If (P.Col <> FLastCursorPos.Col) Or (P.Line <> FLastCursorPos.Line) Then
-          Begin
+          Result := EditorSvcs.TopView.CursorPos;
+      If (Result.Col <> FLastCursorPos.Col) Or (Result.Line <> FLastCursorPos.Line) Then
+        Begin
+          FLastCursorPos := Result;
+          If doFollowEditorCursor In TBADIOptions.BADIOptions.Options Then
+            TfrmDockableModuleExplorer.FollowEditorCursor(Result.Line);
+          If FLastUpdateTickCount > 0 Then
             FLastUpdateTickCount := GetTickCount;
-            FLastCursorPos := P;
-          End;
+        End;
     End;
 End;
 
@@ -159,6 +163,7 @@ Const
   iUpdateInterval = 100;
   
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
   FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
   FUpdateTimer := TTimer.Create(Nil);
@@ -179,6 +184,7 @@ end;
 **)
 destructor TEditorNotifier.Destroy;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   FupdateTimer.Enabled := False;
   FUpdateTimer.OnTimer := Nil;
   FUpdateTimer.Free;
@@ -203,6 +209,7 @@ end;
 **)
 procedure TEditorNotifier.DockFormRefresh(Const EditWindow: INTAEditWindow; DockForm: TDockableForm);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DockFormRefresh', tmoTiming);{$ENDIF}
 end;
 
 (**
@@ -220,10 +227,14 @@ end;
   @param   DockForm   as a TDockableForm
 
 **)
-procedure TEditorNotifier.DockFormUpdated(const EditWindow: INTAEditWindow;
-  DockForm: TDockableForm);
-begin
-end;
+Procedure TEditorNotifier.DockFormUpdated(Const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DockFormUpdated', tmoTiming); {$ENDIF}
+  FUpdateTimer.Enabled := True;
+  FLastParserResult := True;
+  FLastUpdateTickCount := 1;
+End;
 
 (**
 
@@ -243,6 +254,7 @@ end;
 procedure TEditorNotifier.DockFormVisibleChanged(const EditWindow: INTAEditWindow;
   DockForm: TDockableForm);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DockFormVisibleChanged', tmoTiming);{$ENDIF}
 end;
 
 (**
@@ -357,6 +369,7 @@ Const
     ProjOpsConfigs : IOTAProjectOptionsConfigurations;
     
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EditorInfo/SetStandardCompilerDefs', tmoTiming);{$ENDIF}
     TBADIOptions.BADIOptions.Defines.Add(strCompilerVersion);
     {$IFDEF DXE20}
     If Assigned(Project) Then
@@ -380,6 +393,7 @@ Var
   Project : IOTAProject;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EditorInfo', tmoTiming);{$ENDIF}
   Result := '';
   strFileName := '';
   boolModified := False;
@@ -419,6 +433,7 @@ Procedure TEditorNotifier.EditorViewActivated(Const EditWindow: INTAEditWindow;
   Const EditView: IOTAEditView);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EditorViewActivated', tmoTiming);{$ENDIF}
   FUpdateTimer.Enabled := True;
   FLastParserResult := True;
   FLastUpdateTickCount := 1;
@@ -441,6 +456,7 @@ End;
 procedure TEditorNotifier.EditorViewModified(const EditWindow: INTAEditWindow;
   const EditView: IOTAEditView);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EditorViewModified', tmoTiming);{$ENDIF}
   FLastUpdateTickCount := GetTickCount;
 end;
 
@@ -457,6 +473,7 @@ end;
 Procedure TEditorNotifier.EnableTimer(Const boolSuccessfulParse : Boolean);
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EnableTimer', tmoTiming);{$ENDIF}
   FUpdateTimer.Enabled := True;
   FLastParserResult := boolSuccessfulParse;
 end;
@@ -474,6 +491,7 @@ end;
 procedure TEditorNotifier.ExceptionMsg(Const strExceptionMsg: String);
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ExceptionMsg', tmoTiming);{$ENDIF}
   ShowMessage(strExceptionMsg);
 end;
 
@@ -488,8 +506,16 @@ end;
 
 **)
 Procedure TEditorNotifier.RenderDocument(Const Module: TBaseLanguageModule);
+
+Var
+  EditorSvcs : IOTAEditorServices;
+  
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RenderDocument', tmoTiming);{$ENDIF}
   TfrmDockableModuleExplorer.RenderDocumentTree(Module);
+  If doFollowEditorCursor In TBADIOptions.BADIOptions.Options Then
+    If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+      TfrmDockableModuleExplorer.FollowEditorCursor(EditorSvcs.TopView.CursorPos.Line);
 end;
 
 (**
@@ -505,6 +531,7 @@ end;
 procedure TEditorNotifier.ResetLastUpdateTickCount(Const iNewValue : Integer = 0);
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ResetLastUpdateTickCount', tmoTiming);{$ENDIF}
   FLastUpdateTickCount := iNewValue;
 end;
 
@@ -527,10 +554,12 @@ ResourceString
 
 Var
   Editor : IOTASourceEditor;
+  P: TOTAEditPos;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'TimerEventHandler', tmoTiming);{$ENDIF}
   Editor := TBADIToolsAPIFunctions.ActiveSourceEditor;
-  CheckForCursorMovement(Editor);
+  P := CheckForCursorMovement(Editor);
   CheckFileNameAndSize(Editor);
   If (FLastUpdateTickCount > 0) And
     (GetTickCount > FLastUpdateTickCount + TBADIOptions.BADIOptions.UpdateInterval) Then
@@ -566,6 +595,7 @@ end;
 **)
 procedure TEditorNotifier.WindowActivated(const EditWindow: INTAEditWindow);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowActivated', tmoTiming);{$ENDIF}
 end;
 
 (**
@@ -588,6 +618,7 @@ end;
 procedure TEditorNotifier.WindowCommand(const EditWindow: INTAEditWindow;
   Command, Param: Integer; var Handled: Boolean);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowCommand', tmoTiming);{$ENDIF}
 end;
 
 (**
@@ -607,6 +638,7 @@ end;
 procedure TEditorNotifier.WindowNotification(const EditWindow: INTAEditWindow;
   Operation: TOperation);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowNotification', tmoTiming);{$ENDIF}
 end;
 
 (**
@@ -627,6 +659,7 @@ end;
 procedure TEditorNotifier.WindowShow(const EditWindow: INTAEditWindow; Show,
   LoadedFromDesktop: Boolean);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowShow', tmoTiming);{$ENDIF}
 end;
 
 End.

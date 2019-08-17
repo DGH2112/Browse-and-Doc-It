@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    12 Jul 2019
+  @Date    14 Aug 2019
 
   @license
 
@@ -119,6 +119,7 @@ Type
     doCustomDrawing,
     doShowCommentHints,
     doShowChildCountInTitles,
+    doFollowEditorCursor,
 
     doShowErrors,
     doExpandErrors,

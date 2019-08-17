@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    14 Aug 2019
 
   @license
 
@@ -85,6 +85,8 @@ ResourceString
   strShowModuleChecks = 'Show Module Checks';
   (** Options text for showing child counts. **)
   strShowChildCountInTitles = 'Show Child Count in Titles';
+  (** Options text for following the editor cursor. **)
+  strFollowEditorCursor = 'Follow the Editor Cursor';
   (** Options text for automatically expanding errors. **)
   strExpandErrors = 'Automatically Expand Errors';
   (** Options text for automatically expanding warnings. **)

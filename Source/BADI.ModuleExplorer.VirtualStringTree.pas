@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    17 Aug 2019
 
   @license
 
@@ -46,9 +46,13 @@ Type
       Canvas: TCanvas = Nil) : Integer; Override;
   End;
 
+  (** This is an enumerate to defines the information type in the explorer module tree nodes. **)
+  TBADINodeType = (ntLabel, ntDocConflict, ntDocIssue, ntElement);
+
   (** This record described the data sorted in the virtual tree view. **)
   TBADITreeData = Record
     FNode : TBADITreeNodeInfo;
+    FNodeType : TBADINodeType;
   End;
   (** A type to define a pointer to the above tree record. **)
   PBADITreeData = ^TBADITreeData;

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 2.0
-  @Date    14 Jul 2019
+  @Date    17 Aug 2019
 
   @license
 
@@ -497,7 +497,7 @@ begin
                 Begin
                   E := CurrentMethod.FindElement(strAnonymousMethods);
                   If E = Nil Then
-                    E := CurrentMethod.Add(strAnonymousMethods, iiMethodsLabel, scNone, Nil);
+                    E := CurrentMethod.Add(strAnonymousMethods, iiMethodsLabel, scNone);
                   C := E;
                 End;
             End;
@@ -527,7 +527,7 @@ begin
           MethodsLabel := (C As TRecordDecl).FindElement(strMethodsLabel) As TLabelContainer;
           If MethodsLabel = Nil Then
             MethodsLabel := C.Add(
-              strMethodsLabel, iiMethodsLabel, scNone, Nil) As TLabelContainer;
+              strMethodsLabel, iiMethodsLabel, scNone) As TLabelContainer;
           C := MethodsLabel;
         End;
       tmpMethod := Method;
@@ -748,8 +748,7 @@ Begin
             Repeat
               Result.AddDimension;
               T := OrdinalType(TypeToken(Nil, scNone, Nil,
-                FTemporaryElements.Add(Format('%d', [Result.Dimensions]), iiNone,
-                scNone, Nil)));
+                FTemporaryElements.Add(Format('%d', [Result.Dimensions]), iiNone, scNone)));
               If T <> Nil Then
                 Result.AddTokens(T);
             Until Not IsToken(',', Result);
@@ -1176,8 +1175,7 @@ Begin
           ClassVarsLabel := Cls.FindElement(strClassVarsLabel) As TLabelContainer;
           If ClassVarsLabel = Nil Then
             ClassVarsLabel := Cls.Add(strClassVarsLabel,
-              iiPublicClassVariablesLabel, LabelScope,
-              GetComment) As TLabelContainer;
+              iiPublicClassVariablesLabel, LabelScope, 0, 0, GetComment) As TLabelContainer;
           V := ClassVarsLabel;
           NextNonCommentToken;
           While VarDecl(AScope, V, iiPublicClassVariable) Do
@@ -1858,8 +1856,7 @@ Begin
           ConstantsLabel := (Container As TRecordDecl).FindElement(strConstantsLabel) As TLabelContainer;
           If ConstantsLabel = Nil Then
             ConstantsLabel := Container.Add(
-              strConstantsLabel, iiPublicConstantsLabel, LabelScope,
-              GetComment) As TLabelContainer;
+              strConstantsLabel, iiPublicConstantsLabel, LabelScope, 0, 0, GetComment) As TLabelContainer;
           C := ConstantsLabel;
         End Else
           C := ASTLabel[alConstantsLabel];
@@ -1895,7 +1892,7 @@ Var
 Begin
   If Token.UToken = strCONTAINS Then
     Begin
-      C := Add(strContainsLabel, iiUsesLabel, scNone, GetComment);
+      C := Add(strContainsLabel, iiUsesLabel, scNone, Token.Line, Token.Column, GetComment);
       NextNonCommentToken;
       IdentList(C, scNone, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -1967,10 +1964,10 @@ Begin
       AddTickCount(strParse);
       CheckUnResolvedMethods;
       AddTickCount(strResolve);
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
       AddTickCount(strRefs);
@@ -2974,8 +2971,7 @@ begin
               tmpP := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
                 iiPublicField, I[j].Comment);
               If Cls.FieldsLabel = Nil Then
-                Cls.FieldsLabel := Cls.Add(strFieldsLabel, iiFieldsLabel, scNone,
-                  Nil) As TLabelContainer;
+                Cls.FieldsLabel := Cls.Add(strFieldsLabel, iiFieldsLabel, scNone) As TLabelContainer;
               P := Cls.FieldsLabel.Add(tmpP) As TField;
               If P <> tmpP Then
                 AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name,
@@ -3553,7 +3549,7 @@ Begin
         alExportsHeadingsLabel:    strLabel := strExportsLabel;
         alImplementedMethodsLabel: strLabel := strImplementedMethodsLabel;
       End;
-      FASTLabels[eLabel] := Add(strLabel, iiPublicVariablesLabel, scPrivate,
+      FASTLabels[eLabel] := Add(strLabel, iiPublicVariablesLabel, scPrivate, 0, 0,
         GetComment) As TLabelContainer;
     End;
   Result := FASTLabels[eLabel];
@@ -6620,8 +6616,7 @@ begin
         Begin
           PropertiesLabel := Cls.FindElement(strPropertiesLabel) As TLabelContainer;
           If PropertiesLabel = Nil Then
-            PropertiesLabel := Cls.Add(strPropertiesLabel, iiPropertiesLabel,
-              scNone, Nil) As TLabelContainer;
+            PropertiesLabel := Cls.Add(strPropertiesLabel, iiPropertiesLabel, scNone) As TLabelContainer;
           tmpP := TPascalProperty.Create(Token.Token, AScope, Token.Line,
             Token.Column, iiPublicProperty, C);
           P := PropertiesLabel.Add(tmpP) As TPascalProperty;
@@ -7596,7 +7591,7 @@ Var
 Begin
   If Token.UToken = strREQUIRES Then
     Begin
-      R := Add(strRequiresLabel, iiUsesLabel, scNone, GetComment);
+      R := Add(strRequiresLabel, iiUsesLabel, scNone, Token.Line, Token.Column, GetComment);
       NextNonCommentToken;
       IdentList(R, scNone, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -9107,7 +9102,7 @@ Begin
           TypesLabel := (Container As TRecordDecl).FindElement(strTypesLabel) As TLabelContainer;
           If TypesLabel = Nil Then
             TypesLabel := Container.Add(strTypesLabel,
-              iiPublicTypesLabel, LabelScope, GetComment) As TLabelContainer;
+              iiPublicTypesLabel, LabelScope, 0, 0, GetComment) As TLabelContainer;
           TL := TypesLabel;
         End Else
           TL := ASTLabel[alTypesLabel];
@@ -9374,8 +9369,7 @@ Begin
           VarsLabel := (Container As TRecordDecl).FindElement(strVarsLabel) As TLabelContainer;
           If VarsLabel = Nil Then
             VarsLabel := Container.Add(
-              strVarsLabel, iiPublicVariablesLabel, LabelScope,
-              GetComment) As TLabelContainer;
+              strVarsLabel, iiPublicVariablesLabel, LabelScope, 0, 0, GetComment) As TLabelContainer;
           V := VarsLabel;
         End Else
           V := ASTLabel[alVariablesLabel];

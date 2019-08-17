@@ -2,9 +2,9 @@
 
   DFMModule : A unit to tokenize DFM code.
 
-  @Author     David Hoyle
-  @Version    1.0
-  @Date    21 Jun 2019
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    17 Aug 2019
 
   @license
 
@@ -196,10 +196,10 @@ Begin
     Begin
       ParseTokens;
       AddTickCount('Parse');
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       AddTickCount('Refs');
       TidyUpEmptyElements;
     End;

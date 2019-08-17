@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Jul 2019
+  @Date    17 Aug 2019
 
   @license
 
@@ -78,6 +78,7 @@ Type
     Class Procedure RemoveDockableModuleExplorer;
     Class Procedure CreateDockableModuleExplorer;
     Class Procedure RenderDocumentTree(Const BaseLanguageModule: TBaseLanguageModule);
+    Class Procedure FollowEditorCursor(Const iLine : Integer);
     Class Procedure HookEventHandlers(Const SelectionChangeProc: TSelectionChange;
       Const Focus, ScopeChange: TNotifyEvent);
   End;
@@ -211,6 +212,24 @@ Begin
     If FModuleExplorerFrame.Visible Then
       If FModuleExplorerFrame.Explorer.Visible Then
         FModuleExplorerFrame.Explorer.SetFocus;
+End;
+
+(**
+
+  This class method allowsd the caller to update the selection in the explorer module to align with
+  the given line number that is being followed in the editor.
+
+  @precon  None.
+  @postcon The Module Explorer has its selection updated to reflect the line number.
+
+  @param   iLine as an Integer as a constant
+
+**)
+Class Procedure TfrmDockableModuleExplorer.FollowEditorCursor(Const iLine: Integer);
+
+Begin
+  If Assigned(FormInstance) Then
+    FormInstance.FModuleExplorerFrame.FollowEditorCursor(iLine);
 End;
 
 (**
@@ -404,5 +423,3 @@ Begin
 End;
 
 End.
-
-

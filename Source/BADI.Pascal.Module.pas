@@ -9168,12 +9168,12 @@ Begin
   If Token.UToken = strUCUSES Then
     Begin
       AComment := GetComment;
-      U := Add(strUses, iiUsesLabel, scNone, AComment);
+      U := Add(strUses, iiUsesLabel, scNone, 0, 0, AComment);
       If ModuleType = mtUnit Then
         If eScope = scPublic Then
-          U := U.Add(strInterfaceLabel, iiUsesLabel, scNone, Nil)
+          U := U.Add(strInterfaceLabel, iiUsesLabel, scNone, Token.Line, Token.Column, Nil)
         Else
-          U := U.Add(strImplementationLabel, iiUsesLabel, scNone, Nil);
+          U := U.Add(strImplementationLabel, iiUsesLabel, scNone, Token.Line, Token.Column, Nil);
       NextNonCommentToken;
       IdentList(U, eScope, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       // Stop Implementation units from being hinted

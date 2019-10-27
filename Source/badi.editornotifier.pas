@@ -515,7 +515,8 @@ begin
   TfrmDockableModuleExplorer.RenderDocumentTree(Module);
   If doFollowEditorCursor In TBADIOptions.BADIOptions.Options Then
     If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
-      TfrmDockableModuleExplorer.FollowEditorCursor(EditorSvcs.TopView.CursorPos.Line);
+      If Assigned(EditorSvcs.TopView) Then
+        TfrmDockableModuleExplorer.FollowEditorCursor(EditorSvcs.TopView.CursorPos.Line);
 end;
 
 (**

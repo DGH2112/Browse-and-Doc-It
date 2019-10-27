@@ -1,7 +1,7 @@
 [Setup]
 WarnBefore=0
 WarnAfter=0
-IncBuild=0
+IncBuild=1
 CopyVersionInfoFrom=
 ExcludedResExts=.dcr
 EnabledVersionInfo=0
@@ -13,6 +13,22 @@ ReleaseVer=0
 BuildVer=4776
 ResourceName=BADIVerInfo
 SaveModifiedFilesBeforeZipping=0
+IncBuild.Make.Base=1
+IncBuild.Build.Base=1
+IncBuild.Check.Base=0
+IncBuild.MakeUnit.Base=0
+IncBuild.Make.Debug=1
+IncBuild.Build.Debug=1
+IncBuild.Check.Debug=1
+IncBuild.MakeUnit.Debug=1
+IncBuild.Make.Release=0
+IncBuild.Build.Release=1
+IncBuild.Check.Release=0
+IncBuild.MakeUnit.Release=0
+IncBuild.Make.CodeSiteTracing=1
+IncBuild.Build.CodeSiteTracing=1
+IncBuild.Check.CodeSiteTracing=0
+IncBuild.MakeUnit.CodeSiteTracing=0
 
 [Zipping]
 Enabled=1

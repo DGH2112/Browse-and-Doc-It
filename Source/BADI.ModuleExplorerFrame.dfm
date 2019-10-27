@@ -704,4 +704,10 @@ object frameModuleExplorer: TframeModuleExplorer
       OnUpdate = actLocalUpdate
     end
   end
+  object tmFilter: TTimer
+    Interval = 100
+    OnTimer = tmFilterTimer
+    Left = 32
+    Top = 232
+  end
 end

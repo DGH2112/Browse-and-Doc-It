@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Aug 2019
+  @Date    27 Oct 2019
 
   @license
 
@@ -51,6 +51,7 @@ Uses
   ToolWin,
   VirtualTrees,
   StdCtrls,
+  ExtCtrls,
   RegularExpressions,
   BADI.Interfaces,
   BADI.Comment,
@@ -114,6 +115,7 @@ Type
     actChecks: TAction;
     actMetrics: TAction;
     tbtnMetrics: TToolButton;
+    tmFilter: TTimer;
     Procedure actLocalUpdate(Sender: TObject);
     Procedure actLocalExecute(Sender: TObject);
     Procedure FilterChange;
@@ -122,6 +124,7 @@ Type
     Procedure edtExplorerFilterMouseActivate(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y, HitTest: Integer; Var MouseActivate: TMouseActivate);
     Procedure edtExplorerFilterKeyPress(Sender: TObject; Var Key: Char);
+    procedure tmFilterTimer(Sender: TObject);
   Strict Private
     Type
       (** This record contains information about the special tag nodes. **)
@@ -142,7 +145,7 @@ Type
         FStart     : Integer;
         FLength    : Integer;
       End;
-      (** An enumerate to define the panels on the status bar. **)
+      (** An enumerate to define the panels on the status bar. @nohints **)
       TStatusPanelIndex = (
         spiBytes,
         spiTokens,
@@ -177,6 +180,8 @@ Type
     FTokenFontInfo     : TBADITokenFontInfoTokenSet;
     FBGColour          : TColor;
     FFollowNode        : PVirtualNode;
+    FFiltering         : Boolean;
+    FLastFilterUpdate  : Int64;
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -199,8 +204,6 @@ Type
       Const Container : TElementContainer; Const iLevel : Integer);
     Procedure UpdateStatusBar(Const Module : TBaseLanguageModule);
     Procedure ManageExpandedNodes;
-    Procedure FilterProc(Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer;
-      Var Abort: Boolean);
     Procedure SetStatusPanel(Const ePanel: TStatusPanelIndex; Const strStatusBarText: String;
       Const iValue: Integer);
     Procedure CMMouseLeave(Var Msg : TMessage); Message CM_MOUSELEAVE;
@@ -241,6 +244,7 @@ Type
     Procedure FocusFollowedNode;
     Procedure tvExplorerNodeExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure SetExplorerFilter(Const strValue : String);
+    Procedure tvExplorerChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     (**
       This property gets and set the filter text for the explorer view.
       @precon  None.
@@ -659,7 +663,9 @@ begin
   FExplorer.OnMouseMove := tvExplorerMouseMove;
   FExplorer.OnExpanded := tvExplorerNodeExpanded;
   FExplorer.OnCollapsed := tvExplorerNodeExpanded;
+  FExplorer.OnChange := tvExplorerChange;
   FMouseEnter := False;
+  FFiltering := False;
   FExplorer.NodeDataSize := SizeOf(TBADITreeData);
   FINIFileName := TBADIOptions.BADIOptions.INIFileName;
   FNodeInfo := TObjectList.Create(True);
@@ -668,6 +674,7 @@ begin
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
   ilScopeImages.Clear;
   LoadBADIImages(ilScopeImages);
+  FLastFilterUpdate := 0;
   FExplorer.OnGetText := tvExplorerGetText;
 end;
 
@@ -1276,7 +1283,8 @@ end;
 Procedure TframeModuleExplorer.FilterChange;
 
 Var
-  N : PVirtualNode;
+  N, P : PVirtualNode;
+  NodeData : PBADITreeData;
 
 Begin
   Try
@@ -1292,60 +1300,36 @@ Begin
   FFollowNode := Nil;
   FExplorer.BeginUpdate;
   Try
-    N := FExplorer.RootNode.FirstChild;
-    While N <> Nil Do
+    N := FExplorer.GetFirst;
+    While Assigned(N) Do
       Begin
-        FExplorer.IterateSubtree(N, FilterProc, Nil);
-        N := FExplorer.GetNextSibling(N);
+        If ExplorerFilter <> '' Then
+          Begin
+            NodeData := FExplorer.GetNodeData(N);
+            FExplorer.IsVisible[N] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
+            If FExplorer.IsVisible[N] Then
+              Begin
+                If Not Assigned(FFollowNode) Then
+                  FFollowNode := N;
+                P := FExplorer.NodeParent[N];
+                While Assigned(P) Do
+                  Begin
+                    FExplorer.IsVisible[P] := True;
+                    P := FExplorer.NodeParent[P];
+                  End;
+              End;
+          End Else
+            FExplorer.IsVisible[N] := True;
+        N := FExplorer.GetNext(N);
       End;
   Finally
     FExplorer.EndUpdate;
   End;
-End;
-
-(**
-
-  This is a call back mechanism for the tree view in otder to determine whether a node
-  when iterated can be visible.
-
-  @precon  None.
-  @postcon Filters the visible cells in the tree view if they match the filter text.
-
-  @param   Sender as a TBaseVirtualTree
-  @param   Node   as a PVirtualNode
-  @param   Data   as a Pointer
-  @param   Abort  as a Boolean as a reference
-
-**)
-Procedure TframeModuleExplorer.FilterProc(Sender: TBaseVirtualTree; Node: PVirtualNode;
-  Data: Pointer; Var Abort: Boolean);
-
-Var
-  NodeData : PBADITreeData;
-  N : PVirtualNode;
-
-Begin
-  NodeData := Sender.GetNodeData(Node);
-  If ExplorerFilter <> '' Then
+  If Assigned(FFollowNode) Then
     Begin
-      Sender.IsVisible[Node] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
-      If Sender.IsVisible[Node] Then
-        Begin
-          If Not Assigned(FFollowNode) Then
-            Begin
-              FFollowNode := Node;
-              FExplorer.FocusedNode := FFollowNode;
-              FExplorer.ScrollIntoView(FFollowNode, True);
-            End;
-          N := FExplorer.NodeParent[Node];
-          While N <> Nil Do
-            Begin
-              Sender.IsVisible[N] := True;
-              N := FExplorer.NodeParent[N];
-            End;
-        End;
-    End Else
-      Sender.IsVisible[Node] := True;
+      FExplorer.FocusedNode := FFollowNode;
+      FExplorer.ScrollIntoView(FFollowNode, True);
+    End;
 End;
 
 (**
@@ -1421,7 +1405,7 @@ Begin
     ((FFollowNode <> Explorer.FocusedNode) Or Not Explorer.FullyVisible[Explorer.FocusedNode]) Then
     Begin
       Node := FFollowNode;
-      While Not Explorer.FullyVisible[Node] Do
+      While Assigned(Node) And Not Explorer.FullyVisible[Node] Do
         Node := Explorer.NodeParent[Node];
       If Assigned(Node) Then
         Begin
@@ -1945,6 +1929,30 @@ End;
 
 (**
 
+  This is an on timer event handelr for the filter text.
+
+  @precon  None.
+  @postcon Attempts to filter the text in the treeview.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.tmFilterTimer(Sender: TObject);
+
+Const
+  iUpdateInterval = 250;
+
+Begin
+  If (FLastFilterUpdate > 0) And (GetTickCount64 > FLastFilterUpdate + iUpdateInterval) Then
+    Try
+      edtExplorerFilterChange(Self);
+    Finally
+      FLastFilterUpdate := 0;
+    End;
+End;
+
+(**
+
   This is an on After Cell Paint event handler for the interfaces tree view.
 
   @precon  None.
@@ -2056,6 +2064,23 @@ end;
 
 (**
 
+  This is an on change event handler for the Explorer Module VTV control.
+
+  @precon  None.
+  @postcon Updates the Follow Node.
+
+  @param   Sender as a TBaseVirtualTree
+  @param   Node   as a PVirtualNode
+
+**)
+Procedure TframeModuleExplorer.tvExplorerChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+
+Begin
+  FFollowNode := Node;
+End;
+
+(**
+
   This is an on click event handler for the explorer tree view.
 
   @precon  None.
@@ -2064,12 +2089,12 @@ end;
   @param   Sender as a TObject
 
  **)
-procedure TframeModuleExplorer.tvExplorerClick(Sender: TObject);
+Procedure TframeModuleExplorer.tvExplorerClick(Sender: TObject);
 
 Var
-  NodeData : PBADITreeData;
+  NodeData: PBADITreeData;
 
-begin
+Begin
   If FSelectionChanging Then
     Exit;
   FSelectionChanging := True;
@@ -2087,7 +2112,7 @@ begin
   Finally
     FSelectionChanging := False;
   End;
-end;
+End;
 
 (**
 
@@ -2164,36 +2189,44 @@ Var
   ShiftStates: TShiftState;
 
 Begin
-  Case Key Of
-    #08:
-      Begin
-        ExplorerFilter := Copy(ExplorerFilter, 1, Length(ExplorerFilter) - 1);
-        edtExplorerFilterChange(Sender);
-        Key := #0;
+  If Not FFiltering Then
+    Begin
+      FFiltering := True;
+      Try
+        Case Key Of
+          #08:
+            Begin
+              ExplorerFilter := Copy(ExplorerFilter, 1, Length(ExplorerFilter) - 1);
+              FLastFilterUpdate := GetTickCount64;
+              Key := #0;
+            End;
+          #13:
+            Begin
+              tvExplorerClick(Sender);
+              GetKeyboardState(KeyStates);
+              ShiftStates := KeyboardStateToShiftState(KeyStates);
+              If ShiftStates = [] Then
+                If Assigned(OnFocus) Then
+                  FFocus(Sender);
+              Key := #0;
+            End;
+          #27:
+            Begin
+              ExplorerFilter := '';
+              FLastFilterUpdate := GetTickCount64;
+              Key := #0;
+            End;
+          #32..#128:
+            Begin
+              ExplorerFilter := ExplorerFilter + Key;
+              FLastFilterUpdate := GetTickCount64;
+              Key := #0;
+            End;
+        End;
+      Finally
+        FFiltering := False;
       End;
-    #13:
-      Begin
-        tvExplorerClick(Sender);
-        GetKeyboardState(KeyStates);
-        ShiftStates := KeyboardStateToShiftState(KeyStates);
-        If ShiftStates = [] Then
-          If Assigned(OnFocus) Then
-            FFocus(Sender);
-        Key := #0;
-      End;
-    #27:
-      Begin
-        ExplorerFilter := '';
-        edtExplorerFilterChange(Sender);
-        Key := #0;
-      End;
-    #32..#128:
-      Begin
-        ExplorerFilter := ExplorerFilter + Key;
-        edtExplorerFilterChange(Sender);
-        Key := #0;
-      End;
-  End;
+    End;
 End;
 
 (**
@@ -2367,5 +2400,3 @@ begin
 end;
 
 End.
-
-

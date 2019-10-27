@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    15 Aug 2019
+  @Date    27 Oct 2019
 
   @license
 
@@ -231,6 +231,9 @@ uses
 {$R *.res}
 
 begin
+  {$IFDEF DEBUG}
+  ReportMemoryLeaksOnShutdown := True;
+  {$ENDIF DEBUG} 
   {$IFDEF EUREKALOG}
   SetEurekaLogState(True);
   {$ENDIF EUREKALOG}

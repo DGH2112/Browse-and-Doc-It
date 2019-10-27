@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    25 Jun 2019
+  @Date    25 Aug 2019
 
   @license
 
@@ -58,7 +58,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes;
+  UITypes, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -872,7 +872,7 @@ Begin
           While Assigned(N) Do
             Begin
               NodeData := FVSTMetrics.GetNodeData(N);
-              If NodeData.FMetrics[MetricColumns[eColumn].FMetric] >
+              If NodeData.FMetrics[MetricColumns[eColumn].FMetric] >=
                 FLimits.FMetrics[MetricColumns[eColumn].FMetric] Then
                 Inc(iCount);
               N := FVSTMetrics.GetNext(N);

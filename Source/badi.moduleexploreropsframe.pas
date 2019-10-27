@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    22 Sep 2019
 
   @license
 
@@ -378,6 +378,7 @@ Begin
   FIssueLimits[ltWarnings] := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];
   FIssueLimits[ltHints] := TBADIOptions.BADIOptions.IssueLimits[ltHints];
   FIssueLimits[ltConflicts] := TBADIOptions.BADIOptions.IssueLimits[ltConflicts];
+  FIssueLimits[ltChecks] := TBADIOptions.BADIOptions.IssueLimits[ltChecks];
   FIssueLimits[ltMetrics] := TBADIOptions.BADIOptions.IssueLimits[ltMetrics];
   cbxLimits.ItemIndex := 0;
   cbxLimitsChange(Nil);
@@ -415,6 +416,7 @@ Begin
   TBADIOptions.BADIOptions.IssueLimits[ltWarnings] := FIssueLimits[ltWarnings];
   TBADIOptions.BADIOptions.IssueLimits[ltHints] := FIssueLimits[ltHints];
   TBADIOptions.BADIOptions.IssueLimits[ltConflicts] := FIssueLimits[ltConflicts];
+  TBADIOptions.BADIOptions.IssueLimits[ltChecks] := FIssueLimits[ltChecks];
   TBADIOptions.BADIOptions.IssueLimits[ltMetrics] := FIssueLimits[ltMetrics];
 End;
 

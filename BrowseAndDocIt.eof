@@ -2,7 +2,6 @@
 
 [Exception Log]
 EurekaLog Version=8000
-_CustomProfile=""
 Activate=1
 bugIDUseLineNumberCallStack=1
 csoShowELThreads=1
@@ -26,4 +25,5 @@ ProjectID="{AD4C15A1-5A9C-4C71-B023-C105C0474BA9}"
 seMAPI=1
 Sender Classes="TELMailSimpleMAPISender;TELMailMAPISender"
 seSMAPI=1
+_CustomProfile=""
 

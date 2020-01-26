@@ -59,7 +59,7 @@ Procedure TestTDocumentConflict.SetUp;
 Begin
   FDocumentConflict := TDocumentConflict.Create(['First', 'Second'], 12, 23, 34,
     45, 'This is a message with a first parameter (%s) and a second parameter (%s).',
-    'This is a description string.', iiDocConflictMissing);
+    'This is a description string.', iiDocConflictMissing, ctDocumentation);
 End;
 
 Procedure TestTDocumentConflict.TearDown;

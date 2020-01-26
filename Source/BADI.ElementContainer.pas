@@ -4,8 +4,8 @@
   and a label container for tree view headers adn the like.
 
   @Author  David Hoyle
-  @Version 1.1
-  @Date    17 Aug 2019
+  @Version 1.11
+  @Date    19 Jan 2020
 
   @license
 
@@ -479,12 +479,8 @@ Begin
   E := FindRoot;
   E := AddRootContainer(E, strChecks, iiCheckFolder);
   E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiCheckFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltChecks] Then
-    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
-      ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltChecks] Then
-    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiCheckMissing));
+  E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
+    ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon, ctCheck));
 End;
 
 (**
@@ -519,12 +515,8 @@ Begin
   E := FindRoot;
   E := AddRootContainer(E, strDocumentationConflicts, iiDocConflictFolder);
   E := AddCategory(E, strCategory, iiDocConflictFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltConflicts] Then
-    E.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iLine, iColumn,
-      DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltConflicts] Then
-    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiDocConflictMissing));
+  E.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iLine, iColumn,
+    DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon, ctDocumentation));
 End;
 
 (**
@@ -549,26 +541,13 @@ Procedure TElementContainer.AddIssue(Const strFmtMsg: String; Const strParameter
 
 Var
   i: TElementContainer;
-  iCount: Integer;
-  iIssueLimit: Integer;
 
 Begin
   If Not CheckEWHOptions(ErrorType) Or CheckForNoEWH(ErrorType, strParameters, Container) Then
     Exit;
   I := FindRoot;
   I := AddRootContainer(I, recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage);
-  iCount := i.ElementCount;
-  Case ErrorType Of
-    etError:   iIssueLimit := BADIOptions.IssueLimits[ltErrors];
-    etWarning: iIssueLimit := BADIOptions.IssueLimits[ltWarnings];
-    etHint:    iIssueLimit := BADIOptions.IssueLimits[ltHints];
-  Else
-    iIssueLimit := BADIOptions.IssueLimits[ltErrors];
-  End;
-  If iCount < iIssueLimit Then
-    i.Add(TDocIssue.Create(Format(strFmtMsg, strParameters), AScope, iLine, iCol, ErrorType))
-  Else If iCount = iIssueLimit Then
-    i.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 0, 0, ErrorType));
+  i.Add(TDocIssue.Create(Format(strFmtMsg, strParameters), AScope, iLine, iCol, ErrorType));
 End;
 
 (**
@@ -591,26 +570,13 @@ Procedure TElementContainer.AddIssue(Const strMsg: String; Const AScope: TScope;
 
 Var
   i: TElementContainer;
-  iCount: Integer;
-  iIssueLimit: Integer;
 
 Begin
   If Not CheckEWHOptions(ErrorType) Or CheckForNoEWH(ErrorType, [Container.Identifier], Container) Then
     Exit;
   I := FindRoot;
   I := AddRootContainer(I, recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage);
-  iCount := i.ElementCount;
-  Case ErrorType Of
-    etError:   iIssueLimit := BADIOptions.IssueLimits[ltErrors];
-    etWarning: iIssueLimit := BADIOptions.IssueLimits[ltWarnings];
-    etHint:    iIssueLimit := BADIOptions.IssueLimits[ltHints];
-  Else
-    iIssueLimit := BADIOptions.IssueLimits[ltErrors];
-  End;
-  If iCount < iIssueLimit Then
-    i.Add(TDocIssue.Create(strMsg, AScope, iLine, iCol, ErrorType))
-  Else If iCount = iIssueLimit Then
-    i.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 0, 0, ErrorType));
+  i.Add(TDocIssue.Create(strMsg, AScope, iLine, iCol, ErrorType));
 End;
 
 (**
@@ -658,12 +624,10 @@ Begin
   E := FindRoot;
   E := AddRootContainer(E, strMetrics, iiMetricFolder);
   E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
-    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
-      ModuleMetrics[eMetric].FMessage, ModuleMetrics[eMetric].FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
-    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiMetricMissing));
+  E.Add(
+    TDocumentConflict.Create(Args, iLine, iColumn, iL, iC, ModuleMetrics[eMetric].FMessage,
+      ModuleMetrics[eMetric].FDescription, iIcon, ctMetric)
+  );
 End;
 
 (**

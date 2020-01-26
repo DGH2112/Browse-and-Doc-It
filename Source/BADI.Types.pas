@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.1
-  @Date    14 Aug 2019
+  @Version 1.11
+  @Date    19 Jan 2020
 
   @license
 
@@ -91,6 +91,8 @@ Type
   TMethodType = (mtConstructor, mtDestructor, mtProcedure, mtFunction, mtOperator);
   (** An enumerate for warning and errors. **)
   TErrorType = (etHint, etWarning, etError);
+  (** An enumerate for the type of documentation conflict. **)
+  TBADIConflictType = (ctDocumentation, ctMetric, ctCheck);
   (** A type to return an array of strings **)
   TKeyWords = Array of String;
   (** A type for a set of AnsiChar - used for the function IsInSet() **)

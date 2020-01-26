@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    27 Oct 2019
+  @Version 1.01
+  @Date    19 Jan 2020
 
   @license
 
@@ -46,13 +46,14 @@ Uses
   ImgList,
   ComCtrls,
   Contnrs,
-  BADI.Base.Module,
+  Generics.Collections,
   ActnList,
   ToolWin,
   VirtualTrees,
   StdCtrls,
   ExtCtrls,
   RegularExpressions,
+  BADI.Base.Module,
   BADI.Interfaces,
   BADI.Comment,
   BADI.ElementContainer,
@@ -245,6 +246,7 @@ Type
     Procedure tvExplorerNodeExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure SetExplorerFilter(Const strValue : String);
     Procedure tvExplorerChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    Function MaxLimit(Const Container: TElementContainer) : Integer;
     (**
       This property gets and set the filter text for the explorer view.
       @precon  None.
@@ -1682,6 +1684,39 @@ end;
 
 (**
 
+  This method returns the limit for adding child nodes to a node.
+
+  @precon  Container must be a valid instance.
+  @postcon Returns the limit for adding child nodes to a node.
+
+  @param   Container as a TElementContainer as a constant
+  @return  an Integer
+
+**)
+Function TframeModuleExplorer.MaxLimit(Const Container: TElementContainer) : Integer;
+
+Const
+  iDefaultMaxLimit = 9999;
+  
+Begin
+  Result := iDefaultMaxLimit;
+  If Container.ElementCount > 0 Then
+    If Container.Elements[1] Is TDocumentConflict Then
+      Case TDocumentConflict(Container.Elements[1]).ConflictType Of
+        ctDocumentation: Result := TBADIOptions.BADIOptions.IssueLimits[ltConflicts];
+        ctMetric:        Result := TBADIOptions.BADIOptions.IssueLimits[ltMetrics];
+        ctCheck:         Result := TBADIOptions.BADIOptions.IssueLimits[ltChecks];
+      End
+    Else If Container.Elements[1] Is TDocumentConflict Then
+      Case TDocIssue(Container.Elements[1]).ErrorType Of
+        etHint:    Result := TBADIOptions.BADIOptions.IssueLimits[ltHints];
+        etWarning: Result := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];
+        etError:   Result := TBADIOptions.BADIOptions.IssueLimits[ltErrors];  
+      End;
+End;
+
+(**
+
   This method outputs the modules information as items in the treeview.
 
   @precon  M is a valid instance of a TBaseLanguageModule that has been parsed.
@@ -1732,16 +1767,32 @@ end;
 procedure TframeModuleExplorer.RenderContainers(Const RootNode : PVirtualNode;
   Const Container: TElementContainer; Const iLevel : Integer);
 
+Const
+  strTooManyConflictsName = 'TooManyConflicts';
+
 Var
   i : Integer;
   NewNode : PVirtualNode;
+  iLimit : Integer;
+  iCount : Integer;
 
 begin
+  iLimit := MaxLimit(Container);
+  iCount := 0;
   For i := 1 To Container.ElementCount Do
     If Container.Elements[i].Scope In TBADIOptions.BADIOptions.ScopesToRender + [scNone, scGlobal] Then
       Begin
-        NewNode := AddNode(RootNode, Container.Elements[i], iLevel);
-        RenderContainers(NewNode, Container[i], iLevel + 1);
+      If iCount < iLimit Then
+        Begin
+          NewNode := AddNode(RootNode, Container.Elements[i], iLevel);
+          Inc(iCount);
+          RenderContainers(NewNode, Container[i], iLevel + 1);
+        End Else
+        Begin
+          AddNode(RootNode, Format(strTooManyConflicts, [Container.ElementCount]),
+            strTooManyConflictsName, iLevel, Container.Elements[i].ImageIndexAdjustedForScope);
+          Break;
+        End;
       End;
 end;
 

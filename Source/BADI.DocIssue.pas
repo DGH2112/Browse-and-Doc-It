@@ -3,8 +3,8 @@
   This module contains class to represent document issues and conflicts.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    15 Aug 2019
+  @Version 1.1
+  @Date    19 Jan 2020
 
   @license
 
@@ -70,11 +70,12 @@ Type
     FMessage       : String;
     FCommentLine   : Integer;
     FCommentColumn : Integer;
+    FConflictType  : TBADIConflictType;
   Public
     //: @nometric LongParameterList
     Constructor Create(Const Args: Array Of Const; Const iIdentLine, iIdentColumn, iCommentLine,
       iCommentCol : Integer; Const strDocConflictMsg, strDocConflictDesc : String;
-      Const AImageIndex : TBADIImageIndex); ReIntroduce;
+      Const AImageIndex : TBADIImageIndex; Const eConflictType : TBADIConflictType); ReIntroduce;
     Destructor Destroy; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
@@ -95,6 +96,13 @@ Type
       @return  an Integer
     **)
     Property CommentColumn : Integer Read FCommentColumn;
+    (**
+      This property returns the type of the document conflict.
+      @precon  None.
+      @postcon Returns the type of the document conflict.
+      @return  a TBADIConflictType
+    **)
+    Property ConflictType : TBADIConflictType Read FConflictType;
   End;
 
 Implementation
@@ -196,7 +204,7 @@ End;
   @precon  None.
   @postcon Initialises the Conflict class.
 
-  @nometric LongParameterList
+  @nometricLongParameterList
 
   @param   Args               as an Array Of Const as a constant
   @param   iIdentLine         as an Integer as a constant
@@ -206,11 +214,12 @@ End;
   @param   strDocConflictMsg  as a String as a constant
   @param   strDocConflictDesc as a String as a constant
   @param   AImageIndex        as a TBADIImageIndex as a constant
+  @param   eConflictType      as a TBADIConflictType as a constant
 
 **)
 Constructor TDocumentConflict.Create(Const Args: Array Of Const; Const iIdentLine, iIdentColumn,
   iCommentLine, iCommentCol: Integer; Const strDocConflictMsg, strDocConflictDesc: String;
-  Const AImageIndex: TBADIImageIndex);
+  Const AImageIndex: TBADIImageIndex; Const eConflictType : TBADIConflictType);
 
 Const
   strOutputFmt = '%4.4d';
@@ -218,6 +227,7 @@ Const
 Begin
   Inherited Create(Format(strOutputFmt, [iDocConflictCounter]), scGlobal, iIdentLine, iIdentColumn,
     AImageIndex, Nil);
+  FConflictType := eConflictType;
   Inc(iDocConflictCounter);
   If Length(Args) > 0 Then
     FMessage := Format(strDocConflictMsg, Args)

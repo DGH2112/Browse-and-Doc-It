@@ -606,7 +606,7 @@ ResourceString
     'developers known which portion of the module are automatically ' +
     'destroyed.';
   (** Label for too many document conflicts. **)
-  strTooManyConflicts = 'Too many documentation conflicts';
+  strTooManyConflicts = 'Too many documentation conflicts (%d)';
   (** Document conflicts message for too many documentation conflicts. **)
   strTooManyConflictsDesc = 'Browse and Doc It limits the number of conflicts that ' +
     'can be see at any time. This can be changed in the options.';

@@ -522,6 +522,7 @@ Begin
   N := TBADITreeNodeInfo.Create(strText, strName, iLevel, iImageIndex, boolTitle);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
+  FExplorer.InvalidateNode(Result); //: @note Used to recalc node height due to bug in VTV
 End;
 
 (**
@@ -558,6 +559,7 @@ begin
   N := TBADITreeNodeInfo.Create(Element, iLevel);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
+  FExplorer.InvalidateNode(Result); //: @note Used to recalc node height due to bug in VTV
 end;
 
 (**
@@ -596,6 +598,7 @@ Begin
     BackColour, Comment);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
+  FExplorer.InvalidateNode(Result); //: @note Used to recalc node height due to bug in VTV
 End;
 
 (**

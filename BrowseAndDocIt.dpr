@@ -226,7 +226,8 @@ uses
   BADI.IDEThemingNotifier in 'Source\BADI.IDEThemingNotifier.pas',
   BADI.Exclusions in 'Source\BADI.Exclusions.pas',
   BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas',
-  ProgressForm in 'Externals\ProgressForm.pas' {frmProgress};
+  ProgressForm in 'Externals\ProgressForm.pas' {frmProgress},
+  BADI.IDENotifier in 'Source\BADI.IDENotifier.pas';
 
 {$R *.res}
 

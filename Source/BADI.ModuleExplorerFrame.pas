@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.01
-  @Date    19 Jan 2020
+  @Date    26 Jan 2020
 
   @license
 
@@ -183,6 +183,7 @@ Type
     FFollowNode        : PVirtualNode;
     FFiltering         : Boolean;
     FLastFilterUpdate  : Int64;
+    FDocConflictIssues : Array[TLimitType] Of TList<Integer>;
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -1710,7 +1711,7 @@ Begin
         ctMetric:        Result := TBADIOptions.BADIOptions.IssueLimits[ltMetrics];
         ctCheck:         Result := TBADIOptions.BADIOptions.IssueLimits[ltChecks];
       End
-    Else If Container.Elements[1] Is TDocumentConflict Then
+    Else If Container.Elements[1] Is TDocIssue Then
       Case TDocIssue(Container.Elements[1]).ErrorType Of
         etHint:    Result := TBADIOptions.BADIOptions.IssueLimits[ltHints];
         etWarning: Result := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];

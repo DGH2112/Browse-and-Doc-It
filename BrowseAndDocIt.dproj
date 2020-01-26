@@ -370,6 +370,7 @@
         <DCCReference Include="Externals\ProgressForm.pas">
             <Form>frmProgress</Form>
         </DCCReference>
+        <DCCReference Include="Source\BADI.IDENotifier.pas"/>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>
@@ -446,7 +447,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="BrowseAndDocIt.dll" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="BrowseAndDocItXE103.dll" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>BrowseAndDocIt.dll</RemoteName>
                         <Overwrite>true</Overwrite>

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    26 Jan 2020
 
   @license
 
@@ -418,6 +418,19 @@ Type
     Function GetIDEEditorColours(Var iBGColour : TColor) : TBADITokenFontInfoTokenSet;
   End;
 
+  (** This interface allows a module notifier to have the indexed file renamed for removing the
+      notifier from the IDE. **)
+  IBADIModuleNotifierList = Interface
+  ['{60E0D688-F529-4798-A06C-C283F800B7FE}']
+    Procedure Add(Const strFileName : String; Const iIndex : Integer);
+    Function  Remove(Const strFileName: String): Integer;
+    Procedure Rename(Const strOldFileName, strNewFileName : String);
+  End;
+
+  (** This is an event signature that need to the implemented by module and project notifiers so that
+      the module notifier lists can be updated. **)
+  TBADIModuleRenameEvent = Procedure(Const strOldFilename, strNewFilename : String) Of Object;
+  
 Implementation
 
 End.

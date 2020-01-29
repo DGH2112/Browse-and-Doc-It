@@ -227,7 +227,9 @@ uses
   BADI.Exclusions in 'Source\BADI.Exclusions.pas',
   BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas',
   ProgressForm in 'Externals\ProgressForm.pas' {frmProgress},
-  BADI.IDENotifier in 'Source\BADI.IDENotifier.pas';
+  BADI.IDENotifier in 'Source\BADI.IDENotifier.pas',
+  BADI.ModuleNotifierList in 'Source\BADI.ModuleNotifierList.pas',
+  BADI.ModuleNotifier in 'Source\BADI.ModuleNotifier.pas';
 
 {$R *.res}
 

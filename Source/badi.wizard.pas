@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jul 2019
+  @Date    26 Jan 2020
 
   @license
 
@@ -92,7 +92,7 @@ Uses
   BADI.SplashScreen, 
   BADI.AboutBox, 
   BADI.BNFHighlighter,
-  BADI.EidolonHighlighter;
+  BADI.EidolonHighlighter, BADI.IDENotifier;
 
 (**
 
@@ -124,6 +124,7 @@ Begin
   RegisterChecksEditorView;
   RegisterEditorMetricsSubView;
   RegisterEditorChecksSubView;
+  TBADIIDENotifier.InstallIDENotifier;
 End;
 
 (**
@@ -137,6 +138,7 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
+  TBADIIDENotifier.UninstallIDENotifier;
   UnregisterEditorChecksSubView;
   UnregisterEditorMetricsSubView;
   UnregisterChecksEditorView;

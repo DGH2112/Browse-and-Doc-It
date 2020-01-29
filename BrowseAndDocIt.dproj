@@ -371,6 +371,8 @@
             <Form>frmProgress</Form>
         </DCCReference>
         <DCCReference Include="Source\BADI.IDENotifier.pas"/>
+        <DCCReference Include="Source\BADI.ModuleNotifierList.pas"/>
+        <DCCReference Include="Source\BADI.ModuleNotifier.pas"/>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

@@ -229,7 +229,9 @@ uses
   ProgressForm in 'Externals\ProgressForm.pas' {frmProgress},
   BADI.IDENotifier in 'Source\BADI.IDENotifier.pas',
   BADI.ModuleNotifierList in 'Source\BADI.ModuleNotifierList.pas',
-  BADI.ModuleNotifier in 'Source\BADI.ModuleNotifier.pas';
+  BADI.ModuleNotifier in 'Source\BADI.ModuleNotifier.pas',
+  BADI.ModuleStats in 'Source\BADI.ModuleStats.pas',
+  BADI.ModuleStatsList in 'Source\BADI.ModuleStatsList.pas';
 
 {$R *.res}
 

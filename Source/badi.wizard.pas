@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    26 Jan 2020
+  @Date    01 Feb 2020
 
   @license
 
@@ -41,6 +41,7 @@ Uses
   ExtCtrls,
   Contnrs,
   {$ENDIF}
+  BADI.Interfaces,
   BADI.EditorNotifier,
   BADI.IDEOptionsInstaller,
   BADI.IDEMenuInstaller;
@@ -57,6 +58,7 @@ Type
     FEditorIndex             : Integer;
     FBNFHighlighterIndex     : Integer;
     FEidolonHighlighterIndex : Integer;
+    FModuleStatsList         : IBADIModuleStatsList;
   Strict Protected
     // IOTAWizard
     Function GetIDString: String;
@@ -92,7 +94,9 @@ Uses
   BADI.SplashScreen, 
   BADI.AboutBox, 
   BADI.BNFHighlighter,
-  BADI.EidolonHighlighter, BADI.IDENotifier;
+  BADI.EidolonHighlighter,
+  BADI.IDENotifier,
+  BADI.ModuleStatsList;
 
 (**
 
@@ -112,7 +116,8 @@ Begin
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
   AddSplashScreen;
   AddAboutBoxEntry;
-  FEditorNotifier := TEditorNotifier.Create;
+  FModuleStatsList := TBADIModuleStatsList.Create;
+  FEditorNotifier := TEditorNotifier.Create(FModuleStatsList);
   FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(FEditorNotifier);
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
@@ -124,7 +129,7 @@ Begin
   RegisterChecksEditorView;
   RegisterEditorMetricsSubView;
   RegisterEditorChecksSubView;
-  TBADIIDENotifier.InstallIDENotifier;
+  TBADIIDENotifier.InstallIDENotifier(FModuleStatsList);
 End;
 
 (**

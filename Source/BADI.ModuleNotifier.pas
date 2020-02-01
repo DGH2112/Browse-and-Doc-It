@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 1.01
-  @Date    29 Jan 2020
+  @Version 1.02
+  @Date    01 Feb 2020
 
   @license
 

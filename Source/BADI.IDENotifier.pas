@@ -5,8 +5,28 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    26 Jan 2020
+  @Date    01 Feb 2020
   
+  @license
+
+    Browse and Doc It is a RAD Studio plug-in for browsing, checking and
+    documenting your code.
+    
+    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 **)
 Unit BADI.IDENotifier;
 
@@ -26,6 +46,7 @@ Type
       FIDENotifierIndex : Integer;
   Strict Private
     FModuleNotifiers : IBADIModuleNotifierList;
+    FModuleStatsList : IBADIModuleStatsList;
   Strict Protected
     // IOTAIDENotifier
     Procedure AfterCompile(Succeeded: Boolean); Overload;
@@ -44,9 +65,9 @@ Type
     Procedure UninstallModuleNotifier(Const M: IOTAModule; Const FileName: String);
     Procedure ModuleRenameEvent(Const strOldFileName, strNewFileName : String);
   Public
-    Constructor Create;
+    Constructor Create(Const ModuleStatsList : IBADIModuleStatsList);
     Destructor Destroy; Override;
-    Class Procedure InstallIDENotifier;
+    Class Procedure InstallIDENotifier(Const ModuleStatsList : IBADIModuleStatsList);
     Class Procedure UninstallIDENotifier;
   End;
 
@@ -167,12 +188,15 @@ End;
   @precon  None.
   @postcon Creates a module notifier list to hold the module notifiers created.
 
+  @param   ModuleStatsList as an IBADIModuleStatsList as a constant
+
 **)
-Constructor TBADIIDENotifier.Create;
+Constructor TBADIIDENotifier.Create(Const ModuleStatsList : IBADIModuleStatsList);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   FModuleNotifiers := TBADIModuleNotifierList.Create;
+  FModuleStatsList := ModuleStatsList;
 End;
 
 (**
@@ -236,8 +260,10 @@ End;
   @precon  None.
   @postcon The IDE Notifier is installed.
 
+  @param   ModuleStatsList as an IBADIModuleStatsList as a constant
+
 **)
-Class Procedure TBADIIDENotifier.InstallIDENotifier;
+Class Procedure TBADIIDENotifier.InstallIDENotifier(Const ModuleStatsList : IBADIModuleStatsList);
 
 Var
   S : IOTAServices;
@@ -245,7 +271,7 @@ Var
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TBADIIDENotifier.InstallIDENotifier', tmoTiming);{$ENDIF}
   If Supports(BorlandIDEServices, IOTAServices, S) Then
-    FIDENotifierIndex := S.AddNotifier(TBADIIDENotifier.Create);
+    FIDENotifierIndex := S.AddNotifier(TBADIIDENotifier.Create(ModuleStatsList));
 End;
 
 (**
@@ -264,7 +290,15 @@ Procedure TBADIIDENotifier.InstallModuleNotifier(Const M: IOTAModule; Const File
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InstallModuleNotifier', tmoTiming);{$ENDIF}
-  FModuleNotifiers.Add(FileName, M.AddNotifier(TBADIModuleNotifier.Create(FileName, ModuleRenameEvent)));
+  FModuleNotifiers.Add(
+    FileName,
+    M.AddNotifier(
+      TBADIModuleNotifier.Create(
+        FileName,
+        ModuleRenameEvent
+      )
+    )
+  );
 End;
 
 (**
@@ -283,6 +317,7 @@ Procedure TBADIIDENotifier.ModuleRenameEvent(Const strOldFileName, strNewFileNam
 
 Begin
   FModuleNotifiers.Rename(strOldFileName, strNewFileName);
+  FModuleStatsList.Rename(strOldFileName, strNewFileName);
 End;
 
 (**

@@ -181,7 +181,11 @@ uses
   Test.BADI.Refactoring.Functions in 'Source\Test.BADI.Refactoring.Functions.pas',
   BADI.Interfaces in '..\Source\BADI.Interfaces.pas',
   BADI.IDEEditorColours in '..\Source\BADI.IDEEditorColours.pas',
-  BADI.Exclusions in '..\Source\BADI.Exclusions.pas';
+  BADI.Exclusions in '..\Source\BADI.Exclusions.pas',
+  BADI.ModuleStats in '..\Source\BADI.ModuleStats.pas',
+  Test.BADI.ModuleStats in 'Source\Test.BADI.ModuleStats.pas',
+  BADI.ModuleStatsList in '..\Source\BADI.ModuleStatsList.pas',
+  Test.BADI.ModuleStatsList in 'Source\Test.BADI.ModuleStatsList.pas';
 
 {$R *.RES}
 

@@ -1,8 +1,8 @@
 LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
 
 1 VERSIONINFO LOADONCALL MOVEABLE DISCARDABLE IMPURE
-FILEVERSION 1, 3, 2, 8098
-PRODUCTVERSION 1, 3, 2, 8098
+FILEVERSION 1, 3, 2, 8103
+PRODUCTVERSION 1, 3, 2, 8103
 FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
 FILEOS VOS__WINDOWS32
 FILETYPE VFT_APP
@@ -13,7 +13,7 @@ FILETYPE VFT_APP
     {
       VALUE "CompanyName", "Season's Fall Music Limited (c) 1989\000"
       VALUE "FileDescription", "A Delphi IDE adding for browsing and documenting code\000"
-      VALUE "FileVersion", "1.3.2.8098\000"
+      VALUE "FileVersion", "1.3.2.8103\000"
       VALUE "InternalName", "Season's Fall Music Limited (c) 1989\000"
       VALUE "LegalCopyright", "Season's Fall Music Limited (c) 1989\000"
       VALUE "LegalTrademarks", "Season's Fall Music Limited (c) 1989\000"

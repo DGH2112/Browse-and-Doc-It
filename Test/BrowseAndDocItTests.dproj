@@ -292,6 +292,10 @@
         <DCCReference Include="..\Source\BADI.Interfaces.pas"/>
         <DCCReference Include="..\Source\BADI.IDEEditorColours.pas"/>
         <DCCReference Include="..\Source\BADI.Exclusions.pas"/>
+        <DCCReference Include="..\Source\BADI.ModuleStats.pas"/>
+        <DCCReference Include="Source\Test.BADI.ModuleStats.pas"/>
+        <DCCReference Include="..\Source\BADI.ModuleStatsList.pas"/>
+        <DCCReference Include="Source\Test.BADI.ModuleStatsList.pas"/>
         <None Include="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage"/>
         <None Include="..\Source\CompilerDefinitions.inc"/>
         <BuildConfiguration Include="Debug">

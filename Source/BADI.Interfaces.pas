@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    26 Jan 2020
+  @Date    01 Feb 2020
 
   @license
 
@@ -430,6 +430,28 @@ Type
   (** This is an event signature that need to the implemented by module and project notifiers so that
       the module notifier lists can be updated. **)
   TBADIModuleRenameEvent = Procedure(Const strOldFilename, strNewFilename : String) Of Object;
+
+  (** An interface to manage the size of a file (module) and the size of the changes made to the
+      file. **)
+  IBADIModuleStats = Interface
+    Procedure Update(Const iSize : Int64);
+    Function  SizeChange : Int64;
+    Procedure Reset();
+  End;
+
+  (** An interface to manage a dictionary of IBADT=IModuleStats. **)
+  IBADIModuleStatsList = Interface
+    Function  GetModuleStats(Const strFileName : String) : IBADIModuleStats;
+    Procedure Rename(Const strOldFileName, strNewFileName : String);
+    (**
+      This method returns an interfaces of the module stats for the given filename.
+      @precon  None.
+      @postcon Returns an interfaces of the module stats for the given filename.
+      @param   strFileName as a String as a constant
+      @return  an IBADIModuleStats
+    **)
+    Property  ModuleStats[Const strFileName : String] : IBADIModuleStats Read GetModuleStats; Default;
+  End;
   
 Implementation
 

@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.0
+  @Version 1.007
   @Author  David Hoyle
-  @Date    27 Oct 2019
+  @Date    02 Feb 2020
 
   @license
 
@@ -231,7 +231,9 @@ uses
   BADI.ModuleNotifierList in 'Source\BADI.ModuleNotifierList.pas',
   BADI.ModuleNotifier in 'Source\BADI.ModuleNotifier.pas',
   BADI.ModuleStats in 'Source\BADI.ModuleStats.pas',
-  BADI.ModuleStatsList in 'Source\BADI.ModuleStatsList.pas';
+  BADI.ModuleStatsList in 'Source\BADI.ModuleStatsList.pas',
+  BADI.SourceEditorNotifier in 'Source\BADI.SourceEditorNotifier.pas',
+  BADI.EditViewNotifier in 'Source\BADI.EditViewNotifier.pas';
 
 {$R *.res}
 

@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 1.004
+  @Version 1.038
   @Date    02 Feb 2020
 
   @license
@@ -388,7 +388,7 @@ Const
         End;
     {$ELSE}
     TBADIOptions.BADIOptions.Defines.Add(strWIN32);
-    TBADIOptions.BADIOptions.Defines.Add(sreMSWINDOWS);
+    TBADIOptions.BADIOptions.Defines.Add(strMSWINDOWS);
     {$ENDIF}
   
   End;
@@ -645,11 +645,11 @@ end;
   @param   Operation  as a TOperation
 
 **)
-procedure TEditorNotifier.WindowNotification(const EditWindow: INTAEditWindow;
-  Operation: TOperation);
-begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowNotification', tmoTiming);{$ENDIF}
-end;
+Procedure TEditorNotifier.WindowNotification(Const EditWindow: INTAEditWindow; Operation: TOperation);
+
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowNotification', tmoTiming); {$ENDIF}
+End;
 
 (**
 

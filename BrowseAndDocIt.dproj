@@ -375,6 +375,8 @@
         <DCCReference Include="Source\BADI.ModuleNotifier.pas"/>
         <DCCReference Include="Source\BADI.ModuleStats.pas"/>
         <DCCReference Include="Source\BADI.ModuleStatsList.pas"/>
+        <DCCReference Include="Source\BADI.SourceEditorNotifier.pas"/>
+        <DCCReference Include="Source\BADI.EditViewNotifier.pas"/>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

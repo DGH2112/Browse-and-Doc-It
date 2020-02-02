@@ -4,7 +4,7 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 1.02
+  @Version 1.027
   @Date    02 Feb 2020
 
   @license
@@ -57,13 +57,14 @@ Type
     Function  CheckOverwrite: Boolean;
     Procedure ModuleRenamed(Const NewName: String);
     // IOTAModuleNotifier80
-    Function AllowSave: Boolean;
-    Function GetOverwriteFileNameCount: Integer;
-    Function GetOverwriteFileName(Index: Integer): String;
+    Function  AllowSave: Boolean;
+    Function  GetOverwriteFileNameCount: Integer;
+    Function  GetOverwriteFileName(Index: Integer): String;
     Procedure SetSaveFileName(Const FileName: String);
     // IOTAModuleNotifier90
     Procedure BeforeRename(Const OldFileName, NewFileName: String);
     Procedure AfterRename(Const OldFileName, NewFileName: String);
+    // General Methods
     procedure UpdateDateTimeAndVersion;
     Function  ModuleSource : String;
     Procedure OutputMsg(Const strMsg : String);
@@ -486,8 +487,7 @@ Begin
       strHeaderComment := MHMC.Item[0].Groups[0].Value;
       MM := FModuleVersion.Match(strHeaderComment);
       UpdateModuleVersion(MM);
-    End Else
-      OutputMsg(strNoModuleComment);
+    End;
   strSource := ModuleSource;
   MHMC := FModuleHeader.Matches(strSource);
   If MHMC.Count > 0 Then

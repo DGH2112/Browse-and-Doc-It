@@ -4,7 +4,7 @@
   their size and size deltas.
 
   @Author  David Hoyle
-  @Version 1.0
+  @Version 1.009
   @Date    02 Feb 2020
   
   @license
@@ -56,6 +56,7 @@ Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF DEBUG}
+  System.SysUtils,
   BADI.ModuleStats;
 
 (**
@@ -128,12 +129,13 @@ Var
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Rename', tmoTiming);{$ENDIF}
-  If FModuleList.ContainsKey(strOldFileName) Then
-    Begin
-      MS := FModuleList[strOldFileName];
-      FModuleList.Add(strNewFileName, MS);
-      FModuleList.Remove(strOldFileName);
-    End;
+  If CompareText(strOldFileName, strNewFileName) <> 0 Then
+    If FModuleList.ContainsKey(strOldFileName) Then
+      Begin
+        MS := FModuleList[strOldFileName];
+        FModuleList.Add(strNewFileName, MS);
+        FModuleList.Remove(strOldFileName);
+      End;
 End;
 
 End.

@@ -4,8 +4,8 @@
   module save events to see if there have been changes in the files.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    01 Feb 2020
+  @Version 1.309
+  @Date    02 Feb 2020
   
   @license
 
@@ -45,8 +45,9 @@ Type
       (** An integer to hold the IDE Notifier Index. **)
       FIDENotifierIndex : Integer;
   Strict Private
-    FModuleNotifiers : IBADIModuleNotifierList;
-    FModuleStatsList : IBADIModuleStatsList;
+    FModuleNotifiers   : IBADIModuleNotifierList;
+    FModuleStatsList   : IBADIModuleStatsList;
+    FEditViewNotifiers : IBADIModuleNotifierList;
   Strict Protected
     // IOTAIDENotifier
     Procedure AfterCompile(Succeeded: Boolean); Overload;
@@ -64,6 +65,8 @@ Type
     Procedure InstallModuleNotifier(Const M: IOTAModule; Const FileName: String);
     Procedure UninstallModuleNotifier(Const M: IOTAModule; Const FileName: String);
     Procedure ModuleRenameEvent(Const strOldFileName, strNewFileName : String);
+    Procedure InstallEditViewNotifier(Const M : IOTAModule);
+    Procedure UninstallEditViewNotifier(Const M : IOTAModule);
   Public
     Constructor Create(Const ModuleStatsList : IBADIModuleStatsList);
     Destructor Destroy; Override;
@@ -77,7 +80,10 @@ Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF DEBUG}
-  System.SysUtils, BADI.ModuleNotifierList, BADI.ModuleNotifier;
+  System.SysUtils,
+  BADI.ModuleNotifierList,
+  BADI.ModuleNotifier,
+  BADI.SourceEditorNotifier;
 
 (**
 
@@ -197,6 +203,7 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   FModuleNotifiers := TBADIModuleNotifierList.Create;
   FModuleStatsList := ModuleStatsList;
+  FEditViewNotifiers := TBADIModuleNotifierList.Create;
 End;
 
 (**
@@ -255,6 +262,32 @@ End;
 
 (**
 
+  This method installs a source editor notifier for the given module.
+
+  @precon  None.
+  @postcon The source editor notifier is installed.
+
+  @param   M as an IOTAModule as a constant
+
+**)
+Procedure TBADIIDENotifier.InstallEditViewNotifier(Const M: IOTAModule);
+
+Var
+  i: Integer;
+  E : IOTAEditor;
+  SE : IOTASourceEditor;
+
+Begin
+  For i := 0 To M.GetModuleFileCount - 1 Do
+    Begin
+      E := M.GetModuleFileEditor(i);
+      If Supports(E, IOTASourceEditor, SE) Then
+        FEditViewNotifiers.Add(M.FileName, SE.AddNotifier(TBADISourceEditorNotifier.Create));
+    End;
+End;
+
+(**
+
   This class method installs the IDE notifier.
 
   @precon  None.
@@ -300,6 +333,7 @@ Begin
       )
     )
   );
+  InstallEditViewNotifier(M);
 End;
 
 (**
@@ -319,6 +353,37 @@ Procedure TBADIIDENotifier.ModuleRenameEvent(Const strOldFileName, strNewFileNam
 Begin
   FModuleNotifiers.Rename(strOldFileName, strNewFileName);
   FModuleStatsList.Rename(strOldFileName, strNewFileName);
+  FEditViewNotifiers.Rename(strOldFileName, strNewFileName);
+End;
+
+(**
+
+  This method uninstalls a source editor notifier for the given module.
+
+  @precon  None.
+  @postcon The source editor notifier is uninstalled.
+
+  @param   M as an IOTAModule as a constant
+
+**)
+Procedure TBADIIDENotifier.UninstallEditViewNotifier(Const M: IOTAModule);
+
+Var
+  i: Integer;
+  E: IOTAEditor;
+  SE : IOTASourceEditor;
+  iIndex : Integer;
+
+Begin
+  For i := 0 To M.GetModuleFileCount - 1 Do
+    Begin
+      E := M.GetModuleFileEditor(i);
+      If Supports(E, IOTASourceEditor, SE) Then
+        Begin
+          iIndex := FEditViewNotifiers.Remove(M.FileName);
+          SE.RemoveNotifier(iIndex);
+        End;
+    End;
 End;
 
 (**
@@ -358,6 +423,7 @@ Var
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallModuleNotifier', tmoTiming);{$ENDIF}
+  UninstallEditViewNotifier(M);
   iIndex := FModuleNotifiers.Remove(FileName);
   If iIndex > -1 Then
     M.RemoveNotifier(iIndex);

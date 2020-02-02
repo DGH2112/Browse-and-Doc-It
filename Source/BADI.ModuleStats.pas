@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Feb 2020
+  @Date    02 Feb 2020
   
   @license
 
@@ -68,7 +68,7 @@ Uses
 Constructor TBADIModuleStats.Create;
 
 Begin
-  CodeSite.TraceMethod(Self, 'Create', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   FSize := -1;
   FSizeDelta := 0;
 End;
@@ -84,7 +84,7 @@ End;
 Destructor TBADIModuleStats.Destroy;
 
 Begin
-  CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   Inherited;
 End;
 
@@ -99,7 +99,7 @@ End;
 Procedure TBADIModuleStats.Reset();
 
 Begin
-  CodeSite.TraceMethod(Self, 'Reset', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Reset', tmoTiming);{$ENDIF}
   FSizeDelta := 0;
 End;
 
@@ -116,9 +116,8 @@ End;
 Function TBADIModuleStats.SizeChange: Int64;
 
 Begin
-  CodeSite.TraceMethod(Self, 'SizeChange', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SizeChange', tmoTiming);{$ENDIF}
   Result := FSizeDelta;
-  CodeSite.Send('SizeChange', Result);
 End;
 
 (**
@@ -135,13 +134,15 @@ End;
 Procedure TBADIModuleStats.Update(Const iSize: Int64);
 
 Begin
-  CodeSite.TraceMethod(Self, 'Update', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Update', tmoTiming);{$ENDIF}
   If FSize > -1 Then
     Inc(FSizeDelta, Abs(FSize - iSize));
   FSize := iSize;
-  CodeSite.SendFmtMsg('Size: %d, Delta: %d', [FSize, FSizeDelta]);
 End;
 
 End.
+
+
+
 
 

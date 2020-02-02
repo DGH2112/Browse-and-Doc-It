@@ -294,6 +294,7 @@ Begin
     FileName,
     M.AddNotifier(
       TBADIModuleNotifier.Create(
+        FModuleStatsList,
         FileName,
         ModuleRenameEvent
       )

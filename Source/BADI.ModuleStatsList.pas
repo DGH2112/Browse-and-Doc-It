@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Feb 2020
+  @Date    02 Feb 2020
   
   @license
 
@@ -69,7 +69,7 @@ Uses
 Constructor TBADIModuleStatsList.Create;
 
 Begin
-  CodeSite.TraceMethod(Self, 'Create', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   FModuleList := TDictionary<String,IBADIModuleStats>.Create;
 End;
 
@@ -84,7 +84,7 @@ End;
 Destructor TBADIModuleStatsList.Destroy;
 
 Begin
-  CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   FModuleList.Free;
   Inherited;
 End;
@@ -104,6 +104,7 @@ End;
 Function TBADIModuleStatsList.GetModuleStats(Const strFileName: String): IBADIModuleStats;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetModuleStats', tmoTiming);{$ENDIF}
   If Not FModuleList.ContainsKey(strFileName) Then
     FModuleList.Add(strFileName, TBADIModuleStats.Create);
   Result := FModuleList[strFileName];
@@ -126,6 +127,7 @@ Var
   MS: IBADIModuleStats;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Rename', tmoTiming);{$ENDIF}
   If FModuleList.ContainsKey(strOldFileName) Then
     Begin
       MS := FModuleList[strOldFileName];
@@ -135,4 +137,5 @@ Begin
 End;
 
 End.
+
 

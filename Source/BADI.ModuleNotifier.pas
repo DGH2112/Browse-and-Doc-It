@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.02
-  @Date    01 Feb 2020
+  @Date    02 Feb 2020
 
   @license
 
@@ -34,6 +34,7 @@ Interface
 
 Uses
   ToolsAPI,
+  System.RegularExpressions,
   BADI.Interfaces;
 
 Type
@@ -43,6 +44,10 @@ Type
   Strict Private
     FFileName          : String;
     FModuleRenameEvent : TBADIModuleRenameEvent;
+    FModuleStatsList   : IBADIModuleStatsList;
+    FModuleHeader      : TRegEx;
+    FModuleDateTime    : TRegEx;
+    FModuleVersion     : TRegEx;
   Strict Protected
     // IOTAModuleNotifier
     Procedure AfterSave;
@@ -59,8 +64,16 @@ Type
     // IOTAModuleNotifier90
     Procedure BeforeRename(Const OldFileName, NewFileName: String);
     Procedure AfterRename(Const OldFileName, NewFileName: String);
+    procedure UpdateDateTimeAndVersion;
+    Function  ModuleSource : String;
+    Procedure OutputMsg(Const strMsg : String);
+    Procedure CheckForLastSecondUpdates;
+    Procedure UpdateModuleVersion(Const Match : TMatch);
+    Procedure UpdateModuleDate(Const Match : TMatch);
+    Procedure OutputSource(Const strText : String; Const iOffset, iLength : Integer);
   Public
-    Constructor Create(Const strFileName : String; Const ModuleRenameEvent: TBADIModuleRenameEvent);
+    Constructor Create(Const ModuleStatsList : IBADIModuleStatsList; Const strFileName : String;
+      Const ModuleRenameEvent: TBADIModuleRenameEvent);
     Destructor Destroy; Override;
   End;
 
@@ -71,7 +84,9 @@ Uses
   CodeSiteLogging,
   {$ENDIF DEBUG}
   System.SysUtils,
-  BADI.ToolsAPIUtils;
+  System.Math,
+  BADI.Functions,
+  BADI.ToolsAPIUtils, BADI.Types;
 
 (**
 
@@ -105,7 +120,7 @@ Procedure TBADIModuleNotifier.AfterSave;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AfterSave', tmoTiming);{$ENDIF}
-  //: @todo Reset module file size counter here!
+  FModuleStatsList.ModuleStats[FFileName].Reset;
 End;
 
 (**
@@ -157,7 +172,23 @@ Procedure TBADIModuleNotifier.BeforeSave;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeforeSave', tmoTiming);{$ENDIF}
-  //: @todo Implement updating the date and version here!
+  CheckForLastSecondUpdates;
+  If FModuleStatsList.ModuleStats[FFileName].SizeChange > 0 Then
+    UpdateDateTimeAndVersion;
+End;
+
+(**
+
+  This method checks to last second changes to the size of the source code.
+
+  @precon  None.
+  @postcon The module statistics are updated.
+
+**)
+Procedure TBADIModuleNotifier.CheckForLastSecondUpdates;
+
+Begin
+  FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length);
 End;
 
 (**
@@ -184,17 +215,26 @@ End;
   @precon  None.
   @postcon Stores the module filenamer and the module rename event.
 
+  @param   ModuleStatsList   as an IBADIModuleStatsList as a constant
   @param   strFileName       as a String as a constant
   @param   ModuleRenameEvent as a TBADIModuleRenameEvent as a constant
 
 **)
-Constructor TBADIModuleNotifier.Create(Const strFileName : String;
-  Const ModuleRenameEvent: TBADIModuleRenameEvent);
+Constructor TBADIModuleNotifier.Create(Const ModuleStatsList : IBADIModuleStatsList;
+  Const strFileName : String; Const ModuleRenameEvent: TBADIModuleRenameEvent);
+
+Const strModuleHeaderRegEx = '^\s*[(/]\*\*.*?\*\*[)/]';
+  strDateRegEx = '\@Date\s+(\w+[\s\\\/\-]+\w+[\s\\\/\-]+\w+)';
+  strVersionRegEx = '\@version\s+(\d+.\d+)';
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
+  FModuleStatsList := ModuleStatsList;
   FFileName := strFileName;
   FModuleRenameEvent := ModuleRenameEvent;
+  FModuleHeader := TRegEx.Create(strModuleHeaderRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
+  FModuleDateTime := TRegEx.Create(strDateRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
+  FModuleVersion := TRegEx.Create(strVersionRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
 End;
 
 (**
@@ -303,6 +343,105 @@ End;
 
 (**
 
+  This method retreives the source code for the modules filename.
+
+  @precon  None.
+  @postcon The modules source code is returned.
+
+  @return  a String
+
+**)
+Function TBADIModuleNotifier.ModuleSource: String;
+
+Var
+  MS : IOTAModuleServices;
+  M: IOTAModule;
+  SE: IOTASourceEditor;
+  
+Begin
+  Result := '';
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      M := MS.FindModule(FFileName);
+      If Assigned(M) Then
+        Begin
+          SE := TBADIToolsAPIFunctions.SourceEditor(M);
+          If Assigned(SE) Then
+            Result := TBADIToolsAPIFunctions.EditorAsString(SE);
+        End;
+    End;
+End;
+
+(**
+
+  This method outputs a message to the message window in the IDE.
+
+  @precon  None.
+  @postcon A message is output to the IDEs message window.
+
+  @param   strMsg as a String as a constant
+
+**)
+Procedure TBADIModuleNotifier.OutputMsg(Const strMsg: String);
+
+Const
+  strBADI = 'BADI';
+
+Var
+  MS : IOTAMessageServices;
+
+Begin
+  If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
+    MS.AddToolMessage(
+      FFileName,
+      strMsg,
+      strBADI,
+      1,
+      1
+    );
+End;
+
+(**
+
+  This method outputs the given text at the given offset into the module after deleting the text
+  at the offset with the given length.
+
+  @precon  None.
+  @postcon The module version number is updated.
+
+  @param   strText as a String as a constant
+  @param   iOffset as an Integer as a constant
+  @param   iLength as an Integer as a constant
+
+**)
+Procedure TBADIModuleNotifier.OutputSource(Const strText: String; Const iOffset, iLength: Integer);
+
+Var
+  MS: IOTAModuleServices;
+  M: IOTAModule;
+  SE: IOTASourceEditor;
+  Writer: IOTAEditWriter;
+  
+Begin
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      M := MS.FindModule(FFileName);
+      If Assigned(M) Then
+        Begin
+          SE := TBADIToolsAPIFunctions.SourceEditor(M);
+          If Assigned(SE) Then
+            Begin
+              Writer := SE.CreateUndoableWriter;
+              Writer.CopyTo(iOffset);
+              Writer.DeleteTo(iOffset + iLength);
+              Writer.Insert(PAnsiChar(UTF8Encode(strText)));
+            End;
+        End;
+    End;
+End;
+
+(**
+
   This is a setter method for the SaveFileName property.
 
   @precon  None.
@@ -318,6 +457,144 @@ Procedure TBADIModuleNotifier.SetSaveFileName(Const FileName: String);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SetSaveFileName', tmoTiming);{$ENDIF}
+End;
+
+(**
+
+  This method attempts to update the module version number and date time in the modules header comment.
+
+  @precon  None.
+  @postcon The modules header comment (if found) is updated with the latest date time and version number.
+
+**)
+Procedure TBADIModuleNotifier.UpdateDateTimeAndVersion;
+
+ResourceString
+  strNoModuleComment = 'This module does not have a header comment!';
+
+Var
+  strSource: String;
+  MHMC: TMatchCollection;
+  strHeaderComment: String;
+  MM: TMatch;
+
+Begin
+  strSource := ModuleSource;
+  MHMC := FModuleHeader.Matches(strSource);
+  If MHMC.Count > 0 Then
+    Begin
+      strHeaderComment := MHMC.Item[0].Groups[0].Value;
+      MM := FModuleVersion.Match(strHeaderComment);
+      UpdateModuleVersion(MM);
+    End Else
+      OutputMsg(strNoModuleComment);
+  strSource := ModuleSource;
+  MHMC := FModuleHeader.Matches(strSource);
+  If MHMC.Count > 0 Then
+    Begin
+      strHeaderComment := MHMC.Item[0].Groups[0].Value;
+      MM := FModuleDateTime.Match(strHeaderComment);
+      UpdateModuleDate(MM);
+    End Else
+      OutputMsg(strNoModuleComment);
+End;
+
+(**
+
+  This method updates the modules date.
+
+  @precon  None.
+  @postcon The module date is updated if the existing date is valid.
+
+  @param   Match as a TMatch as a constant
+
+**)
+Procedure TBADIModuleNotifier.UpdateModuleDate(Const Match : TMatch);
+
+ResourceString
+  strModuleDateUpdated = 'Module date updated from %s to %s.';
+  strNotValidDate = '"%s" is not a valid date!';
+
+Const
+  strDefaultDateFmt = 'dd mmm yyyy';
+
+Var
+  strDate: String;
+  dtDate: TDateTime;
+  strNewDate : String;
+
+Begin
+  If Match.Success Then
+    Begin
+      strDate := Match.Groups[1].Value;
+      Try
+        dtDate := ConvertDate(strDate);
+        If Trunc(dtDate) <> Trunc(Now()) Then
+          Begin
+            strNewDate := FormatDateTime(strDefaultDateFmt, Now());
+            OutputSource(
+              strNewDate,
+              Match.Groups[1].Index - 1,
+              Match.Groups[1].Length
+            );
+            OutputMsg(Format(strModuleDateUpdated, [strDate, strNewDate]));
+          End;
+      Except
+        On E : EBADIParserError Do
+          OutputMsg(Format(strNotValidDate, [strDate]));
+      End;
+    End;
+End;
+
+(**
+
+  This method updates the modules version number.
+
+  @precon  None.
+  @postcon The module version number is updated if the existing version number is valid.
+
+  @param   Match as a TMatch as a constant
+
+**)
+Procedure TBADIModuleNotifier.UpdateModuleVersion(Const Match : TMatch);
+
+ResourceString
+  strVerIncremented = 'Module version number incremented from %s to %s!';
+  strNotValidVerNum = '"%s" is not a valid version number.';
+
+Const
+  dblChangeFactor = 10000.0;
+  dblDefaultIncrement = 0.001;
+
+Var
+  strVersion: String;
+  dblVersion : Double;
+  iErrorCode: Integer;
+  iCharCount: Int64;
+  strNewVersion: String;
+
+Begin
+  If Match.Success Then
+    Begin
+      strVersion := Match.Groups[1].Value;
+      Val(strVersion, dblVersion, iErrorCode);
+      If iErrorCode = 0 Then
+        Begin
+          iCharCount := FModuleStatsList.ModuleStats[FFileName].SizeChange;
+          dblVersion := dblVersion + Max(
+            dblDefaultIncrement,
+            Int(iCharCount) / dblChangeFactor
+          );
+          strNewVersion := Format('%1.3f', [dblVersion]);
+          OutputSource(
+            strNewVersion,
+            Match.Groups[1].Index - 1,
+            Match.Groups[1].Length
+          );
+          OutputMsg(Format(strVerIncremented, [strVersion, strNewVersion]));
+        End Else
+          OutputMsg(Format(strNotValidVerNum, [strVersion]));
+    End;
 End;
 
 End.

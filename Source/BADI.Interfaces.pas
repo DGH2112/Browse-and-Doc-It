@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    02 Feb 2020
 
   @license
 
@@ -138,6 +138,10 @@ Type
     Procedure SetRefactorConstNewLine(Const boolNewLine : Boolean);
     Function  GetUseIDEEditorColours : Boolean;
     Procedure SetUseIDEEditorColours(Const boolUseIDEEditorColours : Boolean);
+    Function  GetModuleDateFmt : String;
+    Procedure SetModuleDateFmt(Const strValue : String);
+    Function  GetModuleVersionIncrement : Double;
+    Procedure SetModuleVersionIncrement(Const dblValue : Double);
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -410,6 +414,22 @@ Type
       @return  a Boolean
     **)
     Property UseIDEEditorColours : Boolean Read GetUseIDEEditorColours Write SetUseIDEEditorColours;
+    (**
+      This property defines the date format used when a module has its date updated automatically.
+      @precon  None.
+      @postcon Gets and sets the date format.
+      @return  a String
+    **)
+    Property ModuleDateFmt : String Read GetModuleDateFmt Write SetModuleDateFmt;
+    (**
+      This property determines the conversion used for increment the number of bytes changed in a file
+      into the increment of the version number.
+      @precon  None.
+      @postcon Gets and sets the increment factor.
+      @return  a Double
+    **)
+    Property ModuleVersionIncrement : Double Read GetModuleVersionIncrement
+      Write SetModuleVersionIncrement;
   End;
 
   (** An interface to get the IDE Editor Colours from the Registry. **)
@@ -418,6 +438,41 @@ Type
     Function GetIDEEditorColours(Var iBGColour : TColor) : TBADITokenFontInfoTokenSet;
   End;
 
+  (** This interface allows a module notifier to have the indexed file renamed for removing the
+      notifier from the IDE. **)
+  IBADIModuleNotifierList = Interface
+  ['{60E0D688-F529-4798-A06C-C283F800B7FE}']
+    Procedure Add(Const strFileName : String; Const iIndex : Integer);
+    Function  Remove(Const strFileName: String): Integer;
+    Procedure Rename(Const strOldFileName, strNewFileName : String);
+  End;
+
+  (** This is an event signature that need to the implemented by module and project notifiers so that
+      the module notifier lists can be updated. **)
+  TBADIModuleRenameEvent = Procedure(Const strOldFilename, strNewFilename : String) Of Object;
+
+  (** An interface to manage the size of a file (module) and the size of the changes made to the
+      file. **)
+  IBADIModuleStats = Interface
+    Procedure Update(Const iSize : Int64);
+    Function  SizeChange : Int64;
+    Procedure Reset();
+  End;
+
+  (** An interface to manage a dictionary of IBADT=IModuleStats. **)
+  IBADIModuleStatsList = Interface
+    Function  GetModuleStats(Const strFileName : String) : IBADIModuleStats;
+    Procedure Rename(Const strOldFileName, strNewFileName : String);
+    (**
+      This method returns an interfaces of the module stats for the given filename.
+      @precon  None.
+      @postcon Returns an interfaces of the module stats for the given filename.
+      @param   strFileName as a String as a constant
+      @return  an IBADIModuleStats
+    **)
+    Property  ModuleStats[Const strFileName : String] : IBADIModuleStats Read GetModuleStats; Default;
+  End;
+  
 Implementation
 
 End.

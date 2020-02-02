@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Aug 2019
+  @Date    01 Feb 2020
 
   @license
 
@@ -38,6 +38,7 @@ Uses
   ExtCtrls,
   BADi.Base.Module,
   DockForm,
+  BADI.Interfaces,
   BADI.CommonIDEFunctions;
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -47,12 +48,14 @@ Type
       editor can be displayed. **)
   TEditorNotifier = Class(TNotifierObject, IUnknown, IOTANotifier, INTAEditServicesNotifier)
   Strict Private
-    FUpdateTimer : TTimer;
-    FLastEditorName : String;
-    FLastCursorPos: TOTAEditPos;
-    FLastParserResult : Boolean;
+    FUpdateTimer         : TTimer;
+    FLastEditorName      : String;
+    FLastCursorPos       : TOTAEditPos;
+    FLastParserResult    : Boolean;
     FLastUpdateTickCount : Cardinal;
-    FBADIThreadMgr : TBrowseAndDocItThreadManager;
+    FBADIThreadMgr       : TBrowseAndDocItThreadManager;
+    FModuleStatsList     : IBADIModuleStatsList;
+    FSource              : String;
   Strict Protected
     Procedure EnableTimer(Const boolSuccessfulParse : Boolean);
     Procedure TimerEventHandler(Sender : TObject);
@@ -72,7 +75,7 @@ Type
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
   Public
-    Constructor Create;
+    Constructor Create(Const ModuleStatsList : IBADIModuleStatsList);
     Destructor Destroy; Override;
     Procedure ResetLastUpdateTickCount(Const iNewValue : Integer = 0);
   End;
@@ -156,8 +159,10 @@ End;
   @precon  None.
   @postcon Initialise the class be creating a time for handling editor changes.
 
+  @param   ModuleStatsList as an IBADIModuleStatsList as a constant
+
 **)
-constructor TEditorNotifier.Create;
+Constructor TEditorNotifier.Create(Const ModuleStatsList : IBADIModuleStatsList);
 
 Const
   iUpdateInterval = 100;
@@ -165,6 +170,7 @@ Const
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
+  FModuleStatsList := ModuleStatsList;
   FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
   FUpdateTimer := TTimer.Create(Nil);
   FUpdateTimer.Interval := iUpdateInterval;
@@ -403,6 +409,7 @@ begin
       strFileName := SE.FileName;
       boolModified := SE.Modified;
       Result := TBADIToolsAPIFunctions.EditorAsString(SE);
+      FSource := Result;
       Project := TBADIToolsAPIFunctions.ActiveProject;
       If Assigned(Project) Then
         Begin
@@ -576,6 +583,7 @@ begin
               mrCancel: Abort;
             End;
           FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
+          FModuleStatsList.ModuleStats[Editor.FileName].Update(FSource.Length);
         End;
     End;
 end;

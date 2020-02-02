@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    02 Feb 2020
 
   @license
 
@@ -46,42 +46,44 @@ Type
   (** This is a class to define a set of options for the application. **)
   TBADIOptions = Class(TInterfacedObject, IBADIOptions)
   Strict Private
-    FOptions                : TDocOptions;
-    FDefines                : TStringList;
-    FSpecialTags            : TList<TBADISpecialTag>;
-    FExpandedNodes          : TStringList;
-    FINIFileName            : String;
-    FUpdateInterval         : Cardinal;
-    FScopesToRender         : TScopes;
-    FBrowsePosition         : TBrowsePosition;
-    FTreeFontName           : String;
-    FTreeFontSize           : Integer;
-    FFixedFontName          : String;
-    FFixedFontSize          : Integer;
-    FIDEEditorColours       : IBADIIDEEditorColours;
-    FTokenFontInfo          : Array[False..True] Of TBADITokenFontInfoTokenSet;
-    FUseIDEEditorColours    : Boolean;
-    FExclusions             : IBADIExclusions;
-    FMethodDescriptions     : TStringList;
-    FScopesToDocument       : TScopes;
-    FModuleExplorerBGColour : Array[False..True] Of TColor;
-    FTokenLimit             : Integer;
-    FMaxDocOutputWidth      : Integer;
-    FManagedNodesLife       : Integer;
-    FTreeColour             : TColor;
-    FProfilingCode          : TStringList;
-    FIssueLimits            : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
-    FBADIMenuShortCuts      : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
-    FModuleMetrics          : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
-    FModuleMetricSubOps     : TBADIModuleMetricSubOps;
-    FToxicityPower          : Integer;
-    FToxicitySummation      : TBADIToxicitySummation;
-    FModuleChecks           : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord;
-    FModuleCheckSubOps      : TBADIModuleCheckSubOps;
-    FLowMetricMargin        : Double;
-    FHighMetricMargin       : Double;
-    FRefactorConstNewLine   : Boolean;
-    FRequiresIDEEditorColoursUpdating: Boolean;
+    FOptions                          : TDocOptions;
+    FDefines                          : TStringList;
+    FSpecialTags                      : TList<TBADISpecialTag>;
+    FExpandedNodes                    : TStringList;
+    FINIFileName                      : String;
+    FUpdateInterval                   : Cardinal;
+    FScopesToRender                   : TScopes;
+    FBrowsePosition                   : TBrowsePosition;
+    FTreeFontName                     : String;
+    FTreeFontSize                     : Integer;
+    FFixedFontName                    : String;
+    FFixedFontSize                    : Integer;
+    FIDEEditorColours                 : IBADIIDEEditorColours;
+    FTokenFontInfo                    : Array[False..True] Of TBADITokenFontInfoTokenSet;
+    FUseIDEEditorColours              : Boolean;
+    FExclusions                       : IBADIExclusions;
+    FMethodDescriptions               : TStringList;
+    FScopesToDocument                 : TScopes;
+    FModuleExplorerBGColour           : Array[False..True] Of TColor;
+    FTokenLimit                       : Integer;
+    FMaxDocOutputWidth                : Integer;
+    FManagedNodesLife                 : Integer;
+    FTreeColour                       : TColor;
+    FProfilingCode                    : TStringList;
+    FIssueLimits                      : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
+    FBADIMenuShortCuts                : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
+    FModuleMetrics                    : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
+    FModuleMetricSubOps               : TBADIModuleMetricSubOps;
+    FToxicityPower                    : Integer;
+    FToxicitySummation                : TBADIToxicitySummation;
+    FModuleChecks                     : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord;
+    FModuleCheckSubOps                : TBADIModuleCheckSubOps;
+    FLowMetricMargin                  : Double;
+    FHighMetricMargin                 : Double;
+    FRefactorConstNewLine             : Boolean;
+    FRequiresIDEEditorColoursUpdating : Boolean;
+    FModuleDateFmt                    : String;
+    FModuleVersionIncrement           : Double;
   Strict Protected
     // IBADIOptions
     Function  GetOptions : TDocOptions;
@@ -148,6 +150,10 @@ Type
     Procedure SetRefactorConstNewLine(Const boolNewLine : Boolean);
     Function  GetUseIDEEditorColours : Boolean;
     Procedure SetUseIDEEditorColours(Const boolUseIDEEditorColours : Boolean);
+    Function  GetModuleDateFmt : String;
+    Procedure SetModuleDateFmt(Const strValue : String);
+    Function  GetModuleVersionIncrement : Double;
+    Procedure SetModuleVersionIncrement(Const dblValue : Double);
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure RequiresIDEEditorColoursUpdate;
@@ -301,6 +307,12 @@ Const
   strToxicitySummation = 'ToxicitySummation';
   (** An INI Key for Using IDE Editor Colours rather than custom colours. **)
   strUseIDEEditorColours = 'UseIDEEditorColours';
+  (** A constant to define the INI section for the automatic module settings. **)
+  strAutomaticModuleUpdatesINISection = 'Automatic Module Updates';
+  (** A constant for the module date format. **)
+  strDateFormatINIKey = 'Date Format';
+  (** A constant for the module version increment. **)
+  strIncrementINIKey = 'Increment';
 
 Var
   (** This is a class varaiable to hide and hold the BADI Options instance reference. **)
@@ -672,6 +684,22 @@ End;
 
 (**
 
+  This is a getter method for the ModuleDateFmt property.
+
+  @precon  None.
+  @postcon Returns the module date format.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetModuleDateFmt: String;
+
+Begin
+  Result := FModuleDateFmt;
+End;
+
+(**
+
   This is a getter method for the ModuleExploirerBGColour property.
 
   @precon  None.
@@ -718,6 +746,22 @@ Function TBADIOptions.GetModuleMetricSubOps: TBADIModuleMetricSubOps;
 
 Begin
   Result := FModuleMetricSubOps;
+End;
+
+(**
+
+  This is a getter method for the ModuleVersionIncrement property.
+
+  @precon  None.
+  @postcon Returns the module version increment.
+
+  @return  a Double
+
+**)
+Function TBADIOptions.GetModuleVersionIncrement: Double;
+
+Begin
+  Result := FModuleVersionIncrement;
 End;
 
 (**
@@ -1365,6 +1409,10 @@ End;
 **)
 Procedure TBADIOptions.LoadSettings;
 
+Const
+  strDefaultDateFmt = 'dd mmm yyyy';
+  dblDefaultIncrement = 0.0001;
+
 Var
   iniFile : TMemIniFile;
 
@@ -1386,6 +1434,10 @@ Begin
     LoadMetrics(iniFile);
     LoadChecks(iniFile);
     FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
+    FModuleDateFmt := iniFile.ReadString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey,
+      strDefaultDateFmt);
+    FModuleVersionIncrement := iniFile.ReadFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey,
+      dblDefaultIncrement);
   Finally
     iniFile.Free;
   End;
@@ -1779,6 +1831,8 @@ Begin
     SaveMetrics(iniFile);
     SaveChecks(iniFile);
     iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
+    iniFile.WriteString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey, FModuleDateFmt);
+    iniFile.WriteFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey, FModuleVersionIncrement);
     iniFile.UpdateFile;
   Finally
     iniFile.Free;
@@ -2024,6 +2078,22 @@ End;
 
 (**
 
+  This is a setter method for the ModuleDateFmt property.
+
+  @precon  None.
+  @postcon Updates the module date format.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetModuleDateFmt(Const strValue: String);
+
+Begin
+  FModuleDateFmt := strValue;
+End;
+
+(**
+
   This is a setter method for the ModuleExplorerBGColour property.
 
   @precon  None.
@@ -2072,6 +2142,22 @@ Procedure TBADIOptions.SetModuleMetricSubOps(Const setModuleMetricSubOps: TBADIM
 
 Begin
   FModuleMetricSubOps := setModuleMetricSubOps;
+End;
+
+(**
+
+  This is a setter method for the ModuleVersionIncrement property.
+
+  @precon  None.
+  @postcon Updates the module version increment.
+
+  @param   dblValue as a Double as a constant
+
+**)
+Procedure TBADIOptions.SetModuleVersionIncrement(Const dblValue: Double);
+
+Begin
+  FModuleVersionIncrement := dblValue;
 End;
 
 (**
@@ -2303,4 +2389,3 @@ Begin
 End;
 
 End.
-

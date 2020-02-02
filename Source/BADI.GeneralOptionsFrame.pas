@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Jun 2019
+  @Date    02 Feb 2020
 
   @license
 
@@ -60,6 +60,10 @@ Type
     edtManagedNodesLife: TEdit;
     udManagedNodesLife: TUpDown;
     vstGeneralOptions: TVirtualStringTree;
+    lblModsuleDateFmt: TLabel;
+    edtModuleDateFmt: TEdit;
+    lblModuleVersionIncrement: TLabel;
+    edtModuleVerIncrement: TEdit;
     procedure vstGeneralOptionsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure vstGeneralOptionsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
@@ -139,6 +143,8 @@ Begin
   vstGeneralOptions.FullExpand();
   udUpdateInterval.Position := TBADIOptions.BADIOptions.UpdateInterval;
   udManagedNodesLife.Position := TBADIOptions.BADIOptions.ManagedNodesLife;
+  edtModuleDateFmt.Text := TBADIOptions.BADIOptions.ModuleDateFmt;
+  edtModuleVerIncrement.Text := Format('%1.6f', [TBADIOptions.BADIOptions.ModuleVersionIncrement]);
 End;
 
 (**
@@ -154,6 +160,8 @@ Procedure TfmBADIGeneralOptions.SaveSettings;
 Var
   Node: PVirtualNode;
   NodeData : PBADIGeneralOpsRec;
+  dblIncrement : Double;
+  iErrorCode : Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
@@ -170,6 +178,10 @@ Begin
     End;
   TBADIOptions.BADIOptions.UpdateInterval := udUpdateInterval.Position;
   TBADIOptions.BADIOptions.ManagedNodesLife := udManagedNodesLife.Position;
+  TBADIOptions.BADIOptions.ModuleDateFmt := edtModuleDateFmt.Text;
+  Val(edtModuleVerIncrement.Text, dblIncrement, iErrorCode);
+  If iErrorCode = 0 Then
+    TBADIOptions.BADIOptions.ModuleVersionIncrement := dblIncrement;
   TBADIOptions.BADIOptions.RequiresIDEEditorColoursUpdate;
 End;
 

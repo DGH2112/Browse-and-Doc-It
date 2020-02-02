@@ -13,15 +13,16 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
   TabOrder = 0
   object IntervalPanel: TPanel
     Left = 0
-    Top = 249
+    Top = 218
     Width = 525
-    Height = 42
+    Height = 73
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = 192
     DesignSize = (
       525
-      42)
+      73)
     object lblRefreshInterval: TLabel
       Left = 7
       Top = 10
@@ -30,27 +31,49 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Caption = 'Refresh &Interval'
     end
     object lblManagedNodesLife: TLabel
-      Left = 184
+      Left = 215
       Top = 10
-      Width = 238
+      Width = 207
       Height = 23
+      Hint = 'Life-time of Managed Nodes (in days)'
       Alignment = taRightJustify
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
-      Caption = 'Life-time of Managed Nodes (in days)'
-      ExplicitWidth = 221
+      Caption = '&Life-time of Managed Nodes (in days)'
+      EllipsisPosition = epEndEllipsis
+    end
+    object lblModsuleDateFmt: TLabel
+      Left = 7
+      Top = 40
+      Width = 71
+      Height = 16
+      Caption = 'Date &Format'
+      FocusControl = edtModuleDateFmt
+    end
+    object lblModuleVersionIncrement: TLabel
+      Left = 215
+      Top = 40
+      Width = 207
+      Height = 16
+      Hint = 'Module Version Increment'
+      Alignment = taRightJustify
+      Anchors = [akLeft, akTop, akRight]
+      AutoSize = False
+      Caption = 'Module &Version Increment'
+      EllipsisPosition = epEndEllipsis
+      FocusControl = edtModuleVerIncrement
     end
     object edtUpdateInterval: TEdit
       Left = 103
       Top = 7
-      Width = 70
+      Width = 90
       Height = 24
       TabOrder = 0
       Text = '100'
     end
     object udUpdateInterval: TUpDown
-      Left = 173
-      Top = 7
+      Left = 193
+      Top = 6
       Width = 16
       Height = 24
       Associate = edtUpdateInterval
@@ -80,12 +103,27 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Position = 100
       TabOrder = 3
     end
+    object edtModuleDateFmt: TEdit
+      Left = 103
+      Top = 37
+      Width = 106
+      Height = 24
+      TabOrder = 4
+    end
+    object edtModuleVerIncrement: TEdit
+      Left = 428
+      Top = 37
+      Width = 86
+      Height = 24
+      Anchors = [akTop, akRight]
+      TabOrder = 5
+    end
   end
   object vstGeneralOptions: TVirtualStringTree
     Left = 0
     Top = 0
     Width = 525
-    Height = 249
+    Height = 218
     Align = alClient
     Header.AutoSizeIndex = 0
     Header.MainColumn = -1
@@ -97,6 +135,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     OnFreeNode = vstGeneralOptionsFreeNode
     OnGetText = vstGeneralOptionsGetText
     OnPaintText = vstGeneralOptionsPaintText
+    ExplicitHeight = 249
     Columns = <>
   end
 end

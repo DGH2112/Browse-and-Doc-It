@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Feb 2020
+  @Date    02 Feb 2020
 
   @license
 
@@ -138,6 +138,10 @@ Type
     Procedure SetRefactorConstNewLine(Const boolNewLine : Boolean);
     Function  GetUseIDEEditorColours : Boolean;
     Procedure SetUseIDEEditorColours(Const boolUseIDEEditorColours : Boolean);
+    Function  GetModuleDateFmt : String;
+    Procedure SetModuleDateFmt(Const strValue : String);
+    Function  GetModuleVersionIncrement : Double;
+    Procedure SetModuleVersionIncrement(Const dblValue : Double);
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -410,6 +414,22 @@ Type
       @return  a Boolean
     **)
     Property UseIDEEditorColours : Boolean Read GetUseIDEEditorColours Write SetUseIDEEditorColours;
+    (**
+      This property defines the date format used when a module has its date updated automatically.
+      @precon  None.
+      @postcon Gets and sets the date format.
+      @return  a String
+    **)
+    Property ModuleDateFmt : String Read GetModuleDateFmt Write SetModuleDateFmt;
+    (**
+      This property determines the conversion used for increment the number of bytes changed in a file
+      into the increment of the version number.
+      @precon  None.
+      @postcon Gets and sets the increment factor.
+      @return  a Double
+    **)
+    Property ModuleVersionIncrement : Double Read GetModuleVersionIncrement
+      Write SetModuleVersionIncrement;
   End;
 
   (** An interface to get the IDE Editor Colours from the Registry. **)

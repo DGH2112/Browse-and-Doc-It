@@ -86,7 +86,7 @@ Uses
   System.SysUtils,
   System.Math,
   BADI.Functions,
-  BADI.ToolsAPIUtils, BADI.Types;
+  BADI.ToolsAPIUtils, BADI.Types, BADI.Options;
 
 (**
 
@@ -515,9 +515,6 @@ ResourceString
   strModuleDateUpdated = 'Module date updated from %s to %s.';
   strNotValidDate = '"%s" is not a valid date!';
 
-Const
-  strDefaultDateFmt = 'dd mmm yyyy';
-
 Var
   strDate: String;
   dtDate: TDateTime;
@@ -531,7 +528,7 @@ Begin
         dtDate := ConvertDate(strDate);
         If Trunc(dtDate) <> Trunc(Now()) Then
           Begin
-            strNewDate := FormatDateTime(strDefaultDateFmt, Now());
+            strNewDate := FormatDateTime(TBADIOptions.BADIOptions.ModuleDateFmt, Now());
             OutputSource(
               strNewDate,
               Match.Groups[1].Index - 1,
@@ -563,7 +560,6 @@ ResourceString
   strNotValidVerNum = '"%s" is not a valid version number.';
 
 Const
-  dblChangeFactor = 10000.0;
   dblDefaultIncrement = 0.001;
 
 Var
@@ -583,7 +579,7 @@ Begin
           iCharCount := FModuleStatsList.ModuleStats[FFileName].SizeChange;
           dblVersion := dblVersion + Max(
             dblDefaultIncrement,
-            Int(iCharCount) / dblChangeFactor
+            Int(iCharCount) * TBADIOPtions.BADIOptions.ModuleVersionIncrement
           );
           strNewVersion := Format('%1.3f', [dblVersion]);
           OutputSource(

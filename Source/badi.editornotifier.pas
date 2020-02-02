@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    01 Feb 2020
+  @Version 1.004
+  @Date    02 Feb 2020
 
   @license
 
@@ -583,7 +583,8 @@ begin
               mrCancel: Abort;
             End;
           FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
-          FModuleStatsList.ModuleStats[Editor.FileName].Update(FSource.Length);
+          If Assigned(Editor) Then
+            FModuleStatsList.ModuleStats[Editor.FileName].Update(FSource.Length);
         End;
     End;
 end;

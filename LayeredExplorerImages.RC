@@ -1,11 +1,11 @@
-/*
+/**
 
   This is a Windows Resource File which generates a list of BitMaps for use
   In the Explorer Tree View.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.009
+  @Date    03 Feb 2020
 
   @license
 
@@ -27,7 +27,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-*/
+**/
 NoneMask                   BITMAP "Images\NoneMask.bmp"
 GlobalMask                 BITMAP "Images\GlobalMask.bmp"
 LocalMask                  BITMAP "Images\LocalMask.bmp"
@@ -50,16 +50,19 @@ DocConflictFolder          BITMAP "Images\DocConflictFolder.bmp"
 DocConflictIncorrect       BITMAP "Images\DocConflictIncorrect.bmp"
 DocConflictItem            BITMAP "Images\DocConflictItem.bmp"
 DocConflictMissing         BITMAP "Images\DocConflictMissing.bmp"
+DocConflict                BITMAP "Images\DocConflict.bmp"
 
 MetricFolder               BITMAP "Images\MetricFolder.bmp"
 MetricIncorrect            BITMAP "Images\MetricIncorrect.bmp"
 MetricItem                 BITMAP "Images\MetricItem.bmp"
 MetricMissing              BITMAP "Images\MetricMissing.bmp"
+Metric                     BITMAP "Images\Metric.bmp"
 
 CheckFolder                BITMAP "Images\CheckFolder.bmp"
 CheckIncorrect             BITMAP "Images\CheckIncorrect.bmp"
 CheckItem                  BITMAP "Images\CheckItem.bmp"
 CheckMissing               BITMAP "Images\CheckMissing.bmp"
+Check                      BITMAP "Images\Check.bmp"
 
 UsesLabel                  BITMAP "Images\UsesLabel.bmp"
 UsesItem                   BITMAP "Images\UsesItem.bmp"

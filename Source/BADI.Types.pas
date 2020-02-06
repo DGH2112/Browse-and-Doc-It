@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.11
-  @Date    19 Jan 2020
+  @Version 1.118
+  @Date    02 Feb 2020
 
   @license
 
@@ -435,6 +435,8 @@ Type
 
   (** An enumerate to define the different types of issues to limit output for. **)
   TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts, ltChecks, ltMetrics);
+  (** A set of the above enumerates. **)
+  TLimitTypes = Set of TLimitType;
 
   (** This emunerate descibed the different types of doc comment .**)
   TCommentStyle = (csBlock, csLine, csInSitu);

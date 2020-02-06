@@ -3,8 +3,8 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    17 Aug 2019
+  @Version 1.073
+  @Date    02 Feb 2020
 
   @license
 
@@ -44,7 +44,8 @@ Uses
   DockForm,
   BADI.ModuleExplorerFrame,
   BADI.Base.Module,
-  BADI.IDEThemingNotifier;
+  BADI.IDEThemingNotifier,
+  BADI.Types;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -81,6 +82,7 @@ Type
     Class Procedure FollowEditorCursor(Const iLine : Integer);
     Class Procedure HookEventHandlers(Const SelectionChangeProc: TSelectionChange;
       Const Focus, ScopeChange: TNotifyEvent);
+    Class Function  DocIssueConflicts(Const iLine : Integer) : TLimitTypes;
   End;
 
 Implementation
@@ -192,6 +194,25 @@ Begin
   FModuleExplorerFrame.Free;
   SaveStateNecessary := True;
   Inherited;
+End;
+
+(**
+
+  This method returns the limit types that have been associated with the given line number.
+
+  @precon  None.
+  @postcon Returns the limit types that have been associated with the given line number.
+
+  @param   iLine as an Integer as a constant
+  @return  a TLimitTypes
+
+**)
+Class Function TfrmDockableModuleExplorer.DocIssueConflicts(Const iLine: Integer): TLimitTypes;
+
+Begin
+  Result := [];
+  If Assigned(FormInstance) And Assigned(FormInstance.FModuleExplorerFrame) Then
+    Result := FormInstance.FModuleExplorerFrame.DocIssueConflicts[iLine];
 End;
 
 (**

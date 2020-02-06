@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 1.038
+  @Version 1.207
   @Date    02 Feb 2020
 
   @license
@@ -520,10 +520,14 @@ Var
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RenderDocument', tmoTiming);{$ENDIF}
   TfrmDockableModuleExplorer.RenderDocumentTree(Module);
-  If doFollowEditorCursor In TBADIOptions.BADIOptions.Options Then
-    If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+  If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+    Begin
+      If doFollowEditorCursor In TBADIOptions.BADIOptions.Options Then
+          If Assigned(EditorSvcs.TopView) Then
+            TfrmDockableModuleExplorer.FollowEditorCursor(EditorSvcs.TopView.CursorPos.Line);
       If Assigned(EditorSvcs.TopView) Then
-        TfrmDockableModuleExplorer.FollowEditorCursor(EditorSvcs.TopView.CursorPos.Line);
+        EditorSvcs.TopView.Paint;
+    End;
 end;
 
 (**

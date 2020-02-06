@@ -3,8 +3,8 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 1.687
-  @Date    02 Feb 2020
+  @Version 2.232
+  @Date    03 Feb 2020
   
   @license
 
@@ -33,6 +33,7 @@ Interface
 
 Uses
   ToolsAPI,
+  System.Types,
   VCL.Graphics,
   WinApi.Windows;
 
@@ -53,7 +54,11 @@ Type
 Implementation
 
 Uses
-  CodeSiteLogging;
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
+  BADI.DockableModuleExplorer,
+  BADI.Types;
 
 (**
 
@@ -63,6 +68,7 @@ Uses
   @postcon Not used.
 
   @nocheck EmptyMethod
+  @nohint  View
 
   @param   View        as an IOTAEditView as a constant
   @param   FullRepaint as a Boolean as a reference
@@ -72,6 +78,7 @@ Procedure TBADIEditViewNotifier.BeginPaint(Const View: IOTAEditView; Var FullRep
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeginPaint', tmoTiming);{$ENDIF}
+  FullRepaint := True;
 End;
 
 (**
@@ -82,6 +89,7 @@ End;
   @postcon Not used.
 
   @nocheck EmptyMethod
+  @nohint  View
 
   @param   View as an IOTAEditView as a constant
 
@@ -100,6 +108,7 @@ End;
   @postcon No used.
 
   @nocheck EmptyMethod
+  @nohint  View
 
   @param   View as an IOTAEditView as a constant
 
@@ -120,7 +129,7 @@ End;
 
   @nocheck MissingCONSTInParam
   @nometric LongParameterList
-  @nohint  View
+  @nohint  View LineText TextWidth LineAttributes CellSize
 
   @param   View           as an IOTAEditView as a constant
   @param   LineNumber     as an Integer
@@ -137,19 +146,65 @@ Procedure TBADIEditViewNotifier.PaintLine(Const View: IOTAEditView; LineNumber: 
   Const LineText: PAnsiChar; Const TextWidth: Word; Const LineAttributes: TOTAAttributeArray;
   Const Canvas: TCanvas; Const TextRect, LineRect: TRect; Const CellSize: TSize);
 
+  Procedure DrawIcon(Const R : TRect; Const eLimitType : TLimitType);
+
+  Const
+    astrIconResNames : Array[TLimitType] Of String = (
+      'Error',
+      'Warning',
+      'Hint',
+      'DocConflict',
+      'Check',
+      'Metric'
+    );
+
+  Var
+    B : Vcl.Graphics.TBitMap;
+    
+  Begin
+    B := Vcl.Graphics.TBitMap.Create;
+    Try
+      B.LoadFromResourceName(hInstance, astrIconResNames[eLimitType]);
+      B.Transparent := True;
+      Canvas.Draw(R.Left, R.Top, B);
+    Finally
+      B.Free;
+    End;
+  End;
+
 Const
   iPadding = 5;
+  iBitmapWidth = 16;
 
 Var
   R : TRect;
   strText : String;
+  setLimitTypes : TLimitTypes;
+  eLimitType: TLimitType;
   
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PaintLine', tmoTiming);{$ENDIF}
+  setLimitTypes := TfrmDockableModuleExplorer.DocIssueConflicts(LineNumber);
   R := LineRect;
-  R.Left := TextRect.Right + iPadding;
-  strText := 'Hello';
-  Canvas.TextRect(R, strText, []);
+  R.Left := TextRect.Right;
+  InflateRect(R, -iPadding, 0);
+  R.Right := R.Left + iBitmapWidth;
+  Canvas.Font.Color := clRed;
+  For eLimitType := Low(TLimitType) To High(TLimitType) Do
+    If eLimitType In setLimitTypes Then
+      Begin
+        Case eLimitType Of
+          ltErrors: DrawIcon(R, ltErrors);
+          ltWarnings: DrawIcon(R, ltWarnings);
+          ltHints: DrawIcon(R, ltHints);
+          ltConflicts: DrawIcon(R, ltConflicts);
+          ltChecks: DrawIcon(R, ltChecks);
+          ltMetrics: DrawIcon(R, ltMetrics);
+        End;
+        Canvas.TextRect(R, strText, [tfLeft]);
+        Inc(R.Right, iBitmapWidth);
+        Inc(R.Left, iBitmapWidth + iPadding);
+      End;
 End;
 
 End.

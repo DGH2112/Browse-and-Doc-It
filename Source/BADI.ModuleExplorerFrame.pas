@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.01
-  @Date    26 Jan 2020
+  @Version 1.428
+  @Date    02 Feb 2020
 
   @license
 
@@ -183,7 +183,7 @@ Type
     FFollowNode        : PVirtualNode;
     FFiltering         : Boolean;
     FLastFilterUpdate  : Int64;
-    FDocConflictIssues : Array[TLimitType] Of TList<Integer>;
+    FDocConflictIssues : TDictionary<Integer,TLimitTypes>;
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -247,7 +247,9 @@ Type
     Procedure tvExplorerNodeExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure SetExplorerFilter(Const strValue : String);
     Procedure tvExplorerChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    Function MaxLimit(Const Container: TElementContainer) : Integer;
+    Function  MaxLimit(Const Container: TElementContainer) : Integer;
+    Function  GetDocIssueConflicts(Const iLine : Integer) : TLimitTypes;
+    Procedure LogDocIssueConflict(Const Element : TElementContainer);
     (**
       This property gets and set the filter text for the explorer view.
       @precon  None.
@@ -290,6 +292,14 @@ Type
       @return  a TBADIVirtualStringTree
     **)
     Property Explorer : TBADIVirtualStringTree Read FExplorer;
+    (**
+      This property returns the limit types associated with the given line number.
+      @precon  None.
+      @postcon Returns the limit types associated with the given line number.
+      @param   iLine as an Integer as a constant
+      @return  a TLimitTypes
+    **)
+    Property DocIssueConflicts[Const iLine : Integer] : TLimitTypes Read GetDocIssueConflicts;
   End;
 
 Implementation
@@ -682,6 +692,7 @@ begin
   LoadBADIImages(ilScopeImages);
   FLastFilterUpdate := 0;
   FExplorer.OnGetText := tvExplorerGetText;
+  FDocConflictIssues := TDictionary<Integer,TLimitTypes>.Create;
 end;
 
 (**
@@ -728,6 +739,7 @@ End;
 Destructor TframeModuleExplorer.Destroy;
 
 begin
+  FDocConflictIssues.Free;
   If FModule <> Nil Then
     GetExpandedNodes(FModule);
   FExplorer.Free;
@@ -1526,6 +1538,28 @@ End;
 
 (**
 
+  This is a getter method for the DocIssueConflicts property.
+
+  @precon  None.
+  @postcon Returns a set of limit types for the given line number to indicate issues on that line.
+
+  @param   iLine as an Integer as a constant
+  @return  a TLimitTypes
+
+**)
+Function TframeModuleExplorer.GetDocIssueConflicts(Const iLine: Integer): TLimitTypes;
+
+Var
+  setLimitTypes: TLimitTypes;
+
+Begin
+  Result := [];
+  If FDocConflictIssues.TryGetValue(iLine, setLimitTypes) Then
+    Result := setLimitTypes;
+End;
+
+(**
+
   This method gets the tree nodes that are currently expanded and stores them in a string list.
 
   @precon  Node is the tree node to be tested for expansion.
@@ -1661,6 +1695,92 @@ End;
 
 (**
 
+  This method logs the Doc Issue and Conflicts.
+
+  @precon  None.
+  @postcon If the Element is a Doc Issue or Conflict then it is logged.
+
+  @param   Element as a TElementContainer as a constant
+
+**)
+Procedure TframeModuleExplorer.LogDocIssueConflict(Const Element: TElementContainer);
+
+  (**
+
+    This method converts an error type to a limit type.
+
+    @precon  None.
+    @postcon Returns the limit type corresponding to the given error type.
+
+    @param   eErrorType as a TErrorType as a constant
+    @return  a TLimitType
+
+  **)
+  Function ErrorTypeToLimitType(Const eErrorType : TErrorType) : TLimitType;
+
+  Begin
+    Case eErrorType Of
+      etHint:    Result := ltHints;
+      etWarning: Result := ltWarnings;
+      etError:   Result := ltErrors;
+    Else
+      Result := ltErrors;
+    End;
+  End;
+
+  (**
+
+    This method converts an conflict type to a limit type.
+
+    @precon  None.
+    @postcon Returns the limit type corresponding to the given conflict type.
+
+    @param   eConflictType as a TBADIConflictType as a constant
+    @return  a TLimitType
+
+  **)
+  Function ConflictTypeToLimitType(Const eConflictType : TBADIConflictType) : TLimitType;
+
+  Begin
+    Case eConflictType Of
+      ctDocumentation: Result := ltConflicts;
+      ctMetric:        Result := ltMetrics;
+      ctCheck:         Result := ltChecks;
+    Else
+      Result := ltErrors;
+    End;
+  End;
+
+Var
+  DI: TDocIssue;
+  setLimitTypes: TLimitTypes;
+  DC: TDocumentConflict;
+
+Begin
+  If Element Is TDocIssue Then
+    Begin
+      DI := Element As TDocIssue;
+      If FDocConflictIssues.TryGetValue(DI.Line, setLimitTypes) Then
+        Begin
+          Include(setLimitTypes, ErrorTypeToLimitType(DI.ErrorType));
+          FDocConflictIssues.AddOrSetValue(DI.Line, setLimitTypes);
+        End Else
+          FDocConflictIssues.Add(DI.Line, [ErrorTypeToLimitType(DI.ErrorType)]);
+    End
+  Else If Element Is TDocumentConflict Then
+    Begin
+      DC := Element As TDocumentConflict;
+      If FDocConflictIssues.TryGetValue(DC.Line, setLimitTypes) Then
+        Begin
+          Include(setLimitTypes, ConflictTypeToLimitType(DC.ConflictType));
+          FDocConflictIssues.AddOrSetValue(DC.Line, setLimitTypes);
+        End Else
+          FDocConflictIssues.Add(DC.Line, [ConflictTypeToLimitType(DC.ConflictType)]);
+    End;
+End;
+
+(**
+
   This method removed items from the list their date (TObject data) is more than
   a specific age in days.
 
@@ -1768,7 +1888,7 @@ end;
   @param   iLevel    as an Integer as a constant
 
 **)
-procedure TframeModuleExplorer.RenderContainers(Const RootNode : PVirtualNode;
+Procedure TframeModuleExplorer.RenderContainers(Const RootNode : PVirtualNode;
   Const Container: TElementContainer; Const iLevel : Integer);
 
 Const
@@ -1780,25 +1900,27 @@ Var
   iLimit : Integer;
   iCount : Integer;
 
-begin
+Begin
   iLimit := MaxLimit(Container);
   iCount := 0;
   For i := 1 To Container.ElementCount Do
     If Container.Elements[i].Scope In TBADIOptions.BADIOptions.ScopesToRender + [scNone, scGlobal] Then
       Begin
-      If iCount < iLimit Then
-        Begin
-          NewNode := AddNode(RootNode, Container.Elements[i], iLevel);
-          Inc(iCount);
-          RenderContainers(NewNode, Container[i], iLevel + 1);
-        End Else
-        Begin
-          AddNode(RootNode, Format(strTooManyConflicts, [Container.ElementCount]),
-            strTooManyConflictsName, iLevel, Container.Elements[i].ImageIndexAdjustedForScope);
-          Break;
-        End;
+        LogDocIssueConflict(Container.Elements[i]);
+        If iCount < iLimit Then
+          Begin
+            NewNode := AddNode(RootNode, Container.Elements[i], iLevel);
+            Inc(iCount);
+            RenderContainers(NewNode, Container[i], iLevel + 1);
+          End
+        Else If iCount = iLimit Then
+          Begin
+            AddNode(RootNode, Format(strTooManyConflicts, [Container.ElementCount]),
+              strTooManyConflictsName, iLevel, Container.Elements[i].ImageIndexAdjustedForScope);
+            Break;
+          End;
       End;
-end;
+End;
 
 (**
 
@@ -1837,6 +1959,7 @@ Begin
     Exit;
   FRendering := True;
   Try
+    FDocConflictIssues.Clear;
     FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
     FExplorer.Font.Name := TBADIOptions.BADIOptions.TreeFontName;
     FExplorer.Font.Size := TBADIOptions.BADIOptions.TreeFontSize;

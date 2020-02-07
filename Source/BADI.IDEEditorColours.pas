@@ -4,8 +4,8 @@
   the token colours from the IDE.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.016
+  @Date    07 Feb 2020
 
   @license
 
@@ -78,32 +78,34 @@ Const
   strBDSEnviroVar = 'BDS';
   strHelpRegKey = 'Software\Embarcadero\%s\%s\Editor\Highlight';
   strTokenHighlightMap : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
-    'Illegal Char',                     // ttUnknown
-    'Whitespace',                       // ttWhiteSpace
-    'Reserved word',                    // ttReservedWord
-    'Identifier',                       // ttIdentifier
-    'Number',                           // ttNumber
-    'Symbol',                           // ttSymbol
-    'Whitespace',                       // ttLineEnd
-    'String',                           // ttSingleLiteral
-    'Character',                        // ttDoubleLiteral
-    'Comment',                          // ttLineComment
-    'Comment',                          // ttBlockComment
-    'Tags',                             // ttHTMLStartTag
-    'Tags',                             // ttHTMLEndTag
-    'Reserved word',                    // ttDirective
-    'Preprocessor',                     // ttCompilerDirective
-    'Hot Link',                         // ttLinkTag
-    'ttTreeHeader',                     // ttTreeHeader
-    'Whitespace',                       // ttFileEnd
-    'Whitespace',                       // ttLineContinuation
-    'Tags',                             // ttCustomUserToken
-    'Marked Block',                     // ttExplorerHighlight
-    'Plain text',                       // ttPlainText
-    'Comment',                          // ttCommentText
-    'Attribute Names',                  // ttTagHeaderText
-    'Attribute Values',                 // ttTagText 
-    'Additional search match highlight' // Search Highlight
+    'Illegal Char',                      // ttUnknown
+    'Whitespace',                        // ttWhiteSpace
+    'Reserved word',                     // ttReservedWord
+    'Identifier',                        // ttIdentifier
+    'Number',                            // ttNumber
+    'Symbol',                            // ttSymbol
+    'Whitespace',                        // ttLineEnd
+    'String',                            // ttSingleLiteral
+    'Character',                         // ttDoubleLiteral
+    'Comment',                           // ttLineComment
+    'Comment',                           // ttBlockComment
+    'Tags',                              // ttHTMLStartTag
+    'Tags',                              // ttHTMLEndTag
+    'Reserved word',                     // ttDirective
+    'Preprocessor',                      // ttCompilerDirective
+    'Hot Link',                          // ttLinkTag
+    'ttTreeHeader',                      // ttTreeHeader
+    'Whitespace',                        // ttFileEnd
+    'Whitespace',                        // ttLineContinuation
+    'Tags',                              // ttCustomUserToken
+    'Marked Block',                      // ttExplorerHighlight
+    'Plain text',                        // ttPlainText
+    'Comment',                           // ttCommentText
+    'Attribute Names',                   // ttTagHeaderText
+    'Attribute Values',                  // ttTagText 
+    'Additional search match highlight', // Search Highlight
+    'Line Highlight',                    // Line Highlight
+    'ttDocIssueEditorText'               // Doc Issue Editor Text
   );
 
 Var

@@ -3,8 +3,8 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    14 Aug 2019
+  @Version 1.023
+  @Date    07 Feb 2020
 
   @license
 
@@ -682,6 +682,10 @@ ResourceString
   strTokenTagText = 'Tag Text';
   (** A text string to represent the search highlight colour. **)
   strSearchHighlight = 'Search Highlight';
+  (** A text string to represent the Line highlight colour. **)
+  strLineHighlight = 'Line Highlight';
+  (** A text string to represent the Doc Issue Editor colour. **)
+  strDocIssueEditorText = 'Doc Issue Editor Text';
 
   //
   // Token Sets

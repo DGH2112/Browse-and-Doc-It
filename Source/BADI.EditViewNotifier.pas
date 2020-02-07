@@ -3,8 +3,8 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 2.232
-  @Date    03 Feb 2020
+  @Version 2.661
+  @Date    07 Feb 2020
   
   @license
 
@@ -35,12 +35,16 @@ Uses
   ToolsAPI,
   System.Types,
   VCL.Graphics,
-  WinApi.Windows;
+  WinApi.Windows,
+  BADI.Types;
 
 Type
   (** A class which implements the INTAEditorViewNotifier for drawing on the editor. **)
   TBADIEditViewNotifier = Class(TNotifierObject, INTAEditViewNotifier)
   Strict Private
+    FPlainTextFontInfo   : TTokenFontInfo;
+    FTokenFontInfo       : TTokenFontInfo;
+    FLineHighlightColour : TColor;
   Strict Protected
     Procedure BeginPaint(Const View: IOTAEditView; Var FullRepaint: Boolean);
     Procedure EditorIdle(Const View: IOTAEditView);
@@ -58,7 +62,8 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   BADI.DockableModuleExplorer,
-  BADI.Types;
+  BADI.Interfaces,
+  BADI.Options;
 
 (**
 
@@ -79,6 +84,13 @@ Procedure TBADIEditViewNotifier.BeginPaint(Const View: IOTAEditView; Var FullRep
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeginPaint', tmoTiming);{$ENDIF}
   FullRepaint := True;
+  FPlainTextFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[True][ttPlainText];
+  FTokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[False][ttDocIssueEditorText];
+  FLineHighlightColour := TBADIOptions.BADIOptions.TokenFontInfo[True][ttLineHighlight].FBackColour;
+  If FTokenFontInfo.FBackColour = clNone Then
+    FTokenFontInfo.FBackColour := FPlainTextFontInfo.FBackColour;
+  If FTokenFontInfo.FForeColour = clNone Then
+    FTokenFontInfo.FForeColour := FPlainTextFontInfo.FForeColour;
 End;
 
 (**
@@ -146,7 +158,20 @@ Procedure TBADIEditViewNotifier.PaintLine(Const View: IOTAEditView; LineNumber: 
   Const LineText: PAnsiChar; Const TextWidth: Word; Const LineAttributes: TOTAAttributeArray;
   Const Canvas: TCanvas; Const TextRect, LineRect: TRect; Const CellSize: TSize);
 
-  Procedure DrawIcon(Const R : TRect; Const eLimitType : TLimitType);
+  (**
+
+    This method renders a document issue icon onto the editor window at the end of the line with the
+    issue.
+
+    @precon  None.
+    @postcon The icon is rendered on the editor window and the left of R is moved to the right of the
+             drawn icon.
+
+    @param   R          as a TRect as a reference
+    @param   eLimitType as a TLimitType as a constant
+
+  **)
+  Procedure DrawIcon(Var R : TRect; Const eLimitType : TLimitType);
 
   Const
     astrIconResNames : Array[TLimitType] Of String = (
@@ -166,45 +191,75 @@ Procedure TBADIEditViewNotifier.PaintLine(Const View: IOTAEditView; LineNumber: 
     Try
       B.LoadFromResourceName(hInstance, astrIconResNames[eLimitType]);
       B.Transparent := True;
-      Canvas.Draw(R.Left, R.Top, B);
+      Canvas.Draw(R.Left, R.Top + (R.Height - B.Height) Div 2, B);
+      Inc(R.Left, B.Width);
     Finally
       B.Free;
     End;
   End;
 
+  (**
+
+    This method renders the text message associated with a line document issue.
+
+    @precon  None.
+    @postcon The message is printed on the editor to the right of the issue icon. The left edge of the
+             R rectangle is moved to the end position of the printed message.
+
+    @param   R       as a TRect as a reference
+    @param   strText as a String as a constant
+
+  **)
+  Procedure DrawMsgText(Var R : TRect; Const strText : String);
+
+  Var
+    strTextToRender : String;
+    setFontStyles : TFontStyles;
+
+  Begin
+    strTextToRender := strText;
+    If View.CursorPos.Line = LineNumber Then
+      Canvas.Brush.Color := FLineHighlightColour
+    Else
+      Canvas.Brush.Color := FTokenFontInfo.FBackColour;
+    setFontStyles := Canvas.Font.Style;
+    Canvas.Font.Style := FTokenFontInfo.FStyles;
+    Canvas.Font.Color := FTokenFontInfo.FForeColour;
+    Canvas.TextRect(R, strTextToRender, [tfLeft, tfVerticalCenter]);
+    Inc(R.Left, Canvas.TextWidth(strTextToRender));
+    Canvas.Font.Style := setFontStyles;
+  End;
+
 Const
   iPadding = 5;
-  iBitmapWidth = 16;
 
 Var
   R : TRect;
-  strText : String;
-  setLimitTypes : TLimitTypes;
+  LineDocIssue : IBADILineDocIssues;
   eLimitType: TLimitType;
   
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PaintLine', tmoTiming);{$ENDIF}
-  setLimitTypes := TfrmDockableModuleExplorer.DocIssueConflicts(LineNumber);
+  LineDocIssue := TfrmDockableModuleExplorer.LineDocIssue(LineNumber);
   R := LineRect;
   R.Left := TextRect.Right;
   InflateRect(R, -iPadding, 0);
-  R.Right := R.Left + iBitmapWidth;
-  Canvas.Font.Color := clRed;
-  For eLimitType := Low(TLimitType) To High(TLimitType) Do
-    If eLimitType In setLimitTypes Then
-      Begin
-        Case eLimitType Of
-          ltErrors: DrawIcon(R, ltErrors);
-          ltWarnings: DrawIcon(R, ltWarnings);
-          ltHints: DrawIcon(R, ltHints);
-          ltConflicts: DrawIcon(R, ltConflicts);
-          ltChecks: DrawIcon(R, ltChecks);
-          ltMetrics: DrawIcon(R, ltMetrics);
+  If Assigned(LineDocIssue) Then
+    For eLimitType := Low(TLimitType) To High(TLimitType) Do
+      If eLimitType In LineDocIssue.Issues Then
+        Begin
+          Case eLimitType Of
+            ltErrors: DrawIcon(R, ltErrors);
+            ltWarnings: DrawIcon(R, ltWarnings);
+            ltHints: DrawIcon(R, ltHints);
+            ltConflicts: DrawIcon(R, ltConflicts);
+            ltChecks: DrawIcon(R, ltChecks);
+            ltMetrics: DrawIcon(R, ltMetrics);
+          End;
+          Inc(R.Left, iPadding);
+          DrawMsgText(R, LineDocIssue.Message[eLimitType]);
+          Inc(R.Left, iPadding);
         End;
-        Canvas.TextRect(R, strText, [tfLeft]);
-        Inc(R.Right, iBitmapWidth);
-        Inc(R.Left, iBitmapWidth + iPadding);
-      End;
 End;
 
 End.

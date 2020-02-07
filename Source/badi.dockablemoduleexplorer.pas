@@ -3,8 +3,8 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Version 1.073
-  @Date    02 Feb 2020
+  @Version 1.082
+  @Date    07 Feb 2020
 
   @license
 
@@ -45,7 +45,8 @@ Uses
   BADI.ModuleExplorerFrame,
   BADI.Base.Module,
   BADI.IDEThemingNotifier,
-  BADI.Types;
+  BADI.Types,
+  BADI.Interfaces;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -82,7 +83,7 @@ Type
     Class Procedure FollowEditorCursor(Const iLine : Integer);
     Class Procedure HookEventHandlers(Const SelectionChangeProc: TSelectionChange;
       Const Focus, ScopeChange: TNotifyEvent);
-    Class Function  DocIssueConflicts(Const iLine : Integer) : TLimitTypes;
+    Class Function  LineDocIssue(Const iLine : Integer) : IBADILineDocIssues;
   End;
 
 Implementation
@@ -94,7 +95,8 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   DeskUtil,
-  ToolsAPI, BADI.ToolsAPIUtils;
+  ToolsAPI,
+  BADI.ToolsAPIUtils;
 
 Var
   (** This is a private varaible to hold the singleton instance of the
@@ -198,25 +200,6 @@ End;
 
 (**
 
-  This method returns the limit types that have been associated with the given line number.
-
-  @precon  None.
-  @postcon Returns the limit types that have been associated with the given line number.
-
-  @param   iLine as an Integer as a constant
-  @return  a TLimitTypes
-
-**)
-Class Function TfrmDockableModuleExplorer.DocIssueConflicts(Const iLine: Integer): TLimitTypes;
-
-Begin
-  Result := [];
-  If Assigned(FormInstance) And Assigned(FormInstance.FModuleExplorerFrame) Then
-    Result := FormInstance.FModuleExplorerFrame.DocIssueConflicts[iLine];
-End;
-
-(**
-
 
   This method focuses the modukle explorers tree view the be focused IF
   available.
@@ -296,6 +279,25 @@ Begin
       FormInstance.FModuleExplorerFrame.OnFocus := Focus;
       FormInstance.FModuleExplorerFrame.OnRefresh := ScopeChange;
     End;
+End;
+
+(**
+
+  This method returns the limit types that have been associated with the given line number.
+
+  @precon  None.
+  @postcon Returns the limit types that have been associated with the given line number.
+
+  @param   iLine as an Integer as a constant
+  @return  an IBADILineDocIssues
+
+**)
+Class Function TfrmDockableModuleExplorer.LineDocIssue(Const iLine: Integer): IBADILineDocIssues;
+
+Begin
+  Result := Nil;
+  If Assigned(FormInstance) And Assigned(FormInstance.FModuleExplorerFrame) Then
+    Result := FormInstance.FModuleExplorerFrame.LineDocIssues[iLine];
 End;
 
 (**

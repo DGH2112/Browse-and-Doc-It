@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    02 Feb 2020
+  @Version 1.120
+  @Date    07 Feb 2020
 
   @license
 
@@ -471,6 +471,31 @@ Type
       @return  an IBADIModuleStats
     **)
     Property  ModuleStats[Const strFileName : String] : IBADIModuleStats Read GetModuleStats; Default;
+  End;
+
+  (** An interface for the Documentation Issues for a line of code. **)
+  IBADILineDocIssues = Interface
+    // Getters and Setters
+    Function  GetLimitTypes : TLimitTypes;
+    Function  GetMessage(Const eLimitType : TLimitType) : String;
+    // General Methods
+    Procedure AddIssue(Const eLimitType : TLimitType; Const strMsg : String);
+    // Properties
+    (**
+      This property returns a set of enumerates which define the doc issues for the line.
+      @precon  None.
+      @postcon Returns a set of enumerates which define the doc issues for the line.
+      @return  a TLimitTypes
+    **)
+    Property Issues : TLimitTypes Read GetLimitTypes;
+    (**
+      This method returns the text associated with the given doc issue type.
+      @precon  None.
+      @postcon Returns the text associated with the given doc issue type.
+      @param   eLimitType as a TLimitType as a constant
+      @return  a String
+    **)
+    Property Message[Const eLimitType : TLimitType] : String Read GetMessage;
   End;
   
 Implementation

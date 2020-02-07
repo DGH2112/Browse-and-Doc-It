@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    14 Aug 2019
+  @Version 1.026
+  @Date    07 Feb 2020
 
   @license
 
@@ -189,7 +189,9 @@ Const
     (FForeColour : clNavy;       FStyles : [];                     FBackColour: clNone),
     (FForeColour : clPurple;     FStyles : [fsBold, fsUnderline];  FBackColour: clNone),
     (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone)
+    (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clNone;       FStyles : [];                     FBackColour: clNone),
+    (FForeColour : clFuchsia;    FStyles : [];                     FBackColour: clNone)
   );
 
   (** This is a list of image resource masks to be placed of the below images to create vesions
@@ -439,7 +441,9 @@ Const
     strTokenCommentText,
     strTokenTagHeaderText,
     strTokenTagText,
-    strSearchHighlight
+    strSearchHighlight,
+    strLineHighlight,
+    strDocIssueEditorText
   );
 
   (** A constant string to represent the position of the main procedure code in

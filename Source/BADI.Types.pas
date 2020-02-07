@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.118
-  @Date    02 Feb 2020
+  @Version 1.123
+  @Date    07 Feb 2020
 
   @license
 
@@ -68,7 +68,9 @@ Type
     ttCommentText,
     ttTagHeaderText,
     ttTagText,
-    ttSearchHighlight
+    ttSearchHighlight,
+    ttLineHighlight,
+    ttDocIssueEditorText
   );
   (** An enumerate for the scoping of identifiers. **)
   TScope = (

@@ -233,7 +233,8 @@ uses
   BADI.ModuleStats in 'Source\BADI.ModuleStats.pas',
   BADI.ModuleStatsList in 'Source\BADI.ModuleStatsList.pas',
   BADI.SourceEditorNotifier in 'Source\BADI.SourceEditorNotifier.pas',
-  BADI.EditViewNotifier in 'Source\BADI.EditViewNotifier.pas';
+  BADI.EditViewNotifier in 'Source\BADI.EditViewNotifier.pas',
+  BADI.LineDocIssue in 'Source\BADI.LineDocIssue.pas';
 
 {$R *.res}
 

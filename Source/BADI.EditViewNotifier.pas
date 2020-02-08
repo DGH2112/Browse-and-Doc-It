@@ -3,7 +3,7 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 2.999
+  @Version 3.004
   @Date    08 Feb 2020
   
   @license
@@ -153,12 +153,12 @@ Begin
   IconsToRender(DocOps, doShowCheckIconsInEditor, ltChecks);
   IconsToRender(DocOps, doShowMetricIconsInEditor, ltMetrics);
   FMsgsToRender := [];
-  MsgsToRender(DocOps, doShowErrorIconsInEditor, ltErrors);
-  MsgsToRender(DocOps, doShowWarningIconsInEditor, ltWarnings);
-  MsgsToRender(DocOps, doShowHintIconsInEditor, ltHints);
-  MsgsToRender(DocOps, doShowConflictIconsInEditor, ltConflicts);
-  MsgsToRender(DocOps, doShowCheckIconsInEditor, ltChecks);
-  MsgsToRender(DocOps, doShowMetricIconsInEditor, ltMetrics);
+  MsgsToRender(DocOps, doShowErrorMsgsInEditor, ltErrors);
+  MsgsToRender(DocOps, doShowWarningMsgsInEditor, ltWarnings);
+  MsgsToRender(DocOps, doShowHintMsgsInEditor, ltHints);
+  MsgsToRender(DocOps, doShowConflictMsgsInEditor, ltConflicts);
+  MsgsToRender(DocOps, doShowCheckMsgsInEditor, ltChecks);
+  MsgsToRender(DocOps, doShowMetricMsgsInEditor, ltMetrics);
 End;
 
 (**

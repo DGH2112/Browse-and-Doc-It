@@ -379,6 +379,7 @@
         <DCCReference Include="Source\BADI.EditViewNotifier.pas"/>
         <DCCReference Include="Source\BADI.LineDocIssue.pas"/>
         <DCCReference Include="Source\BADI.DocIssueTotals.pas"/>
+        <DCCReference Include="Source\BADI.DocIssuesHintWindow.pas"/>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

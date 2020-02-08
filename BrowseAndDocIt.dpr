@@ -235,7 +235,8 @@ uses
   BADI.SourceEditorNotifier in 'Source\BADI.SourceEditorNotifier.pas',
   BADI.EditViewNotifier in 'Source\BADI.EditViewNotifier.pas',
   BADI.LineDocIssue in 'Source\BADI.LineDocIssue.pas',
-  BADI.DocIssueTotals in 'Source\BADI.DocIssueTotals.pas';
+  BADI.DocIssueTotals in 'Source\BADI.DocIssueTotals.pas',
+  BADI.DocIssuesHintWindow in 'Source\BADI.DocIssuesHintWindow.pas';
 
 {$R *.res}
 

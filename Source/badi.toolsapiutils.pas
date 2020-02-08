@@ -4,8 +4,8 @@
   throughout this project.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    12 Jul 2019
+  @Version 1.005
+  @Date    08 Feb 2020
 
   @license
 
@@ -51,6 +51,8 @@ Type
 
   (** A record to encapsulate the custom Tools API functions **)
   TBADIToolsAPIFunctions = Record
+  Strict Private
+  Public
     Class Function ProjectGroup: IOTAProjectGroup; Static;
     Class Function ActiveProject : IOTAProject; Static;
     Class Function ProjectModule(Const Project : IOTAProject) : IOTAModule; Static;
@@ -79,6 +81,10 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   Character;
+
+Const
+  (** A constant for the BADI Message Group Name. **)
+  strBADIGroupName = 'BADI';
 
 (**
 
@@ -233,10 +239,14 @@ Class Procedure TBADIToolsAPIFunctions.OutputMessage(Const strText : String);
 
 Var
   MS : IOTAMessageServices;
+  MsgGroup: IOTAMessageGroup;
   
 Begin
   If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
-    MS.AddTitleMessage(strText);
+    Begin
+      MsgGroup := MS.AddMessageGroup(strBADIGroupName);
+      MS.AddTitleMessage(strText, MsgGroup);
+    End;
 End;
 
 (**
@@ -262,10 +272,15 @@ Class Procedure TBADIToolsAPIFunctions.OutputMessage(Const strFileName, strText,
 
 Var
   MS : IOTAMessageServices;
+  MsgGroup: IOTAMessageGroup;
+  LineRef: Pointer;
   
 Begin
   If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
-    MS.AddToolMessage(strFileName, strText, strPrefix, iLine, iCol);
+    Begin
+      MsgGroup := MS.AddMessageGroup(strBADIGroupName);
+      MS.AddToolMessage(strFileName, strText, strPrefix, iLine, iCol, Nil, LineRef, MsgGroup);
+    End;
 End;
 
 (**

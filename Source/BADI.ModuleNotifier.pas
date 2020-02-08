@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 1.027
-  @Date    02 Feb 2020
+  @Version 1.028
+  @Date    08 Feb 2020
 
   @license
 
@@ -393,7 +393,7 @@ Var
 
 Begin
   If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
-    MS.AddToolMessage(
+    TBADIToolsAPIFunctions.OutputMessage(
       FFileName,
       strMsg,
       strBADI,

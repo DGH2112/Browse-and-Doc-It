@@ -3,8 +3,8 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    02 Feb 2020
+  @Version 1.001
+  @Date    08 Feb 2020
 
   @license
 
@@ -1411,7 +1411,7 @@ Procedure TBADIOptions.LoadSettings;
 
 Const
   strDefaultDateFmt = 'dd mmm yyyy';
-  dblDefaultIncrement = 0.0001;
+  dblDefaultIncrement = 0.00001;
 
 Var
   iniFile : TMemIniFile;

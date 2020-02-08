@@ -3,8 +3,8 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.023
-  @Date    07 Feb 2020
+  @Version 1.121
+  @Date    08 Feb 2020
 
   @license
 
@@ -101,16 +101,40 @@ ResourceString
   strExpandMetrics = 'Automatically Expand Metrics';
   (** Options text for Syntax Highlight Errors **)
   strSyntaxHighlightErrors = 'Syntax Highlight Module Errors';
+  (** Options text for Showing Error Icons in the Code Editor **)
+  strShowErrorIconsInEditor = 'Show Error Icons in the Code Editor';
+  (** Options text for Showing Error Messages in the Code Editor **)
+  strShowErrorMsgsInEditor = 'Show Error Messages in the Code Editor';
   (** Options text for Syntax Highlight Warnings **)
   strSyntaxHighlightWarnings = 'Syntax Highlight Module Warnings';
+  (** Options text for Showing Warning Icons in the Code Editor **)
+  strShowWarningIconsInEditor = 'Show Warning Icons in the Code Editor';
+  (** Options text for Showing Warning Messages in the Code Editor **)
+  strShowWarningMsgsInEditor = 'Show Warning Messages in the Code Editor';
   (** Options text for Syntax Highlight Hints **)
   strSyntaxHighlightHints = 'Syntax Highlight Module Hints';
+  (** Options text for Showing Hint Icons in the Code Editor **)
+  strShowHintIconsInEditor = 'Show Hint Icons in the Code Editor';
+  (** Options text for Showing Hint Messages in the Code Editor **)
+  strShowHintMsgsInEditor = 'Show Hint Messages in the Code Editor';
   (** Options text for Syntax Highlight Documentation Conflicts **)
   strSyntaxHighlightDocumentationConflicts = 'Syntax Highlight Documentation Conflicts';
+  (** Options text for Showing Conflict Icons in the Code Editor **)
+  strShowConflictIconsInEditor = 'Show Documentation Conflicts Icons in the Code Editor';
+  (** Options text for Showing Conflict Messages in the Code Editor **)
+  strShowConflictMsgsInEditor = 'Show Documentation Conflicts Messages in the Code Editor';
   (** Options text for Syntax Highlight Checks **)
   strSyntaxHighlightChecks = 'Syntax Highlight Checks';
+  (** Options text for Showing Check Icons in the Code Editor **)
+  strShowCheckIconsInEditor = 'Show Check Icons in the Code Editor';
+  (** Options text for Showing Check Messages in the Code Editor **)
+  strShowCheckMsgsInEditor = 'Show Check Messages in the Code Editor';
   (** Options text for Syntax Highlight Metrics **)
   strSyntaxHighlightMetrics = 'Syntax Highlight Metrics';
+  (** Options text for Showing Metric Icons in the Code Editor **)
+  strShowMetricIconsInEditor = 'Show Metric Icons in the Code Editor';
+  (** Options text for Showing Metric Messages in the Code Editor **)
+  strShowMetricMsgsInEditor = 'Show Metric Messages in the Code Editor';
   (** Options text for auto hiding checks in the editoe views if they have no issues. **)
   strAutoHideChecksWithNoIssues = 'Auto Hide Checks with no issues in the Editor Views';
   (** Options text for auto hiding metrics in the editoe views if they have no issues. **)

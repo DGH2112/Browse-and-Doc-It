@@ -3,8 +3,8 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 2.661
-  @Date    07 Feb 2020
+  @Version 2.999
+  @Date    08 Feb 2020
   
   @license
 
@@ -42,16 +42,25 @@ Type
   (** A class which implements the INTAEditorViewNotifier for drawing on the editor. **)
   TBADIEditViewNotifier = Class(TNotifierObject, INTAEditViewNotifier)
   Strict Private
+    Const
+      (** A constant to define the padding between the editor content, doc issue icons and text. **)
+      iPadding = 5;
+  Strict Private
     FPlainTextFontInfo   : TTokenFontInfo;
     FTokenFontInfo       : TTokenFontInfo;
     FLineHighlightColour : TColor;
+    FIconsToRender       : TLimitTypes;
+    FMsgsToRender        : TLimitTypes;
   Strict Protected
+    // INTAEditViewNotifier
     Procedure BeginPaint(Const View: IOTAEditView; Var FullRepaint: Boolean);
     Procedure EditorIdle(Const View: IOTAEditView);
     Procedure EndPaint(Const View: IOTAEditView);
     Procedure PaintLine(Const View: IOTAEditView; LineNumber: Integer; Const LineText: PAnsiChar;
       Const TextWidth: Word; Const LineAttributes: TOTAAttributeArray; Const Canvas: TCanvas;
       Const TextRect: TRect; Const LineRect: TRect; Const CellSize: TSize);
+    // General Methods
+    Procedure DrawIcon(Const Canvas : TCanvas; Var R : TRect; Const eLimitType : TLimitType);
   Public
   End;
 
@@ -72,7 +81,6 @@ Uses
   @precon  None.
   @postcon Not used.
 
-  @nocheck EmptyMethod
   @nohint  View
 
   @param   View        as an IOTAEditView as a constant
@@ -80,6 +88,51 @@ Uses
 
 **)
 Procedure TBADIEditViewNotifier.BeginPaint(Const View: IOTAEditView; Var FullRepaint: Boolean);
+
+  (**
+
+    This procedure updates the FIconsToRender set with a limit type if the given doc option is in the
+    given doc option set.
+
+    @precon  None.
+    @postcon The FIconsToRender set is updated accordingly.
+
+    @param   DocOps        as a TDocOptions as a constant
+    @param   eDocOption    as a TDocOption as a constant
+    @param   eDocIssueType as a TLimitType as a constant
+
+  **)
+  Procedure IconsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
+    Const eDocIssueType : TLimitType);
+
+  Begin
+    If eDocOption In DocOps Then
+      Include(FIconsToRender, eDocIssueType);
+  End;
+
+  (**
+
+    This procedure updates the FMsgoRender set with a limit type if the given doc option is in the
+    given doc option set.
+
+    @precon  None.
+    @postcon The FMsgsToRender set is updated accordingly.
+
+    @param   DocOps        as a TDocOptions as a constant
+    @param   eDocOption    as a TDocOption as a constant
+    @param   eDocIssueType as a TLimitType as a constant
+
+  **)
+  Procedure MsgsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
+    Const eDocIssueType : TLimitType);
+
+  Begin
+    If eDocOption In DocOps Then
+      Include(FMsgsToRender, eDocIssueType);
+  End;
+
+Var
+  DocOps: TDocOptions;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeginPaint', tmoTiming);{$ENDIF}
@@ -91,6 +144,62 @@ Begin
     FTokenFontInfo.FBackColour := FPlainTextFontInfo.FBackColour;
   If FTokenFontInfo.FForeColour = clNone Then
     FTokenFontInfo.FForeColour := FPlainTextFontInfo.FForeColour;
+  DocOps := TBADIOptions.BADIOptions.Options;
+  FIconsToRender := [];
+  IconsToRender(DocOps, doShowErrorIconsInEditor, ltErrors);
+  IconsToRender(DocOps, doShowWarningIconsInEditor, ltWarnings);
+  IconsToRender(DocOps, doShowHintIconsInEditor, ltHints);
+  IconsToRender(DocOps, doShowConflictIconsInEditor, ltConflicts);
+  IconsToRender(DocOps, doShowCheckIconsInEditor, ltChecks);
+  IconsToRender(DocOps, doShowMetricIconsInEditor, ltMetrics);
+  FMsgsToRender := [];
+  MsgsToRender(DocOps, doShowErrorIconsInEditor, ltErrors);
+  MsgsToRender(DocOps, doShowWarningIconsInEditor, ltWarnings);
+  MsgsToRender(DocOps, doShowHintIconsInEditor, ltHints);
+  MsgsToRender(DocOps, doShowConflictIconsInEditor, ltConflicts);
+  MsgsToRender(DocOps, doShowCheckIconsInEditor, ltChecks);
+  MsgsToRender(DocOps, doShowMetricIconsInEditor, ltMetrics);
+End;
+
+(**
+
+  This method renders a document issue icon onto the editor window at the end of the line with the issue.
+
+  @precon  None.
+  @postcon The icon is rendered on the editor window and the left of R is moved to the right of the 
+           drawn icon.
+
+  @param   Canvas     as a TCanvas as a constant
+  @param   R          as a TRect as a reference
+  @param   eLimitType as a TLimitType as a constant
+
+**)
+Procedure TBADIEditViewNotifier.DrawIcon(Const Canvas : TCanvas; Var R : TRect;
+  Const eLimitType : TLimitType);
+
+Const
+  astrIconResNames : Array[TLimitType] Of String = (
+    'Error',
+    'Warning',
+    'Hint',
+    'DocConflict',
+    'Check',
+    'Metric'
+  );
+
+Var
+  B : Vcl.Graphics.TBitMap;
+    
+Begin
+  B := Vcl.Graphics.TBitMap.Create;
+  Try
+    B.LoadFromResourceName(hInstance, astrIconResNames[eLimitType]);
+    B.Transparent := True;
+    Canvas.Draw(R.Left, R.Top + (R.Height - B.Height) Div 2, B);
+    Inc(R.Left, B.Width);
+  Finally
+    B.Free;
+  End;
 End;
 
 (**
@@ -160,46 +269,6 @@ Procedure TBADIEditViewNotifier.PaintLine(Const View: IOTAEditView; LineNumber: 
 
   (**
 
-    This method renders a document issue icon onto the editor window at the end of the line with the
-    issue.
-
-    @precon  None.
-    @postcon The icon is rendered on the editor window and the left of R is moved to the right of the
-             drawn icon.
-
-    @param   R          as a TRect as a reference
-    @param   eLimitType as a TLimitType as a constant
-
-  **)
-  Procedure DrawIcon(Var R : TRect; Const eLimitType : TLimitType);
-
-  Const
-    astrIconResNames : Array[TLimitType] Of String = (
-      'Error',
-      'Warning',
-      'Hint',
-      'DocConflict',
-      'Check',
-      'Metric'
-    );
-
-  Var
-    B : Vcl.Graphics.TBitMap;
-    
-  Begin
-    B := Vcl.Graphics.TBitMap.Create;
-    Try
-      B.LoadFromResourceName(hInstance, astrIconResNames[eLimitType]);
-      B.Transparent := True;
-      Canvas.Draw(R.Left, R.Top + (R.Height - B.Height) Div 2, B);
-      Inc(R.Left, B.Width);
-    Finally
-      B.Free;
-    End;
-  End;
-
-  (**
-
     This method renders the text message associated with a line document issue.
 
     @precon  None.
@@ -230,9 +299,6 @@ Procedure TBADIEditViewNotifier.PaintLine(Const View: IOTAEditView; LineNumber: 
     Canvas.Font.Style := setFontStyles;
   End;
 
-Const
-  iPadding = 5;
-
 Var
   R : TRect;
   LineDocIssue : IBADILineDocIssues;
@@ -248,17 +314,23 @@ Begin
     For eLimitType := Low(TLimitType) To High(TLimitType) Do
       If eLimitType In LineDocIssue.Issues Then
         Begin
-          Case eLimitType Of
-            ltErrors: DrawIcon(R, ltErrors);
-            ltWarnings: DrawIcon(R, ltWarnings);
-            ltHints: DrawIcon(R, ltHints);
-            ltConflicts: DrawIcon(R, ltConflicts);
-            ltChecks: DrawIcon(R, ltChecks);
-            ltMetrics: DrawIcon(R, ltMetrics);
-          End;
-          Inc(R.Left, iPadding);
-          DrawMsgText(R, LineDocIssue.Message[eLimitType]);
-          Inc(R.Left, iPadding);
+          If eLimitType In FIconsToRender Then
+            Begin
+              Case eLimitType Of
+                ltErrors:    DrawIcon(Canvas, R, ltErrors);
+                ltWarnings:  DrawIcon(Canvas, R, ltWarnings);
+                ltHints:     DrawIcon(Canvas, R, ltHints);
+                ltConflicts: DrawIcon(Canvas, R, ltConflicts);
+                ltChecks:    DrawIcon(Canvas, R, ltChecks);
+                ltMetrics:   DrawIcon(Canvas, R, ltMetrics);
+              End;
+              Inc(R.Left, iPadding);
+            End;
+          If eLimitType In FMsgsToRender Then
+            Begin
+              DrawMsgText(R, LineDocIssue.Message[eLimitType]);
+              Inc(R.Left, iPadding);
+            End;
         End;
 End;
 

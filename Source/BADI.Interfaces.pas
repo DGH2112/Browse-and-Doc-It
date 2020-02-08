@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.120
-  @Date    07 Feb 2020
+  @Version 1.210
+  @Date    08 Feb 2020
 
   @license
 
@@ -454,6 +454,7 @@ Type
   (** An interface to manage the size of a file (module) and the size of the changes made to the
       file. **)
   IBADIModuleStats = Interface
+  ['{525A3C3C-AB11-48C4-835D-ADA5A88B848C}']
     Procedure Update(Const iSize : Int64);
     Function  SizeChange : Int64;
     Procedure Reset();
@@ -461,6 +462,7 @@ Type
 
   (** An interface to manage a dictionary of IBADT=IModuleStats. **)
   IBADIModuleStatsList = Interface
+  ['{C64AD7A8-8A15-4114-90DD-E689D8193CA5}']
     Function  GetModuleStats(Const strFileName : String) : IBADIModuleStats;
     Procedure Rename(Const strOldFileName, strNewFileName : String);
     (**
@@ -475,6 +477,7 @@ Type
 
   (** An interface for the Documentation Issues for a line of code. **)
   IBADILineDocIssues = Interface
+  ['{6D94887A-69E7-4736-A1B1-6BB533DE9D9F}']
     // Getters and Setters
     Function  GetLimitTypes : TLimitTypes;
     Function  GetMessage(Const eLimitType : TLimitType) : String;
@@ -496,6 +499,25 @@ Type
       @return  a String
     **)
     Property Message[Const eLimitType : TLimitType] : String Read GetMessage;
+  End;
+
+  (** An interface to returning the doc issue totals for the whole module. **)
+  IBADIDocIssueTotals = Interface
+  ['{FE2ACA7E-03A5-4C12-A872-A8A4F33AC809}']
+    // Getters and Setters
+    Function  GetTotals(Const eLimitType : TLimitType) : Integer;
+    // General Methods
+    Procedure IncDocIssue(Const eDocIssueType : TLimitType);
+    Procedure Clear;
+    // Property
+    (**
+      This property returns the total for the given doc issue type.
+      @precon  None.
+      @postcon Returns the total for the given doc issue type.
+      @param   eLimitType as a TLimitType as a constant
+      @return  an Integer
+    **)
+    Property Totals[Const eLimitType : TLimitType] : Integer Read GetTotals;
   End;
   
 Implementation

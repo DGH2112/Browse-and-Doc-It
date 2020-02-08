@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.512
-  @Date    07 Feb 2020
+  @Version 1.629
+  @Date    08 Feb 2020
 
   @license
 
@@ -184,6 +184,7 @@ Type
     FFiltering         : Boolean;
     FLastFilterUpdate  : Int64;
     FLineDocIssues     : TDictionary<Integer,IBADILineDocIssues>;
+    FDocIssueTotals    : IBADIDocIssueTotals;
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -249,6 +250,7 @@ Type
     Procedure tvExplorerChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Function  MaxLimit(Const Container: TElementContainer) : Integer;
     Function  GetLineDocIssue(Const iLine : Integer) : IBADILineDocIssues;
+    Function  GetDocIssueTotals : IBADIDocIssueTotals;
     Procedure LogDocIssueConflict(Const Element : TElementContainer);
     (**
       This property gets and set the filter text for the explorer view.
@@ -258,8 +260,6 @@ Type
     **)
     Property ExplorerFilter : String Read FExplorerFilter Write SetExplorerFilter;
   Public
-    { Public declarations }
-    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
     Procedure RenderModule(Const Module : TBaseLanguageModule);
@@ -300,6 +300,13 @@ Type
       @return  a IBADILineDocIssues
     **)
     Property LineDocIssues[Const iLine : Integer] : IBADILineDocIssues Read GetLineDocIssue;
+    (**
+      This property returns the document issue totals for the parsed module.
+      @precon  None.
+      @postcon Returns the document issue totals for the parsed module.
+      @return  an IBADIDocIssueTotals
+    **)
+    Property DocIssueTotals : IBADIDocIssueTotals Read GetDocIssueTotals;
   End;
 
 Implementation
@@ -308,6 +315,7 @@ Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
+  SysUtils,
   Types,
   Math,
   BADI.Generic.Tokenizer,
@@ -320,8 +328,9 @@ Uses
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.ModuleExplorer.TreeNodeInfo,
-  SysUtils,
-  BADI.DocIssue, BADI.LineDocIssue;
+  BADI.DocIssue,
+  BADI.LineDocIssue,
+  BADI.DocIssueTotals;
 
 Resourcestring
   (** A format pattern for the bytes statusbar text. **)
@@ -693,6 +702,7 @@ begin
   FLastFilterUpdate := 0;
   FExplorer.OnGetText := tvExplorerGetText;
   FLineDocIssues := TDictionary<Integer,IBADILineDocIssues>.Create;
+  FDocIssueTotals := TBADIDocIssueTotals.Create;
 end;
 
 (**
@@ -1538,6 +1548,22 @@ End;
 
 (**
 
+  This is a getter method for the DocIssueTotals property.
+
+  @precon  None.
+  @postcon Returns the Document Issues Totals.
+
+  @return  an IBADIDocIssueTotals
+
+**)
+Function TframeModuleExplorer.GetDocIssueTotals: IBADIDocIssueTotals;
+
+Begin
+  Result := FDocIssueTotals;
+End;
+
+(**
+
   This method gets the tree nodes that are currently expanded and stores them in a string list.
 
   @precon  Node is the tree node to be tested for expansion.
@@ -1748,6 +1774,7 @@ Procedure TframeModuleExplorer.LogDocIssueConflict(Const Element: TElementContai
 
 Var
   DI: TDocIssue;
+  eLimitType : TLimitType;
   LineDocIssues: IBADILineDocIssues;
   DC: TDocumentConflict;
 
@@ -1755,20 +1782,24 @@ Begin
   If Element Is TDocIssue Then
     Begin
       DI := Element As TDocIssue;
+      eLimitType := ErrorTypeToLimitType(DI.ErrorType);
       If FLineDocIssues.TryGetValue(DI.Line, LineDocIssues) Then
-        LineDocIssues.AddIssue(ErrorTypeToLimitType(DI.ErrorType), Element.AsString(False, False))
+        LineDocIssues.AddIssue(eLimitType, Element.AsString(False, False))
       Else
-        FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(ErrorTypeToLimitType(DI.ErrorType),
+        FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(eLimitType,
           Element.AsString(False, False)));
+      FDocIssueTotals.IncDocIssue(eLimitType);
     End
   Else If Element Is TDocumentConflict Then
     Begin
       DC := Element As TDocumentConflict;
+      eLimitType := ConflictTypeToLimitType(DC.ConflictType);
       If FLineDocIssues.TryGetValue(DC.Line, LineDocIssues) Then
-        LineDocIssues.AddIssue(ConflictTypeToLimitType(DC.ConflictType), Element.AsString(False, False))
+        LineDocIssues.AddIssue(eLimitType, Element.AsString(False, False))
       Else
-        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(ConflictTypeToLimitType(DC.ConflictType),
+        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(eLimitType,
           Element.AsString(False, False)));
+      FDocIssueTotals.IncDocIssue(eLimitType);
     End;
 End;
 
@@ -1953,6 +1984,7 @@ Begin
   FRendering := True;
   Try
     FLineDocIssues.Clear;
+    FDocIssueTotals.Clear;
     FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
     FExplorer.Font.Name := TBADIOptions.BADIOptions.TreeFontName;
     FExplorer.Font.Size := TBADIOptions.BADIOptions.TreeFontSize;

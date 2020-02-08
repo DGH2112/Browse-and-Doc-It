@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Version 1.082
+  @Version 1.140
   @Date    07 Feb 2020
 
   @license
@@ -84,6 +84,7 @@ Type
     Class Procedure HookEventHandlers(Const SelectionChangeProc: TSelectionChange;
       Const Focus, ScopeChange: TNotifyEvent);
     Class Function  LineDocIssue(Const iLine : Integer) : IBADILineDocIssues;
+    Class Function  DocIssueTotals : IBADIDocIssueTotals;
   End;
 
 Implementation
@@ -196,6 +197,24 @@ Begin
   FModuleExplorerFrame.Free;
   SaveStateNecessary := True;
   Inherited;
+End;
+
+(**
+
+  This method returns the doc issues totals.
+
+  @precon  None.
+  @postcon An interfaced object is returned whcih contains the documentation issue totals.
+
+  @return  an IBADIDocIssueTotals
+
+**)
+Class Function TfrmDockableModuleExplorer.DocIssueTotals: IBADIDocIssueTotals;
+
+Begin
+  Result := Nil;
+  If Assigned(FormInstance) And Assigned(FormInstance.FModuleExplorerFrame) Then
+    Result := FormInstance.FModuleExplorerFrame.DocIssueTotals;
 End;
 
 (**

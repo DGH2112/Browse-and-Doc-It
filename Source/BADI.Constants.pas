@@ -3,7 +3,7 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.026
+  @Version 1.150
   @Date    07 Feb 2020
 
   @license
@@ -88,30 +88,40 @@ Const
     (FDescription : strShowErrors;                            FEnabled : True;  FGroup: dogErrors),
     (FDescription : strExpandErrors;                          FEnabled:   True; FGroup: dogErrors),
     (FDescription : strSyntaxHighlightErrors;                 FEnabled : False; FGroup: dogErrors),
+    (FDescription : strShowErrorIconsInEditor;                FEnabled :  True; FGroup: dogErrors),
+    (FDescription : strShowErrorMsgsInEditor;                 FEnabled : False; FGroup: dogErrors),
 
     (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogWarnings),
     (FDescription : strExpandWarnings;                        FEnabled:   True; FGroup: dogWarnings),
     (FDescription : strSyntaxHighlightWarnings;               FEnabled : False; FGroup: dogWarnings),
+    (FDescription : strShowWarningIconsInEditor;              FEnabled :  True; FGroup: dogWarnings),
+    (FDescription : strShowWarningMsgsInEditor;               FEnabled : False; FGroup: dogWarnings),
 
     (FDescription : strShowHints;                             FEnabled : False; FGroup: dogHints),
     (FDescription : strExpandHints;                           FEnabled:   True; FGroup: dogHints),
     (FDescription : strSyntaxHighlightHints;                  FEnabled : False; FGroup: dogHints),
+    (FDescription : strShowHintIconsInEditor;                 FEnabled :  True; FGroup: dogHints),
+    (FDescription : strShowHintMsgsInEditor;                  FEnabled : False; FGroup: dogHints),
 
     (FDescription : strShowDocumentationConflicts;            FEnabled : False; FGroup: dogConflicts),
     (FDescription : strExpandDocConflicts;                    FEnabled:   True; FGroup: dogConflicts),
     (FDescription : strSyntaxHighlightDocumentationConflicts; FEnabled : False; FGroup: dogConflicts),
+    (FDescription : strShowConflictIconsInEditor;             FEnabled :  True; FGroup: dogConflicts),
+    (FDescription : strShowConflictMsgsInEditor;              FEnabled : False; FGroup: dogConflicts),
 
     (FDescription : strShowModuleChecks;                      FEnabled : False; FGroup: dogChecks),
     (FDescription : strExpandChecks;                          FEnabled:   True; FGroup: dogChecks),
     (FDescription : strSyntaxHighlightChecks;                 FEnabled : False; FGroup: dogChecks),
     (FDescription : strAutoHideChecksWithNoIssues;            FEnabled : False; FGroup: dogChecks),
+    (FDescription : strShowCheckIconsInEditor;                FEnabled :  True; FGroup: dogChecks),
+    (FDescription : strShowCheckMsgsInEditor;                 FEnabled : False; FGroup: dogChecks),
 
     (FDescription : strShowModuleMetrics;                     FEnabled : False; FGroup: dogMetrics),
     (FDescription : strExpandMetrics;                         FEnabled:   True; FGroup: dogMetrics),
     (FDescription : strSyntaxHighlightMetrics;                FEnabled : False; FGroup: dogMetrics),
     (FDescription : strAutoHideMetricsWithNoIssues;           FEnabled : False; FGroup: dogMetrics),
-
-
+    (FDescription : strShowMetricIconsInEditor;               FEnabled :  True; FGroup: dogMetrics),
+    (FDescription : strShowMetricMsgsInEditor;                FEnabled : False; FGroup: dogMetrics),
 
     (FDescription : strShowUndocumentedTypes;                 FEnabled : False; FGroup: dogTypes),
     (FDescription : strShowUndocumentedRecords;               FEnabled : False; FGroup: dogTypes),

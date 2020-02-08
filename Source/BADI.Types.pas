@@ -3,7 +3,7 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.123
+  @Version 1.162
   @Date    07 Feb 2020
 
   @license
@@ -128,28 +128,40 @@ Type
     doShowErrors,
     doExpandErrors,
     doSyntaxHighlightErrors,
+    doShowErrorIconsInEditor,
+    doShowErrorMsgsInEditor,
 
     doShowWarnings,
     doExpandWarnings,
     doSyntaxHighlightWarnings,
+    doShowWarningIconsInEditor,
+    doShowWarningMsgsInEditor,
 
     doShowHints,
     doExpandHints,
     doSyntaxHighlightHints,
+    doShowHintIconsInEditor,
+    doShowHintMsgsInEditor,
 
     doShowConflicts,
     doExpandDocConflicts,
     doSyntaxHighlightConflict,
+    doShowConflictIconsInEditor,
+    doShowConflictMsgsInEditor,
 
     doShowChecks,
     doExpandChecks,
     doSyntaxHighlightChecks,
     doAutoHideChecksWithNoissues,
+    doShowCheckIconsInEditor,
+    doShowCheckMsgsInEditor,
 
     doShowMetrics,
     doExpandMetrics,
     doSyntaxHighlightMetrics,
     doAutoHideMetricsWithNoissues,
+    doShowMetricIconsInEditor,
+    doShowMetricMsgsInEditor,
 
     doShowUndocumentedTypes,
     doShowUndocumentedRecords,

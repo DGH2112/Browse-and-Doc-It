@@ -4,7 +4,7 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.629
+  @Version 1.632
   @Date    08 Feb 2020
 
   @license
@@ -1934,15 +1934,12 @@ Begin
         If iCount < iLimit Then
           Begin
             NewNode := AddNode(RootNode, Container.Elements[i], iLevel);
-            Inc(iCount);
             RenderContainers(NewNode, Container[i], iLevel + 1);
           End
         Else If iCount = iLimit Then
-          Begin
-            AddNode(RootNode, Format(strTooManyConflicts, [Container.ElementCount]),
-              strTooManyConflictsName, iLevel, Container.Elements[i].ImageIndexAdjustedForScope);
-            Break;
-          End;
+          AddNode(RootNode, Format(strTooManyConflicts, [Container.ElementCount]),
+            strTooManyConflictsName, iLevel, Container.Elements[i].ImageIndexAdjustedForScope);
+        Inc(iCount);
       End;
 End;
 

@@ -3,7 +3,7 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 3.004
+  @Version 3.241
   @Date    08 Feb 2020
   
   @license
@@ -45,6 +45,9 @@ Type
     Const
       (** A constant to define the padding between the editor content, doc issue icons and text. **)
       iPadding = 5;
+    Class Var
+      (** A class varaiable to determine whether the paint cycle is a full cycle or not. **)
+      FFullRepaint : Boolean;
   Strict Private
     FPlainTextFontInfo   : TTokenFontInfo;
     FTokenFontInfo       : TTokenFontInfo;
@@ -60,8 +63,8 @@ Type
       Const TextWidth: Word; Const LineAttributes: TOTAAttributeArray; Const Canvas: TCanvas;
       Const TextRect: TRect; Const LineRect: TRect; Const CellSize: TSize);
     // General Methods
-    Procedure DrawIcon(Const Canvas : TCanvas; Var R : TRect; Const eLimitType : TLimitType);
   Public
+    Class Procedure ForceFullRepaint;
   End;
 
 Implementation
@@ -70,9 +73,14 @@ Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
+  System.SysUtils,
+  Vcl.Controls,
+  Vcl.Forms,
   BADI.DockableModuleExplorer,
   BADI.Interfaces,
-  BADI.Options;
+  BADI.Options,
+  BADI.DocIssuesHintWindow,
+  BADI.Functions;
 
 (**
 
@@ -136,7 +144,7 @@ Var
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeginPaint', tmoTiming);{$ENDIF}
-  FullRepaint := True;
+  FullRepaint := FFullRepaint;
   FPlainTextFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[True][ttPlainText];
   FTokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[False][ttDocIssueEditorText];
   FLineHighlightColour := TBADIOptions.BADIOptions.TokenFontInfo[True][ttLineHighlight].FBackColour;
@@ -159,47 +167,6 @@ Begin
   MsgsToRender(DocOps, doShowConflictMsgsInEditor, ltConflicts);
   MsgsToRender(DocOps, doShowCheckMsgsInEditor, ltChecks);
   MsgsToRender(DocOps, doShowMetricMsgsInEditor, ltMetrics);
-End;
-
-(**
-
-  This method renders a document issue icon onto the editor window at the end of the line with the issue.
-
-  @precon  None.
-  @postcon The icon is rendered on the editor window and the left of R is moved to the right of the 
-           drawn icon.
-
-  @param   Canvas     as a TCanvas as a constant
-  @param   R          as a TRect as a reference
-  @param   eLimitType as a TLimitType as a constant
-
-**)
-Procedure TBADIEditViewNotifier.DrawIcon(Const Canvas : TCanvas; Var R : TRect;
-  Const eLimitType : TLimitType);
-
-Const
-  astrIconResNames : Array[TLimitType] Of String = (
-    'Error',
-    'Warning',
-    'Hint',
-    'DocConflict',
-    'Check',
-    'Metric'
-  );
-
-Var
-  B : Vcl.Graphics.TBitMap;
-    
-Begin
-  B := Vcl.Graphics.TBitMap.Create;
-  Try
-    B.LoadFromResourceName(hInstance, astrIconResNames[eLimitType]);
-    B.Transparent := True;
-    Canvas.Draw(R.Left, R.Top + (R.Height - B.Height) Div 2, B);
-    Inc(R.Left, B.Width);
-  Finally
-    B.Free;
-  End;
 End;
 
 (**
@@ -236,8 +203,46 @@ End;
 **)
 Procedure TBADIEditViewNotifier.EndPaint(Const View: IOTAEditView);
 
+Const
+  strTEditControlClsName = 'TEditControl';
+
+Var
+  R : TRect;
+  C: TWinControl;
+  i: Integer;
+
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EndPaint', tmoTiming);{$ENDIF}
+  R := Rect(0, 0, 0, 0);
+  C := View.GetEditWindow.Form;
+  For i := 0 To C.ComponentCount - 1 Do
+    If CompareText(C.Components[i].ClassName, strTEditControlClsName) = 0  Then
+      Begin
+        C := (C.Components[i] As TWinControl);
+        R := C.ClientRect;
+        R.TopLeft := C.ClientToScreen(R.TopLeft);
+        R.BottomRight := C.ClientToScreen(R.BottomRight);
+        Dec(R.Bottom, iPadding);
+        Dec(R.Right, iPadding);
+        Break;
+      End;
+  If FFullRepaint And Application.MainForm.Visible Then
+    TBADIDocIssueHintWindow.Display(R, TfrmDockableModuleExplorer.DocIssueTotals);
+  FFullRepaint := False;
+End;
+
+(**
+
+  This method sets the next paint cycle to be a full paint cycle.
+
+  @precon  None.
+  @postcon The next paint cycle will be a full cycle.
+
+**)
+Class Procedure TBADIEditViewNotifier.ForceFullRepaint;
+
+Begin
+  FFullRepaint := True;
 End;
 
 (**
@@ -287,14 +292,12 @@ Procedure TBADIEditViewNotifier.PaintLine(Const View: IOTAEditView; LineNumber: 
 
   Begin
     strTextToRender := strText;
-    If View.CursorPos.Line = LineNumber Then
-      Canvas.Brush.Color := FLineHighlightColour
-    Else
-      Canvas.Brush.Color := FTokenFontInfo.FBackColour;
     setFontStyles := Canvas.Font.Style;
     Canvas.Font.Style := FTokenFontInfo.FStyles;
     Canvas.Font.Color := FTokenFontInfo.FForeColour;
-    Canvas.TextRect(R, strTextToRender, [tfLeft, tfVerticalCenter]);
+    SetBkMode(Canvas.Handle, TRANSPARENT);
+    DrawText(Canvas.Handle, PChar(strTextToRender), Length(strTextToRender),
+      R, DT_LEFT Or DT_VCENTER);
     Inc(R.Left, Canvas.TextWidth(strTextToRender));
     Canvas.Font.Style := setFontStyles;
   End;

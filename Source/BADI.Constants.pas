@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.150
-  @Date    07 Feb 2020
+  @Version 1.180
+  @Date    08 Feb 2020
 
   @license
 
@@ -84,6 +84,7 @@ Const
     (FDescription : strShowCommentsInTheHints;                FEnabled : False; FGroup: dogGeneral),
     (FDescription : strShowChildCountinTitles;                FEnabled : False; FGroup: dogGeneral),
     (FDescription : strFollowEditorCursor;                    FEnabled : False; FGroup: dogGeneral),
+    (FDescription : strdoShowDocIssueTotalsInEditor;          FEnabled :  True; FGroup: dogGeneral),
 
     (FDescription : strShowErrors;                            FEnabled : True;  FGroup: dogErrors),
     (FDescription : strExpandErrors;                          FEnabled:   True; FGroup: dogErrors),

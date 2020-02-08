@@ -2,9 +2,9 @@
 
   This method contains functions that are used global through out the application.
 
-  @Version 1.0
+  @Version 1.012
   @Author  David Hoyle.
-  @Date    21 Jun 2019
+  @Date    08 Feb 2020
 
   @license
 
@@ -36,7 +36,8 @@ Uses
   Classes,
   Dialogs,
   Controls,
-  Graphics,
+  Vcl.Graphics,
+  WinApi.Windows,
   BADI.Types,
   BADI.Interfaces,
   BADI.Base.Container,
@@ -52,21 +53,21 @@ Type
 
   Procedure DisplayException(Const strMsg: String); Overload;
   Procedure DisplayException(Const strMsg: String; Const Params: Array Of Const); Overload;
-  Function IsKeyWord(Const strWord: String; Const strWordList: Array Of String): Boolean;
-  Function IsInSet(Const C: Char; Const strCharSet: TSetOfAnsiChar): Boolean; InLine;
-  Function PrologCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
-  Function EpilogCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
-  Function OutputCommentAndTag(Const C: TBADIBaseContainer; Const iMaxWidth: Integer;
+  Function  IsKeyWord(Const strWord: String; Const strWordList: Array Of String): Boolean;
+  Function  IsInSet(Const C: Char; Const strCharSet: TSetOfAnsiChar): Boolean; InLine;
+  Function  PrologCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
+  Function  EpilogCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
+  Function  OutputCommentAndTag(Const C: TBADIBaseContainer; Const iMaxWidth: Integer;
     Const boolShowHTML, boolFixed: Boolean): String;
-  Function BuildLangIndepRep(Const Param: TGenericParameter): String;
-  Function BADIImageIndex(Const iBADIImageIndex: TBADIImageIndex; Const AScope: TScope): Integer;
+  Function  BuildLangIndepRep(Const Param: TGenericParameter): String;
+  Function  BADIImageIndex(Const iBADIImageIndex: TBADIImageIndex; Const AScope: TScope): Integer;
   Procedure BuildNumber(Var iMajor, iMinor, iBugFix, iBuild: Integer);
-  Function BuildRootKey: String;
-  Function Like(Const strPattern, strText: String): Boolean;
-  Function ConvertDate(Const strDate: String): TDateTime;
-  Function GetField(Const strText: String; Const Ch: Char; Const iIndex: Integer;
+  Function  BuildRootKey: String;
+  Function  Like(Const strPattern, strText: String): Boolean;
+  Function  ConvertDate(Const strDate: String): TDateTime;
+  Function  GetField(Const strText: String; Const Ch: Char; Const iIndex: Integer;
     Const boolIgnoreQuotes: Boolean = True): String;
-  Function CharCount(Const cChar: Char; Const strText: String;
+  Function  CharCount(Const cChar: Char; Const strText: String;
     Const boolIgnoreQuotes: Boolean = True): Integer;
   Procedure LoadBADIImages(Const ilScopeImages: TImageList);
   Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean; 
@@ -75,12 +76,12 @@ Type
     boolSyntax : Boolean; Const iForeColour, iBackColour : TColor; Const FontStyles : TFontStyles;
     Const TokenFontInfoTokenSet : TBADITokenFontInfoTokenSet; Const iBGColour : TColor;
     Const Canvas : TCanvas);
-  Function BlendColour(Const iBaseColour, iHighlightColour : TColor; Const dblBlend : Double) : TColor;
+  Function  BlendColour(Const iBaseColour, iHighlightColour : TColor; Const dblBlend : Double) : TColor;
+  Procedure DrawIcon(Const Canvas : TCanvas; Var R : TRect; Const eLimitType : TLimitType);
 
 Implementation
 
 Uses
-  Windows,
   BADI.Constants,
   SHFolder,
   UITypes;
@@ -683,6 +684,46 @@ End;
 
 (**
 
+  This method renders a document issue icon onto the editor window at the end of the line with the issue.
+
+  @precon  None.
+  @postcon The icon is rendered on the editor window and the left of R is moved to the right of the 
+           drawn icon.
+
+  @param   Canvas     as a TCanvas as a constant
+  @param   R          as a TRect as a reference
+  @param   eLimitType as a TLimitType as a constant
+
+**)
+Procedure DrawIcon(Const Canvas : TCanvas; Var R : TRect; Const eLimitType : TLimitType);
+
+Const
+  astrIconResNames : Array[TLimitType] Of String = (
+    'Error',
+    'Warning',
+    'Hint',
+    'DocConflict',
+    'Check',
+    'Metric'
+  );
+
+Var
+  B : Vcl.Graphics.TBitMap;
+    
+Begin
+  B := Vcl.Graphics.TBitMap.Create;
+  Try
+    B.LoadFromResourceName(hInstance, astrIconResNames[eLimitType]);
+    B.Transparent := True;
+    Canvas.Draw(R.Left, R.Top + (R.Height - B.Height) Div 2, B);
+    Inc(R.Left, B.Width);
+  Finally
+    B.Free;
+  End;
+End;
+
+(**
+
   This procedure returns a string list containing the epilog element of code passed in the template
   parameter.
 
@@ -1009,8 +1050,8 @@ Const
 
 Var
   R: TRect;
-  MainImage: Graphics.TBitmap;
-  ScopeImage: Graphics.TBitmap;
+  MainImage: Vcl.Graphics.TBitmap;
+  ScopeImage: Vcl.Graphics.TBitmap;
   iImage: TBADIImageIndex;
   iScope: TScope;
   x: Integer;
@@ -1018,9 +1059,9 @@ Var
 
 Begin
   R := Rect(0, 0, iBitMapSize, iBitMapSize);
-  MainImage := Graphics.TBitMap.Create;
+  MainImage := Vcl.Graphics.TBitMap.Create;
   Try
-    ScopeImage := Graphics.TBitmap.Create;
+    ScopeImage := Vcl.Graphics.TBitmap.Create;
     Try
       For iImage := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
         For iScope := Low(TScope) To High(TScope) Do

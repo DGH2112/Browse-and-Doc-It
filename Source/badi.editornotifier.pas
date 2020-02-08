@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 1.207
-  @Date    02 Feb 2020
+  @Version 1.212
+  @Date    08 Feb 2020
 
   @license
 
@@ -87,13 +87,16 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,
-  BADI.ToolsAPIUtils,
   Dialogs,
-  BADI.DockableModuleExplorer,
   Windows,
   Forms,
+  Controls,
+  BADI.ToolsAPIUtils,
+  BADI.DockableModuleExplorer,
   BADI.Options,
-  Controls, BADI.Types;
+  BADI.Types,
+  BADI.DocIssuesHintWindow,
+  BADI.EditViewNotifier;
 
 (**
 
@@ -240,6 +243,7 @@ Begin
   FUpdateTimer.Enabled := True;
   FLastParserResult := True;
   FLastUpdateTickCount := 1;
+  TBADIDocIssueHintWindow.Disappear;
 End;
 
 (**
@@ -526,7 +530,10 @@ begin
           If Assigned(EditorSvcs.TopView) Then
             TfrmDockableModuleExplorer.FollowEditorCursor(EditorSvcs.TopView.CursorPos.Line);
       If Assigned(EditorSvcs.TopView) Then
-        EditorSvcs.TopView.Paint;
+        Begin
+          TBADIEditViewNotifier.ForceFullRepaint;
+          EditorSvcs.TopView.Paint;
+        End;
     End;
 end;
 
@@ -591,6 +598,8 @@ begin
             FModuleStatsList.ModuleStats[Editor.FileName].Update(FSource.Length);
         End;
     End;
+  If Not Application.Active Then
+    TBADIDocIssueHintWindow.Disappear;
 end;
 
 (**

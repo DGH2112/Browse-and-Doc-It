@@ -3,7 +3,7 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.121
+  @Version 1.163
   @Date    08 Feb 2020
 
   @license
@@ -79,6 +79,8 @@ ResourceString
   strShowHints = 'Show Module Hints';
   (** Options text for Showing Documentation Conflicts **)
   strShowDocumentationConflicts = 'Show Documentation Conflicts';
+  (** Optiosn text for showing the doc issue ttoals in the Code Editor. **)
+  strdoShowDocIssueTotalsInEditor = 'Show Documentation Issue Totals in the Code Editor';
   (** Options text for Showing Module Metrics. **)
   strShowModuleMetrics = 'Show Module Metrics';
   (** Options text for Showing Module Checks. **)

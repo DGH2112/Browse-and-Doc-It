@@ -4,8 +4,8 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 1.292
-  @Date    02 Feb 2020
+  @Version 1.306
+  @Date    08 Feb 2020
   
   @license
 
@@ -46,29 +46,38 @@ Type
     Procedure ViewActivated(Const View: IOTAEditView);
     Procedure ViewNotification(Const View: IOTAEditView; Operation: TOperation);
   Public
-    Constructor Create;
+    Constructor Create(Const SE : IOTASourceEditor);
     Destructor Destroy; Override;
   End;
 
 Implementation
 
 Uses
-  CodeSiteLogging, BADI.EditViewNotifier;
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
+  BADI.EditViewNotifier;
 
 (**
 
   A constructor for the TBADISourceEditorNotifier class.
 
   @precon  None.
-  @postcon Initialises the class.
+  @postcon Initialises the class and creates a view if a edit view is available. This is a workaround
+           for new modules created afrer the IDE has started.
+
+  @param   SE as an IOTASourceEditor as a constant
 
 **)
-Constructor TBADISourceEditorNotifier.Create;
+Constructor TBADISourceEditorNotifier.Create(Const SE : IOTASourceEditor);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   FEditViewNotifierIndex := -1;
   FView := Nil;
+  // Workaround for new modules create after the IDE has started
+  If SE.EditViewCount > 0 Then
+    ViewNotification(SE.EditViews[0], opInsert);
 End;
 
 (**
@@ -124,12 +133,14 @@ Procedure TBADISourceEditorNotifier.ViewNotification(Const View: IOTAEditView; O
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);{$ENDIF}
   Case Operation Of
+    // Only create a notifier if one has not already been created!
     opInsert:
-      Begin
-        FView := View;
-        FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create);
-      End;
-     // opRemove Never gets called!
+      If FEditViewNotifierIndex = -1 Then 
+        Begin
+          FView := View;
+          FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create);
+        End;
+    // opRemove Never gets called!
     opRemove:
       If FEditViewNotifierIndex > -1 Then
         Begin

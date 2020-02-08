@@ -3,7 +3,7 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.210
+  @Version 1.211
   @Date    08 Feb 2020
 
   @license
@@ -463,8 +463,12 @@ Type
   (** An interface to manage a dictionary of IBADT=IModuleStats. **)
   IBADIModuleStatsList = Interface
   ['{C64AD7A8-8A15-4114-90DD-E689D8193CA5}']
+    // Getter and Setters
     Function  GetModuleStats(Const strFileName : String) : IBADIModuleStats;
+    // General Methods
     Procedure Rename(Const strOldFileName, strNewFileName : String);
+    Procedure Remove(Const strFileName : String);
+    // Properties
     (**
       This method returns an interfaces of the module stats for the given filename.
       @precon  None.

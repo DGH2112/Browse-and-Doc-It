@@ -4,8 +4,8 @@
   their size and size deltas.
 
   @Author  David Hoyle
-  @Version 1.009
-  @Date    02 Feb 2020
+  @Version 1.016
+  @Date    08 Feb 2020
   
   @license
 
@@ -43,8 +43,10 @@ Type
   Strict Private
     FModuleList : TDictionary<String,IBADIModuleStats>;
   Strict Protected
+    // IBADIModuleStatsList
     Function  GetModuleStats(Const strFileName: String): IBADIModuleStats;
     Procedure Rename(Const strOldFileName: String; Const strNewFileName: String);
+    Procedure Remove(Const strFileName : String);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -113,6 +115,22 @@ End;
 
 (**
 
+  This method removes the named module statistics from the list.
+
+  @precon  None.
+  @postcon The module statistics with the given filename is removed if found in the list.
+
+  @param   strFileName as a String as a constant
+
+**)
+Procedure TBADIModuleStatsList.Remove(Const strFileName: String);
+
+Begin
+  FModuleList.Remove(strFileName);
+End;
+
+(**
+
   This method renames the existing module statistics with a new filename key.
 
   @precon  None.
@@ -139,5 +157,3 @@ Begin
 End;
 
 End.
-
-

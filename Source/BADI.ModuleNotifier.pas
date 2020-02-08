@@ -4,7 +4,7 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 1.028
+  @Version 1.030
   @Date    08 Feb 2020
 
   @license
@@ -250,6 +250,7 @@ Destructor TBADIModuleNotifier.Destroy;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
+  FModuleStatsList.Remove(FFileName);
   Inherited;
 End;
 

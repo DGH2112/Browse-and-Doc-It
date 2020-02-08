@@ -4,8 +4,8 @@
   module save events to see if there have been changes in the files.
 
   @Author  David Hoyle
-  @Version 1.309
-  @Date    02 Feb 2020
+  @Version 1.341
+  @Date    08 Feb 2020
   
   @license
 
@@ -278,11 +278,12 @@ Var
   SE : IOTASourceEditor;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InstallEditViewNotifier', tmoTiming);{$ENDIF}
   For i := 0 To M.GetModuleFileCount - 1 Do
     Begin
       E := M.GetModuleFileEditor(i);
       If Supports(E, IOTASourceEditor, SE) Then
-        FEditViewNotifiers.Add(M.FileName, SE.AddNotifier(TBADISourceEditorNotifier.Create));
+        FEditViewNotifiers.Add(M.FileName, SE.AddNotifier(TBADISourceEditorNotifier.Create(SE)));
     End;
 End;
 
@@ -351,6 +352,7 @@ End;
 Procedure TBADIIDENotifier.ModuleRenameEvent(Const strOldFileName, strNewFileName: String);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleRenameEvent', tmoTiming);{$ENDIF}
   FModuleNotifiers.Rename(strOldFileName, strNewFileName);
   FModuleStatsList.Rename(strOldFileName, strNewFileName);
   FEditViewNotifiers.Rename(strOldFileName, strNewFileName);
@@ -375,6 +377,7 @@ Var
   iIndex : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallEditViewNotifier', tmoTiming);{$ENDIF}
   For i := 0 To M.GetModuleFileCount - 1 Do
     Begin
       E := M.GetModuleFileEditor(i);
@@ -430,3 +433,4 @@ Begin
 End;
 
 End.
+

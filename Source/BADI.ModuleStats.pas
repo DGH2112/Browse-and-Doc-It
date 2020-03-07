@@ -4,8 +4,8 @@
   change of a module.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    02 Feb 2020
+  @Version 1.094
+  @Date    07 Mar 2020
   
   @license
 
@@ -41,21 +41,23 @@ Type
   Strict Private
     FSize      : Int64;
     FSizeDelta : Int64;
+    FFileName  : String;
   Strict Protected
     Procedure Reset();
     Function  SizeChange: Int64;
     Procedure Update(Const iSize: Int64);
   Public
-    Constructor Create;
+    Constructor Create(Const strFileName : String);
     Destructor Destroy; Override;
   End;
 
 Implementation
 
-{$IFDEF DEBUG}
 Uses
-  CodeSiteLogging;
-{$ENDIF DEBUG}
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
+  SysUtils;
 
 (**
 
@@ -64,13 +66,16 @@ Uses
   @precon  None.
   @postcon Initialises the class.
 
+  @param   strFileName as a String as a constant
+
 **)
-Constructor TBADIModuleStats.Create;
+Constructor TBADIModuleStats.Create(Const strFileName : String);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   FSize := -1;
   FSizeDelta := 0;
+  FFileName := strFileName;
 End;
 
 (**

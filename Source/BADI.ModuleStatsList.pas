@@ -4,8 +4,8 @@
   their size and size deltas.
 
   @Author  David Hoyle
-  @Version 1.016
-  @Date    08 Feb 2020
+  @Version 1.017
+  @Date    09 Feb 2020
   
   @license
 
@@ -109,7 +109,7 @@ Function TBADIModuleStatsList.GetModuleStats(Const strFileName: String): IBADIMo
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetModuleStats', tmoTiming);{$ENDIF}
   If Not FModuleList.ContainsKey(strFileName) Then
-    FModuleList.Add(strFileName, TBADIModuleStats.Create);
+    FModuleList.Add(strFileName, TBADIModuleStats.Create(strFileName));
   Result := FModuleList[strFileName];
 End;
 

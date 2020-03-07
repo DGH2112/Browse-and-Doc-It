@@ -29,7 +29,7 @@ Uses
 Procedure TBADIModuleStatsTest.Setup;
 
 Begin
-  FModuleStats := TBADIModuleStats.Create;
+  FModuleStats := TBADIModuleStats.Create('D:\Path\Filename.ext');
 End;
 
 Procedure TBADIModuleStatsTest.TearDown;

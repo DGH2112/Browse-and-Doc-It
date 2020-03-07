@@ -4,7 +4,7 @@
   module save events to see if there have been changes in the files.
 
   @Author  David Hoyle
-  @Version 1.341
+  @Version 1.349
   @Date    08 Feb 2020
   
   @license
@@ -384,7 +384,8 @@ Begin
       If Supports(E, IOTASourceEditor, SE) Then
         Begin
           iIndex := FEditViewNotifiers.Remove(M.FileName);
-          SE.RemoveNotifier(iIndex);
+          If iIndex > -1 Then
+            SE.RemoveNotifier(iIndex);
         End;
     End;
 End;

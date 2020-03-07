@@ -4,8 +4,8 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 1.306
-  @Date    08 Feb 2020
+  @Version 1.313
+  @Date    17 Feb 2020
   
   @license
 
@@ -132,22 +132,23 @@ Procedure TBADISourceEditorNotifier.ViewNotification(Const View: IOTAEditView; O
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);{$ENDIF}
-  Case Operation Of
-    // Only create a notifier if one has not already been created!
-    opInsert:
-      If FEditViewNotifierIndex = -1 Then 
-        Begin
-          FView := View;
-          FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create);
-        End;
-    // opRemove Never gets called!
-    opRemove:
-      If FEditViewNotifierIndex > -1 Then
-        Begin
-          View.RemoveNotifier(FEditViewNotifierIndex);
-          FEditViewNotifierIndex := -1;
-        End;
-  End;
+  If Assigned(View) Then
+    Case Operation Of
+      // Only create a notifier if one has not already been created!
+      opInsert:
+        If FEditViewNotifierIndex = -1 Then 
+          Begin
+            FView := View;
+            FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create);
+          End;
+      // opRemove Never gets called!
+      opRemove:
+        If FEditViewNotifierIndex > -1 Then
+          Begin
+            View.RemoveNotifier(FEditViewNotifierIndex);
+            FEditViewNotifierIndex := -1;
+          End;
+    End;
 End;
 
 End.

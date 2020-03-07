@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 1.030
-  @Date    08 Feb 2020
+  @Version 1.118
+  @Date    22 Feb 2020
 
   @license
 
@@ -189,6 +189,7 @@ End;
 Procedure TBADIModuleNotifier.CheckForLastSecondUpdates;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckForLastSecondUpdates', tmoTiming);{$ENDIF}
   FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length);
 End;
 
@@ -361,6 +362,7 @@ Var
   SE: IOTASourceEditor;
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleSource', tmoTiming);{$ENDIF}
   Result := '';
   If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
     Begin
@@ -393,6 +395,7 @@ Var
   MS : IOTAMessageServices;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OutputMsg', tmoTiming);{$ENDIF}
   If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
     TBADIToolsAPIFunctions.OutputMessage(
       FFileName,
@@ -425,6 +428,7 @@ Var
   Writer: IOTAEditWriter;
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OutputSource', tmoTiming);{$ENDIF}
   If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
     Begin
       M := MS.FindModule(FFileName);
@@ -481,23 +485,30 @@ Var
   MM: TMatch;
 
 Begin
-  strSource := ModuleSource;
-  MHMC := FModuleHeader.Matches(strSource);
-  If MHMC.Count > 0 Then
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateDateTimeAndVersion', tmoTiming);{$ENDIF}
+  If doAutoUpdateModuleVersion In TBADIOptions.BADIOptions.Options Then
     Begin
-      strHeaderComment := MHMC.Item[0].Groups[0].Value;
-      MM := FModuleVersion.Match(strHeaderComment);
-      UpdateModuleVersion(MM);
+      strSource := ModuleSource;
+      MHMC := FModuleHeader.Matches(strSource);
+      If MHMC.Count > 0 Then
+        Begin
+          strHeaderComment := MHMC.Item[0].Groups[0].Value;
+          MM := FModuleVersion.Match(strHeaderComment);
+          UpdateModuleVersion(MM);
+        End;
     End;
-  strSource := ModuleSource;
-  MHMC := FModuleHeader.Matches(strSource);
-  If MHMC.Count > 0 Then
+  If doAutoUpdateModuleVersion In TBADIOptions.BADIOptions.Options Then
     Begin
-      strHeaderComment := MHMC.Item[0].Groups[0].Value;
-      MM := FModuleDateTime.Match(strHeaderComment);
-      UpdateModuleDate(MM);
-    End Else
-      OutputMsg(strNoModuleComment);
+      strSource := ModuleSource;
+      MHMC := FModuleHeader.Matches(strSource);
+      If MHMC.Count > 0 Then
+        Begin
+          strHeaderComment := MHMC.Item[0].Groups[0].Value;
+          MM := FModuleDateTime.Match(strHeaderComment);
+          UpdateModuleDate(MM);
+        End Else
+          OutputMsg(strNoModuleComment);
+    End;
 End;
 
 (**
@@ -522,6 +533,7 @@ Var
   strNewDate : String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateModuleDate', tmoTiming);{$ENDIF}
   If Match.Success Then
     Begin
       strDate := Match.Groups[1].Value;
@@ -571,6 +583,7 @@ Var
   strNewVersion: String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateModuleVersion', tmoTiming);{$ENDIF}
   If Match.Success Then
     Begin
       strVersion := Match.Groups[1].Value;
@@ -595,3 +608,5 @@ Begin
 End;
 
 End.
+
+

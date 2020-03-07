@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.171
-  @Date    08 Feb 2020
+  @Version 1.177
+  @Date    15 Feb 2020
 
   @license
 
@@ -125,6 +125,8 @@ Type
     doShowChildCountInTitles,
     doFollowEditorCursor,
     doShowDocIssueTotalsInEditor,
+    doAutoUpdateModuleDate,
+    doAutoUpdateModuleVersion,
 
     doShowErrors,
     doExpandErrors,

@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 1.212
-  @Date    08 Feb 2020
+  @Version 1.221
+  @Date    28 Mar 2020
 
   @license
 
@@ -355,8 +355,11 @@ Const
   {$IFDEF VER320} // Delphi XE10.2 Tokyo
   strCompilerVersion = 'VER320';
   {$ENDIF}
-  {$IFDEF VER330} // Delphi XE10.3 Carnival
-  strCompilerVersion = 'VER320';
+  {$IFDEF VER330} // Delphi XE10.3 Rio
+  strCompilerVersion = 'VER330';
+  {$ENDIF}
+  {$IFDEF VER340} // Delphi XE10.4 Denali
+  strCompilerVersion = 'VER340';
   {$ENDIF}
   {$IFNDEF D0001}
     {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}

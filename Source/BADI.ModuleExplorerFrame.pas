@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.632
-  @Date    08 Feb 2020
+  @Version 1.634
+  @Date    28 Mar 2020
 
   @license
 
@@ -2143,7 +2143,7 @@ Const
   iUpdateInterval = 250;
 
 Begin
-  If (FLastFilterUpdate > 0) And (GetTickCount64 > FLastFilterUpdate + iUpdateInterval) Then
+  If (FLastFilterUpdate > 0) And (GetTickCount > FLastFilterUpdate + iUpdateInterval) Then
     Try
       edtExplorerFilterChange(Self);
     Finally
@@ -2397,7 +2397,7 @@ Begin
           #08:
             Begin
               ExplorerFilter := Copy(ExplorerFilter, 1, Length(ExplorerFilter) - 1);
-              FLastFilterUpdate := GetTickCount64;
+              FLastFilterUpdate := GetTickCount;
               Key := #0;
             End;
           #13:
@@ -2413,13 +2413,13 @@ Begin
           #27:
             Begin
               ExplorerFilter := '';
-              FLastFilterUpdate := GetTickCount64;
+              FLastFilterUpdate := GetTickCount;
               Key := #0;
             End;
           #32..#128:
             Begin
               ExplorerFilter := ExplorerFilter + Key;
-              FLastFilterUpdate := GetTickCount64;
+              FLastFilterUpdate := GetTickCount;
               Key := #0;
             End;
         End;

@@ -4,7 +4,7 @@
   throughout this project.
 
   @Author  David Hoyle
-  @Version 1.061
+  @Version 1.075
   @Date    28 Mar 2020
 
   @license
@@ -68,11 +68,9 @@ Type
       iIdentColumn : Integer; Const BrowsePosition : TBrowsePosition); Overload; Static;
     Class Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
       Const BrowsePosition : TBrowsePosition); Overload; Static;
-    {$IFDEF DXE102}
     Class Procedure RegisterFormClassForTheming(Const AFormClass : TCustomFormClass;
       Const Component : TComponent = Nil); Static;
     Class Procedure ApplyTheming(Const Component : TComponent); Static;
-    {$ENDIF}
   End;
 
 Implementation
@@ -130,7 +128,6 @@ Begin
     Result := ES.TopBuffer;
 End;
 
-{$IFDEF DXE102}
 (**
 
   This method apply theming to the given componentif theming is enabled and available.
@@ -143,15 +140,18 @@ End;
 **)
 Class Procedure TBADIToolsAPIFunctions.ApplyTheming(Const Component: TComponent);
 
+{$IFDEF DXE102}
 Var
   ITS : IOTAIDEThemingServices;
+{$ENDIF DXE102}
   
 Begin
+  {$IFDEF DXE102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       ITS.ApplyTheme(Component);
+  {$ENDIF DXE102}
 End;
-{$ENDIF}
 
 (**
 
@@ -658,7 +658,6 @@ Begin
     End;
 End;
 
-{$IFDEF DXE102}
 (**
 
   This method regsiters the given form class for theming is theming is enabled and available.
@@ -673,27 +672,30 @@ End;
 Class Procedure TBADIToolsAPIFunctions.RegisterFormClassForTheming(Const AFormClass : TCustomFormClass;
   Const Component : TComponent = Nil);
 
+{$IFDEF DXE102}
 Var
   {$IFDEF DXE104} // Breaking change to the Open Tools API - They fixed the wrongly defined interface
   ITS : IOTAIDEThemingServices;
   {$ELSE}
   ITS : IOTAIDEThemingServices250;
-  {$ENDIF}
+  {$ENDIF DXE104}
+{$ENDIF DXE102}
   
 Begin
+  {$IFDEF DXE102}
   {$IFDEF DXE104}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
   {$ELSE}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices250, ITS) Then
-  {$ENDIF}
+  {$ENDIF DXE104}
     If ITS.IDEThemingEnabled Then
       Begin
         ITS.RegisterFormClass(AFormClass);
         If Assigned(Component) Then
           ITS.ApplyTheme(Component);
       End;
+  {$ENDIF DXE102}
 End;
-{$ENDIF}
 
 (**
 

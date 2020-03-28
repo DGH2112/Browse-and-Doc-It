@@ -3,8 +3,8 @@
   This module contains a class to add and edit method descriptions.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.030
+  @Date    28 Mar 2020
 
   @license
 
@@ -54,9 +54,10 @@ Type
     edtPattern: TEdit;
     lblDescription: TLabel;
     edtDescription: TEdit;
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     pnlForm: TPanel;
+    btnCancel: TButton;
+    btnOK: TButton;
+    ilButtons: TImageList;
   Strict Private
   Strict Protected
   Public
@@ -67,11 +68,11 @@ Implementation
 
 {$R *.dfm}
 
-{$IFNDEF STANDALONEAPP}
 Uses
+  {$IFNDEF STANDALONEAPP}
   ToolsAPI,
+  {$ENDIF}
   BADI.ToolsAPIUtils;
-{$ENDIF}
 
 (**
 
@@ -96,17 +97,9 @@ Var
   
 Begin
   Result := False;
-  { $IFDEF DXE102
-  TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmMethodDescriptions);
-  TBADIToolsAPIFunctions.ApplyTheming(Self);
-  {$ENDIF}
   F := TfrmMethodDescriptions.Create(Nil);
   Try
-    { $IFDEF DXE102
-    If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-      If ITS.IDEThemingEnabled Then
-        ITS.ApplyTheme(F);
-    {$ENDIF}
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmMethodDescriptions, F);
     F.edtPattern.Text := strPattern;
     F.edtDescription.Text := strDescription;
     If F.ShowModal = mrOK Then

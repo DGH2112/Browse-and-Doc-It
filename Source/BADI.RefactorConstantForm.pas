@@ -44,7 +44,8 @@ Uses
   Dialogs,
   StdCtrls,
   Buttons,
-  BADI.Refactoring.Functions, Vcl.ExtCtrls, System.ImageList, Vcl.ImgList;
+  ExtCtrls,
+  BADI.Refactoring.Functions;
 
 {$INCLUDE CompilerDefinitions.inc}
 

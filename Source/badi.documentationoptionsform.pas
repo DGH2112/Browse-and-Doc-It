@@ -45,7 +45,7 @@ uses
   StdCtrls,
   Buttons,
   ExtCtrls,
-  BADI.Documentation.Dispatcher, System.ImageList, Vcl.ImgList;
+  BADI.Documentation.Dispatcher;
 
 type
   (** A class to represent the form interface. **)

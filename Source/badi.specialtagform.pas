@@ -4,8 +4,8 @@
   through a single method.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.018
+  @Date    28 Mar 2020
 
   @license
 
@@ -56,8 +56,6 @@ Type
     edtName: TEdit;
     lblDescription: TLabel;
     edtDescription: TEdit;
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     lbxTagProperties: TCheckListBox;
     lblTagProperties: TLabel;
     gbxFontStyles: TGroupBox;
@@ -71,6 +69,9 @@ Type
     cbxBackColour: TColorBox;
     lblBackColour: TLabel;
     pnlForm: TPanel;
+    btnCancel: TButton;
+    btnOK: TButton;
+    ilButtons: TImageList;
     procedure btnOKClick(Sender: TObject);
   Strict Private
   Strict Protected
@@ -85,13 +86,11 @@ Implementation
 Uses
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  BADI.ToolsAPIUtils,
   {$ENDIF}
+  BADI.ToolsAPIUtils,
   BADI.Constants;
 
 {$R *.DFM}
-
-{ TfrmSpecialTag }
 
 (**
 
@@ -145,10 +144,7 @@ Begin
   Result := False;
   frm := TfrmSpecialTag.Create(Application.MainForm);
   Try
-    { $IFDEF DXE102 
-    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmSpecialTag);
-    TBADIToolsAPIFunctions.ApplyTheming(Self);
-    {$ENDIF}
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmSpecialTag, frm);
     frm.InitialiseForm(SpecialTag);
     If frm.ShowModal = mrOK Then
       Begin

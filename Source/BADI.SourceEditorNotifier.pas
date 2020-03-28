@@ -4,8 +4,8 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 1.313
-  @Date    17 Feb 2020
+  @Version 1.329
+  @Date    28 Mar 2020
   
   @license
 
@@ -36,11 +36,15 @@ Uses
   ToolsAPI,
   System.Classes;
 
+{$INCLUDE CompilerDefinitions.inc}
+
 Type
   (** This class implements an IOTAEditorNotifier to tracker when views are created and destroyed. **)
   TBADISourceEditorNotifier = Class(TNotifierObject, IInterface, IOTANotifier, IOTAEditorNotifier)
   Strict Private
+    {$IFDEF DXE100}
     FEditViewNotifierIndex : Integer;
+    {$ENDIF DXE100}
     FView                  : IOTAEditView;
   Strict Protected
     Procedure ViewActivated(Const View: IOTAEditView);
@@ -73,7 +77,9 @@ Constructor TBADISourceEditorNotifier.Create(Const SE : IOTASourceEditor);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
+  {$IFDEF DXE100}
   FEditViewNotifierIndex := -1;
+  {$ENDIF DXE100}
   FView := Nil;
   // Workaround for new modules create after the IDE has started
   If SE.EditViewCount > 0 Then
@@ -132,6 +138,7 @@ Procedure TBADISourceEditorNotifier.ViewNotification(Const View: IOTAEditView; O
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);{$ENDIF}
+  {$IFDEF DXE100}
   If Assigned(View) Then
     Case Operation Of
       // Only create a notifier if one has not already been created!
@@ -149,6 +156,7 @@ Begin
             FEditViewNotifierIndex := -1;
           End;
     End;
+  {$ENDIF DXE100}
 End;
 
 End.

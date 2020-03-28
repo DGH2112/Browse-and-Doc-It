@@ -3,8 +3,8 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 3.241
-  @Date    08 Feb 2020
+  @Version 3.253
+  @Date    28 Mar 2020
   
   @license
 
@@ -38,6 +38,9 @@ Uses
   WinApi.Windows,
   BADI.Types;
 
+{$INCLUDE CompilerDefinitions.inc}
+
+{$IFDEF DXE100}
 Type
   (** A class which implements the INTAEditorViewNotifier for drawing on the editor. **)
   TBADIEditViewNotifier = Class(TNotifierObject, INTAEditViewNotifier)
@@ -66,6 +69,7 @@ Type
   Public
     Class Procedure ForceFullRepaint;
   End;
+{$ENDIF DXE100}
 
 Implementation
 
@@ -82,6 +86,7 @@ Uses
   BADI.DocIssuesHintWindow,
   BADI.Functions;
 
+{$IFDEF DXE100}
 (**
 
   This method is called before painting on the editor starts.
@@ -336,5 +341,6 @@ Begin
             End;
         End;
 End;
+{$ENDIF DXE100}
 
 End.

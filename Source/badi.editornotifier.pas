@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 1.221
+  @Version 1.226
   @Date    28 Mar 2020
 
   @license
@@ -534,7 +534,9 @@ begin
             TfrmDockableModuleExplorer.FollowEditorCursor(EditorSvcs.TopView.CursorPos.Line);
       If Assigned(EditorSvcs.TopView) Then
         Begin
+          {$IFDEF DXE100}
           TBADIEditViewNotifier.ForceFullRepaint;
+          {$ENDIF DXE100}
           EditorSvcs.TopView.Paint;
         End;
     End;

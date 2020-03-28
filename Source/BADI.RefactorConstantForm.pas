@@ -4,8 +4,8 @@
   refactoring.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.032
+  @Date    28 Mar 2020
 
   @license
 
@@ -44,7 +44,7 @@ Uses
   Dialogs,
   StdCtrls,
   Buttons,
-  BADI.Refactoring.Functions, Vcl.ExtCtrls;
+  BADI.Refactoring.Functions, Vcl.ExtCtrls, System.ImageList, Vcl.ImgList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -57,12 +57,13 @@ Type
     lblLiteral: TLabel;
     lblScope: TLabel;
     cbxScope: TComboBox;
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     cbxType: TComboBox;
     lblType: TLabel;
     chkNewLine: TCheckBox;
     pnlFudgePanel: TPanel;
+    btnCancel: TButton;
+    btnOK: TButton;
+    ilButtons: TImageList;
     Procedure btnOKClick(Sender: TObject);
   Strict Private
     FRefactoringInfo : TBADIRefactoringInfo;
@@ -183,14 +184,11 @@ Begin
   Result := False;
   F := TfrmBADIRefactorConstant.Create(Application.MainForm);
   Try
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmBADIRefactorConstant, F);
     F.edtName.Text := RefactoringInfo.Name;
     F.edtLiteral.Text := RefactoringInfo.Token.Token;
     F.InitialiseDialogue(RefactoringInfo.Scopes, RefactoringInfo.Types, boolNewLine);
     F.FRefactoringInfo := RefactoringInfo;
-    { $IFDEF DXE102
-    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmBADIRefactorConstant);
-    TBADIToolsAPIFunctions.ApplyTheming(Self);
-    {$ENDIF}
     If F.ShowModal = mrOK Then
       Begin
         RefactoringInfo.Name := F.edtName.Text;

@@ -2,9 +2,9 @@
 
   This method contains functions that are used global through out the application.
 
-  @Version 1.012
+  @Version 1.081
   @Author  David Hoyle.
-  @Date    08 Feb 2020
+  @Date    28 Mar 2020
 
   @license
 
@@ -1054,8 +1054,6 @@ Var
   ScopeImage: Vcl.Graphics.TBitmap;
   iImage: TBADIImageIndex;
   iScope: TScope;
-  x: Integer;
-  y: Integer;
 
 Begin
   R := Rect(0, 0, iBitMapSize, iBitMapSize);
@@ -1068,10 +1066,8 @@ Begin
           Begin
               MainImage.LoadFromResourceName(hInstance, BADIImageList[iImage].FResourceName);
               ScopeImage.LoadFromResourceName(hInstance, BADIScopeList[iScope].FResourceName);
-              For x := 0 To 11 Do
-                For y := 0 To 11 Do
-                  If ScopeImage.Canvas.Pixels[x, y] <> BADIScopeList[iScope].FMaskColour Then
-                    MainImage.Canvas.Pixels[x, y] := ScopeImage.Canvas.Pixels[x, y];
+              ScopeImage.Transparent := True;
+              MainImage.Canvas.Draw(0, 0, ScopeImage);
               ilScopeImages.AddMasked(MainImage, BADIImageList[iImage].FMaskColour);
           End;
     Finally

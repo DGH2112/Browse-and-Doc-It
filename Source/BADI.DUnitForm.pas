@@ -3,9 +3,9 @@
   This module defines a class which reprepsents a form for selecting
   DUnit Unit Tetsing Options.
 
-  @Version 1.0
+  @Version 1.042
   @Author  David Hoyle
-  @Date    25 Jun 2019
+  @Date    28 Mar 2020
 
   @license
 
@@ -52,7 +52,7 @@ uses
   ImgList,
   ExtCtrls,
   UITypes,
-  BADI.ElementContainer;
+  BADI.ElementContainer, System.ImageList;
 
 type
   (** A class to represent the form interface. **)
@@ -61,8 +61,6 @@ type
     rdoExistingProject: TRadioButton;
     cbxExistingProject: TComboBox;
     rdoNewProject: TRadioButton;
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     gbxUnit: TGroupBox;
     rdoExistingUnit: TRadioButton;
     cbxExistingUnit: TComboBox;
@@ -81,6 +79,9 @@ type
     lblMethodName: TLabel;
     edtClassName: TEdit;
     edtMethodName: TEdit;
+    btnOK: TButton;
+    btnCancel: TButton;
+    ilButtons: TImageList;
     Procedure rdoNewExistingProject(Sender: TObject);
     Procedure btnOKClick(Sender: TObject);
     Procedure rdoNewExistingUnit(Sender: TObject);
@@ -457,40 +458,54 @@ Class Procedure TfrmDUnit.Execute(Const objDUnitCreator : TDUnitCreator);
 
 var
   strUnitTobeTested: String;
+  F: TfrmDUnit;
 
 Begin
-  With TfrmDUnit.Create(Application.MainForm) Do
-    Try
-      objDUnitCreator.Errors := ErrorProc;
-      FDUnitCreator := objDUnitCreator;
-      InitialiseTreeView;
-      rdoNewExistingProject(Nil);
-      rdoNewExistingUnit(Nil);
-      If ShowModal = mrOK Then
-        Begin
-          If cbxBaseClass.Items.IndexOf(cbxBaseClass.Text) = -1 Then
-            cbxBaseClass.Items.Add(cbxBaseClass.Text);
-          SaveSettings;
-          strUnitTobeTested := TBADIToolsAPIFunctions.ActiveSourceEditor.FileName;
-          BuildTestCaseList;
-          If rdoNewProject.Checked Then
-            objDUnitCreator.CreateTestProject(edtNewProjectName.Text)
-          Else
-            objDUnitCreator.ActivateProject(cbxExistingProject.ItemIndex);
-          objDUnitCreator.AddUnitToBeTested(strUnitToBeTested);
-          strUnitToBeTested := ChangeFileExt(ExtractFileName(strUnitToBeTested), '');
-          If rdoNewUnit.Checked Then
-            objDUnitCreator.CreateTestUnit(edtNewUnitName.Text,
-              strUnitToBeTested, FTestCases, cbxBaseClass.Text,
-              edtTestSuiteName.Text, edtClassName.Text, edtMethodName.Text)
-          Else
-            objDUnitCreator.UpdateTestUnit(cbxExistingUnit.ItemIndex,
-              strUnitToBeTested, FTestCases, cbxBaseClass.Text,
-              edtTestSuiteName.Text, edtClassName.Text, edtMethodName.Text);
-        End;
-    Finally
-      Free;
-    End;
+  F := TfrmDUnit.Create(Application.MainForm);
+  Try
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDUnit, F);
+    objDUnitCreator.Errors := F.ErrorProc;
+    F.FDUnitCreator := objDUnitCreator;
+    F.InitialiseTreeView;
+    F.rdoNewExistingProject(Nil);
+    F.rdoNewExistingUnit(Nil);
+    If F.ShowModal = mrOK Then
+      Begin
+        If F.cbxBaseClass.Items.IndexOf(F.cbxBaseClass.Text) = -1 Then
+          F.cbxBaseClass.Items.Add(F.cbxBaseClass.Text);
+        F.SaveSettings;
+        strUnitTobeTested := TBADIToolsAPIFunctions.ActiveSourceEditor.FileName;
+        F.BuildTestCaseList;
+        If F.rdoNewProject.Checked Then
+          objDUnitCreator.CreateTestProject(F.edtNewProjectName.Text)
+        Else
+          objDUnitCreator.ActivateProject(F.cbxExistingProject.ItemIndex);
+        objDUnitCreator.AddUnitToBeTested(strUnitToBeTested);
+        strUnitToBeTested := ChangeFileExt(ExtractFileName(strUnitToBeTested), '');
+        If F.rdoNewUnit.Checked Then
+          objDUnitCreator.CreateTestUnit(
+            F.edtNewUnitName.Text,
+            strUnitToBeTested,
+            F.FTestCases,
+            F.cbxBaseClass.Text,
+            F.edtTestSuiteName.Text,
+            F.edtClassName.Text,
+            F.edtMethodName.Text
+          )
+        Else
+          objDUnitCreator.UpdateTestUnit(
+            F.cbxExistingUnit.ItemIndex,
+            strUnitToBeTested,
+            F.FTestCases,
+            F.cbxBaseClass.Text,
+            F.edtTestSuiteName.Text,
+            F.edtClassName.Text,
+            F.edtMethodName.Text
+          );
+      End;
+  Finally
+    F.Free;
+  End;
 End;
 
 (**

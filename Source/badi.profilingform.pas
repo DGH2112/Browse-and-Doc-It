@@ -3,9 +3,9 @@
   This module contains a class which represents a form for selecting and
   deselecting methods which need profiling.
 
-  @Version 1.0
+  @Version 1.027
   @Author  David Hoyle
-  @Date    25 Jun 2019
+  @Date    28 Mar 2020
 
   @license
 
@@ -52,7 +52,7 @@ uses
   Contnrs,
   ExtCtrls,
   UITypes,
-  BADI.ElementContainer;
+  BADI.ElementContainer, System.ImageList;
 
 type
   (** An enumerate to define if the profile job is an insertion or a removal. **)
@@ -140,13 +140,14 @@ type
 
   (** A class to represent the form interface. **)
   TfrmProfiling = class(TForm)
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     vstMethods: TVirtualStringTree;
     ilScopeImages: TImageList;
     mmoCode: TMemo;
     pnlPanel: TPanel;
     Splitter: TSplitter;
+    btnOK: TButton;
+    btnCancel: TButton;
+    ilButtons: TImageList;
     procedure btnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     {$IFNDEF D2009}
@@ -289,12 +290,9 @@ Begin
   Result := Nil;
   frm := TfrmProfiling.Create(Application.MainForm);
   Try
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmProfiling, frm);
     frm.InitialiseTreeView(Module);
     frm.mmoCode.Lines.Text := TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName];
-    { $IFDEF DXE102
-    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmProfiling);
-    TBADIToolsAPIFunctions.ApplyTheming(frm);
-    {$ENDIF}
     If frm.ShowModal = mrOK Then
       Begin
         Result := TProfileJobs.Create;

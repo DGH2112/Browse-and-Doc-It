@@ -4,8 +4,8 @@
   throughout this project.
 
   @Author  David Hoyle
-  @Version 1.005
-  @Date    08 Feb 2020
+  @Version 1.061
+  @Date    28 Mar 2020
 
   @license
 
@@ -69,7 +69,8 @@ Type
     Class Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
       Const BrowsePosition : TBrowsePosition); Overload; Static;
     {$IFDEF DXE102}
-    Class Procedure RegisterFormClassForTheming(Const AFormClass : TCustomFormClass); Static;
+    Class Procedure RegisterFormClassForTheming(Const AFormClass : TCustomFormClass;
+      Const Component : TComponent = Nil); Static;
     Class Procedure ApplyTheming(Const Component : TComponent); Static;
     {$ENDIF}
   End;
@@ -666,17 +667,31 @@ End;
   @postcon The form is regsitered for theming is available and enabled.
 
   @param   AFormClass as a TCustomFormClass as a constant
+  @param   Component  as a TComponent as a constant
 
 **)
-Class Procedure TBADIToolsAPIFunctions.RegisterFormClassForTheming(Const AFormClass : TCustomFormClass);
+Class Procedure TBADIToolsAPIFunctions.RegisterFormClassForTheming(Const AFormClass : TCustomFormClass;
+  Const Component : TComponent = Nil);
 
 Var
+  {$IFDEF DXE104} // Breaking change to the Open Tools API - They fixed the wrongly defined interface
+  ITS : IOTAIDEThemingServices;
+  {$ELSE}
   ITS : IOTAIDEThemingServices250;
+  {$ENDIF}
   
 Begin
+  {$IFDEF DXE104}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+  {$ELSE}
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices250, ITS) Then
+  {$ENDIF}
     If ITS.IDEThemingEnabled Then
-      ITS.RegisterFormClass(AFormClass);
+      Begin
+        ITS.RegisterFormClass(AFormClass);
+        If Assigned(Component) Then
+          ITS.ApplyTheme(Component);
+      End;
 End;
 {$ENDIF}
 

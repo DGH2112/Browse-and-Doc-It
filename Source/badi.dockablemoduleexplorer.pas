@@ -3,8 +3,8 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Version 1.140
-  @Date    07 Feb 2020
+  @Version 1.230
+  @Date    28 Mar 2020
 
   @license
 
@@ -430,20 +430,9 @@ End;
 **)
 Procedure TfrmDockableModuleExplorer.ThemeForm(Sender : TObject);
 
-{$IFDEF DXE102}
-Var
-  ITS : IOTAIDEThemingServices250;
-{$ENDIF}
-
 Begin
   {$IFDEF DXE102}
-  //TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDockableModuleExplorer);
-  If Supports(BorlandIDEServices, IOTAIDEThemingServices250, ITS) Then
-    If ITS.IDEThemingEnabled Then
-      Begin
-        ITS.RegisterFormClass(TfrmDockableModuleExplorer);
-        ITS.ApplyTheme(Self);
-      End;
+  TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDockableModuleExplorer, Self);
   {$ENDIF}
 End;
 

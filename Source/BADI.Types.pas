@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.177
-  @Date    15 Feb 2020
+  @Version 1.313
+  @Date    12 Apr 2020
 
   @license
 
@@ -242,6 +242,78 @@ Type
     iiCheckIncorrect,
     iiCheckItem,
     iiCheckMissing,
+
+    iiRedWarning,
+    iiAmberWarning,
+    iiYellowWarning,
+    iiGreenWarning,
+    iiBlueWarning,
+
+    iiRedStop,
+    iiAmberStop,
+    iiYellowStop,
+    iiGreenStop,
+    iiBlueStop,
+
+    iiRedProhibited,
+    iiAmberProhibited,
+    iiYellowProhibited,
+    iiGreenProhibited,
+    iiBlueProhibited,
+
+    iiRedBug,
+    iiAmberBug,
+    iiYellowBug,
+    iiGreenBug,
+    iiBlueBug,
+
+    iiRedUpArrow,
+    iiAmberUpArrow,
+    iiYellowUpArrow,
+    iiGreenUpArrow,
+    iiBlueUpArrow,
+
+    iiRedRightArrow,
+    iiAmberRightArrow,
+    iiYellowRightArrow,
+    iiGreenRightArrow,
+    iiBlueRightArrow,
+
+    iiRedDownArrow,
+    iiAmberDownArrow,
+    iiYellowDownArrow,
+    iiGreenDownArrow,
+    iiBlueDownArrow,
+
+    iiRedLeftArrow,
+    iiAmberLeftArrow,
+    iiYellowLeftArrow,
+    iiGreenLeftArrow,
+    iiBlueLeftArrow,
+
+    iiRedBookmark,
+    iiAmberBookmark,
+    iiYellowBookmark,
+    iiGreenBookmark,
+    iiBlueBookmark,
+
+    iiRedTick,
+    iiAmberTick,
+    iiYellowTick,
+    iiGreenTick,
+    iiBlueTick,
+
+    iiRedToDoTick,
+    iiAmberToDoTick,
+    iiYellowToDoTick,
+    iiGreenToDoTick,
+    iiBlueToDoTick,
+
+    iiRedToDoCross,
+    iiAmberToDoCross,
+    iiYellowToDoCross,
+    iiGreenToDoCross,
+    iiBlueToDoCross,
 
     iiUsesLabel,
     iiUsesItem,

@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.211
-  @Date    15 Feb 2020
+  @Version 1.813
+  @Date    12 Apr 2020
 
   @license
 
@@ -221,7 +221,9 @@ Const
   );
 
   (** This is a list of Image Resource name to be loaded fom the executable. **)
-  BADIImageList : Array[Succ(Low(TBADIImageIndex))..High(TBADIImageIndex)] Of TImageIndexInfo = (
+  BADIImageList : Array[TBADIImageIndex] Of TImageIndexInfo = (
+    (FResourceName : 'Module';                        FMaskColour: clLime),
+
     (FResourceName : 'Module';                        FMaskColour: clLime),
 
     (FResourceName : 'ErrorFolder';                   FMaskColour: clLime),
@@ -245,6 +247,78 @@ Const
     (FResourceName : 'CheckIncorrect';                FMaskColour: clFuchsia),
     (FResourceName : 'CheckItem';                     FMaskColour: clFuchsia),
     (FResourceName : 'CheckMissing';                  FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedWarning';                    FMaskColour: clFuchsia),
+    (FResourceName : 'AmberWarning';                  FMaskColour: clFuchsia),
+    (FResourceName : 'YellowWarning';                 FMaskColour: clFuchsia),
+    (FResourceName : 'GreenWarning';                  FMaskColour: clFuchsia),
+    (FResourceName : 'BlueWarning';                   FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedStop';                       FMaskColour: clFuchsia),
+    (FResourceName : 'AmberStop';                     FMaskColour: clFuchsia),
+    (FResourceName : 'YellowStop';                    FMaskColour: clFuchsia),
+    (FResourceName : 'GreenStop';                     FMaskColour: clFuchsia),
+    (FResourceName : 'BlueStop';                      FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedProhibited';                 FMaskColour: clFuchsia),
+    (FResourceName : 'AmberProhibited';               FMaskColour: clFuchsia),
+    (FResourceName : 'YellowProhibited';              FMaskColour: clFuchsia),
+    (FResourceName : 'GreenProhibited';               FMaskColour: clFuchsia),
+    (FResourceName : 'BlueProhibited';                FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedBug';                        FMaskColour: clFuchsia),
+    (FResourceName : 'AmberBug';                      FMaskColour: clFuchsia),
+    (FResourceName : 'YellowBug';                     FMaskColour: clFuchsia),
+    (FResourceName : 'GreenBug';                      FMaskColour: clFuchsia),
+    (FResourceName : 'BlueBug';                       FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedUpArrow';                    FMaskColour: clFuchsia),
+    (FResourceName : 'AmberUpArrow';                  FMaskColour: clFuchsia),
+    (FResourceName : 'YellowUpArrow';                 FMaskColour: clFuchsia),
+    (FResourceName : 'GreenUpArrow';                  FMaskColour: clFuchsia),
+    (FResourceName : 'BlueUpArrow';                   FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedRightArrow';                 FMaskColour: clFuchsia),
+    (FResourceName : 'AmberRightArrow';               FMaskColour: clFuchsia),
+    (FResourceName : 'YellowRightArrow';              FMaskColour: clFuchsia),
+    (FResourceName : 'GreenRightArrow';               FMaskColour: clFuchsia),
+    (FResourceName : 'BlueRightArrow';                FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedDownArrow';                  FMaskColour: clFuchsia),
+    (FResourceName : 'AmberDownArrow';                FMaskColour: clFuchsia),
+    (FResourceName : 'YellowDownArrow';               FMaskColour: clFuchsia),
+    (FResourceName : 'GreenDownArrow';                FMaskColour: clFuchsia),
+    (FResourceName : 'BlueDownArrow';                 FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedLeftArrow';                  FMaskColour: clFuchsia),
+    (FResourceName : 'AmberLeftArrow';                FMaskColour: clFuchsia),
+    (FResourceName : 'YellowLeftArrow';               FMaskColour: clFuchsia),
+    (FResourceName : 'GreenLeftArrow';                FMaskColour: clFuchsia),
+    (FResourceName : 'BlueLeftArrow';                 FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedBookmark';                   FMaskColour: clFuchsia),
+    (FResourceName : 'AmberBookmark';                 FMaskColour: clFuchsia),
+    (FResourceName : 'YellowBookmark';                FMaskColour: clFuchsia),
+    (FResourceName : 'GreenBookmark';                 FMaskColour: clFuchsia),
+    (FResourceName : 'BlueBookmark';                  FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedTick';                       FMaskColour: clFuchsia),
+    (FResourceName : 'AmberTick';                     FMaskColour: clFuchsia),
+    (FResourceName : 'YellowTick';                    FMaskColour: clFuchsia),
+    (FResourceName : 'GreenTick';                     FMaskColour: clFuchsia),
+    (FResourceName : 'BlueTick';                      FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedToDoTick';                   FMaskColour: clFuchsia),
+    (FResourceName : 'AmberToDoTick';                 FMaskColour: clFuchsia),
+    (FResourceName : 'YellowToDoTick';                FMaskColour: clFuchsia),
+    (FResourceName : 'GreenToDoTick';                 FMaskColour: clFuchsia),
+    (FResourceName : 'BlueToDoTick';                  FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedToDoCross';                  FMaskColour: clFuchsia),
+    (FResourceName : 'AmberToDoCross';                FMaskColour: clFuchsia),
+    (FResourceName : 'YellowToDoCross';               FMaskColour: clFuchsia),
+    (FResourceName : 'GreenToDoCross';                FMaskColour: clFuchsia),
+    (FResourceName : 'BlueToDoCross';                 FMaskColour: clFuchsia),
 
     (FResourceName : 'UsesLabel';                     FMaskColour: clLime),
     (FResourceName : 'UsesItem';                      FMaskColour: clLime),
@@ -837,6 +911,15 @@ Const
     (FName: 'MCParmListIgnoreEvents'; FDescription: strMissingCONSTInParamIgnoreEventHandlersCat; FParentCheck: mcMissingCONSTInParemterList)
   );
 
+  astrLimitType : Array[TLimitType] Of String = (
+    'Errors',
+    'Warnings',
+    'Hints',
+    'DocConflicts',
+    'Checks',
+    'Metrics'
+  );
+  
 Implementation
 
 End.

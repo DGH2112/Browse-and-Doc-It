@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.634
-  @Date    28 Mar 2020
+  @Version 1.663
+  @Date    04 Apr 2020
 
   @license
 
@@ -1459,8 +1459,13 @@ Var
   Node : PVirtualNode;
   NodeData : PBADITreeData;
   iNodeLine, iFollowLine : Integer;
+  eDocIssue : TLimitType;
   
 Begin
+  For eDocIssue := Low(TLimitType) To High(TLimitType) Do
+    If eDocIssue In TBADIOptions.BADIOptions.DoNotFollowEditor Then
+      If FDocIssueTotals.Totals[eDocIssue] > 0 Then
+        Exit;
   iFollowLine := 0;
   Node := Explorer.GetFirst();
   While Assigned(Node) Do

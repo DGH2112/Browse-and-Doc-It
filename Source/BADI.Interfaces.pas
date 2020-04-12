@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.211
-  @Date    08 Feb 2020
+  @Version 1.262
+  @Date    04 Apr 2020
 
   @license
 
@@ -142,6 +142,8 @@ Type
     Procedure SetModuleDateFmt(Const strValue : String);
     Function  GetModuleVersionIncrement : Double;
     Procedure SetModuleVersionIncrement(Const dblValue : Double);
+    Function  GetDoNotFollowEditor : TLimitTypes;
+    Procedure SetDoNotFollowEditor(Const setLimitTypes : TLimitTypes);
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -430,6 +432,14 @@ Type
     **)
     Property ModuleVersionIncrement : Double Read GetModuleVersionIncrement
       Write SetModuleVersionIncrement;
+    (**
+      This property gets and sets the limits type that if present in the module prevent the explorer
+      selection from following the editor cursor.
+      @precon  None.
+      @postcon Gets and sets the limits to not follow.
+      @return  a TLimitTypes
+    **)
+    Property DoNotFollowEditor : TLimitTypes Read GetDoNotFollowEditor Write SetDoNotFollowEditor;
   End;
 
   (** An interface to get the IDE Editor Colours from the Registry. **)

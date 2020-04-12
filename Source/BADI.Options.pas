@@ -3,8 +3,10 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 1.001
-  @Date    08 Feb 2020
+  @Version 1.110
+  @Date    04 Apr 2020
+
+  @todo    Need interface for the Do Not Follow Editor options.
 
   @license
 
@@ -84,6 +86,7 @@ Type
     FRequiresIDEEditorColoursUpdating : Boolean;
     FModuleDateFmt                    : String;
     FModuleVersionIncrement           : Double;
+    FDoNotFollowEditor                : TLimitTypes;
   Strict Protected
     // IBADIOptions
     Function  GetOptions : TDocOptions;
@@ -154,6 +157,8 @@ Type
     Procedure SetModuleDateFmt(Const strValue : String);
     Function  GetModuleVersionIncrement : Double;
     Procedure SetModuleVersionIncrement(Const dblValue : Double);
+    Function  GetDoNotFollowEditor : TLimitTypes;
+    Procedure SetDoNotFollowEditor(Const setLimitTypes : TLimitTypes);
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure RequiresIDEEditorColoursUpdate;
@@ -453,6 +458,12 @@ Function TBADIOptions.GetDefines: TStringList;
 
 Begin
   Result := FDefines;
+End;
+
+Function TBADIOptions.GetDoNotFollowEditor: TLimitTypes;
+
+Begin
+  Result := FDoNotFollowEditor;
 End;
 
 (**
@@ -1412,9 +1423,11 @@ Procedure TBADIOptions.LoadSettings;
 Const
   strDefaultDateFmt = 'dd mmm yyyy';
   dblDefaultIncrement = 0.00001;
+  setDefaults = [ltErrors..ltHints, ltChecks];
 
 Var
   iniFile : TMemIniFile;
+  eDocIssue: TLimitType;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
@@ -1438,6 +1451,10 @@ Begin
       strDefaultDateFmt);
     FModuleVersionIncrement := iniFile.ReadFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey,
       dblDefaultIncrement);
+    FDoNotFollowEditor := [];
+    For eDocIssue := Low(TLimitType) To High(TLimitType) Do
+      If iniFile.ReadBool('Do Not Follow Editor', astrLimitType[eDocIssue], eDocIssue In setDefaults) Then
+        Include(FDoNotFollowEditor, eDocIssue);
   Finally
     iniFile.Free;
   End;
@@ -1813,6 +1830,7 @@ Procedure TBADIOptions.SaveSettings;
 
 Var
   iniFile : TMemIniFile;
+  eDocIssue : TLimitType;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
@@ -1833,6 +1851,8 @@ Begin
     iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
     iniFile.WriteString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey, FModuleDateFmt);
     iniFile.WriteFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey, FModuleVersionIncrement);
+    For eDocIssue := Low(TLimitType) To High(TLimitType) Do
+      iniFile.WriteBool('Do Not Follow Editor', astrLimitType[eDocIssue], eDocIssue In FDoNotFollowEditor);
     iniFile.UpdateFile;
   Finally
     iniFile.Free;
@@ -1906,6 +1926,12 @@ Procedure TBADIOptions.SetBrowsePosition(Const eBrowsePosition: TBrowsePosition)
 
 Begin
   FBrowsePosition := eBrowsePosition;
+End;
+
+Procedure TBADIOptions.SetDoNotFollowEditor(Const setLimitTypes: TLimitTypes);
+
+Begin
+  FDoNotFollowEditor := setLimitTypes;
 End;
 
 (**

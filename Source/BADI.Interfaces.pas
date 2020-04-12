@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.262
-  @Date    04 Apr 2020
+  @Version 1.347
+  @Date    12 Apr 2020
 
   @license
 
@@ -35,6 +35,7 @@ Uses
   System.Classes,
   System.Generics.Collections,
   VCL.Graphics,
+  VCL.Controls,
   BADI.Types;
 
 Type
@@ -144,6 +145,7 @@ Type
     Procedure SetModuleVersionIncrement(Const dblValue : Double);
     Function  GetDoNotFollowEditor : TLimitTypes;
     Procedure SetDoNotFollowEditor(Const setLimitTypes : TLimitTypes);
+    Function  GetScopeImageList : TImageList;
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -440,6 +442,13 @@ Type
       @return  a TLimitTypes
     **)
     Property DoNotFollowEditor : TLimitTypes Read GetDoNotFollowEditor Write SetDoNotFollowEditor;
+    (**
+      This property returns a single scope image list for use throughout the application.
+      @precon  None.
+      @postcon Returns a single scope image list for use throughout the application.
+      @return  a TImageList
+    **)
+    Property ScopeImageList : TImageList Read GetScopeImageList;
   End;
 
   (** An interface to get the IDE Editor Colours from the Registry. **)
@@ -515,23 +524,28 @@ Type
     Property Message[Const eLimitType : TLimitType] : String Read GetMessage;
   End;
 
+  (** A record to describe the information inside the Totals dictionary. **)
+  TBADITotalInfo = Record
+    FImageIndex : TBADIImageIndex;
+    FCounter    : Integer;
+  End;
+  
   (** An interface to returning the doc issue totals for the whole module. **)
   IBADIDocIssueTotals = Interface
   ['{FE2ACA7E-03A5-4C12-A872-A8A4F33AC809}']
     // Getters and Setters
-    Function  GetTotals(Const eLimitType : TLimitType) : Integer;
+    Function  GetTotals : TDictionary<String, TBADITotalInfo>;
     // General Methods
-    Procedure IncDocIssue(Const eDocIssueType : TLimitType);
+    Procedure IncDocIssue(Const strDocIssueType : String; Const eImageListIndex : TBADIImageIndex);
     Procedure Clear;
     // Property
     (**
       This property returns the total for the given doc issue type.
       @precon  None.
       @postcon Returns the total for the given doc issue type.
-      @param   eLimitType as a TLimitType as a constant
-      @return  an Integer
+      @return  a TDictionary<String, TBADITotalInfo>
     **)
-    Property Totals[Const eLimitType : TLimitType] : Integer Read GetTotals;
+    Property Totals : TDictionary<String, TBADITotalInfo> Read GetTotals;
   End;
   
 Implementation

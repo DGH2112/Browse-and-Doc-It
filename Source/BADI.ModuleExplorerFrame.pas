@@ -4,7 +4,7 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.684
+  @Version 1.827
   @Date    12 Apr 2020
 
   @license
@@ -60,7 +60,7 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types;
+  BADI.Types, System.Actions, System.ImageList;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
@@ -73,7 +73,6 @@ Type
       application specifics. **)
   TframeModuleExplorer = class(TFrame)
     stbStatusBar: TStatusBar;
-    ilScopeImages: TImageList;
     tbrExplorerScope: TToolBar;
     ilToolbar: TImageList;
     alToolbar: TActionList;
@@ -676,7 +675,7 @@ begin
   FExplorer.Header.Font.Style := [];
   FExplorer.Header.MainColumn := -1;
   FExplorer.Header.Options := [hoColumnResize, hoDrag];
-  FExplorer.Images := ilScopeImages;
+  FExplorer.Images := TBADIOptions.BADIOptions.ScopeImageList;
   FExplorer.TabOrder := iTabOrder;
   FExplorer.TreeOptions.MiscOptions := FExplorer.TreeOptions.MiscOptions + [toVariableNodeHeight];
   FExplorer.EmptyListMessage := strBrowseAndDocItCannotParse;
@@ -698,8 +697,6 @@ begin
   FHintWin := TBADICustomHintWindow.Create(Self, FExplorer);
   FHintWin.Color := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours][ttExplorerHighlight].FBackColour;
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
-  ilScopeImages.Clear;
-  LoadBADIImages(ilScopeImages);
   FLastFilterUpdate := 0;
   FExplorer.OnGetText := tvExplorerGetText;
   FLineDocIssues := TDictionary<Integer,IBADILineDocIssues>.Create;
@@ -796,8 +793,12 @@ Procedure TframeModuleExplorer.DrawImage(Var R : TRect);
 Begin
   R.Left := R.Left + Integer(FExplorer.Indent) + FExplorer.Margin;
   Inc(R.Top);
-  ilScopeImages.Draw(FTargetCanvas, R.Left, ((R.Bottom - R.Top) - ilScopeImages.Height) Div iDivisor,
-    FNodeData.FNode.ImageIndex);
+  FExplorer.Images.Draw(
+    FTargetCanvas,
+    R.Left,
+    ((R.Bottom - R.Top) - FExplorer.Images.Height) Div iDivisor,
+    FNodeData.FNode.ImageIndex
+  );
 End;
 
 (**
@@ -1032,7 +1033,7 @@ Var
   iColour: TColor;
 
 Begin
-  R.Left := R.Left + ilScopeImages.Width + FExplorer.TextMargin;
+  R.Left := R.Left + FExplorer.Images.Width + FExplorer.TextMargin;
   iTop := R.Top;
   iLeft := R.Left + iPadding;
   iTextPos := 1;
@@ -1464,10 +1465,12 @@ Var
   eDocIssue : TLimitType;
   
 Begin
+  {: @bug
   For eDocIssue := Low(TLimitType) To High(TLimitType) Do
     If eDocIssue In TBADIOptions.BADIOptions.DoNotFollowEditor Then
       If FDocIssueTotals.Totals[eDocIssue] > 0 Then
         Exit;
+  }
   iFollowLine := 0;
   Node := Explorer.GetFirst();
   While Assigned(Node) Do
@@ -1549,6 +1552,19 @@ Begin
                   FSpecialTagNodes[iSpecialTag].FFontColour,
                   FSpecialTagNodes[iSpecialTag].FBackColour,
                   Cmt);
+                If tpShowInEditor In FSpecialTagNodes[iSpecialTag].FTagProperties Then
+                  Begin
+                    {: @bug DI := Element As TDocIssue;
+                    eLimitType := ErrorTypeToLimitType(DI.ErrorType);
+                    If FLineDocIssues.TryGetValue(DI.Line, LineDocIssues) Then
+                      LineDocIssues.AddIssue(eLimitType, Element.AsString(False, False))
+                    Else
+                      FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(eLimitType, Element.AsString(False, False)));}
+                    FDocIssueTotals.IncDocIssue(
+                      FSpecialTagNodes[iSpecialTag].FTagName,
+                      FSpecialTagNodes[iSpecialTag].FImageIndex
+                    );
+                  End;
               End;
     End;
 End;
@@ -1779,6 +1795,16 @@ Procedure TframeModuleExplorer.LogDocIssueConflict(Const Element: TElementContai
     End;
   End;
 
+Const
+  aLimitImageIndex : Array[TlimitType] Of TBADIImageIndex = (
+    iiError,
+    iiWarning,
+    iiHint,
+    iiDocConflictItem,
+    iiCheckItem,
+    iiMetricItem
+  );
+
 Var
   DI: TDocIssue;
   eLimitType : TLimitType;
@@ -1793,9 +1819,8 @@ Begin
       If FLineDocIssues.TryGetValue(DI.Line, LineDocIssues) Then
         LineDocIssues.AddIssue(eLimitType, Element.AsString(False, False))
       Else
-        FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(eLimitType,
-          Element.AsString(False, False)));
-      FDocIssueTotals.IncDocIssue(eLimitType);
+        FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(eLimitType, Element.AsString(False, False)));
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], aLimitImageIndex[eLimitType]);
     End
   Else If Element Is TDocumentConflict Then
     Begin
@@ -1806,7 +1831,7 @@ Begin
       Else
         FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(eLimitType,
           Element.AsString(False, False)));
-      FDocIssueTotals.IncDocIssue(eLimitType);
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], aLimitImageIndex[eLimitType]);    
     End;
 End;
 
@@ -2262,7 +2287,7 @@ begin
   FNodeData := Sender.GetNodeData(Node);
   sl := FNodeData.FNode.Tokens;
   DrawHighlightSelectedItem(FExplorer.Color, ItemRect);
-  DrawSelectedNode(sl, ItemRect, ilScopeImages.Width, iPos);
+  DrawSelectedNode(sl, ItemRect, FExplorer.Images.Width, iPos);
   R := ItemRect;
   DrawTree(R);
   DrawImage(R);

@@ -3,7 +3,7 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.880
+  @Version 1.890
   @Date    12 Apr 2020
 
   @license
@@ -579,7 +579,8 @@ Const
     strTagPropExpand,
     strTagPropShowInDocs,
     strTagPropFixedFont,
-    strTagPropSyntax
+    strTagPropSyntax,
+    strTagPropShowInEditor
   );
 
   (** A constant name for the Long Method metric so it can be disabled. **)
@@ -919,6 +920,7 @@ Const
     (FName: 'MCParmListIgnoreEvents'; FDescription: strMissingCONSTInParamIgnoreEventHandlersCat; FParentCheck: mcMissingCONSTInParemterList)
   );
 
+  (** A constant array of strings for the names of the limit types. **)
   astrLimitType : Array[TLimitType] Of String = (
     'Errors',
     'Warnings',

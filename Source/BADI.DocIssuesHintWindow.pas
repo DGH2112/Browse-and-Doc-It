@@ -3,8 +3,8 @@
   This module contains a custom hint window to display the module metric totals.
 
   @Author  David Hoyle
-  @Version 1.374
-  @Date    09 Feb 2020
+  @Version 1.879
+  @Date    12 Apr 2020
   
   @license
 
@@ -32,6 +32,7 @@ Unit BADI.DocIssuesHintWindow;
 Interface
 
 Uses
+  System.Classes,
   Vcl.Controls,
   WinApi.Windows,
   BADI.Types,
@@ -41,6 +42,13 @@ Type
   (** A class to define a new hint window for the totals to be displayed within on the Code Editor. **)
   TBADIDocIssueHintWindow = Class(THintWindow)
   Strict Private
+    Type
+      (** A record to define the information to render. **)
+      TTotalRec = Record
+        FLabel      : String;
+        FImageIndex : TBADIImageIndex;
+        FCount      : Integer;
+      End;
     Const
       (** A constant to define the padding around the contents of the hint window. **)
       iPadding = 5;
@@ -50,13 +58,18 @@ Type
       (** A class variable to hold the singleton instance of the code editor totals hint window. **)
       FHintWindow : TBADIDocIssueHintWindow;
   Strict Private
-    FTotals : Array[TLimitType] Of Integer;
+    FTotals : TArray<TTotalRec>;
+    FScopeImageList : TImageList;
+    FCalcHeight : Integer;
+    FCalcNameWidth : Integer;
+    FCalcNumWidth : Integer;
   Strict Protected
     Procedure Paint; Override;
     Function CalcHintRect(Const Rect : TRect; Const Totals: IBADIDocIssueTotals): TRect;
       Reintroduce; Overload;
     Procedure ActivateHint(Const Rect: TRect); Reintroduce;
       Overload;
+      procedure UpdateFontInfo(const R: TRect);
   Public
     Class Constructor Create;
     Class Destructor Destroy;
@@ -71,13 +84,14 @@ Uses
   CodeSiteLogging,
   {$ENDIF DEBUG}
   System.SysUtils,
-  System.Classes,
   System.Math,
+  System.Generics.Collections,
   Vcl.Graphics,
   Vcl.Forms,
   ToolsAPI,
   BADI.Functions,
-  BADI.Options;
+  BADI.Options,
+  BADI.DockableModuleExplorer;
 
 Const
   (** Text for testing the height of a line of text. **)
@@ -116,29 +130,38 @@ Function TBADIDocIssueHintWindow.CalcHintRect(Const Rect : TRect;
   Const Totals: IBADIDocIssueTotals): TRect;
 
 Var
-  iHeight: Integer;
-  iWidth: Integer;
-  eDocIssueType: TLimitType;
   iTextWidth: Integer;
+  Issue : TPair<String, TBADITotalInfo>;
+  iIndex : Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CalcHintRect', tmoTiming);{$ENDIF}
+  If Not Assigned(FScopeImageList) Then
+    FScopeImageList := TBADIOptions.BADIOptions.ScopeImageList;
   Result := Rect;
-  iHeight := 0;
-  iWidth := 0;
-  For eDocIssueType := Low(TLimitType) To High(TLimitType) Do
+  iIndex := 0;
+  FCalcHeight := 0;
+  FCalcNameWidth := 0;
+  FCalcNumWidth := 0;
+  UpdateFontInfo(Result);
+  SetLength(FTotals, Totals.Totals.Count);
+  For Issue In Totals.Totals Do
     Begin
-      FTotals[eDocIssueType] := Totals.Totals[eDocIssueType];
-      If FTotals[eDocIssueType] > 0 Then
-        Begin
-          Inc(iHeight, Max(Canvas.TextHeight(strTextHeightTest), iIconSize) + iPadding);
-          iTextWidth := Canvas.TextWidth(Format('%d', [FTotals[eDocIssueType]]));
-          If iTextWidth > iWidth Then
-            iWidth := iTextWidth;
-        End;
+      FTotals[iIndex].FLabel := Issue.Key;
+      FTotals[iIndex].FImageIndex := Issue.Value.FImageIndex;
+      FTotals[iIndex].FCount := Issue.Value.FCounter;
+      Inc(FCalcHeight, Max(Canvas.TextHeight(strTextHeightTest), iIconSize) + iPadding);
+      iTextWidth := Canvas.TextWidth(FTotals[iIndex].FLabel);
+      If iTextWidth > FCalcNameWidth Then
+        FCalcNameWidth := iTextWidth;
+      iTextWidth := Canvas.TextWidth(Format('%d', [FTotals[iIndex].FCount]));
+      If iTextWidth > FCalcNumWidth Then
+        FCalcNumWidth := iTextWidth;
+      Inc(iIndex);
     End;
-  Result.Top := Result.Bottom - (iHeight);
-  Result.Left := Result.Right - (iPadding + iWidth + iPadding + iIconSize + iPadding);
+  Result.Top := Result.Bottom - (FCalcHeight);
+  Result.Left := Result.Right -
+    (iPadding + FCalcNameWidth + iPadding + iIconSize + iPadding + FCalcNumWidth + iPadding);
   InflateRect(Result, 1, 1);
 End;
 
@@ -223,17 +246,65 @@ End;
 Procedure TBADIDocIssueHintWindow.Paint;
 
 Var
-  R : TRect;
-  eDocIssueType: TLimitType;
+  R, S : TRect;
+  iDocIssueType: Integer;
   strText: String;
-  boolUseIDEColours: Boolean;
-  TFI: TTokenFontInfo;
-  ES : IOTAEditorServices;
+  iHeight: Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Paint', tmoTiming);{$ENDIF}
   DoubleBuffered := True;
   R := Rect(0, 0, Width - 1, Height - 1);
+  UpdateFontInfo(R);
+  // Render Totals
+  Inc(R.Top, iPadding);
+  Dec(R.Right, iPadding);
+  For iDocIssueType := Low(FTotals) To High(FTotals) Do
+    Begin
+      R.Left := iPadding;
+      iHeight := Max(Canvas.TextHeight(strTextHeightTest), iIconSize);
+      R.Bottom := R.Top + iHeight;
+      // Draw Label Text
+      strText := FTotals[iDocIssueType].FLabel;
+      Canvas.TextRect(R, strText, [tfLeft, tfVerticalCenter]);
+      Inc(R.Left, FCalcNameWidth);
+      Inc(R.Left, iPadding);
+      // Draw Icon
+      S := R;
+      Inc(S.Top, iHeight - FScopeImageList.Height);
+      FScopeImageList.Draw(
+        Canvas,
+        S.Left,
+        S.Top,
+        BADIImageIndex(FTotals[iDocIssueType].FImageIndex, scNone)
+      );
+      Inc(R.Left, FScopeImageList.Width);
+      Inc(R.Left, iPadding);
+      // Draw Counter
+      strText := Format('%d', [FTotals[iDocIssueType].FCount]);
+      Canvas.TextRect(R, strText, [tfLeft, tfVerticalCenter]);
+      Inc(R.Top, Canvas.TextHeight(strTextHeightTest) + iPadding);
+    End;
+End;
+
+(**
+
+  This method updates the canvas with the correct font information for rendering the hint.
+
+  @precon  None.
+  @postcon Thre canvas is updated with thr correct font information.
+
+  @param   R as a TRect as a constant
+
+**)
+Procedure TBADIDocIssueHintWindow.UpdateFontInfo(Const R: TRect);
+
+Var
+  boolUseIDEColours: Boolean;
+  TFI: TTokenFontInfo;
+  ES: IOTAEditorServices;
+
+Begin
   // Background
   boolUseIDEColours := TBADIOptions.BADIOptions.UseIDEEditorColours;
   TFI := TBADIOptions.BADIOptions.TokenFontInfo[boolUseIDEColours][ttPlainText];
@@ -248,22 +319,6 @@ Begin
       Font.Size := ES.EditOptions.FontSize;
     End;
   Canvas.Font.Assign(Font);
-  // Render Totals
-  Inc(R.Top, iPadding);
-  Dec(R.Right, iPadding);
-  For eDocIssueType := Low(TLimitType) To High(TLimitType) Do
-    Begin
-      If FTotals[eDocIssueType] > 0 Then
-        Begin
-          R.Left := iPadding;
-          R.Bottom := R.Top + Max(Canvas.TextHeight(strTextHeightTest), iIconSize);
-          DrawIcon(Canvas, R, eDocIssueType);
-          Inc(R.Left, iPadding);
-          strText := Format('%d', [FTotals[eDocIssueType]]);
-          Canvas.TextRect(R, strText, [tfLeft, tfVerticalCenter]);
-          Inc(R.Top, Canvas.TextHeight(strTextHeightTest) + iPadding);
-        End;
-    End;
 End;
 
 End.

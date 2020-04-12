@@ -4,8 +4,8 @@
   document issues totals for a module.
 
   @Author  David Hoyle
-  @Version 1.199
-  @Date    09 Feb 2020
+  @Version 1.364
+  @Date    12 Apr 2020
   
   @license
 
@@ -33,6 +33,7 @@ Unit BADI.DocIssueTotals;
 Interface
 
 Uses
+  System.Generics.Collections,
   BADI.Types,
   BADI.Interfaces;
 
@@ -40,13 +41,15 @@ Type
   (** A class to implement the IBADIDocIssueTotals. **)
   TBADIDocIssueTotals = Class(TInterfacedObject, IBADIDocIssueTotals)
   Strict Private
-    FTotals : Array[TLimitType] Of Integer;
+    FTotals : TDictionary<String, TBADITotalInfo>;
   Strict Protected
     // IBADIDocIssueTotals
-    Function  GetTotals(Const eLimitType: TLimitType): Integer;
-    Procedure IncDocIssue(Const eDocIssueType: TLimitType);
+    Function  GetTotals : TDictionary<String, TBADITotalInfo>;
+    Procedure IncDocIssue(Const strDocIssueType : String; Const eImageListIndex : TBADIImageIndex);
     Procedure Clear;
   Public
+    Constructor Create;
+    Destructor Destroy; Override;
   End;
 
 Implementation
@@ -61,12 +64,37 @@ Implementation
 **)
 Procedure TBADIDocIssueTotals.Clear;
 
-Var
-  eDocIssueTotal: TLimitType;
+Begin
+  FTotals.Clear;
+End;
+
+(**
+
+  A constructor for the TBADIDocIssueTotals class.
+
+  @precon  None.
+  @postcon Creates a dictionary to store the values.
+
+**)
+Constructor TBADIDocIssueTotals.Create;
 
 Begin
-  For eDocIssueTotal := Low(TLimitType) To High(TLimitType) Do
-    FTotals[eDocIssueTotal] := 0;
+  FTotals := TDictionary<String, TBADITotalInfo>.Create;
+End;
+
+(**
+
+  A destructor for the TBADIDocIssueTotals class.
+
+  @precon  None.
+  @postcon Frees the dictionary.
+
+**)
+Destructor TBADIDocIssueTotals.Destroy;
+
+Begin
+  FTotals.Free;
+  Inherited Destroy;
 End;
 
 (**
@@ -76,14 +104,13 @@ End;
   @precon  None;
   @postcon Returns the total for the given doc issue type.
 
-  @param   eLimitType as a TLimitType as a constant
-  @return  an Integer
+  @return  a TDictionary<String, TBADITotalInfo>
 
 **)
-Function TBADIDocIssueTotals.GetTotals(Const eLimitType: TLimitType): Integer;
+Function TBADIDocIssueTotals.GetTotals : TDictionary<String, TBADITotalInfo>;
 
 Begin
-  Result := FTotals[eLimitType];
+  Result := FTotals;
 End;
 
 (**
@@ -93,13 +120,27 @@ End;
   @precon  None.
   @postcon The given doc issue type is incremented.
 
-  @param   eDocIssueType as a TLimitType as a constant
+  @param   strDocIssueType as a String as a constant
+  @param   eImageListIndex as a TBADIImageIndex as a constant
 
 **)
-Procedure TBADIDocIssueTotals.IncDocIssue(Const eDocIssueType: TLimitType);
+Procedure TBADIDocIssueTotals.IncDocIssue(Const strDocIssueType : String;
+  Const eImageListIndex : TBADIImageIndex);
+
+Var
+  recValue: TBADITotalInfo;
 
 Begin
-  Inc(FTotals[eDocIssueType]);
+  If FTotals.TryGetValue(strDocIssueType, recValue) Then
+    Begin
+      Inc(recValue.FCounter);
+      FTotals.AddOrSetValue(strDocIssueType, recValue);
+    End Else
+    Begin
+      recValue.FImageIndex := eImageListIndex;
+      recValue.FCounter := 1;
+      FTotals.Add(strDocIssueType, recValue);
+    End;
 End;
 
 End.

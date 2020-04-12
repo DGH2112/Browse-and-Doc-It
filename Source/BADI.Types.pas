@@ -3,7 +3,7 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.357
+  @Version 1.359
   @Date    12 Apr 2020
 
   @license
@@ -582,7 +582,7 @@ Type
     Var strActionName : String) : Boolean Of Object;
 
   (** An enumerate to define the properties of a comment tag. **)
-  TBADITagProperty = (tpShowInTree, tpAutoExpand, tpShowInDoc, tpFixed, tpSyntax);
+  TBADITagProperty = (tpShowInTree, tpAutoExpand, tpShowInDoc, tpFixed, tpSyntax, tpShowInEditor);
 
   (** A set of tag properties. **)
   TBADITagProperties = Set Of TBADITagProperty;

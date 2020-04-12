@@ -3,7 +3,7 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.323
+  @Version 1.334
   @Date    12 Apr 2020
 
   @license
@@ -797,6 +797,8 @@ ResourceString
   strTagPropFixedFont = 'Fixed Font Tag (preserves LF/CR and Indents)';
   (** A description for a tag to use syntax highlighting. **)
   strTagPropSyntax = 'Syntax Highlight the Tag';
+  (** A tag property to allow it to be shown in the editor. **)
+  strTagPropShowInEditor = 'Show in Editor';
 
   //
   // Metrics

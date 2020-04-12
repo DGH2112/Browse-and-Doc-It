@@ -2,7 +2,7 @@
 
   This module contains a frame for editing the BADI special tags.
 
-  @Version 1.205
+  @Version 1.270
   @Author  David Hoyle
   @Date    12 Apr 2020
 
@@ -47,6 +47,7 @@ Uses
   Buttons,
   ComCtrls,
   Generics.Collections,
+  UITypes,
   BADI.CustomOptionsFrame,
   BADI.Types,
   VirtualTrees,
@@ -124,7 +125,16 @@ Type
   (** A pointer to the above node data. **)
   PSpecialTagNodeData = ^TSpecialTagsNodeData;
   (** A enumerate to define the columns in the report. **)
-  TColumnIndexes = (ciName, ciDescription, ciShowInTree, ciAutoExpand, ciShowInDocs, ciFixed, ciSyntax);
+  TColumnIndexes = (
+    ciName,
+    ciDescription, 
+    ciShowInTree, 
+    ciAutoExpand, 
+    ciShowInDocs, 
+    ciFixed, 
+    ciSyntax,
+    ciEditor
+  );
 
 (**
 
@@ -350,44 +360,57 @@ Begin
   C.Position := 0;
   C.Style := vsOwnerDraw;
   C.Width := 100;
+  C.MinWidth := 100;
   C.Text := 'Tag Name';
   C := FVSTSpecialTags.Header.Columns.Add;
-  C.MinWidth := 200;
   C.Position := 1;
   C.Style := vsOwnerDraw;
   C.Width := 235;
+  C.MinWidth := 200;
   C.Text := 'Tag Description';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 2;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Tree';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 3;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Expand';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 4;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Docs';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 5;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Fixed';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 6;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Syntax';
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 7;
+  C.Style := vsOwnerDraw;
+  C.Width := 60;
+  C.Text := 'Editor';
   FVSTSpecialTags.Header.AutoSizeIndex := 1;
+  C.MinWidth := 60;
 End;
 
 (**
@@ -511,11 +534,12 @@ Begin
   NodeData := Sender.GetNodeData(Node);
   ST := FSpecialTags[NodeData.FSpecialTagIndex];
   Case TColumnIndexes(Column) Of
-    ciShowInTree: TargetCanvas.Brush.Color := Colour[tpShowInTree In ST.FTagProperties];
-    ciAutoExpand: TargetCanvas.Brush.Color := Colour[tpAutoExpand In ST.FTagProperties];
-    ciShowInDocs: TargetCanvas.Brush.Color := Colour[tpShowInDoc  In ST.FTagProperties];
-    ciFixed:      TargetCanvas.Brush.Color := Colour[tpFixed      In ST.FTagProperties];
-    ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax     In ST.FTagProperties];
+    ciShowInTree: TargetCanvas.Brush.Color := Colour[tpShowInTree   In ST.FTagProperties];
+    ciAutoExpand: TargetCanvas.Brush.Color := Colour[tpAutoExpand   In ST.FTagProperties];
+    ciShowInDocs: TargetCanvas.Brush.Color := Colour[tpShowInDoc    In ST.FTagProperties];
+    ciFixed:      TargetCanvas.Brush.Color := Colour[tpFixed        In ST.FTagProperties];
+    ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax       In ST.FTagProperties];
+    ciEditor:     TargetCanvas.Brush.Color := Colour[tpShowInEditor In ST.FTagProperties];
   Else
     TargetCanvas.Brush.Color := clWindow;
     {$IFDEF DXE102}
@@ -633,11 +657,12 @@ Begin
   Case TColumnIndexes(Column) Of
     ciName:        CellText := ST.FName;
     ciDescription: CellText := ST.FDescription;
-    ciShowInTree:  CellText := strBoolean[tpShowInTree In  ST.FTagProperties];
-    ciAutoExpand:  CellText := strBoolean[tpAutoExpand In  ST.FTagProperties];
-    ciShowInDocs:  CellText := strBoolean[tpShowInDoc  In  ST.FTagProperties];
-    ciFixed:       CellText := strBoolean[tpFixed      In  ST.FTagProperties];
-    ciSyntax:      CellText := strBoolean[tpSyntax     In  ST.FTagProperties];  
+    ciShowInTree:  CellText := strBoolean[tpShowInTree   In  ST.FTagProperties];
+    ciAutoExpand:  CellText := strBoolean[tpAutoExpand   In  ST.FTagProperties];
+    ciShowInDocs:  CellText := strBoolean[tpShowInDoc    In  ST.FTagProperties];
+    ciFixed:       CellText := strBoolean[tpFixed        In  ST.FTagProperties];
+    ciSyntax:      CellText := strBoolean[tpSyntax       In  ST.FTagProperties];  
+    ciEditor:      CellText := strBoolean[tpShowInEditor In  ST.FTagProperties];  
   End;
 End;
 
@@ -696,6 +721,7 @@ Begin
         ciShowInDocs: ToggleSpecialTagProp(ST, tpShowInDoc);
         ciFixed:      ToggleSpecialTagProp(ST, tpFixed);
         ciSyntax:     ToggleSpecialTagProp(ST, tpSyntax);
+        ciEditor:     ToggleSpecialTagProp(ST, tpShowInEditor);
       End;
       FSpecialTags[NodeData.FSpecialTagIndex] := ST;
       FVSTSpecialTags.Invalidate;
@@ -729,7 +755,7 @@ Begin
   TargetCanvas.Font.Style := ST.FFontStyles;
   TargetCanvas.Font.Color := clWindowText;
   Case TColumnIndexes(Column) Of
-    ciShowInTree..ciSyntax: TargetCanvas.Font.Color := clBlack;
+    ciShowInTree..ciEditor: TargetCanvas.Font.Color := clBlack;
   Else
     {$IFDEF DXE102}
     If Assigned(FStyleServices) Then

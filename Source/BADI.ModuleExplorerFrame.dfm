@@ -165,10 +165,6 @@ object frameModuleExplorer: TframeModuleExplorer
       Action = actTypes
     end
   end
-  object ilScopeImages: TImageList
-    Left = 29
-    Top = 67
-  end
   object ilToolbar: TImageList
     Height = 12
     Width = 12

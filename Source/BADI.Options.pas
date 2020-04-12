@@ -3,7 +3,7 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 1.465
+  @Version 1.515
   @Date    12 Apr 2020
 
   @license
@@ -33,9 +33,10 @@ Interface
 
 Uses
   Classes,
-  Graphics,
   Generics.Collections,
   RegularExpressions,
+  VCL.Graphics,
+  VCL.Controls,
   IniFiles,
   BADI.Types,
   BADI.Interfaces;
@@ -85,6 +86,7 @@ Type
     FModuleDateFmt                    : String;
     FModuleVersionIncrement           : Double;
     FDoNotFollowEditor                : TLimitTypes;
+    FScopeImageList                   : TImageList;
   Strict Protected
     // IBADIOptions
     Function  GetOptions : TDocOptions;
@@ -186,6 +188,7 @@ Type
     Procedure SaveExtensions(Const iniFile: TMemIniFile);
     Procedure SaveMetrics(Const iniFile: TMemIniFile);
     Procedure SaveChecks(Const iniFile: TMemIniFile);
+    Function  GetScopeImageList : TImageList;
   Public
     Constructor Create(Const IDEEditorColours : IBADIIDEEditorColours);
     Destructor Destroy; Override;
@@ -410,6 +413,8 @@ Begin
   FScopesToDocument := [scPublished, scPublic, scProtected, scPrivate];
   FProfilingCode := TStringList.Create;
   FRequiresIDEEditorColoursUpdating := True;
+  FScopeImageList := TImageList.Create(Nil);
+  LoadBADIImages(FScopeImageList);
 End;
 
 (**
@@ -425,6 +430,7 @@ Destructor TBADIOptions.Destroy;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   SaveSettings;
+  FScopeImageList.Free;
   FProfilingCode.Free;
   FMethodDescriptions.Free;
   FExpandedNodes.Free;
@@ -847,6 +853,22 @@ Function TBADIOptions.GetRefactorConstNewLine: Boolean;
 
 Begin
   Result := FRefactorConstNewLine;
+End;
+
+(**
+
+  This is a getter method for the ScopeImageList property.
+
+  @precon  None.
+  @postcon Returns the Scope Image List.
+
+  @return  a TImageList
+
+**)
+Function TBADIOptions.GetScopeImageList: TImageList;
+
+Begin
+  Result := FScopeImageList;
 End;
 
 (**

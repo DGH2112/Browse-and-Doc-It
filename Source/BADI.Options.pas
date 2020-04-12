@@ -3,10 +3,8 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 1.110
-  @Date    04 Apr 2020
-
-  @todo    Need interface for the Do Not Follow Editor options.
+  @Version 1.283
+  @Date    12 Apr 2020
 
   @license
 
@@ -175,6 +173,7 @@ Type
     Procedure LoadExtensions(Const iniFile: TMemIniFile);
     Procedure LoadMetrics(Const iniFile: TMemIniFile);
     Procedure LoadChecks(Const iniFile: TMemIniFile);
+    Procedure UpdateDoNotFollowEditor();
     Procedure SaveDocOptions(Const iniFile: TMemIniFile);
     Procedure SaveSpecialTags(Const iniFile: TMemIniFile);
     Procedure SaveManagedNodes(Const iniFile: TMemIniFile);
@@ -460,6 +459,16 @@ Begin
   Result := FDefines;
 End;
 
+(**
+
+  This is a getter method for the DoNotFollowEditor property.
+
+  @precon  None.
+  @postcon Returns the set of limits which should prevent the module explorer following the editor.
+
+  @return  a TLimitTypes
+
+**)
 Function TBADIOptions.GetDoNotFollowEditor: TLimitTypes;
 
 Begin
@@ -1423,11 +1432,9 @@ Procedure TBADIOptions.LoadSettings;
 Const
   strDefaultDateFmt = 'dd mmm yyyy';
   dblDefaultIncrement = 0.00001;
-  setDefaults = [ltErrors..ltHints, ltChecks];
 
 Var
   iniFile : TMemIniFile;
-  eDocIssue: TLimitType;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
@@ -1446,15 +1453,12 @@ Begin
     LoadExtensions(iniFile);
     LoadMetrics(iniFile);
     LoadChecks(iniFile);
+    UpdateDoNotFollowEditor();
     FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
     FModuleDateFmt := iniFile.ReadString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey,
       strDefaultDateFmt);
     FModuleVersionIncrement := iniFile.ReadFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey,
       dblDefaultIncrement);
-    FDoNotFollowEditor := [];
-    For eDocIssue := Low(TLimitType) To High(TLimitType) Do
-      If iniFile.ReadBool('Do Not Follow Editor', astrLimitType[eDocIssue], eDocIssue In setDefaults) Then
-        Include(FDoNotFollowEditor, eDocIssue);
   Finally
     iniFile.Free;
   End;
@@ -1830,7 +1834,6 @@ Procedure TBADIOptions.SaveSettings;
 
 Var
   iniFile : TMemIniFile;
-  eDocIssue : TLimitType;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
@@ -1851,8 +1854,7 @@ Begin
     iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
     iniFile.WriteString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey, FModuleDateFmt);
     iniFile.WriteFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey, FModuleVersionIncrement);
-    For eDocIssue := Low(TLimitType) To High(TLimitType) Do
-      iniFile.WriteBool('Do Not Follow Editor', astrLimitType[eDocIssue], eDocIssue In FDoNotFollowEditor);
+    UpdateDoNotFollowEditor();
     iniFile.UpdateFile;
   Finally
     iniFile.Free;
@@ -1928,6 +1930,16 @@ Begin
   FBrowsePosition := eBrowsePosition;
 End;
 
+(**
+
+  This is a setter method for the DoNotFollowEditor property.
+
+  @precon  None.
+  @postcon Set the set of limits which should prevent the module explorer following the editor.
+
+  @param   setLimitTypes as a TLimitTypes as a constant
+
+**)
 Procedure TBADIOptions.SetDoNotFollowEditor(Const setLimitTypes: TLimitTypes);
 
 Begin
@@ -2412,6 +2424,36 @@ Procedure TBADIOptions.SetUseIDEEditorColours(Const boolUseIDEEditorColours: Boo
 
 Begin
   FUseIDEEditorColours := boolUseIDEEditorColours;
+End;
+
+(**
+
+  This method updates the Do not Follow Editor property based on the documentation options.
+
+  @precon  None.
+  @postcon The Do Not Follow Editor options are updated.
+
+**)
+Procedure TBADIOptions.UpdateDoNotFollowEditor();
+
+Const
+  aLimitOptions : Array[TLimitType] Of TDocOption = (
+    doDoNotFollowEditorIfErrors,
+    doDoNotFollowEditorIfWarnings,
+    doDoNotFollowEditorIfHints,
+    doDoNotFollowEditorIfConflicts,
+    doDoNotFollowEditorIfChecks,
+    doDoNotFollowEditorIfMetrics
+  );
+
+Var
+  eDocIssue: TLimitType;
+  
+Begin
+  FDoNotFollowEditor := [];
+  For eDocIssue := Low(TLimitType) To High(TLimitType) Do
+    If aLimitOptions[eDocIssue] In FOptions Then
+      Include(FDoNotFollowEditor, eDocIssue);
 End;
 
 End.

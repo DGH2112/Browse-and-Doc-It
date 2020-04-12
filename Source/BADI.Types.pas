@@ -3,7 +3,7 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.313
+  @Version 1.337
   @Date    12 Apr 2020
 
   @license
@@ -109,6 +109,7 @@ Type
     dogConflicts,
     dogChecks,
     dogMetrics,
+    dogDoNotFollow,
     dogTypes,
     dogModule,
     dogMethod,
@@ -165,6 +166,13 @@ Type
     doAutoHideMetricsWithNoissues,
     doShowMetricIconsInEditor,
     doShowMetricMsgsInEditor,
+
+    doDoNotFollowEditorIfErrors,
+    doDoNotFollowEditorIfWarnings,
+    doDoNotFollowEditorIfHints,
+    doDoNotFollowEditorIfConflicts,
+    doDoNotFollowEditorIfChecks,
+    doDoNotFollowEditorIfMetrics,
 
     doShowUndocumentedTypes,
     doShowUndocumentedRecords,

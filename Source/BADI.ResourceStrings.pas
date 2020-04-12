@@ -3,8 +3,8 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.202
-  @Date    15 Feb 2020
+  @Version 1.323
+  @Date    12 Apr 2020
 
   @license
 
@@ -50,6 +50,9 @@ ResourceString
   strOptionGroupChecks = 'Checks';
   (** An option group description for Metric options. **)
   strOptionGroupMetrics = 'Metrics';
+  (** An option group description for issues if present prevent the editor from being followed
+      in the module explorer options. **)
+  strOptionGroupDoNotFollow = 'Do Not Follow Edit IF...';
   (** An option group description for Type options. **)
   strOptionGroupTypes = 'Types';
   (** An option group description for Module options. **)
@@ -141,6 +144,20 @@ ResourceString
   strShowMetricIconsInEditor = 'Show Metric Icons in the Code Editor';
   (** Options text for Showing Metric Messages in the Code Editor **)
   strShowMetricMsgsInEditor = 'Show Metric Messages in the Code Editor';
+  (** Options text for preventing the module explorer following the Code Editor if there are errors **)
+  strDoNotFollowEditorIfErrors = 'Errors';
+  (** Options text for preventing the module explorer following the Code Editor if there are warnings **)
+  strDoNotFollowEditorIfWarnings = 'Warnings';
+  (** Options text for preventing the module explorer following the Code Editor if there are hints **)
+  strDoNotFollowEditorIfHints = 'Hints';
+  (** Options text for preventing the module explorer following the Code Editor if there are
+      documentation conflicts **)
+  strDoNotFollowEditorIfConflicts = 'Documentation Conflicts';
+  (** Options text for preventing the module explorer following the Code Editor if there are checks **)
+  strDoNotFollowEditorIfChecks = 'Code Checks';
+  (** Options text for preventing the module explorer following the Code Editor if there are metrics **)
+  strDoNotFollowEditorIfMetrics = 'Code Metrics';
+
   (** Options text for auto hiding checks in the editoe views if they have no issues. **)
   strAutoHideChecksWithNoIssues = 'Auto Hide Checks with no issues in the Editor Views';
   (** Options text for auto hiding metrics in the editoe views if they have no issues. **)

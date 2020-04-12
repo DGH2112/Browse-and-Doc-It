@@ -3,7 +3,7 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.813
+  @Version 1.880
   @Date    12 Apr 2020
 
   @license
@@ -70,6 +70,7 @@ Const
     strOptionGroupConflicts,
     strOptionGroupChecks,
     strOptionGroupMetrics,
+    strOptionGroupDoNotFollow,
     strOptionGroupTypes,
     strOptionGroupModule,
     strOptionGroupMethods,
@@ -125,6 +126,13 @@ Const
     (FDescription : strAutoHideMetricsWithNoIssues;           FEnabled : False; FGroup: dogMetrics),
     (FDescription : strShowMetricIconsInEditor;               FEnabled :  True; FGroup: dogMetrics),
     (FDescription : strShowMetricMsgsInEditor;                FEnabled : False; FGroup: dogMetrics),
+
+    (FDescription : strDoNotFollowEditorIfErrors;             FEnabled : True;  FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfWarnings;           FEnabled : True;  FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfHints;              FEnabled : True;  FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfConflicts;          FEnabled : False; FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfChecks;             FEnabled : True;  FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfMetrics;            FEnabled : False; FGroup: dogDoNotFollow),
 
     (FDescription : strShowUndocumentedTypes;                 FEnabled : False; FGroup: dogTypes),
     (FDescription : strShowUndocumentedRecords;               FEnabled : False; FGroup: dogTypes),

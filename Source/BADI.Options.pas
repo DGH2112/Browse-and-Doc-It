@@ -3,7 +3,7 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 1.283
+  @Version 1.465
   @Date    12 Apr 2020
 
   @license
@@ -217,6 +217,8 @@ Const
   strSpecialTagFontForeColours = 'SpecialTagFontForeColours';
   (** An INI key for special tag font back colours. **)
   strSpecialTagFontBackColours = 'SpecialTagFontBackColours';
+  (** An INI key for special tag image indexes. **)
+  strSpecialTagImageIndexes = 'SpecialTagImageIndexes';
   (** An ini section name for the managed nodes. **)
   strManagedExpandedNodes = 'ManagedExpandedNodes';
   (** An ini section name for the documentation options. **)
@@ -357,25 +359,27 @@ Type
     FTagName : String;
     FTagDesc : String;
     FTagOps  : TBADITagProperties;
+    FTagImage: TBADIImageIndex;
   End;
   
 Const
-  DefaultSpecialTags : Array[0..14] Of TDefaultSpecialTag = (
-    (FTagName: 'todo';      FTagDesc: 'Things To Do';           FTagOps: [tpShowInTree..tpShowInDoc]),
-    (FTagName: 'precon';    FTagDesc: 'Pre-Conditions';         FTagOps: []),
-    (FTagName: 'postcon';   FTagDesc: 'Post-Conditions';        FTagOps: []),
-    (FTagName: 'param';     FTagDesc: 'Parameters';             FTagOps: []),
-    (FTagName: 'return';    FTagDesc: 'Returns';                FTagOps: []),
-    (FTagName: 'note';      FTagDesc: 'Notes';                  FTagOps: []),
-    (FTagName: 'see';       FTagDesc: 'Also See';               FTagOps: []),
-    (FTagName: 'exception'; FTagDesc: 'Exception Raised';       FTagOps: []),
-    (FTagName: 'bug';       FTagDesc: 'Known Bugs';             FTagOps: [tpShowInTree..tpShowInDoc]),
-    (FTagName: 'debug';     FTagDesc: 'Debugging Code';         FTagOps: [tpShowInTree..tpShowInDoc]),
-    (FTagName: 'date';      FTagDesc: 'Date Code Last Updated'; FTagOps: []),
-    (FTagName: 'author';    FTagDesc: 'Code Author';            FTagOps: []),
-    (FTagName: 'version';   FTagDesc: 'Code Version';           FTagOps: []),
-    (FTagName: 'refactor';  FTagDesc: 'Refactorings';           FTagOps: [tpShowInTree..tpShowInDoc]),
-    (FTagName: 'code';      FTagDesc: 'Code Example';           FTagOps: [tpShowInTree..tpFixed])
+  DefaultSpecialTags : Array[0..15] Of TDefaultSpecialTag = (
+    (FTagName: 'todo';      FTagDesc: 'Things To Do';           FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiRedToDoCross),
+    (FTagName: 'done';      FTagDesc: 'Completed Things To Do'; FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiGreenToDoCross),
+    (FTagName: 'precon';    FTagDesc: 'Pre-Conditions';         FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'postcon';   FTagDesc: 'Post-Conditions';        FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'param';     FTagDesc: 'Parameters';             FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'return';    FTagDesc: 'Returns';                FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'note';      FTagDesc: 'Notes';                  FTagOps: [];                          FTagImage: iiToDoItem),
+    (FTagName: 'see';       FTagDesc: 'Also See';               FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'exception'; FTagDesc: 'Exception Raised';       FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'bug';       FTagDesc: 'Known Bugs';             FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiRedBug),
+    (FTagName: 'debug';     FTagDesc: 'Debugging Code';         FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiYellowBug),
+    (FTagName: 'date';      FTagDesc: 'Date Code Last Updated'; FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'author';    FTagDesc: 'Code Author';            FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'version';   FTagDesc: 'Code Version';           FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'refactor';  FTagDesc: 'Refactorings';           FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiBlueBookmark),
+    (FTagName: 'code';      FTagDesc: 'Code Example';           FTagOps: [tpShowInTree..tpFixed];     FTagImage: iiNone)
   );
 var
   iTag: Integer;
@@ -392,8 +396,10 @@ Begin
       TBADISpecialTag.Create(
         DefaultSpecialTags[iTag].FTagName,
         DefaultSpecialTags[iTag].FTagDesc,
-        DefaultSpecialTags[iTag].FTagOps)
-      );
+        DefaultSpecialTags[iTag].FTagOps,
+        DefaultSpecialTags[iTag].FTagImage
+      )
+    );
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
   FExpandedNodes.Duplicates := dupIgnore;
@@ -1511,9 +1517,14 @@ Begin
       FSpecialTags.Clear;
     For iTag := 0 To sl.Count - 1 Do
       Begin
-        iSTIndex := FSpecialTags.Add(TBADISpecialTag.Create(sl[iTag],
-          iniFile.ReadString(strSpecialTagNames, sl[iTag], ''),
-          TBADITagProperties(Byte(iniFile.ReadInteger(strSpecialTags, sl[iTag], 0)))));
+        iSTIndex := FSpecialTags.Add(
+          TBADISpecialTag.Create(
+            sl[iTag],
+            iniFile.ReadString(strSpecialTagNames, sl[iTag], ''),
+            TBADITagProperties(Byte(iniFile.ReadInteger(strSpecialTags, sl[iTag], 0))),
+            TBADIImageIndex(iniFile.ReadInteger(strSpecialTagImageIndexes, sl[iTag], Integer(iiNone)))
+          )
+        );
         ST := FSpecialTags[iSTIndex];
         ST.FFontStyles := TFontStyles(Byte(iniFile.ReadInteger(strSpecialTagFontStyles, sl[iTag], 0)));
         ST.FFontColour := StringToColor(iniFile.ReadString(strSpecialTagFontForeColours, sl[iTag],
@@ -1895,22 +1906,20 @@ Procedure TBADIOptions.SaveSpecialTags(Const iniFile: TMemIniFile);
 
 Var
   iTag: Integer;
+  ST: TBADISpecialTag;
 
 Begin
   iniFile.EraseSection(strSpecialTags);
   iniFile.EraseSection(strSpecialTagNames);
   For iTag := 0 To FSpecialTags.Count - 1 Do
     Begin
-      iniFile.WriteInteger(strSpecialTags, FSpecialTags[iTag].FName,
-        Byte(FSpecialTags[iTag].FTagProperties));
-      iniFile.WriteString(strSpecialTagNames, FSpecialTags[iTag].FName,
-        FSpecialTags[iTag].FDescription);
-      iniFile.WriteInteger(strSpecialTagFontStyles, FSpecialTags[iTag].FName,
-        Byte(FSpecialTags[iTag].FFontStyles));
-      iniFile.WriteString(strSpecialTagFontForeColours, FSpecialTags[iTag].FName,
-        ColorToString(FSpecialTags[iTag].FFontColour));
-      iniFile.WriteString(strSpecialTagFontBackColours, FSpecialTags[iTag].FName,
-        ColorToString(FSpecialTags[iTag].FBackColour));
+      ST := FSpecialTags[iTag];
+      iniFile.WriteInteger(strSpecialTags, ST.FName, Byte(ST.FTagProperties));
+      iniFile.WriteString(strSpecialTagNames, ST.FName, ST.FDescription);
+      iniFile.WriteInteger(strSpecialTagFontStyles, ST.FName, Byte(ST.FFontStyles));
+      iniFile.WriteString(strSpecialTagFontForeColours, ST.FName, ColorToString(ST.FFontColour));
+      iniFile.WriteString(strSpecialTagFontBackColours, ST.FName, ColorToString(ST.FBackColour));
+      iniFile.WriteInteger(strSpecialTagImageIndexes, ST.FName, Integer(ST.FIconImage));
     End;
 End;
 

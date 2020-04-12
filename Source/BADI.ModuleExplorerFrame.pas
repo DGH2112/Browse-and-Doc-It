@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.663
-  @Date    04 Apr 2020
+  @Version 1.684
+  @Date    12 Apr 2020
 
   @license
 
@@ -137,6 +137,7 @@ Type
         FFontStyles    : TFontStyles;
         FFontColour    : TColor;
         FBackColour    : TColor;
+        FImageIndex    : TBADIImageIndex;
       End;
       (** An enumerate to define the position of the found text when filtering. **)
       TMatchType = (mtNone, mtStart, mtFull, mtEnd, mtMiddle);
@@ -727,12 +728,13 @@ Begin
       FSpecialTagNodes[i].FFontStyles := TBADIOptions.BADIOptions.SpecialTags[i].FFontStyles;
       FSpecialTagNodes[i].FFontColour := TBADIOptions.BADIOptions.SpecialTags[i].FFontColour;
       FSpecialTagNodes[i].FBackColour := TBADIOptions.BADIOptions.SpecialTags[i].FBackColour;
+      FSpecialTagNodes[i].FImageIndex := TBADIOptions.BADIOptions.SpecialTags[i].FIconImage;
       FSpecialTagNodes[i].Node := AddNode(
         FModule,
         FSpecialTagNodes[i].FTagDesc,
         FSpecialTagNodes[i].FTagName,
         1,
-        BADIImageIndex(iiTodoFolder, scNone),
+        BADIImageIndex(TBADIOptions.BADIOptions.SpecialTags[i].FIconImage, scNone),
         True
       );
     End;
@@ -1541,7 +1543,7 @@ Begin
                   FSpecialTagNodes[iSpecialTag].Node,
                   Tag,
                   iTreeLevel,
-                  BADIImageIndex(iiToDoItem, scNone),
+                  BADIImageIndex(FSpecialTagNodes[iSpecialTag].FImageIndex, scNone),
                   FSpecialTagNodes[iSpecialTag].FTagProperties,
                   FSpecialTagNodes[iSpecialTag].FFontStyles,
                   FSpecialTagNodes[iSpecialTag].FFontColour,

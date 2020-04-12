@@ -3,8 +3,8 @@ object frmSpecialTag: TfrmSpecialTag
   Top = 459
   BorderStyle = bsDialog
   Caption = 'Special Tag'
-  ClientHeight = 331
-  ClientWidth = 479
+  ClientHeight = 412
+  ClientWidth = 463
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,17 +18,17 @@ object frmSpecialTag: TfrmSpecialTag
   object pnlForm: TPanel
     Left = 0
     Top = 0
-    Width = 479
-    Height = 331
+    Width = 463
+    Height = 412
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      479
-      331)
+      463
+      412)
     object lblBackColour: TLabel
       Left = 76
-      Top = 273
+      Top = 324
       Width = 67
       Height = 16
       Anchors = [akLeft, akBottom]
@@ -45,7 +45,7 @@ object frmSpecialTag: TfrmSpecialTag
     end
     object lblFontColour: TLabel
       Left = 76
-      Top = 245
+      Top = 296
       Width = 66
       Height = 16
       Anchors = [akLeft, akBottom]
@@ -68,10 +68,18 @@ object frmSpecialTag: TfrmSpecialTag
       Caption = '&Properties'
       FocusControl = lbxTagProperties
     end
+    object lblImageIndex: TLabel
+      Left = 76
+      Top = 352
+      Width = 71
+      Height = 16
+      Anchors = [akLeft, akBottom]
+      Caption = 'Image &Index'
+    end
     object cbxBackColour: TColorBox
       Left = 160
-      Top = 270
-      Width = 311
+      Top = 321
+      Width = 295
       Height = 22
       Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor, cbPrettyNames, cbCustomColors]
       Anchors = [akLeft, akRight, akBottom]
@@ -79,8 +87,8 @@ object frmSpecialTag: TfrmSpecialTag
     end
     object cbxFontColour: TColorBox
       Left = 160
-      Top = 242
-      Width = 311
+      Top = 293
+      Width = 295
       Height = 22
       Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor, cbPrettyNames, cbCustomColors]
       Anchors = [akLeft, akRight, akBottom]
@@ -89,7 +97,7 @@ object frmSpecialTag: TfrmSpecialTag
     object edtDescription: TEdit
       Left = 76
       Top = 38
-      Width = 395
+      Width = 379
       Height = 24
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 1
@@ -97,15 +105,15 @@ object frmSpecialTag: TfrmSpecialTag
     object edtName: TEdit
       Left = 76
       Top = 8
-      Width = 395
+      Width = 379
       Height = 24
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
     end
     object gbxFontStyles: TGroupBox
       Left = 76
-      Top = 184
-      Width = 395
+      Top = 228
+      Width = 379
       Height = 52
       Anchors = [akLeft, akRight, akBottom]
       Caption = 'Font Styles'
@@ -114,7 +122,7 @@ object frmSpecialTag: TfrmSpecialTag
         AlignWithMargins = True
         Left = 12
         Top = 21
-        Width = 371
+        Width = 355
         Height = 26
         Margins.Left = 10
         Margins.Right = 10
@@ -160,13 +168,13 @@ object frmSpecialTag: TfrmSpecialTag
           end>
         TabOrder = 0
         DesignSize = (
-          371
+          355
           26)
         object chkBold: TCheckBox
           AlignWithMargins = True
           Left = 3
           Top = 4
-          Width = 86
+          Width = 82
           Height = 17
           Anchors = []
           Caption = '&Bold'
@@ -174,9 +182,9 @@ object frmSpecialTag: TfrmSpecialTag
         end
         object chkItalic: TCheckBox
           AlignWithMargins = True
-          Left = 95
+          Left = 91
           Top = 4
-          Width = 86
+          Width = 82
           Height = 17
           Anchors = []
           Caption = '&Italic'
@@ -184,9 +192,9 @@ object frmSpecialTag: TfrmSpecialTag
         end
         object chkUnderlined: TCheckBox
           AlignWithMargins = True
-          Left = 187
+          Left = 179
           Top = 4
-          Width = 86
+          Width = 82
           Height = 17
           Anchors = []
           Caption = '&Underlined'
@@ -194,9 +202,9 @@ object frmSpecialTag: TfrmSpecialTag
         end
         object chkStrikeout: TCheckBox
           AlignWithMargins = True
-          Left = 280
+          Left = 267
           Top = 4
-          Width = 87
+          Width = 85
           Height = 17
           Anchors = []
           Caption = '&Strikeout'
@@ -207,14 +215,14 @@ object frmSpecialTag: TfrmSpecialTag
     object lbxTagProperties: TCheckListBox
       Left = 76
       Top = 68
-      Width = 395
-      Height = 110
+      Width = 379
+      Height = 154
       Anchors = [akLeft, akTop, akRight, akBottom]
       TabOrder = 2
     end
     object btnCancel: TButton
-      Left = 396
-      Top = 298
+      Left = 380
+      Top = 379
       Width = 75
       Height = 25
       Anchors = [akRight, akBottom]
@@ -226,11 +234,11 @@ object frmSpecialTag: TfrmSpecialTag
       Images = ilButtons
       ModalResult = 2
       ParentDoubleBuffered = False
-      TabOrder = 7
+      TabOrder = 8
     end
     object btnOK: TButton
-      Left = 315
-      Top = 298
+      Left = 299
+      Top = 379
       Width = 75
       Height = 25
       Anchors = [akRight, akBottom]
@@ -242,8 +250,18 @@ object frmSpecialTag: TfrmSpecialTag
       Images = ilButtons
       ModalResult = 1
       ParentDoubleBuffered = False
-      TabOrder = 6
+      TabOrder = 7
       OnClick = btnOKClick
+    end
+    object cbxImageIndex: TComboBoxEx
+      Left = 160
+      Top = 348
+      Width = 295
+      Height = 25
+      ItemsEx = <>
+      Style = csExDropDownList
+      Anchors = [akLeft, akRight, akBottom]
+      TabOrder = 6
     end
   end
   object ilButtons: TImageList

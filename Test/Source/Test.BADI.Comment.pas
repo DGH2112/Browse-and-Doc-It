@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    12 Apr 2020
 
   @license
 
@@ -98,7 +98,7 @@ Begin
         Break;
       End;
   TBADIOptions.BADIOptions.SpecialTags.Add(TBADISpecialTag.Create('code', 'Example Code',
-    [tpShowInTree..tpFixed]));
+    [tpShowInTree..tpFixed], iiNone));
   FComment := TComment.Create(strComment, 12, 34);
 End;
 

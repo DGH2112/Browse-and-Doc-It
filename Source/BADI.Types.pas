@@ -3,7 +3,7 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.337
+  @Version 1.357
   @Date    12 Apr 2020
 
   @license
@@ -595,8 +595,9 @@ Type
     FFontStyles    : TFontStyles;
     FFontColour    : TColor;
     FBackColour    : TColor;
-    Constructor Create(Const strName, strDescription : String;
-      Const setTagProperties : TBADITagProperties);
+    FIconImage     : TBADIImageIndex;
+    Constructor Create(Const strName, strDescription: String;
+  Const setTagProperties: TBADITagProperties; Const eImageIndex : TBADIImageIndex);
   End;
 
   (** An enumerate to descibe each of the metrics. **)
@@ -740,10 +741,11 @@ Implementation
   @param   strName          as a String as a constant
   @param   strDescription   as a String as a constant
   @param   setTagProperties as a TBADITagProperties as a constant
+  @param   eImageIndex      as a TBADIImageIndex as a constant
 
 **)
 Constructor TBADISpecialTag.Create(Const strName, strDescription: String;
-  Const setTagProperties: TBADITagProperties);
+  Const setTagProperties: TBADITagProperties; Const eImageIndex : TBADIImageIndex);
 
 Begin
   FName := strName;
@@ -752,6 +754,7 @@ Begin
   FFontStyles := [];
   FFontColour := clNone;
   FBackColour := clNone;
+  FIconImage := eImageIndex;
 End;
 
 End.

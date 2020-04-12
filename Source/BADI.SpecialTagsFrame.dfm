@@ -363,4 +363,8 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
       FFF8C403FFF8FF3FFFFFEC07FFFFFF7F00000000000000000000000000000000
       000000000000}
   end
+  object ilBADIImages: TImageList
+    Left = 80
+    Top = 288
+  end
 end

@@ -4,8 +4,8 @@
   through a single method.
 
   @Author  David Hoyle
-  @Version 1.018
-  @Date    28 Mar 2020
+  @Version 1.461
+  @Date    12 Apr 2020
 
   @license
 
@@ -45,7 +45,7 @@ Uses
   Buttons,
   CheckLst,
   BADI.Types,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, System.ImageList, Vcl.ImgList, Vcl.ComCtrls;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -72,13 +72,16 @@ Type
     btnCancel: TButton;
     btnOK: TButton;
     ilButtons: TImageList;
+    lblImageIndex: TLabel;
+    cbxImageIndex: TComboBoxEx;
     procedure btnOKClick(Sender: TObject);
   Strict Private
+    FBADIImages : TImageList;
   Strict Protected
-    Procedure InitialiseForm(Const SpecialTag : TBADISpecialTag);
+    Procedure InitialiseForm(Const BADIImages : TImageList; Const SpecialTag : TBADISpecialTag);
     Procedure FinaliseForm(Var SpecialTag : TBADISpecialTag);
   Public
-    Class Function Execute(Var SpecialTag : TBADISpecialTag): Boolean;
+    Class Function Execute(Const BADIImages : TImageList; Var SpecialTag : TBADISpecialTag): Boolean;
   End;
 
 Implementation
@@ -87,8 +90,13 @@ Uses
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
   {$ENDIF}
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
+  System.TypInfo,
   BADI.ToolsAPIUtils,
-  BADI.Constants;
+  BADI.Constants,
+  BADI.Functions;
 
 {$R *.DFM}
 
@@ -132,11 +140,13 @@ End;
            pressed.
   @postcon Displays the special tag form.
 
+  @param   BADIImages as a TImageList as a constant
   @param   SpecialTag as a TBADISpecialTag as a reference
   @return  a Boolean
 
 **)
-Class Function TfrmSpecialTag.Execute(Var SpecialTag : TBADISpecialTag): Boolean;
+Class Function TfrmSpecialTag.Execute(Const BADIImages : TImageList;
+  Var SpecialTag : TBADISpecialTag): Boolean;
 
 Var
   frm : TfrmSpecialTag;
@@ -145,7 +155,7 @@ Begin
   frm := TfrmSpecialTag.Create(Application.MainForm);
   Try
     TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmSpecialTag, frm);
-    frm.InitialiseForm(SpecialTag);
+    frm.InitialiseForm(BADIImages, SpecialTag);
     If frm.ShowModal = mrOK Then
       Begin
         frm.FinaliseForm(SpecialTag);
@@ -189,6 +199,7 @@ Begin
     Include(SpecialTag.FFontStyles, fsStrikeOut);
   SpecialTag.FFontColour := cbxFontColour.Selected;
   SpecialTag.FBackColour := cbxBackColour.Selected;
+  SpecialTag.FIconImage := TBADIImageIndex(cbxImageIndex.ItemIndex);
 End;
 
 (**
@@ -198,16 +209,27 @@ End;
   @precon  None.
   @postcon The information for the special tag is set in the form controls.
 
+  @param   BADIImages as a TImageList as a constant
   @param   SpecialTag as a TBADISpecialTag as a constant
 
 **)
-Procedure TfrmSpecialTag.InitialiseForm(Const SpecialTag : TBADISpecialTag);
+Procedure TfrmSpecialTag.InitialiseForm(Const BADIImages : TImageList;
+  Const SpecialTag : TBADISpecialTag);
+
+Const
+  iFirstChar = 1;
+  iCharLen = 2;
 
 Var
   eTagProp : TBADITagProperty;
   iIndex: Integer;
+  eImageIndex: TBADIImageIndex;
+  strName: String;
+  Item: TComboExItem;
 
 Begin
+  FBADIImages := BADIImages;
+  cbxImageIndex.Images := BADIImages;
   edtName.Text := SpecialTag.FName;
   edtDescription.Text := SpecialTag.FDescription;
   For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
@@ -221,6 +243,15 @@ Begin
   chkStrikeout.Checked := fsStrikeOut In SpecialTag.FFontStyles;
   CbxFontColour.Selected := SpecialTag.FFontColour;
   cbxBackColour.Selected := SpecialTag.FBackColour;
+  For eImageIndex := Low(TBADIImageIndex) To High(TBADIImageIndex) Do
+    Begin
+      Item := cbxImageIndex.ItemsEx.Add;
+      strName := GetEnumName(TypeInfo(TBADIImageIndex), Ord(eImageIndex));
+      Delete(strName, iFirstChar, iCharLen);
+      Item.Caption := strName;
+      Item.ImageIndex := BADIImageIndex(eImageIndex, scNone);
+    End;
+  cbxImageIndex.ItemIndex := Integer(SpecialTag.FIconImage);
 End;
 
 End.

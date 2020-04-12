@@ -2,9 +2,9 @@
 
   This module contains a frame for editing the BADI special tags.
 
-  @Version 1.0
+  @Version 1.205
   @Author  David Hoyle
-  @Date    25 Jun 2019
+  @Date    12 Apr 2020
 
   @license
 
@@ -51,7 +51,7 @@ Uses
   BADI.Types,
   VirtualTrees,
   Themes, 
-  BADI.CustomVirtualStringTree;
+  BADI.CustomVirtualStringTree, System.ImageList, Vcl.ImgList;
 
 Type
   (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)
@@ -65,6 +65,7 @@ Type
     btnMoveUp: TButton;
     btnAdd: TButton;
     ilButtonIcons: TImageList;
+    ilBADIImages: TImageList;
     Procedure btnAddClick(Sender: TObject);
     Procedure btnDeleteClick(Sender: TObject);
     Procedure btnEditClick(Sender: TObject);
@@ -81,6 +82,8 @@ Type
       Y: Integer);
     Procedure vstSpecialTagsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    Procedure vstSpecialTagsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean; Var ImageIndex: TImageIndex);
   Strict Private
     FSpecialTags    : TList<TBADISpecialTag>;
     FVSTSpecialTags : TBADISpecialTagsOptionsVirtualStringTree;
@@ -91,7 +94,6 @@ Type
     Procedure PopulateTreeView;
     Procedure CreateVirtualStringTree;
   Public
-    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
     Destructor Destroy; Override;
     Procedure LoadSettings;
@@ -111,7 +113,8 @@ Uses
   BADI.SpecialTagForm,
   BADI.Constants,
   BADI.OptionsForm,
-  BADI.Options;
+  BADI.Options,
+  BADI.Functions;
 
 Type
   (** A record to describe the data to be stoed in the treeview. **)
@@ -143,8 +146,8 @@ Var
   ST : TBADISpecialTag;
 
 Begin
-  ST.Create(strTag, strTagDescription, []);
-  If TfrmSpecialTag.Execute(ST) Then
+  ST.Create(strTag, strTagDescription, [], iiNone);
+  If TfrmSpecialTag.Execute(ilBADIImages, ST) Then
     Begin
       FSpecialTags.Add(ST);
       PopulateTreeView;
@@ -166,12 +169,17 @@ Procedure TfmBADISpecialTagsFrame.btnDeleteClick(Sender: TObject);
 
 Var
   NodeData : PSpecialTagNodeData;
+  Node: PVirtualNode;
 
 Begin
   If Assigned(FVSTSpecialTags.FocusedNode) Then
     Begin
       NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       FSpecialTags.Delete(NodeData.FSpecialTagIndex);
+      Node := FVSTSpecialTags.GetPrevious(FVSTSpecialTags.FocusedNode);
+      If Not Assigned(Node) Then
+        Node := FVSTSpecialTags.GetNext(FVSTSpecialTags.FocusedNode);
+      FVSTSpecialTags.FocusedNode := Node;  
       PopulateTreeView;
     End;
 End;
@@ -198,7 +206,7 @@ Begin
     Begin
       NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       ST := FSpecialTags[NodeData.FSpecialTagIndex];
-      If TfrmSpecialTag.Execute(ST) Then
+      If TfrmSpecialTag.Execute(ilBADIImages, ST) Then
         Begin
           FSpecialTags[NodeData.FSpecialTagIndex] := ST;
           PopulateTreeView;
@@ -299,6 +307,7 @@ Begin
   FVSTSpecialTags.NodeDataSize := SizeOf(TSpecialTagsNodeData);
   FSpecialTags := TList<TBADISpecialTag>.Create;
   PopulateTreeView;
+  LoadBADIImages(ilBADIImages);
 End;
 
 (**
@@ -328,12 +337,15 @@ Begin
   FVSTSpecialTags.Anchors := [akLeft, akTop, akRight, akBottom];
   FVSTSpecialTags.Header.Height := 20;
   FVSTSpecialTags.TabOrder := 0;
+  FVSTSpecialTags.TreeOptions.PaintOptions := FVSTSpecialTags.TreeOptions.PaintOptions - [toShowRoot];
+  FVSTSpecialTags.Images := ilBADIImages;
   FVSTSpecialTags.OnBeforeCellPaint := vstSpecialTagsBeforeCellPaint;
   FVSTSpecialTags.OnClick := vstSpecialTagsClick;
   FVSTSpecialTags.OnDblClick := vstSpecialTagsDblClick;
   FVSTSpecialTags.OnGetText := vstSpecialTagsGetText;
   FVSTSpecialTags.OnPaintText := vstSpecialTagsPaintText;
   FVSTSpecialTags.OnMouseDown := vstSpecialTagsMouseDown;
+  FVSTSpecialTags.OnGetImageIndex := vstSpecialTagsGetImageIndex;
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Position := 0;
   C.Style := vsOwnerDraw;
@@ -557,6 +569,38 @@ Procedure TfmBADISpecialTagsFrame.vstSpecialTagsDblClick(Sender: TObject);
 
 Begin
   btnEditClick(Sender);
+End;
+
+(**
+
+  This is an on GetImageIndex ebent handler for the treeview.
+
+  @precon  None.
+  @postcon Returns the image index for the current node.
+
+  @param   Sender     as a TBaseVirtualTree
+  @param   Node       as a PVirtualNode
+  @param   Kind       as a TVTImageKind
+  @param   Column     as a TColumnIndex
+  @param   Ghosted    as a Boolean as a reference
+  @param   ImageIndex as a TImageIndex as a reference
+
+**)
+Procedure TfmBADISpecialTagsFrame.vstSpecialTagsGetImageIndex(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean;
+  Var ImageIndex: TImageIndex);
+
+Var
+  NodeData : PSpecialTagNodeData;
+  ST : TBADISpecialTag;
+
+Begin
+  If (Column = 0) And (Kind In [ikNormal, ikSelected]) Then
+    Begin
+      NodeData := Sender.GetNodeData(Node);
+      ST := FSpecialTags[NodeData.FSpecialTagIndex];
+      ImageIndex := BADIImageIndex(ST.FIconImage, scNone);
+    End;
 End;
 
 (**

@@ -3,8 +3,8 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Author  David Hoyle
-  @Version 2.0
-  @Date    17 Aug 2019
+  @Version 2.085
+  @Date    12 Apr 2020
 
   @license
 
@@ -3535,6 +3535,7 @@ Function TPascalModule.GetASTLabel(Const eLabel : TBADIASTLabel): TLabelContaine
 
 Var
   strLabel : String;
+  eImageLabel : TBADIImageIndex;
   
 Begin
   If Not Assigned(FASTLabels[eLabel]) Then
@@ -3549,8 +3550,19 @@ Begin
         alExportsHeadingsLabel:    strLabel := strExportsLabel;
         alImplementedMethodsLabel: strLabel := strImplementedMethodsLabel;
       End;
-      FASTLabels[eLabel] := Add(strLabel, iiPublicVariablesLabel, scPrivate, 0, 0,
-        GetComment) As TLabelContainer;
+      Case eLabel Of
+        alTypesLabel:              eImageLabel := iiPublicTypesLabel;
+        alConstantsLabel:          eImageLabel := iiPublicConstantsLabel;
+        alResourceStringsLabel:    eImageLabel := iiPublicResourceStringsLabel;
+        alVariablesLabel:          eImageLabel := iiPublicVariablesLabel;
+        alThreadVarsLabel:         eImageLabel := iiPublicThreadVarsLabel;
+        alExportedHeadingsLabel:   eImageLabel := iiExportedHeadingsLabel;
+        alExportsHeadingsLabel:    eImageLabel := iiExportedFunctionsLabel;
+        alImplementedMethodsLabel: eImageLabel := iiImplementedMethods;
+      Else
+        eImageLabel := iiNone;
+      End;
+      FASTLabels[eLabel] := Add(strLabel, eImageLabel, scNone, 0, 0, GetComment) As TLabelContainer;
     End;
   Result := FASTLabels[eLabel];
 End;

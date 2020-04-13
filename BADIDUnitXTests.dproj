@@ -90,6 +90,9 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <RcCompile Include="LayeredExplorerImages.RC">
+            <Form>LayeredExplorerImages.res</Form>
+        </RcCompile>
         <DCCReference Include="Source\BADI.Initialisation.pas"/>
         <DCCReference Include="Source\BADI.Module.Dispatcher.pas"/>
         <DCCReference Include="Source\BADI.BackusNaur.Module.pas"/>

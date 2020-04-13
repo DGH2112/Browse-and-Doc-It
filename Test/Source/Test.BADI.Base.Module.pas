@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.003
+  @Date    13 Apr 2020
 
   @license
 
@@ -398,11 +398,9 @@ Begin
       CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS:'#13#10 +
         P.FirstDocConflict);
     If ttChecks In TestTypes Then
-      CheckEquals(iChecks, P.HeadingCount(strChecks), 'CHECKS:'#13#10 +
-        P.FirstCheck);
+      CheckEquals(iChecks, P.HeadingCount(strChecks), 'CHECKS:'#13#10 + P.FirstCheck);
     If ttMetrics In TestTypes Then
-      CheckEquals(iMetrics, P.HeadingCount(strMetrics), 'METRICS:'#1#10 +
-        P.FirstMetric);
+      CheckEquals(iMetrics, P.HeadingCount(strMetrics), 'METRICS:'#13#10 + P.FirstMetric);
     For iCheck := Low(strCheckValues) to High(strCheckValues) Do
       If strCheckValues[iCheck] <> '' Then
         Begin

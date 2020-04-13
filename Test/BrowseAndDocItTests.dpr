@@ -1,8 +1,8 @@
-//: @stopdocumentation
 Program BrowseAndDocItTests;
 
 {$INCLUDE '..\Source\CompilerDefinitions.inc'}
 {$R 'BADIVerInfo.res' '..\BADIVerInfo.RC'}
+{$R 'LayeredExplorerImages.res' '..\LayeredExplorerImages.RC'}
 
 uses
   FastMM4,
@@ -190,6 +190,10 @@ uses
 {$R *.RES}
 
 begin
+  TBADIOptions.BADIOptions.MaxDocOutputWidth := 80;
+  TBADIOptions.BADIOptions.ToxicityPower := 3;
+  TBADIOptions.BADIOptions.ToxicitySummartion := tsAddBeforePower;
+  TBADIOptions.BADIOptions.TokenLimit := 50;
   RunRegisteredTests();
 end.
 

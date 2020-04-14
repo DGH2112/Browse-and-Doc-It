@@ -3,8 +3,8 @@
   This module contains a custom hint window to display the module metric totals.
 
   @Author  David Hoyle
-  @Version 1.879
-  @Date    12 Apr 2020
+  @Version 2.238
+  @Date    13 Apr 2020
   
   @license
 
@@ -33,6 +33,7 @@ Interface
 
 Uses
   System.Classes,
+  Vcl.Graphics,
   Vcl.Controls,
   WinApi.Windows,
   BADI.Types,
@@ -42,13 +43,6 @@ Type
   (** A class to define a new hint window for the totals to be displayed within on the Code Editor. **)
   TBADIDocIssueHintWindow = Class(THintWindow)
   Strict Private
-    Type
-      (** A record to define the information to render. **)
-      TTotalRec = Record
-        FLabel      : String;
-        FImageIndex : TBADIImageIndex;
-        FCount      : Integer;
-      End;
     Const
       (** A constant to define the padding around the contents of the hint window. **)
       iPadding = 5;
@@ -58,18 +52,21 @@ Type
       (** A class variable to hold the singleton instance of the code editor totals hint window. **)
       FHintWindow : TBADIDocIssueHintWindow;
   Strict Private
-    FTotals : TArray<TTotalRec>;
+    FTotals : TArray<TBADITotalInfo>;
     FScopeImageList : TImageList;
     FCalcHeight : Integer;
     FCalcNameWidth : Integer;
     FCalcNumWidth : Integer;
+    FBackColour : TColor;
+    FForeColour : TColor;
   Strict Protected
     Procedure Paint; Override;
     Function CalcHintRect(Const Rect : TRect; Const Totals: IBADIDocIssueTotals): TRect;
       Reintroduce; Overload;
     Procedure ActivateHint(Const Rect: TRect); Reintroduce;
       Overload;
-      procedure UpdateFontInfo(const R: TRect);
+    Procedure UpdateBaseFontInfo(Const R: TRect);
+    Procedure UpdateFontInfo(Const TotalInfo: TBADITotalInfo);
   Public
     Class Constructor Create;
     Class Destructor Destroy;
@@ -86,7 +83,6 @@ Uses
   System.SysUtils,
   System.Math,
   System.Generics.Collections,
-  Vcl.Graphics,
   Vcl.Forms,
   ToolsAPI,
   BADI.Functions,
@@ -139,22 +135,26 @@ Begin
   If Not Assigned(FScopeImageList) Then
     FScopeImageList := TBADIOptions.BADIOptions.ScopeImageList;
   Result := Rect;
+  UpdateBaseFontInfo(Result);
   iIndex := 0;
   FCalcHeight := 0;
   FCalcNameWidth := 0;
   FCalcNumWidth := 0;
-  UpdateFontInfo(Result);
   SetLength(FTotals, Totals.Totals.Count);
   For Issue In Totals.Totals Do
     Begin
       FTotals[iIndex].FLabel := Issue.Key;
       FTotals[iIndex].FImageIndex := Issue.Value.FImageIndex;
-      FTotals[iIndex].FCount := Issue.Value.FCounter;
+      FTotals[iIndex].FForeColour := Issue.Value.FForeColour;
+      FTotals[iIndex].FBackColour := Issue.Value.FBackColour;
+      FTotals[iIndex].FFontStyles := Issue.Value.FFontStyles;
+      FTotals[iIndex].FCounter := Issue.Value.FCounter;
+      UpdateFontInfo(FTotals[iIndex]);
       Inc(FCalcHeight, Max(Canvas.TextHeight(strTextHeightTest), iIconSize) + iPadding);
       iTextWidth := Canvas.TextWidth(FTotals[iIndex].FLabel);
       If iTextWidth > FCalcNameWidth Then
         FCalcNameWidth := iTextWidth;
-      iTextWidth := Canvas.TextWidth(Format('%d', [FTotals[iIndex].FCount]));
+      iTextWidth := Canvas.TextWidth(Format('%d', [FTotals[iIndex].FCounter]));
       If iTextWidth > FCalcNumWidth Then
         FCalcNumWidth := iTextWidth;
       Inc(iIndex);
@@ -255,12 +255,13 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Paint', tmoTiming);{$ENDIF}
   DoubleBuffered := True;
   R := Rect(0, 0, Width - 1, Height - 1);
-  UpdateFontInfo(R);
+  UpdateBaseFontInfo(R);
   // Render Totals
   Inc(R.Top, iPadding);
   Dec(R.Right, iPadding);
   For iDocIssueType := Low(FTotals) To High(FTotals) Do
     Begin
+      UpdateFontInfo(FTotals[iDocIssueType]);
       R.Left := iPadding;
       iHeight := Max(Canvas.TextHeight(strTextHeightTest), iIconSize);
       R.Bottom := R.Top + iHeight;
@@ -281,7 +282,7 @@ Begin
       Inc(R.Left, FScopeImageList.Width);
       Inc(R.Left, iPadding);
       // Draw Counter
-      strText := Format('%d', [FTotals[iDocIssueType].FCount]);
+      strText := Format('%d', [FTotals[iDocIssueType].FCounter]);
       Canvas.TextRect(R, strText, [tfLeft, tfVerticalCenter]);
       Inc(R.Top, Canvas.TextHeight(strTextHeightTest) + iPadding);
     End;
@@ -297,7 +298,7 @@ End;
   @param   R as a TRect as a constant
 
 **)
-Procedure TBADIDocIssueHintWindow.UpdateFontInfo(Const R: TRect);
+Procedure TBADIDocIssueHintWindow.UpdateBaseFontInfo(Const R: TRect);
 
 Var
   boolUseIDEColours: Boolean;
@@ -308,17 +309,40 @@ Begin
   // Background
   boolUseIDEColours := TBADIOptions.BADIOptions.UseIDEEditorColours;
   TFI := TBADIOptions.BADIOptions.TokenFontInfo[boolUseIDEColours][ttPlainText];
-  Canvas.Brush.Color := TFI.FBackColour;
+  FBackColour := TFI.FBackColour;
+  Canvas.Brush.Color := FBackColour;
   Canvas.FillRect(R);
   // Font
-  Font.Color := TFI.FForeColour;
-  Font.Style := TFI.FStyles;
+  FForeColour := TFI.FForeColour;
+  Font.Color := FForeColour;
   If Supports(BorlandIDEServices, IOTAEditorServices, ES) Then
     Begin
       Font.Name := ES.EditOptions.FontName;
       Font.Size := ES.EditOptions.FontSize;
     End;
   Canvas.Font.Assign(Font);
+End;
+
+(**
+
+  This method updates the font information for the individual items to be rendered.
+
+  @precon  None.
+  @postcon The canvas brush and font information is updated.
+
+  @param   TotalInfo as a TBADITotalInfo as a constant
+
+**)
+Procedure TBADIDocIssueHintWindow.UpdateFontInfo(Const TotalInfo: TBADITotalInfo);
+
+Begin
+  Canvas.Brush.Color := FBackColour;
+  If TotalInfo.FBackColour <> clNone Then
+    Canvas.Brush.Color := TotalInfo.FBackColour;
+  Canvas.Font.Color := FForeColour;
+  If TotalInfo.FForeColour <> clNone Then
+    Canvas.Font.Color := TotalInfo.FForeColour;
+  Canvas.Font.Style := TotalInfo.FFontStyles;
 End;
 
 End.

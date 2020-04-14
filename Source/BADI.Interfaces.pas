@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.347
-  @Date    12 Apr 2020
+  @Version 1.427
+  @Date    14 Apr 2020
 
   @license
 
@@ -143,8 +143,8 @@ Type
     Procedure SetModuleDateFmt(Const strValue : String);
     Function  GetModuleVersionIncrement : Double;
     Procedure SetModuleVersionIncrement(Const dblValue : Double);
-    Function  GetDoNotFollowEditor : TLimitTypes;
-    Procedure SetDoNotFollowEditor(Const setLimitTypes : TLimitTypes);
+    Function  GetDoNotFollowEditor : TArray<String>;
+    Procedure SetDoNotFollowEditor(Const astrDoNotFollowTypes : TArray<String>);
     Function  GetScopeImageList : TImageList;
     // General Methods
     Procedure LoadSettings;
@@ -435,13 +435,13 @@ Type
     Property ModuleVersionIncrement : Double Read GetModuleVersionIncrement
       Write SetModuleVersionIncrement;
     (**
-      This property gets and sets the limits type that if present in the module prevent the explorer
+      This property gets and sets the limits type that if present in the module prevent the explorer 
       selection from following the editor cursor.
       @precon  None.
       @postcon Gets and sets the limits to not follow.
-      @return  a TLimitTypes
+      @return  a TArray<String>
     **)
-    Property DoNotFollowEditor : TLimitTypes Read GetDoNotFollowEditor Write SetDoNotFollowEditor;
+    Property DoNotFollowEditor : TArray<String> Read GetDoNotFollowEditor Write SetDoNotFollowEditor;
     (**
       This property returns a single scope image list for use throughout the application.
       @precon  None.
@@ -498,35 +498,48 @@ Type
     Property  ModuleStats[Const strFileName : String] : IBADIModuleStats Read GetModuleStats; Default;
   End;
 
+  (** A record to describe the document issue information. **)
+  TBADIDocIssueInfo = Record
+    FName       : String;
+    FImageIndex : TBADIImageIndex;
+    FForeColour : TColor;
+    FBackColour : TColor;
+    FMessage    : String;
+  End;
+
   (** An interface for the Documentation Issues for a line of code. **)
   IBADILineDocIssues = Interface
   ['{6D94887A-69E7-4736-A1B1-6BB533DE9D9F}']
     // Getters and Setters
-    Function  GetLimitTypes : TLimitTypes;
-    Function  GetMessage(Const eLimitType : TLimitType) : String;
+    Function  GetLimitTypes : TArray<String>;
+    Function  GetMessage(Const strDocIssueType : String) : TBADIDocIssueInfo;
     // General Methods
-    Procedure AddIssue(Const eLimitType : TLimitType; Const strMsg : String);
+    Procedure AddIssue(Const strDocIssueType : String; Const DocIssueInfo : TBADIDocIssueInfo);
     // Properties
     (**
       This property returns a set of enumerates which define the doc issues for the line.
       @precon  None.
       @postcon Returns a set of enumerates which define the doc issues for the line.
-      @return  a TLimitTypes
+      @return  a TArray<String>
     **)
-    Property Issues : TLimitTypes Read GetLimitTypes;
+    Property Issues : TArray<String> Read GetLimitTypes;
     (**
       This method returns the text associated with the given doc issue type.
       @precon  None.
       @postcon Returns the text associated with the given doc issue type.
-      @param   eLimitType as a TLimitType as a constant
-      @return  a String
+      @param   strDocIssueType as a String as a constant
+      @return  a TBADIDocIssueInfo
     **)
-    Property Message[Const eLimitType : TLimitType] : String Read GetMessage;
+    Property Message[Const strDocIssueType : String] : TBADIDocIssueInfo Read GetMessage; Default;
   End;
 
   (** A record to describe the information inside the Totals dictionary. **)
   TBADITotalInfo = Record
+    FLabel      : String;
     FImageIndex : TBADIImageIndex;
+    FForeColour : TColor;
+    FBackColour : TColor;
+    FFontStyles : TFontStyles;
     FCounter    : Integer;
   End;
   
@@ -535,8 +548,9 @@ Type
   ['{FE2ACA7E-03A5-4C12-A872-A8A4F33AC809}']
     // Getters and Setters
     Function  GetTotals : TDictionary<String, TBADITotalInfo>;
+    Function  ContainsAny(Const astrValue : TArray<String>) : Boolean;
     // General Methods
-    Procedure IncDocIssue(Const strDocIssueType : String; Const eImageListIndex : TBADIImageIndex);
+    Procedure IncDocIssue(Const strDocIssueType : String; Const TotalInfo : TBADITotalInfo);
     Procedure Clear;
     // Property
     (**

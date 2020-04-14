@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.827
-  @Date    12 Apr 2020
+  @Version 2.285
+  @Date    14 Apr 2020
 
   @license
 
@@ -1462,15 +1462,10 @@ Var
   Node : PVirtualNode;
   NodeData : PBADITreeData;
   iNodeLine, iFollowLine : Integer;
-  eDocIssue : TLimitType;
   
 Begin
-  {: @bug
-  For eDocIssue := Low(TLimitType) To High(TLimitType) Do
-    If eDocIssue In TBADIOptions.BADIOptions.DoNotFollowEditor Then
-      If FDocIssueTotals.Totals[eDocIssue] > 0 Then
-        Exit;
-  }
+  If FDocIssueTotals.ContainsAny(TBADIOptions.BADIOptions.DoNotFollowEditor) Then
+    Exit;
   iFollowLine := 0;
   Node := Explorer.GetFirst();
   While Assigned(Node) Do
@@ -1531,6 +1526,10 @@ Var
   iComment, iTag, iSpecialTag : Integer;
   Cmt: TComment;
   Tag: TTag;
+  ST: TSpecialTagNode;
+  DocIssues: IBADILineDocIssues;
+  recDocIssueInfo : TBADIDocIssueInfo;
+  recTotalInfo : TBADITotalInfo;
 
 Begin
   For iComment := 0 To Module.BodyCommentCount - 1 Do
@@ -1542,28 +1541,29 @@ Begin
             If CompareText(Cmt.Tag[iTag].TagName, FSpecialTagNodes[iSpecialTag].FTagName) = 0 Then
               Begin
                 Tag := Cmt.Tag[iTag];
-                AddNode(
-                  FSpecialTagNodes[iSpecialTag].Node,
-                  Tag,
-                  iTreeLevel,
-                  BADIImageIndex(FSpecialTagNodes[iSpecialTag].FImageIndex, scNone),
-                  FSpecialTagNodes[iSpecialTag].FTagProperties,
-                  FSpecialTagNodes[iSpecialTag].FFontStyles,
-                  FSpecialTagNodes[iSpecialTag].FFontColour,
-                  FSpecialTagNodes[iSpecialTag].FBackColour,
-                  Cmt);
+                ST := FSpecialTagNodes[iSpecialTag];
+                AddNode(FSpecialTagNodes[iSpecialTag].Node, Tag, iTreeLevel,
+                  BADIImageIndex(ST.FImageIndex, scNone), ST.FTagProperties, ST.FFontStyles,
+                  ST.FFontColour, ST.FBackColour, Cmt);
                 If tpShowInEditor In FSpecialTagNodes[iSpecialTag].FTagProperties Then
                   Begin
-                    {: @bug DI := Element As TDocIssue;
-                    eLimitType := ErrorTypeToLimitType(DI.ErrorType);
-                    If FLineDocIssues.TryGetValue(DI.Line, LineDocIssues) Then
-                      LineDocIssues.AddIssue(eLimitType, Element.AsString(False, False))
+                    recDocIssueInfo.FName := ST.FTagName;
+                    recDocIssueInfo.FImageIndex := ST.FImageIndex;
+                    recDocIssueInfo.FForeColour := ST.FFontColour;
+                    recDocIssueInfo.FBackColour := ST.FBackColour;
+                    recDocIssueInfo.FMessage := '';
+                    If FLineDocIssues.TryGetValue(Tag.Line, DocIssues) Then
+                      DocIssues.AddIssue('@' + ST.FTagName, recDocIssueInfo)
                     Else
-                      FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(eLimitType, Element.AsString(False, False)));}
-                    FDocIssueTotals.IncDocIssue(
-                      FSpecialTagNodes[iSpecialTag].FTagName,
-                      FSpecialTagNodes[iSpecialTag].FImageIndex
-                    );
+                      FLineDocIssues.Add(
+                        Tag.Line,
+                        TBADILineDocIssue.Create('@' + ST.FTagName, recDocIssueInfo)
+                      );
+                    recTotalInfo.FImageIndex := ST.FImageIndex;
+                    recTotalInfo.FForeColour := ST.FFontColour;
+                    recTotalInfo.FBackColour := ST.FBackColour;
+                    recTotalInfo.FFontStyles := ST.FFontStyles;
+                    FDocIssueTotals.IncDocIssue('@' + ST.FTagName, recTotalInfo);
                   End;
               End;
     End;
@@ -1810,28 +1810,48 @@ Var
   eLimitType : TLimitType;
   LineDocIssues: IBADILineDocIssues;
   DC: TDocumentConflict;
+  recTotalInfo : TBADITotalInfo;
+  recDocIssueInfo : TBADIDocIssueInfo;
 
 Begin
   If Element Is TDocIssue Then
     Begin
       DI := Element As TDocIssue;
       eLimitType := ErrorTypeToLimitType(DI.ErrorType);
+      recDocIssueInfo.FName := astrLimitType[eLimitType];
+      recDocIssueInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recDocIssueInfo.FForeColour := clNone;
+      recDocIssueInfo.FBackColour := clNone;
+      recDocIssueInfo.FMessage := Element.AsString(False, False);
       If FLineDocIssues.TryGetValue(DI.Line, LineDocIssues) Then
-        LineDocIssues.AddIssue(eLimitType, Element.AsString(False, False))
+        LineDocIssues.AddIssue(astrLimitType[eLimitType], recDocIssueInfo)
       Else
-        FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(eLimitType, Element.AsString(False, False)));
-      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], aLimitImageIndex[eLimitType]);
+        FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo));
+      recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recTotalInfo.FForeColour := clNone;
+      recTotalInfo.FBackColour := clNone;
+      recTotalInfo.FFontStyles := [];
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);
     End
   Else If Element Is TDocumentConflict Then
     Begin
       DC := Element As TDocumentConflict;
       eLimitType := ConflictTypeToLimitType(DC.ConflictType);
+      recDocIssueInfo.FName := astrLimitType[eLimitType];
+      recDocIssueInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recDocIssueInfo.FForeColour := clNone;
+      recDocIssueInfo.FBackColour := clNone;
+      recDocIssueInfo.FMessage := Element.AsString(False, False);
       If FLineDocIssues.TryGetValue(DC.Line, LineDocIssues) Then
-        LineDocIssues.AddIssue(eLimitType, Element.AsString(False, False))
+        LineDocIssues.AddIssue(astrLimitType[eLimitType], recDocIssueInfo)
       Else
-        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(eLimitType,
-          Element.AsString(False, False)));
-      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], aLimitImageIndex[eLimitType]);    
+        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType],
+          recDocIssueInfo));
+      recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recTotalInfo.FForeColour := clNone;
+      recTotalInfo.FBackColour := clNone;
+      recTotalInfo.FFontStyles := [];
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);    
     End;
 End;
 

@@ -3,8 +3,8 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 3.253
-  @Date    28 Mar 2020
+  @Version 4.287
+  @Date    14 Apr 2020
   
   @license
 
@@ -33,9 +33,11 @@ Interface
 
 Uses
   ToolsAPI,
+  System.Classes,
   System.Types,
   VCL.Graphics,
   WinApi.Windows,
+  BADI.Interfaces,
   BADI.Types;
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -53,10 +55,11 @@ Type
       FFullRepaint : Boolean;
   Strict Private
     FPlainTextFontInfo   : TTokenFontInfo;
+    FCommentFontInfo     : TTokenFontInfo;
     FTokenFontInfo       : TTokenFontInfo;
-    FLineHighlightColour : TColor;
-    FIconsToRender       : TLimitTypes;
-    FMsgsToRender        : TLimitTypes;
+    //FLineHighlightColour : TColor;
+    FIconsToRender       : TStringList;
+    FMsgsToRender        : TStringList;
   Strict Protected
     // INTAEditViewNotifier
     Procedure BeginPaint(Const View: IOTAEditView; Var FullRepaint: Boolean);
@@ -66,7 +69,16 @@ Type
       Const TextWidth: Word; Const LineAttributes: TOTAAttributeArray; Const Canvas: TCanvas;
       Const TextRect: TRect; Const LineRect: TRect; Const CellSize: TSize);
     // General Methods
+    Procedure DrawMsgText(Const Canvas : TCanvas; Var R : TRect; Const strText : String;
+      Const LineDocIssue : TBADIDocIssueInfo);
+    Procedure DrawCommentTag(Const Canvas : TCanvas; Var R : TRect; Const strText : String;
+      Const LineDocIssue : TBADIDocIssueInfo);
+    Procedure MarkUpdateSpecialTags(Const Canvas : TCanvas;  Const strDocIssue : String;
+      Const DocIssueInfo : TBADIDocIssueInfo; Const LineText: PAnsiChar; Const TextRect : TRect;
+      Const CellSize: TSize);
   Public
+    Constructor Create;
+    Destructor Destroy; Override;
     Class Procedure ForceFullRepaint;
   End;
 {$ENDIF DXE100}
@@ -78,13 +90,14 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   System.SysUtils,
+  System.StrUtils,
   Vcl.Controls,
   Vcl.Forms,
   BADI.DockableModuleExplorer,
-  BADI.Interfaces,
   BADI.Options,
   BADI.DocIssuesHintWindow,
-  BADI.Functions;
+  BADI.Functions,
+  BADI.Constants;
 
 {$IFDEF DXE100}
 (**
@@ -120,7 +133,7 @@ Procedure TBADIEditViewNotifier.BeginPaint(Const View: IOTAEditView; Var FullRep
 
   Begin
     If eDocOption In DocOps Then
-      Include(FIconsToRender, eDocIssueType);
+      FIconsToRender.Add(astrLimitType[eDocIssueType]);
   End;
 
   (**
@@ -141,7 +154,7 @@ Procedure TBADIEditViewNotifier.BeginPaint(Const View: IOTAEditView; Var FullRep
 
   Begin
     If eDocOption In DocOps Then
-      Include(FMsgsToRender, eDocIssueType);
+      FMsgsToRender.Add(astrLimitType[eDocIssueType]);
   End;
 
 Var
@@ -151,27 +164,148 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeginPaint', tmoTiming);{$ENDIF}
   FullRepaint := FFullRepaint;
   FPlainTextFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[True][ttPlainText];
+  FCommentFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[True][ttCommentText];
   FTokenFontInfo := TBADIOptions.BADIOptions.TokenFontInfo[False][ttDocIssueEditorText];
-  FLineHighlightColour := TBADIOptions.BADIOptions.TokenFontInfo[True][ttLineHighlight].FBackColour;
   If FTokenFontInfo.FBackColour = clNone Then
     FTokenFontInfo.FBackColour := FPlainTextFontInfo.FBackColour;
   If FTokenFontInfo.FForeColour = clNone Then
     FTokenFontInfo.FForeColour := FPlainTextFontInfo.FForeColour;
   DocOps := TBADIOptions.BADIOptions.Options;
-  FIconsToRender := [];
+  FIconsToRender.Clear;
   IconsToRender(DocOps, doShowErrorIconsInEditor, ltErrors);
   IconsToRender(DocOps, doShowWarningIconsInEditor, ltWarnings);
   IconsToRender(DocOps, doShowHintIconsInEditor, ltHints);
   IconsToRender(DocOps, doShowConflictIconsInEditor, ltConflicts);
   IconsToRender(DocOps, doShowCheckIconsInEditor, ltChecks);
   IconsToRender(DocOps, doShowMetricIconsInEditor, ltMetrics);
-  FMsgsToRender := [];
+  FMsgsToRender.Clear;
   MsgsToRender(DocOps, doShowErrorMsgsInEditor, ltErrors);
   MsgsToRender(DocOps, doShowWarningMsgsInEditor, ltWarnings);
   MsgsToRender(DocOps, doShowHintMsgsInEditor, ltHints);
   MsgsToRender(DocOps, doShowConflictMsgsInEditor, ltConflicts);
   MsgsToRender(DocOps, doShowCheckMsgsInEditor, ltChecks);
   MsgsToRender(DocOps, doShowMetricMsgsInEditor, ltMetrics);
+End;
+
+(**
+
+  A constructor for the TBADIEditViewNotifier class.
+
+  @precon  None.
+  @postcon Creates 2 strings list for the icons and msgs to render.
+
+**)
+Constructor TBADIEditViewNotifier.Create;
+
+Begin
+  Inherited Create;
+  FIconsToRender := TStringList.Create;
+  FIconsToRender.Sorted := True;
+  FIconsToRender.Duplicates := dupIgnore;
+  FMsgsToRender := TStringList.Create;
+  FMsgsToRender.Sorted := True;
+  FMsgsToRender.Duplicates := dupIgnore;
+End;
+
+(**
+
+  A destructor for the TBADIEditViewNotifier class.
+
+  @precon  None.
+  @postcon Frees the string lists.
+
+**)
+Destructor TBADIEditViewNotifier.Destroy;
+
+Begin
+  FIconsToRender.Free;
+  FMsgsToRender.Free;
+  Inherited Destroy;
+End;
+
+(**
+
+  This method renders the comment tag associated with a line document issue.
+
+  @precon  None.
+  @postcon The comment tag is overwritten on the editor.
+
+  @param   Canvas       as a TCanvas as a constant
+  @param   R            as a TRect as a reference
+  @param   strText      as a String as a constant
+  @param   LineDocIssue as a TBADIDocIssueInfo as a constant
+
+**)
+Procedure TBADIEditViewNotifier.DrawCommentTag(Const Canvas : TCanvas; Var R : TRect;
+  Const strText : String; Const LineDocIssue : TBADIDocIssueInfo);
+
+Var
+  strTextToRender : String;
+  setFontStyles : TFontStyles;
+
+Begin
+  strTextToRender := strText;
+  setFontStyles := Canvas.Font.Style;
+  Try
+    Canvas.Brush.Color := FCommentFontInfo.FBackColour;
+    If LineDocIssue.FBackColour <> clNone Then
+      Canvas.Brush.Color := LineDocIssue.FBackColour
+    Else
+      SetBkMode(Canvas.Handle, TRANSPARENT);
+    Canvas.Font.Style := FCommentFontInfo.FStyles;
+    Canvas.Font.Color := FCommentFontInfo.FForeColour;
+    If LineDocIssue.FForeColour <> clNone Then
+      Canvas.Font.Color := LineDocIssue.FForeColour;
+    DrawText(
+      Canvas.Handle,
+      PChar(strTextToRender),
+      Length(strTextToRender),
+      R,
+      DT_LEFT Or DT_VCENTER
+    );
+  Finally
+    Canvas.Font.Style := setFontStyles;
+  End;
+End;
+
+(**
+
+  This method renders the text message associated with a line document issue.
+
+  @precon  None.
+  @postcon The message is printed on the editor to the right of the issue icon. The left edge of the R 
+           rectangle is moved to the end position of the printed message.
+
+  @param   Canvas       as a TCanvas as a constant
+  @param   R            as a TRect as a reference
+  @param   strText      as a String as a constant
+  @param   LineDocIssue as a TBADIDocIssueInfo as a constant
+
+**)
+Procedure TBADIEditViewNotifier.DrawMsgText(Const Canvas : TCanvas; Var R : TRect;
+  Const strText : String; Const LineDocIssue : TBADIDocIssueInfo);
+
+Var
+  strTextToRender : String;
+  setFontStyles : TFontStyles;
+
+Begin
+  strTextToRender := strText;
+  setFontStyles := Canvas.Font.Style;
+  Canvas.Font.Style := FTokenFontInfo.FStyles;
+  Canvas.Font.Color := FTokenFontInfo.FForeColour;
+  If LineDocIssue.FForeColour <> clNone Then
+    Canvas.Font.Color := LineDocIssue.FForeColour;
+  SetBkMode(Canvas.Handle, TRANSPARENT);
+  DrawText(
+    Canvas.Handle,
+    PChar(strTextToRender),
+    Length(strTextToRender),
+    R,
+    DT_LEFT Or DT_VCENTER
+  );
+  Inc(R.Left, Canvas.TextWidth(strTextToRender));
+  Canvas.Font.Style := setFontStyles;
 End;
 
 (**
@@ -252,6 +386,41 @@ End;
 
 (**
 
+  This method overwrite sthe tag name in the comment with a coloured version.
+
+  @precon  Canvas and LineText must be valid instances.
+  @postcon The special tags are overwritten with coloured text.
+
+  @param   Canvas       as a TCanvas as a constant
+  @param   strDocIssue  as a String as a constant
+  @param   DocIssueInfo as a TBADIDocIssueInfo as a constant
+  @param   LineText     as a PAnsiChar as a constant
+  @param   TextRect     as a TRect as a constant
+  @param   CellSize     as a TSize as a constant
+
+**)
+Procedure TBADIEditViewNotifier.MarkUpdateSpecialTags(Const Canvas : TCanvas; Const strDocIssue : String;
+  Const DocIssueInfo : TBADIDocIssueInfo; Const LineText: PAnsiChar; Const TextRect: TRect;
+  Const CellSize: TSize);
+  
+Var
+  R: TRect;
+  iPos: Integer;
+  strText: String;
+  
+Begin
+  If strDocIssue[1] = '@' Then
+    Begin
+      strText := UTF8ToString(LineText);
+      iPos := Pos(strDocIssue, strText);
+      R := TextRect;
+      Inc(R.Left, Pred(iPos) * CellSize.cx);
+      DrawCommentTag(Canvas, R, strDocIssue, DocIssueInfo);
+    End;
+End;
+
+(**
+
   This method is called after each line in the editor is painted.
 
   @precon  None.
@@ -277,40 +446,12 @@ Procedure TBADIEditViewNotifier.PaintLine(Const View: IOTAEditView; LineNumber: 
   Const LineText: PAnsiChar; Const TextWidth: Word; Const LineAttributes: TOTAAttributeArray;
   Const Canvas: TCanvas; Const TextRect, LineRect: TRect; Const CellSize: TSize);
 
-  (**
-
-    This method renders the text message associated with a line document issue.
-
-    @precon  None.
-    @postcon The message is printed on the editor to the right of the issue icon. The left edge of the
-             R rectangle is moved to the end position of the printed message.
-
-    @param   R       as a TRect as a reference
-    @param   strText as a String as a constant
-
-  **)
-  Procedure DrawMsgText(Var R : TRect; Const strText : String);
-
-  Var
-    strTextToRender : String;
-    setFontStyles : TFontStyles;
-
-  Begin
-    strTextToRender := strText;
-    setFontStyles := Canvas.Font.Style;
-    Canvas.Font.Style := FTokenFontInfo.FStyles;
-    Canvas.Font.Color := FTokenFontInfo.FForeColour;
-    SetBkMode(Canvas.Handle, TRANSPARENT);
-    DrawText(Canvas.Handle, PChar(strTextToRender), Length(strTextToRender),
-      R, DT_LEFT Or DT_VCENTER);
-    Inc(R.Left, Canvas.TextWidth(strTextToRender));
-    Canvas.Font.Style := setFontStyles;
-  End;
-
 Var
   R : TRect;
   LineDocIssue : IBADILineDocIssues;
-  eLimitType: TLimitType;
+  strDocIssue: String;
+  recDocIssue : TBADIDocIssueInfo;
+  iIndex: Integer;
   
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PaintLine', tmoTiming);{$ENDIF}
@@ -319,27 +460,23 @@ Begin
   R.Left := TextRect.Right;
   InflateRect(R, -iPadding, 0);
   If Assigned(LineDocIssue) Then
-    For eLimitType := Low(TLimitType) To High(TLimitType) Do
-      If eLimitType In LineDocIssue.Issues Then
-        Begin
-          If eLimitType In FIconsToRender Then
-            Begin
-              Case eLimitType Of
-                ltErrors:    DrawIcon(Canvas, R, ltErrors);
-                ltWarnings:  DrawIcon(Canvas, R, ltWarnings);
-                ltHints:     DrawIcon(Canvas, R, ltHints);
-                ltConflicts: DrawIcon(Canvas, R, ltConflicts);
-                ltChecks:    DrawIcon(Canvas, R, ltChecks);
-                ltMetrics:   DrawIcon(Canvas, R, ltMetrics);
-              End;
-              Inc(R.Left, iPadding);
-            End;
-          If eLimitType In FMsgsToRender Then
-            Begin
-              DrawMsgText(R, LineDocIssue.Message[eLimitType]);
-              Inc(R.Left, iPadding);
-            End;
-        End;
+    For strDocIssue In LineDocIssue.Issues Do
+      Begin
+        recDocIssue := LineDocIssue[strDocIssue];
+        If FIconsToRender.Find(recDocIssue.FName, iIndex) Then
+          TBADIOptions.BADIOptions.ScopeImageList.Draw(
+            Canvas, 
+            LineRect.Left,
+            LineRect.Top,
+            BADIImageIndex(recDocIssue.FImageIndex, scNone)
+          );
+        If FMsgsToRender.Find(recDocIssue.FName, iIndex) Then
+          Begin
+            DrawMsgText(Canvas, R, recDocIssue.FMessage, recDocIssue);
+            Inc(R.Left, iPadding);
+          End;
+        MarkUpdateSpecialTags(Canvas, strDocIssue, recDocIssue, LineText, TextRect, CellSize);
+     End;
 End;
 {$ENDIF DXE100}
 

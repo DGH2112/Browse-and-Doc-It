@@ -4,8 +4,8 @@
   document issues totals for a module.
 
   @Author  David Hoyle
-  @Version 1.364
-  @Date    12 Apr 2020
+  @Version 1.484
+  @Date    13 Apr 2020
   
   @license
 
@@ -45,7 +45,8 @@ Type
   Strict Protected
     // IBADIDocIssueTotals
     Function  GetTotals : TDictionary<String, TBADITotalInfo>;
-    Procedure IncDocIssue(Const strDocIssueType : String; Const eImageListIndex : TBADIImageIndex);
+    Function  ContainsAny(Const astrValue : TArray<String>) : Boolean;
+    Procedure IncDocIssue(Const strDocIssueType : String; Const TotalInfo : TBADITotalInfo);
     Procedure Clear;
   Public
     Constructor Create;
@@ -66,6 +67,32 @@ Procedure TBADIDocIssueTotals.Clear;
 
 Begin
   FTotals.Clear;
+End;
+
+(**
+
+  This method test whether any of the given values are keys in the totals dictionary.
+
+  @precon  None.
+  @postcon Returns true of any values are keys in the dictionary.
+
+  @param   astrValue as a TArray<String> as a constant
+  @return  a Boolean
+
+**)
+Function TBADIDocIssueTotals.ContainsAny(Const astrValue: TArray<String>): Boolean;
+
+Var
+  strKey : String;
+  
+Begin
+  Result := False;
+  For strKey In astrValue Do
+    If FTotals.ContainsKey(strKey) Then
+      Begin
+        Result := True;
+        Break;
+      End;
 End;
 
 (**
@@ -121,11 +148,11 @@ End;
   @postcon The given doc issue type is incremented.
 
   @param   strDocIssueType as a String as a constant
-  @param   eImageListIndex as a TBADIImageIndex as a constant
+  @param   TotalInfo       as a TBADITotalInfo as a constant
 
 **)
 Procedure TBADIDocIssueTotals.IncDocIssue(Const strDocIssueType : String;
-  Const eImageListIndex : TBADIImageIndex);
+  Const TotalInfo : TBADITotalInfo);
 
 Var
   recValue: TBADITotalInfo;
@@ -137,7 +164,7 @@ Begin
       FTotals.AddOrSetValue(strDocIssueType, recValue);
     End Else
     Begin
-      recValue.FImageIndex := eImageListIndex;
+      recValue := TotalInfo;
       recValue.FCounter := 1;
       FTotals.Add(strDocIssueType, recValue);
     End;

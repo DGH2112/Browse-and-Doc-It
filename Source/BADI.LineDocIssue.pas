@@ -4,8 +4,8 @@
   about issues on a line.
 
   @Author  David Hoyle
-  @Version 1.315
-  @Date    09 Feb 2020
+  @Version 1.540
+  @Date    13 Apr 2020
   
   @license
 
@@ -33,6 +33,7 @@ Unit BADI.LineDocIssue;
 Interface
 
 Uses
+  System.Generics.Collections,
   BADI.Interfaces,
   BADI.Types;
 
@@ -40,14 +41,14 @@ Type
   (** A class which implements the IBADILineDocIssues interface. **)
   TBADILineDocIssue = Class(TInterfacedObject, IBADILineDocIssues)
   Strict Private
-    FLimits : TLimitTypes;
-    FMsgs : Array[TLimitType] Of String;
+    FDocIssues : TDictionary<String, TBADIDocIssueInfo>;
   Strict Protected
-    Procedure AddIssue(Const eLimitType: TLimitType; Const strMsg: String);
-    Function GetLimitTypes: TLimitTypes;
-    Function GetMessage(Const eLimitType: TLimitType): String;
+    Procedure AddIssue(Const strDocIssueType : String; Const DocIssueInfo : TBADIDocIssueInfo);
+    Function GetLimitTypes: TArray<String>;
+    Function GetMessage(Const strDocIssueType : String): TBADIDocIssueInfo;
   Public
-    Constructor Create(Const eLimitType : TLimitType; Const strMsg : String);
+    Constructor Create(Const strDocIssueType : String; Const DocIssueInfo : TBADIDocIssueInfo);
+    Destructor Destroy; Override;
   End;
 
 Implementation
@@ -59,15 +60,16 @@ Implementation
   @precon  None.
   @postcon The document issue type and message are stored for later retrieval.
 
-  @param   eLimitType as a TLimitType as a constant
-  @param   strMsg     as a String as a constant
+  @param   strDocIssueType as a String as a constant
+  @param   DocIssueInfo    as a TBADIDocIssueInfo as a constant
 
 **)
-Procedure TBADILineDocIssue.AddIssue(Const eLimitType: TLimitType; Const strMsg: String);
+Procedure TBADILineDocIssue.AddIssue(Const strDocIssueType : String;
+  Const DocIssueInfo : TBADIDocIssueInfo);
 
 Begin
-  Include(FLimits, eLimitType);
-  FMsgs[eLimitType] := strMsg;
+  If Not FDocIssues.ContainsKey(strDocIssueType) Then
+    FDocIssues.Add(strDocIssueType, DocIssueInfo);
 End;
 
 (**
@@ -75,16 +77,33 @@ End;
   A constructor for the TBADILineDocIssues class.
 
   @precon  None.
-  @postcon Initialises the class with the first issue type and message.
+  @postcon Initialises the class dictionary with the first issue type and message.
 
-  @param   eLimitType as a TLimitType as a constant
-  @param   strMsg     as a String as a constant
+  @param   strDocIssueType as a String as a constant
+  @param   DocIssueInfo    as a TBADIDocIssueInfo as a constant
 
 **)
-Constructor TBADILineDocIssue.Create(Const eLimitType: TLimitType; Const strMsg: String);
+Constructor TBADILineDocIssue.Create(Const strDocIssueType : String;
+  Const DocIssueInfo : TBADIDocIssueInfo);
 
 Begin
-  AddIssue(eLimitType, strMsg);
+  FDocIssues := TDictionary<String, TBADIDocIssueInfo>.Create;
+  FDocIssues.Add(strDocIssueType, DocIssueInfo);
+End;
+
+(**
+
+  A destructor for the TBADILineDocIssue class.
+
+  @precon  None.
+  @postcon Frees the dictionary.
+
+**)
+Destructor TBADILineDocIssue.Destroy;
+
+Begin
+  FDocIssues.Free;
+  Inherited Destroy;
 End;
 
 (**
@@ -94,13 +113,23 @@ End;
   @precon  None.
   @postcon Returns a set of the doc iissue limit types for the line.
 
-  @return  a TLimitTypes
+  @return  a TArray<String>
 
 **)
-Function TBADILineDocIssue.GetLimitTypes: TLimitTypes;
+Function TBADILineDocIssue.GetLimitTypes: TArray<String>;
+
+Var
+  iKey: Integer;
+  Issue: TPair<String, TBADIDocIssueInfo>;
 
 Begin
-  Result := FLimits;
+  SetLength(Result, FDocIssues.Count);
+  iKey := 0;
+  For Issue In FDocIssues Do
+    Begin
+      Result[iKey] := Issue.Key;
+      Inc(iKey);
+    End;
 End;
 
 (**
@@ -110,14 +139,14 @@ End;
   @precon  None.
   @postcon Returns the message for the given doc issue limit type.
 
-  @param   eLimitType as a TLimitType as a constant
-  @return  a String
+  @param   strDocIssueType as a String as a constant
+  @return  a TBADIDocIssueInfo
 
 **)
-Function TBADILineDocIssue.GetMessage(Const eLimitType: TLimitType): String;
+Function TBADILineDocIssue.GetMessage(Const strDocIssueType : String): TBADIDocIssueInfo;
 
 Begin
-  Result := FMsgs[eLimitType];
+  FDocIssues.TryGetValue(strDocIssueType, Result);
 End;
 
 End.

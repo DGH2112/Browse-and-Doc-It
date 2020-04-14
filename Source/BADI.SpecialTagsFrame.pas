@@ -2,9 +2,9 @@
 
   This module contains a frame for editing the BADI special tags.
 
-  @Version 1.270
+  @Version 1.284
   @Author  David Hoyle
-  @Date    12 Apr 2020
+  @Date    13 Apr 2020
 
   @license
 
@@ -66,7 +66,6 @@ Type
     btnMoveUp: TButton;
     btnAdd: TButton;
     ilButtonIcons: TImageList;
-    ilBADIImages: TImageList;
     Procedure btnAddClick(Sender: TObject);
     Procedure btnDeleteClick(Sender: TObject);
     Procedure btnEditClick(Sender: TObject);
@@ -157,7 +156,7 @@ Var
 
 Begin
   ST.Create(strTag, strTagDescription, [], iiNone);
-  If TfrmSpecialTag.Execute(ilBADIImages, ST) Then
+  If TfrmSpecialTag.Execute(TBADIOptions.BADIOptions.ScopeImageList, ST) Then
     Begin
       FSpecialTags.Add(ST);
       PopulateTreeView;
@@ -216,7 +215,7 @@ Begin
     Begin
       NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       ST := FSpecialTags[NodeData.FSpecialTagIndex];
-      If TfrmSpecialTag.Execute(ilBADIImages, ST) Then
+      If TfrmSpecialTag.Execute(TBADIOptions.BADIOptions.ScopeImageList, ST) Then
         Begin
           FSpecialTags[NodeData.FSpecialTagIndex] := ST;
           PopulateTreeView;
@@ -317,7 +316,6 @@ Begin
   FVSTSpecialTags.NodeDataSize := SizeOf(TSpecialTagsNodeData);
   FSpecialTags := TList<TBADISpecialTag>.Create;
   PopulateTreeView;
-  LoadBADIImages(ilBADIImages);
 End;
 
 (**
@@ -348,7 +346,7 @@ Begin
   FVSTSpecialTags.Header.Height := 20;
   FVSTSpecialTags.TabOrder := 0;
   FVSTSpecialTags.TreeOptions.PaintOptions := FVSTSpecialTags.TreeOptions.PaintOptions - [toShowRoot];
-  FVSTSpecialTags.Images := ilBADIImages;
+  FVSTSpecialTags.Images := TBADIOptions.BADIOptions.ScopeImageList;
   FVSTSpecialTags.OnBeforeCellPaint := vstSpecialTagsBeforeCellPaint;
   FVSTSpecialTags.OnClick := vstSpecialTagsClick;
   FVSTSpecialTags.OnDblClick := vstSpecialTagsDblClick;

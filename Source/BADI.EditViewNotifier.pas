@@ -3,8 +3,8 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 4.287
-  @Date    14 Apr 2020
+  @Version 4.404
+  @Date    18 Apr 2020
   
   @license
 
@@ -159,6 +159,7 @@ Procedure TBADIEditViewNotifier.BeginPaint(Const View: IOTAEditView; Var FullRep
 
 Var
   DocOps: TDocOptions;
+  iTag: Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeginPaint', tmoTiming);{$ENDIF}
@@ -178,6 +179,9 @@ Begin
   IconsToRender(DocOps, doShowConflictIconsInEditor, ltConflicts);
   IconsToRender(DocOps, doShowCheckIconsInEditor, ltChecks);
   IconsToRender(DocOps, doShowMetricIconsInEditor, ltMetrics);
+  For iTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
+    If tpShowInEditor In TBADIOptions.BADIOptions.SpecialTags[iTag].FTagProperties Then
+      FIconsToRender.Add(TBADIOptions.BADIOptions.SpecialTags[iTag].FName);
   FMsgsToRender.Clear;
   MsgsToRender(DocOps, doShowErrorMsgsInEditor, ltErrors);
   MsgsToRender(DocOps, doShowWarningMsgsInEditor, ltWarnings);
@@ -457,19 +461,23 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PaintLine', tmoTiming);{$ENDIF}
   LineDocIssue := TfrmDockableModuleExplorer.LineDocIssue(LineNumber);
   R := LineRect;
-  R.Left := TextRect.Right;
-  InflateRect(R, -iPadding, 0);
   If Assigned(LineDocIssue) Then
     For strDocIssue In LineDocIssue.Issues Do
       Begin
         recDocIssue := LineDocIssue[strDocIssue];
         If FIconsToRender.Find(recDocIssue.FName, iIndex) Then
-          TBADIOptions.BADIOptions.ScopeImageList.Draw(
-            Canvas, 
-            LineRect.Left,
-            LineRect.Top,
-            BADIImageIndex(recDocIssue.FImageIndex, scNone)
-          );
+          Begin
+            TBADIOptions.BADIOptions.ScopeImageList.Draw(
+              Canvas,
+              R.Left,
+              R.Top,
+              BADIImageIndex(recDocIssue.FImageIndex, scNone)
+            );
+            Inc(R.Left, TBADIOptions.BADIOptions.ScopeImageList.Width + iPadding);
+            // After first icon change to Text Rect
+            If (R.Left > LineRect.Left) And (R.Left < TextRect.Right) Then
+              R.Left := TextRect.Right + iPadding;
+          End;
         If FMsgsToRender.Find(recDocIssue.FName, iIndex) Then
           Begin
             DrawMsgText(Canvas, R, recDocIssue.FMessage, recDocIssue);

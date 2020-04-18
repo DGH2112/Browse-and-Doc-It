@@ -75,7 +75,6 @@
         <DCC_UnitSearchPath>.\Virtual-Treeview-6.5.0-IDE\Source;$(BDSPROJECTSDIR)\Binaries\CS5\Lib\RX10.3\Win32;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-        <DCC_Define>EUREKALOG_VER7;$(DCC_Define)</DCC_Define>
         <DllSuffix>XE103</DllSuffix>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
@@ -99,7 +98,7 @@
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Optimize>false</DCC_Optimize>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-        <DCC_Define>DEBUG;EUREKALOG;$(DCC_Define)</DCC_Define>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
         <DCC_RangeChecking>true</DCC_RangeChecking>

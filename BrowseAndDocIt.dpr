@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.013
+  @Version 1.040
   @Author  David Hoyle
-  @Date    07 Feb 2020
+  @Date    18 Apr 2020
 
   @license
 
@@ -54,17 +54,6 @@ library BrowseAndDocIt;
 
 uses
   ShareMem,
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  ESendMailMAPI,
-  ESendMailSMAPI,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  EDebugExports,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   SysUtils,
   Classes,
   {$IFDEF DEBUG}
@@ -248,6 +237,7 @@ begin
   SetEurekaLogState(True);
   {$ENDIF EUREKALOG}
 end.
+
 
 
 

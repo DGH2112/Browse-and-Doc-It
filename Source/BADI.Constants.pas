@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.890
-  @Date    12 Apr 2020
+  @Version 1.898
+  @Date    25 Apr 2020
 
   @license
 
@@ -328,6 +328,8 @@ Const
     (FResourceName : 'GreenToDoCross';                FMaskColour: clFuchsia),
     (FResourceName : 'BlueToDoCross';                 FMaskColour: clFuchsia),
 
+    (FResourceName : 'BadTag';                        FMaskColour: clLime),
+    
     (FResourceName : 'UsesLabel';                     FMaskColour: clLime),
     (FResourceName : 'UsesItem';                      FMaskColour: clLime),
 

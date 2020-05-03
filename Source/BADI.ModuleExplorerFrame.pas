@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 2.285
-  @Date    14 Apr 2020
+  @Version 2.845
+  @Date    25 Apr 2020
 
   @license
 
@@ -1520,53 +1520,185 @@ end;
 **)
 procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageModule);
 
+  (**
+
+    This function attempts to find the index of the given tag name in the special tags array.
+
+    @precon  None.
+    @postcon Returns the index position of the tag in the special tags array else returns -1 if not
+             found.
+
+    @param   strTagName as a String as a constant
+    @return  an Integer
+
+  **)
+  Function FindTag(Const strTagName : String) : Integer;
+
+  Var
+    iSpecialTag: Integer;
+
+  Begin
+    Result := -1;
+    For iSpecialTag := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
+      If CompareText(strTagName, FSpecialTagNodes[iSpecialTag].FTagName) = 0 Then
+        Begin
+          Result := iSpecialTag;
+          Break;
+        End;
+  End;
+
+  (**
+
+    This procedure adds a doc issue to the module based on a line and tag record.
+
+    @precon  None.
+    @postcon A doc issue is aded tot he module.
+
+    @param   iLine as an Integer as a constant
+    @param   Tag   as a TSpecialTagNode as a constant
+
+  **)
+  Procedure AddDocIssueInfo(Const iLine : Integer; Const Tag : TSpecialTagNode); OverLoad;
+
+  Var
+    recDocIssueInfo : TBADIDocIssueInfo;
+    DocIssues: IBADILineDocIssues;
+  
+  Begin
+    recDocIssueInfo.FName := Tag.FTagName;
+    recDocIssueInfo.FImageIndex := Tag.FImageIndex;
+    recDocIssueInfo.FForeColour := Tag.FFontColour;
+    recDocIssueInfo.FBackColour := Tag.FBackColour;
+    recDocIssueInfo.FMessage := '';
+    If FLineDocIssues.TryGetValue(iLine, DocIssues) Then
+      DocIssues.AddIssue('@' + Tag.FTagName, recDocIssueInfo)
+    Else
+      FLineDocIssues.Add(iLine, TBADILineDocIssue.Create('@' + Tag.FTagName, recDocIssueInfo));
+  End;
+
+  (**
+
+    This procedure adds a doc issue to the module based on a line and tag name.
+
+    @precon  None.
+    @postcon A doc issue is aded tot he module.
+
+    @param   iLine      as an Integer as a constant
+    @param   strTagName as a String as a constant
+
+  **)
+  Procedure AddDocIssueInfo(Const iLine : Integer; Const strTagName : String); Overload;
+
+  Var
+    recDocIssueInfo : TBADIDocIssueInfo;
+    DocIssues: IBADILineDocIssues;
+  
+  Begin
+    recDocIssueInfo.FName := strTagName;
+    recDocIssueInfo.FImageIndex := iiBadTag;
+    recDocIssueInfo.FForeColour := clRed;
+    recDocIssueInfo.FBackColour := clNone;
+    recDocIssueInfo.FMessage := '';
+    If FLineDocIssues.TryGetValue(iLine, DocIssues) Then
+      DocIssues.AddIssue('@' + strTagName, recDocIssueInfo)
+    Else
+      FLineDocIssues.Add(iLine, TBADILineDocIssue.Create('@' + strTagName, recDocIssueInfo));
+  End;
+
+  (**
+
+    This procedure outputs adds Total Info record based on a tag record.
+
+    @precon  None.
+    @postcon A Total Info record is added to the module.
+
+    @param   Tag as a TSpecialTagNode as a constant
+
+  **)
+  Procedure AddTotalInfo(Const Tag : TSpecialTagNode); Overload;
+
+  Var
+    recTotalInfo : TBADITotalInfo;
+
+  Begin
+    recTotalInfo.FImageIndex := Tag.FImageIndex;
+    recTotalInfo.FForeColour := Tag.FFontColour;
+    recTotalInfo.FBackColour := Tag.FBackColour;
+    recTotalInfo.FFontStyles := Tag.FFontStyles;
+    FDocIssueTotals.IncDocIssue('@' + Tag.FTagName, recTotalInfo);
+  End;
+
+  (**
+
+    This procedure outputs adds Total Info record based on a tag name.
+
+    @precon  None.
+    @postcon A Total Info record is added to the module.
+
+    @param   strTagName as a String as a constant
+
+  **)
+  Procedure AddTotalInfo(Const strTagName : String); Overload;
+
+  Var
+    recTotalInfo : TBADITotalInfo;
+
+  Begin
+    recTotalInfo.FImageIndex := iiBadTag;
+    recTotalInfo.FForeColour := clRed;
+    recTotalInfo.FBackColour := clNone;
+    recTotalInfo.FFontStyles := [];
+    FDocIssueTotals.IncDocIssue('@' + strTagName, recTotalInfo);
+  End;
+
 Const
   iTreeLevel = 2;
+  astrTagsToIgnore : TArray<String> = [
+    'nocheck',
+    'nochecks',
+    'nodocumentation',
+    'nohint',
+    'nohints',
+    'nometric',
+    'nometrics',
+    'stopdocumentation'
+  ];
   
 Var
   iComment, iTag, iSpecialTag : Integer;
   Cmt: TComment;
   Tag: TTag;
   ST: TSpecialTagNode;
-  DocIssues: IBADILineDocIssues;
-  recDocIssueInfo : TBADIDocIssueInfo;
-  recTotalInfo : TBADITotalInfo;
 
 Begin
   For iComment := 0 To Module.BodyCommentCount - 1 Do
     Begin
       Cmt := Module.BodyComment[iComment];
       For iTag := 0 To Cmt.TagCount - 1 Do
-        For iSpecialTag := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
-          If tpShowInTree In FSpecialTagNodes[iSpecialTag].FTagProperties Then
-            If CompareText(Cmt.Tag[iTag].TagName, FSpecialTagNodes[iSpecialTag].FTagName) = 0 Then
+        Begin
+          iSpecialTag := FindTag(Cmt.Tag[iTag].TagName);
+          If iSpecialTag >= 0 Then
+            Begin
+              If tpShowInTree In FSpecialTagNodes[iSpecialTag].FTagProperties Then
+                Begin
+                  Tag := Cmt.Tag[iTag];
+                  ST := FSpecialTagNodes[iSpecialTag];
+                  AddNode(FSpecialTagNodes[iSpecialTag].Node, Tag, iTreeLevel,
+                    BADIImageIndex(ST.FImageIndex, scNone), ST.FTagProperties, ST.FFontStyles,
+                    ST.FFontColour, ST.FBackColour, Cmt);
+                  If tpShowInEditor In FSpecialTagNodes[iSpecialTag].FTagProperties Then
+                    Begin
+                      AddDocIssueInfo(Tag.Line, ST);
+                      AddTotalInfo(ST);
+                    End;
+                End;
+            End Else
+            If Not IsKeyWord(LowerCase(Cmt.Tag[iTag].TagName), astrTagsToIgnore) Then
               Begin
-                Tag := Cmt.Tag[iTag];
-                ST := FSpecialTagNodes[iSpecialTag];
-                AddNode(FSpecialTagNodes[iSpecialTag].Node, Tag, iTreeLevel,
-                  BADIImageIndex(ST.FImageIndex, scNone), ST.FTagProperties, ST.FFontStyles,
-                  ST.FFontColour, ST.FBackColour, Cmt);
-                If tpShowInEditor In FSpecialTagNodes[iSpecialTag].FTagProperties Then
-                  Begin
-                    recDocIssueInfo.FName := ST.FTagName;
-                    recDocIssueInfo.FImageIndex := ST.FImageIndex;
-                    recDocIssueInfo.FForeColour := ST.FFontColour;
-                    recDocIssueInfo.FBackColour := ST.FBackColour;
-                    recDocIssueInfo.FMessage := '';
-                    If FLineDocIssues.TryGetValue(Tag.Line, DocIssues) Then
-                      DocIssues.AddIssue('@' + ST.FTagName, recDocIssueInfo)
-                    Else
-                      FLineDocIssues.Add(
-                        Tag.Line,
-                        TBADILineDocIssue.Create('@' + ST.FTagName, recDocIssueInfo)
-                      );
-                    recTotalInfo.FImageIndex := ST.FImageIndex;
-                    recTotalInfo.FForeColour := ST.FFontColour;
-                    recTotalInfo.FBackColour := ST.FBackColour;
-                    recTotalInfo.FFontStyles := ST.FFontStyles;
-                    FDocIssueTotals.IncDocIssue('@' + ST.FTagName, recTotalInfo);
-                  End;
+                AddDocIssueInfo(Cmt.Tag[iTag].Line, Cmt.Tag[iTag].TagName);
+                AddTotalInfo(Cmt.Tag[iTag].TagName);
               End;
+        End;
     End;
 End;
 

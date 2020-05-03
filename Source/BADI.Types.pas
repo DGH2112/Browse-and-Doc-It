@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.359
-  @Date    12 Apr 2020
+  @Version 1.361
+  @Date    25 Apr 2020
 
   @license
 
@@ -322,6 +322,8 @@ Type
     iiYellowToDoCross,
     iiGreenToDoCross,
     iiBlueToDoCross,
+
+    iiBadTag,
 
     iiUsesLabel,
     iiUsesItem,

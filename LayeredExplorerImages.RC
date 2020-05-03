@@ -4,8 +4,8 @@
   In the Explorer Tree View.
 
   @Author  David Hoyle
-  @Version 1.428
-  @Date    12 Apr 2020
+  @Version 1.436
+  @Date    25 Apr 2020
 
   @license
 
@@ -135,6 +135,8 @@ AmberToDoCross             BITMAP "Images\AmberToDoCross.bmp"
 YellowToDoCross            BITMAP "Images\YellowToDoCross.bmp"
 GreenToDoCross             BITMAP "Images\GreenToDoCross.bmp"
 BlueToDoCross              BITMAP "Images\BlueToDoCross.bmp"
+
+BadTag                     BITMAP "Images\BadTag.bmp"
 
 UsesLabel                  BITMAP "Images\UsesLabel.bmp"
 UsesItem                   BITMAP "Images\UsesItem.bmp"

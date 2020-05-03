@@ -1326,6 +1326,7 @@ Begin
       Begin
         stbStatusBar.SimpleText := E.Message;
         stbStatusBar.SimplePanel := True;
+        Exit;
       End;
   End;
   FFollowNode := Nil;

@@ -3,8 +3,8 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 4.404
-  @Date    18 Apr 2020
+  @Version 5.106
+  @Date    03 May 2020
   
   @license
 
@@ -35,6 +35,7 @@ Uses
   ToolsAPI,
   System.Classes,
   System.Types,
+  System.RTTI,
   VCL.Graphics,
   WinApi.Windows,
   BADI.Interfaces,
@@ -57,9 +58,10 @@ Type
     FPlainTextFontInfo   : TTokenFontInfo;
     FCommentFontInfo     : TTokenFontInfo;
     FTokenFontInfo       : TTokenFontInfo;
-    //FLineHighlightColour : TColor;
     FIconsToRender       : TStringList;
     FMsgsToRender        : TStringList;
+    FHorizontalScroll    : Integer;
+    FRTTIContext         : TRttiContext;
   Strict Protected
     // INTAEditViewNotifier
     Procedure BeginPaint(Const View: IOTAEditView; Var FullRepaint: Boolean);
@@ -73,9 +75,14 @@ Type
       Const LineDocIssue : TBADIDocIssueInfo);
     Procedure DrawCommentTag(Const Canvas : TCanvas; Var R : TRect; Const strText : String;
       Const LineDocIssue : TBADIDocIssueInfo);
+      procedure FindHorizontalScrollPosition(const View: IOTAEditView);
     Procedure MarkUpdateSpecialTags(Const Canvas : TCanvas;  Const strDocIssue : String;
       Const DocIssueInfo : TBADIDocIssueInfo; Const LineText: PAnsiChar; Const TextRect : TRect;
       Const CellSize: TSize);
+    Procedure IconsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
+      Const eDocIssueType : TLimitType);
+    Procedure MsgsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
+      Const eDocIssueType : TLimitType);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -100,6 +107,10 @@ Uses
   BADI.Constants;
 
 {$IFDEF DXE100}
+Const
+  (** A constant for the name of the IDE Edit Control. **)
+  strTEditControlClsName = 'TEditControl';
+
 (**
 
   This method is called before painting on the editor starts.
@@ -114,48 +125,6 @@ Uses
 
 **)
 Procedure TBADIEditViewNotifier.BeginPaint(Const View: IOTAEditView; Var FullRepaint: Boolean);
-
-  (**
-
-    This procedure updates the FIconsToRender set with a limit type if the given doc option is in the
-    given doc option set.
-
-    @precon  None.
-    @postcon The FIconsToRender set is updated accordingly.
-
-    @param   DocOps        as a TDocOptions as a constant
-    @param   eDocOption    as a TDocOption as a constant
-    @param   eDocIssueType as a TLimitType as a constant
-
-  **)
-  Procedure IconsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
-    Const eDocIssueType : TLimitType);
-
-  Begin
-    If eDocOption In DocOps Then
-      FIconsToRender.Add(astrLimitType[eDocIssueType]);
-  End;
-
-  (**
-
-    This procedure updates the FMsgoRender set with a limit type if the given doc option is in the
-    given doc option set.
-
-    @precon  None.
-    @postcon The FMsgsToRender set is updated accordingly.
-
-    @param   DocOps        as a TDocOptions as a constant
-    @param   eDocOption    as a TDocOption as a constant
-    @param   eDocIssueType as a TLimitType as a constant
-
-  **)
-  Procedure MsgsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
-    Const eDocIssueType : TLimitType);
-
-  Begin
-    If eDocOption In DocOps Then
-      FMsgsToRender.Add(astrLimitType[eDocIssueType]);
-  End;
 
 Var
   DocOps: TDocOptions;
@@ -189,6 +158,7 @@ Begin
   MsgsToRender(DocOps, doShowConflictMsgsInEditor, ltConflicts);
   MsgsToRender(DocOps, doShowCheckMsgsInEditor, ltChecks);
   MsgsToRender(DocOps, doShowMetricMsgsInEditor, ltMetrics);
+  FindHorizontalScrollPosition(View);
 End;
 
 (**
@@ -209,6 +179,7 @@ Begin
   FMsgsToRender := TStringList.Create;
   FMsgsToRender.Sorted := True;
   FMsgsToRender.Duplicates := dupIgnore;
+  FRTTIContext := TRTTIContext.Create;
 End;
 
 (**
@@ -346,9 +317,6 @@ End;
 **)
 Procedure TBADIEditViewNotifier.EndPaint(Const View: IOTAEditView);
 
-Const
-  strTEditControlClsName = 'TEditControl';
-
 Var
   R : TRect;
   C: TWinControl;
@@ -376,6 +344,48 @@ End;
 
 (**
 
+  This method attempts to find the horizontal field of the IDE`s editor control to determine the
+  horizontal scroll of the text.
+
+  @precon  None.
+  @postcon If the field is found the integer value is placed in the FHorizontalScroll field.
+
+  @param   View as an IOTAEditView as a constant
+
+**)
+Procedure TBADIEditViewNotifier.FindHorizontalScrollPosition(Const View: IOTAEditView);
+
+Const
+  strSHScrollPosFieldName = 'sHScrollPos';
+
+Var
+  F: TCustomForm;
+  iComponent: Integer;
+  Typ: TRttiType;
+  Field : TRttiField;
+  Value: TValue;
+
+Begin
+  FHorizontalScroll := 0;
+  If Not Assigned(View) Or Not Assigned(View.GetEditWindow) Then
+    Exit;
+  F := View.GetEditWindow.Form;
+  If Assigned(F) Then
+    For iComponent := 1 To F.ComponentCount - 1 Do
+      If CompareText(F.Components[iComponent].ClassName, strTEditControlClsName) = 0 Then
+        Begin
+          Typ := FRTTIContext.GetType(F.Components[iComponent].ClassType);
+          Field := Typ.GetField(strSHScrollPosFieldName);
+          If Assigned(Field) Then
+            Begin
+              Value := Field.GetValue(F.Components[iComponent]);
+              FHorizontalScroll := Value.AsInteger;
+            End;
+        End;
+End;
+
+(**
+
   This method sets the next paint cycle to be a full paint cycle.
 
   @precon  None.
@@ -386,6 +396,27 @@ Class Procedure TBADIEditViewNotifier.ForceFullRepaint;
 
 Begin
   FFullRepaint := True;
+End;
+
+(**
+
+  This procedure updates the FIconsToRender set with a limit type if the given doc option is in the
+  given doc option set.
+
+  @precon  None.
+  @postcon The FIconsToRender set is updated accordingly.
+
+  @param   DocOps        as a TDocOptions as a constant
+  @param   eDocOption    as a TDocOption as a constant
+  @param   eDocIssueType as a TLimitType as a constant
+
+**)
+Procedure TBADIEditViewNotifier.IconsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
+  Const eDocIssueType : TLimitType);
+
+Begin
+  If eDocOption In DocOps Then
+    FIconsToRender.Add(astrLimitType[eDocIssueType]);
 End;
 
 (**
@@ -416,11 +447,41 @@ Begin
   If strDocIssue[1] = '@' Then
     Begin
       strText := UTF8ToString(LineText);
-      iPos := Pos(strDocIssue, strText);
-      R := TextRect;
-      Inc(R.Left, Pred(iPos) * CellSize.cx);
-      DrawCommentTag(Canvas, R, strDocIssue, DocIssueInfo);
+      iPos := Pos(LowerCase(strDocIssue), LowerCase(strText));
+      If iPos > 0 Then
+        Begin
+          strText := Copy(strText, iPos, strDocIssue.Length);
+          R := TextRect;
+          iPos := iPos - 1 - FHorizontalScroll;
+          If iPos > 0 Then
+            Inc(R.Left, iPos * CellSize.cx)
+          Else
+            Delete(strText, 1, -iPos);
+          If strText.Length > 0 Then
+            DrawCommentTag(Canvas, R, strText, DocIssueInfo);
+        End;
     End;
+End;
+
+(**
+
+  This procedure updates the FMsgoRender set with a limit type if the given doc option is in the
+  given doc option set.
+
+  @precon  None.
+  @postcon The FMsgsToRender set is updated accordingly.
+
+  @param   DocOps        as a TDocOptions as a constant
+  @param   eDocOption    as a TDocOption as a constant
+  @param   eDocIssueType as a TLimitType as a constant
+
+**)
+Procedure TBADIEditViewNotifier.MsgsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
+  Const eDocIssueType : TLimitType);
+
+Begin
+  If eDocOption In DocOps Then
+    FMsgsToRender.Add(astrLimitType[eDocIssueType]);
 End;
 
 (**
@@ -465,7 +526,7 @@ Begin
     For strDocIssue In LineDocIssue.Issues Do
       Begin
         recDocIssue := LineDocIssue[strDocIssue];
-        If FIconsToRender.Find(recDocIssue.FName, iIndex) Then
+        If FIconsToRender.Find(recDocIssue.FName, iIndex) Or (recDocIssue.FImageIndex In [iiBadTag]) Then
           Begin
             TBADIOptions.BADIOptions.ScopeImageList.Draw(
               Canvas,

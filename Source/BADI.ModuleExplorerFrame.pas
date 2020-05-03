@@ -2197,7 +2197,12 @@ Const
 Begin
   If (FLastFilterUpdate > 0) And (GetTickCount > FLastFilterUpdate + iUpdateInterval) Then
     Try
-      edtExplorerFilterChange(Self);
+      tmFilter.Enabled := False;
+      Try
+        edtExplorerFilterChange(Self);
+      Finally
+        tmFilter.Enabled := True;
+      End;
     Finally
       FLastFilterUpdate := 0;
     End;

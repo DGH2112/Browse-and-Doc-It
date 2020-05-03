@@ -3,8 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    01 Feb 2020
+  @Version 1.402
+  @Date    18 Apr 2020
 
   @license
 
@@ -74,6 +74,7 @@ Type
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
     Procedure UpdateMenuShortcuts(Sender : TObject);
+    Procedure InitialisingMsg(Const strMsg : String);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -85,6 +86,7 @@ Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
+  System.SysUtils,
   BADI.DockableModuleExplorer,
   BADI.Constants, 
   BADI.Module.Metrics, 
@@ -110,26 +112,60 @@ Uses
 **)
 Constructor TBrowseAndDocItWizard.Create;
 
+ResourceString
+  strCreatingModuleExplorer = 'Creating module explorer...';
+  strCreatingSplashScreenEntry = 'Creating Splash Screen Entry...';
+  strCreatingAboutBoxEntry = 'Creating About Box Entry...';
+  strCreatingModuleStatistics = 'Creating Module Statistics...';
+  strCreatingEditorNotifier = 'Creating Editor Notifier...';
+  strRegisteringEditorNotifier = 'Registering Editor Notifier...';
+  strCreatingIDEMenu = 'Creating IDE Menu...';
+  strSettingUpShortcuts = 'Setting up Shortcuts...';
+  strCreatingBNFHighlighter = 'Creating BNF Highlighter...';
+  strCreatingEidolonHighlighter = 'Creating Eidolon Highlighter...';
+  strRegisteringMetricsEditorView = 'Registering Metrics Editor View...';
+  strRegisteringChecksEditorView = 'Registering Checks Editor View...';
+  strRegisteringMetricsEditorSubView = 'Registering Metrics Editor Sub-View...';
+  strRegisteringChecksEditorSubView = 'Registering Checks Editor Sub-View...';
+  strCreatingIDENotifer = 'Creating IDE Notifer...';
+  strDone = 'Done!';
+
 Begin
   Inherited Create;
+  InitialisingMsg(strCreatingModuleExplorer);
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
+  InitialisingMsg(strCreatingSplashScreenEntry);
   AddSplashScreen;
+  InitialisingMsg(strCreatingAboutBoxEntry);
   AddAboutBoxEntry;
+  InitialisingMsg(strCreatingModuleStatistics);
   FModuleStatsList := TBADIModuleStatsList.Create;
+  InitialisingMsg(strCreatingEditorNotifier);
   FEditorNotifier := TEditorNotifier.Create(FModuleStatsList);
+  InitialisingMsg(strRegisteringEditorNotifier);
   FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(FEditorNotifier);
+  InitialisingMsg(strCreatingIDEMenu);
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
+  InitialisingMsg(strSettingUpShortcuts);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
+  InitialisingMsg(strCreatingBNFHighlighter);
   FBNFHighlighterIndex := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TBNFHighlighter.Create);
+  InitialisingMsg(strCreatingEidolonHighlighter);
   FEidolonHighlighterIndex := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TEidolonHighlighter.Create);
+  InitialisingMsg(strRegisteringMetricsEditorView);
   RegisterMetricsEditorView;
+  InitialisingMsg(strRegisteringChecksEditorView);
   RegisterChecksEditorView;
+  InitialisingMsg(strRegisteringMetricsEditorSubView);
   RegisterEditorMetricsSubView;
+  InitialisingMsg(strRegisteringChecksEditorSubView);
   RegisterEditorChecksSubView;
+  InitialisingMsg(strCreatingIDENotifer);
   TBADIIDENotifier.InstallIDENotifier(FModuleStatsList);
+  InitialisingMsg(strDone);
 End;
 
 (**
@@ -267,12 +303,25 @@ Begin
   Result := [wsEnabled];
 End;
 
-//Procedure TBrowseAndDocItWizard.ModuleExplorerClick(Sender: TObject);
-//
-//Begin
-//  If Assigned(FBADIIDEMenuInstaller) Then
-//    FBADIIDEMenuInstaller.ModuleExplorerClick(Sender);
-//End;
+(**
+
+  This method outputs a message on the splash screen as the IDE is loaded.
+
+  @precon  None.
+  @postcon The messages is displayed on the splash screen.
+
+  @param   strMsg as a String as a constant
+
+**)
+Procedure TBrowseAndDocItWizard.InitialisingMsg(Const strMsg: String);
+
+Var
+  SSS : IOTASplashScreenServices;
+  
+Begin
+  If Supports(SplashScreenServices, IOTASplashScreenServices, SSS) Then
+    SSS.StatusMessage(strMsg);
+End;
 
 (**
 

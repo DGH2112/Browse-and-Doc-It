@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.427
-  @Date    14 Apr 2020
+  @Version 1.440
+  @Date    24 May 2020
 
   @license
 
@@ -477,6 +477,7 @@ Type
     Procedure Update(Const iSize : Int64);
     Function  SizeChange : Int64;
     Procedure Reset();
+    Procedure Rename(Const strFileName : String);
   End;
 
   (** An interface to manage a dictionary of IBADT=IModuleStats. **)
@@ -541,6 +542,8 @@ Type
     FBackColour : TColor;
     FFontStyles : TFontStyles;
     FCounter    : Integer;
+    FFirstLine  : Integer;
+    FFirstCol   : Integer;
   End;
   
   (** An interface to returning the doc issue totals for the whole module. **)

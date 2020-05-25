@@ -2,9 +2,9 @@
 
   This module excapsulates the creation of menus in the IDE.
 
-  @Version 1.0
+  @Version 1.070
   @Author  David Hoyle
-  @Date    12 Jul 2019
+  @Date    24 May 2020
 
   @license
 
@@ -577,27 +577,8 @@ End;
 **)
 Procedure TBADIIDEMenuInstaller.Focus(Sender: TObject);
 
-Const
-  strTEditControl = 'TEditControl';
-  
-Var
-  i  : Integer;
-  frm: TCustomForm;
-
 Begin
-  If TBADIToolsAPIFunctions.ActiveSourceEditor <> Nil Then
-    Begin
-      TBADIToolsAPIFunctions.ActiveSourceEditor.Show;
-      // IDE hack to focus the editor window because the above line doesn't do it
-      frm   := TBADIToolsAPIFunctions.ActiveSourceEditor.EditViews[0].GetEditWindow.Form;
-      For i := 0 To frm.ComponentCount - 1 Do
-        If frm.Components[i].ClassName = strTEditControl Then
-          Begin
-            If (frm.Components[i] As TWinControl).Visible Then
-              (frm.Components[i] As TWinControl).SetFocus;
-            Break;
-          End;
-    End;
+  TBADIToolsAPIFunctions.FocusActiveEditor;
 End;
 
 (**

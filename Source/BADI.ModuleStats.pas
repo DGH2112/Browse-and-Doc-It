@@ -4,8 +4,8 @@
   change of a module.
 
   @Author  David Hoyle
-  @Version 1.094
-  @Date    07 Mar 2020
+  @Version 2.054
+  @Date    09 May 2020
   
   @license
 
@@ -46,6 +46,7 @@ Type
     Procedure Reset();
     Function  SizeChange: Int64;
     Procedure Update(Const iSize: Int64);
+    Procedure Rename(Const strFileName : String);
   Public
     Constructor Create(Const strFileName : String);
     Destructor Destroy; Override;
@@ -58,6 +59,8 @@ Uses
   CodeSiteLogging,
   {$ENDIF DEBUG}
   SysUtils;
+
+{$DEFINE CODESITE}
 
 (**
 
@@ -93,6 +96,12 @@ Begin
   Inherited;
 End;
 
+Procedure TBADIModuleStats.Rename(Const strFileName: String);
+
+Begin
+  FFileName := strFileName;
+End;
+
 (**
 
   This method resets the sizwe delta to zero to signify no change.
@@ -123,6 +132,9 @@ Function TBADIModuleStats.SizeChange: Int64;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SizeChange', tmoTiming);{$ENDIF}
   Result := FSizeDelta;
+  {$IFDEF CODESITE}
+  CodeSite.SendFmtMsg(csmNote, 'Filename: %s, Size: %1.0n', [ExtractFileName(FFilename), Int(Result)]);
+  {$ENDIF}
 End;
 
 (**
@@ -142,12 +154,11 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Update', tmoTiming);{$ENDIF}
   If FSize > -1 Then
     Inc(FSizeDelta, Abs(FSize - iSize));
+  {$IFDEF CODESITE}
+  CodeSite.SendFmtMsg(csmNote, 'Filename: %s, Old Size: %1.0n, New Size: %1.0n, Delta: %1.0n', [
+    ExtractFileName(FFileName), Int(FSize), Int(iSize), Int(FSizeDelta)]);
+  {$ENDIF}
   FSize := iSize;
 End;
 
 End.
-
-
-
-
-

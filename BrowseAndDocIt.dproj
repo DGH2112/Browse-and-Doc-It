@@ -76,6 +76,7 @@
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DllSuffix>XE103</DllSuffix>
+        <DCC_Warnings>error</DCC_Warnings>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
@@ -379,6 +380,7 @@
         <DCCReference Include="Source\BADI.LineDocIssue.pas"/>
         <DCCReference Include="Source\BADI.DocIssueTotals.pas"/>
         <DCCReference Include="Source\BADI.DocIssuesHintWindow.pas"/>
+        <DCCReference Include="Source\BADI.ProjectNotifier.pas"/>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

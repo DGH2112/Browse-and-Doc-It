@@ -4,8 +4,8 @@
   their size and size deltas.
 
   @Author  David Hoyle
-  @Version 1.017
-  @Date    09 Feb 2020
+  @Version 1.025
+  @Date    08 May 2020
   
   @license
 
@@ -126,6 +126,7 @@ End;
 Procedure TBADIModuleStatsList.Remove(Const strFileName: String);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Remove', tmoTiming);{$ENDIF}
   FModuleList.Remove(strFileName);
 End;
 
@@ -157,3 +158,5 @@ Begin
 End;
 
 End.
+
+

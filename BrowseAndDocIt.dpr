@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.040
+  @Version 1.064
   @Author  David Hoyle
-  @Date    18 Apr 2020
+  @Date    24 May 2020
 
   @license
 
@@ -56,6 +56,7 @@ uses
   ShareMem,
   SysUtils,
   Classes,
+  Graphics,
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF PROFILECODE}
@@ -225,7 +226,8 @@ uses
   BADI.EditViewNotifier in 'Source\BADI.EditViewNotifier.pas',
   BADI.LineDocIssue in 'Source\BADI.LineDocIssue.pas',
   BADI.DocIssueTotals in 'Source\BADI.DocIssueTotals.pas',
-  BADI.DocIssuesHintWindow in 'Source\BADI.DocIssuesHintWindow.pas';
+  BADI.DocIssuesHintWindow in 'Source\BADI.DocIssuesHintWindow.pas',
+  BADI.ProjectNotifier in 'Source\BADI.ProjectNotifier.pas';
 
 {$R *.res}
 
@@ -236,6 +238,8 @@ begin
   {$IFDEF EUREKALOG}
   SetEurekaLogState(True);
   {$ENDIF EUREKALOG}
+  //CodeSite.Category := 'BADI';
+  //CodeSite.CategoryColor := $80FFFF;
 end.
 
 

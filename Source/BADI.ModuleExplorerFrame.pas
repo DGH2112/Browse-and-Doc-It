@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 2.845
-  @Date    25 Apr 2020
+  @Version 3.006
+  @Date    24 May 2020
 
   @license
 
@@ -1341,7 +1341,7 @@ Begin
             FExplorer.IsVisible[N] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
             If FExplorer.IsVisible[N] Then
               Begin
-                If Not Assigned(FFollowNode) Then
+                If Not Assigned(FFollowNode) And FExplorer.FullyVisible[N] Then
                   FFollowNode := N;
                 P := FExplorer.NodeParent[N];
                 While Assigned(P) Do
@@ -1612,10 +1612,11 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     @precon  None.
     @postcon A Total Info record is added to the module.
 
-    @param   Tag as a TSpecialTagNode as a constant
+    @param   Tag   as a TSpecialTagNode as a constant
+    @param   iLine as an Integer as a constant
 
   **)
-  Procedure AddTotalInfo(Const Tag : TSpecialTagNode); Overload;
+  Procedure AddTotalInfo(Const Tag : TSpecialTagNode; Const iLine, iCol : Integer); Overload;
 
   Var
     recTotalInfo : TBADITotalInfo;
@@ -1625,6 +1626,8 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     recTotalInfo.FForeColour := Tag.FFontColour;
     recTotalInfo.FBackColour := Tag.FBackColour;
     recTotalInfo.FFontStyles := Tag.FFontStyles;
+    recTotalInfo.FFirstLine := iLine;
+    recTotalInfo.FFirstCol := iCol;
     FDocIssueTotals.IncDocIssue('@' + Tag.FTagName, recTotalInfo);
   End;
 
@@ -1636,9 +1639,10 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     @postcon A Total Info record is added to the module.
 
     @param   strTagName as a String as a constant
+    @param   iLine      as an Integer as a constant
 
   **)
-  Procedure AddTotalInfo(Const strTagName : String); Overload;
+  Procedure AddTotalInfo(Const strTagName : String; Const iLine, iCol : Integer); Overload;
 
   Var
     recTotalInfo : TBADITotalInfo;
@@ -1648,8 +1652,13 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     recTotalInfo.FForeColour := clRed;
     recTotalInfo.FBackColour := clNone;
     recTotalInfo.FFontStyles := [];
+    recTotalInfo.FFirstLine := iLine;
+    recTotalInfo.FFirstCol := iCol;
     FDocIssueTotals.IncDocIssue('@' + strTagName, recTotalInfo);
   End;
+
+ResourceString
+  strBadTagFound = 'Bad Tag "%s" found!';
 
 Const
   iTreeLevel = 2;
@@ -1689,14 +1698,21 @@ Begin
                   If tpShowInEditor In FSpecialTagNodes[iSpecialTag].FTagProperties Then
                     Begin
                       AddDocIssueInfo(Tag.Line, ST);
-                      AddTotalInfo(ST);
+                      AddTotalInfo(ST, Tag.Line, Tag.Column);
                     End;
                 End;
             End Else
             If Not IsKeyWord(LowerCase(Cmt.Tag[iTag].TagName), astrTagsToIgnore) Then
               Begin
+                AddNode(
+                  FModule,
+                  Format(strBadTagFound, [Cmt.Tag[iTag].TagName]),
+                  Cmt.Tag[iTag].TagName,
+                  1,
+                  BADIImageIndex(iiBadTag, scNone)
+                );
                 AddDocIssueInfo(Cmt.Tag[iTag].Line, Cmt.Tag[iTag].TagName);
-                AddTotalInfo(Cmt.Tag[iTag].TagName);
+                AddTotalInfo(Cmt.Tag[iTag].TagName, Cmt.Tag[iTag].Line, Cmt.Tag[iTag].Column);
               End;
         End;
     End;
@@ -1964,6 +1980,8 @@ Begin
       recTotalInfo.FForeColour := clNone;
       recTotalInfo.FBackColour := clNone;
       recTotalInfo.FFontStyles := [];
+      recTotalInfo.FFirstLine := DI.Line;
+      recTotalInfo.FFirstCol := DI.Column;
       FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);
     End
   Else If Element Is TDocumentConflict Then
@@ -1984,6 +2002,8 @@ Begin
       recTotalInfo.FForeColour := clNone;
       recTotalInfo.FBackColour := clNone;
       recTotalInfo.FFontStyles := [];
+      recTotalInfo.FFirstLine := DC.Line;
+      recTotalInfo.FFirstCol := DC.Column;
       FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);    
     End;
 End;

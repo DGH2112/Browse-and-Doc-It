@@ -4,8 +4,8 @@
   tree nodes.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.033
+  @Date    24 May 2020
 
   @license
 
@@ -75,15 +75,13 @@ Type
     Procedure PaintRenderComment(Var iBottom : Integer); InLine;
     Procedure PaintRenderSpecialTags(Const iBottom : Integer); InLine;
   Public
-    //: @nometric MissingCONSTInParam
-    Constructor Create(Const AOwner : TComponent; Const ATreeView : TVirtualStringTree); ReIntroduce;
+    Constructor Create(Const AOwner : TComponent; Const ATreeView : TVirtualStringTree); Reintroduce;
+      Overload; Virtual;
     Procedure Paint; Override;
-    //: @nometric MissingCONSTInParam
     Function CalcHintRect(MinWidth, MaxWidth : Integer; Node : PVirtualNode;
-      SyntaxHighlight : Boolean; Comment : TComment) : TRect; Reintroduce; Overload;
-    //: @nometric MissingCONSTInParam
+      SyntaxHighlight : Boolean; Comment : TComment) : TRect; Reintroduce; Overload; Virtual;
     Procedure ActivateHint(Rect : TRect; Node : PVirtualNode;
-      SyntaxHighlight : Boolean; Comment : TComment); Reintroduce; Overload;
+      SyntaxHighlight : Boolean; Comment : TComment); Reintroduce; Overload; Virtual;
     Function CanDrawSpecialTag(Const Comment : TComment; Const strSpecialTag : String) : Boolean;
   End;
 
@@ -375,8 +373,6 @@ End;
 
   @precon  ATreeView must be a valid instance of the explorer treeview.
   @postcon Ensures the hint can get the treeviews font information.
-
-  @nometricMissingCONSTInParam
 
   @param   AOwner    as a TComponent as a constant
   @param   ATreeView as a TVirtualStringTree as a constant

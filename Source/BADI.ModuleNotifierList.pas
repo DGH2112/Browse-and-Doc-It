@@ -3,8 +3,8 @@
   This module contains an interfaced class which manages module notifier indexes using their filenames.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    26 Jan 2020
+  @Version 1.013
+  @Date    09 May 2020
 
   @license
 
@@ -97,7 +97,7 @@ Uses
 
 **)
 Constructor TBADIModuleNotifierList.TModuleNotifierRec.Create(Const strFileName: String;
-  Const iIndex: Integer {: @ debug Const eNotifierType: TDGHIDENotification } );
+  Const iIndex: Integer);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TDINModuleNotifierList.TModuleNotifierRec.Create', tmoTiming);{$ENDIF}
@@ -149,7 +149,7 @@ End;
 Destructor TBADIModuleNotifierList.Destroy;
 
 ResourceString
-  strDestroyOrphanedModuleNotifier = 'Destroy(Orphaned Module Notifier)';
+  strDestroyOrphanedModuleNotifier = 'TBADIModuleNotifierList.Destroy(Orphaned Module Notifier): %s';
 
 Var
   iModule : Integer;
@@ -159,7 +159,8 @@ Begin
   For iModule := FModuleNotifierList.Count - 1 DownTo 0 Do
     Begin
       {$IFDEF DEBUG}
-      CodeSite.Send(csmWarning, strDestroyOrphanedModuleNotifier, FModuleNotifierList[iModule].FileName);
+      CodeSite.SendFmtMsg(csmError, strDestroyOrphanedModuleNotifier,
+        [FModuleNotifierList[iModule].FileName]);
       {$ENDIF}
       FModuleNotifierList.Delete(iModule);
       //: @note Cannot remove any left over notifiers here as the module

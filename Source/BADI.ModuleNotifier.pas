@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 1.118
-  @Date    22 Feb 2020
+  @Version 2.191
+  @Date    23 May 2020
 
   @license
 
@@ -42,12 +42,13 @@ Type
   TBADIModuleNotifier = Class(TNotifierObject, IInterface, IOTANotifier, IOTAModuleNotifier80,
     IOTAModuleNotifier90, IOTAModuleNotifier)
   Strict Private
-    FFileName          : String;
-    FModuleRenameEvent : TBADIModuleRenameEvent;
-    FModuleStatsList   : IBADIModuleStatsList;
-    FModuleHeader      : TRegEx;
-    FModuleDateTime    : TRegEx;
-    FModuleVersion     : TRegEx;
+    FFileName             : String;
+    FModuleRenameEvent    : TBADIModuleRenameEvent;
+    FModuleStatsList      : IBADIModuleStatsList;
+    FModuleHeader         : TRegEx;
+    FModuleDateTime       : TRegEx;
+    FModuleVersion        : TRegEx;
+    FLastUpdatedTickCount : Cardinal;
   Strict Protected
     // IOTAModuleNotifier
     Procedure AfterSave;
@@ -55,7 +56,7 @@ Type
     Procedure Destroyed;
     Procedure Modified;
     Function  CheckOverwrite: Boolean;
-    Procedure ModuleRenamed(Const NewName: String);
+    Procedure ModuleRenamed(Const NewName: String); Overload;
     // IOTAModuleNotifier80
     Function  AllowSave: Boolean;
     Function  GetOverwriteFileNameCount: Integer;
@@ -72,6 +73,21 @@ Type
     Procedure UpdateModuleVersion(Const Match : TMatch);
     Procedure UpdateModuleDate(Const Match : TMatch);
     Procedure OutputSource(Const strText : String; Const iOffset, iLength : Integer);
+    // Properties
+    (**
+      This property provides access to the ModuleRenameEvent.
+      @precon  None.
+      @postcon Returns the ModuleRenameEvent.
+      @return  a TBADIModuleRenameEvent
+    **)
+    Property ModuleRenameEvent : TBADIModuleRenameEvent Read FModuleRenameEvent;
+    (**
+      This property provides read / write access to the notifier filename.
+      @precon  None.
+      @postcon Gets and sets the notifier filename.
+      @return  a String
+    **)
+    Property FileName : String Read FFileName Write FFileName;
   Public
     Constructor Create(Const ModuleStatsList : IBADIModuleStatsList; Const strFileName : String;
       Const ModuleRenameEvent: TBADIModuleRenameEvent);
@@ -86,8 +102,11 @@ Uses
   {$ENDIF DEBUG}
   System.SysUtils,
   System.Math,
+  WinAPI.Windows,
+  BADI.Types,
   BADI.Functions,
-  BADI.ToolsAPIUtils, BADI.Types, BADI.Options;
+  BADI.ToolsAPIUtils,
+  BADI.Options;
 
 (**
 
@@ -95,6 +114,8 @@ Uses
 
   @precon  None.
   @postcon Updated the internal filename.
+
+  @nohint  OldFileName NewFileName
 
   @param   OldFileName as a String as a constant
   @param   NewFileName as a String as a constant
@@ -104,9 +125,6 @@ Procedure TBADIModuleNotifier.AfterRename(Const OldFileName, NewFileName: String
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AfterRename', tmoTiming);{$ENDIF}
-  FFileName := NewFileName;
-  If Assigned(FModuleRenameEvent) Then
-    FModuleRenameEvent(OldFileName, NewFileName);
 End;
 
 (**
@@ -190,7 +208,11 @@ Procedure TBADIModuleNotifier.CheckForLastSecondUpdates;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckForLastSecondUpdates', tmoTiming);{$ENDIF}
-  FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length);
+  If (FLastUpdatedTickCount > 0) And (FLastUpdatedTickCount <> GetTickCount) Then
+    Begin
+      FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length);
+      FLastUpdatedTickCount := 0;
+    End;
 End;
 
 (**
@@ -237,6 +259,8 @@ Begin
   FModuleHeader := TRegEx.Create(strModuleHeaderRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
   FModuleDateTime := TRegEx.Create(strDateRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
   FModuleVersion := TRegEx.Create(strVersionRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
+  FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length);
+  FLastUpdatedTickCount := 0;
 End;
 
 (**
@@ -321,8 +345,15 @@ End;
 **)
 Procedure TBADIModuleNotifier.Modified;
 
+Const
+  iUpdateInterval : Cardinal = 500;
+
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Modified', tmoTiming);{$ENDIF}
+  If (FLastUpdatedTickCount > 0) And (GetTickCount - FLastUpdatedTickCount >= iUpdateInterval) Then
+    CheckForLastSecondUpdates
+  Else
+    FLastUpdatedTickCount := GetTickCount;
 End;
 
 (**
@@ -339,9 +370,8 @@ Procedure TBADIModuleNotifier.ModuleRenamed(Const NewName: String);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleRenamed', tmoTiming);{$ENDIF}
-  If Assigned(FModuleRenameEvent) Then
-    FModuleRenameEvent(FFileName, NewName);
   FFileName := NewName;
+  FModuleStatsList.ModuleStats[NewName].Rename(NewName);
 End;
 
 (**
@@ -396,6 +426,9 @@ Var
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OutputMsg', tmoTiming);{$ENDIF}
+  {$IFDEF CODESITE}
+  CodeSite.Send(csmNote, 'TBADIModuleNotifier.OutputMsg', strMsg);
+  {$ENDIF CODESITE}
   If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
     TBADIToolsAPIFunctions.OutputMessage(
       FFileName,
@@ -608,5 +641,8 @@ Begin
 End;
 
 End.
+
+
+
 
 

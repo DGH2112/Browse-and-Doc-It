@@ -4,8 +4,8 @@
   throughout this project.
 
   @Author  David Hoyle
-  @Version 1.075
-  @Date    28 Mar 2020
+  @Version 1.495
+  @Date    24 May 2020
 
   @license
 
@@ -39,6 +39,7 @@ Uses
   System.SysUtils,
   System.Classes,
   VCL.Forms,
+  VCL.Controls,
   WinAPI.Windows,
   BADI.Types,
   BADI.ElementContainer;
@@ -71,6 +72,7 @@ Type
     Class Procedure RegisterFormClassForTheming(Const AFormClass : TCustomFormClass;
       Const Component : TComponent = Nil); Static;
     Class Procedure ApplyTheming(Const Component : TComponent); Static;
+    Class Procedure FocusActiveEditor; Static;
   End;
 
 Implementation
@@ -223,6 +225,41 @@ Begin
   Finally
     Reader := Nil;
   End;
+End;
+
+(**
+
+  This method attempts to focus the edit control as the OTA IOTASourceEditor.Show does tno do this.
+
+  @precon  None.
+  @postcon The code editor is focused for editing.
+
+**)
+Class Procedure TBADIToolsAPIFunctions.FocusActiveEditor;
+
+Const
+  strTEditControl = 'TEditControl';
+  
+Var
+  i  : Integer;
+  frm: TCustomForm;
+  E: IOTASourceEditor;
+
+Begin
+  E := ActiveSourceEditor;
+  If Assigned(E) Then
+    Begin
+      E.Show;
+      // IDE hack to focus the editor window because the above line doesn't do it
+      frm   := E.EditViews[0].GetEditWindow.Form;
+      For i := 0 To frm.ComponentCount - 1 Do
+        If frm.Components[i].ClassName = strTEditControl Then
+          Begin
+            If (frm.Components[i] As TWinControl).Visible Then
+              (frm.Components[i] As TWinControl).SetFocus;
+            Break;
+          End;
+    End;
 End;
 
 (**
@@ -725,3 +762,5 @@ Begin
 End;
 
 End.
+
+

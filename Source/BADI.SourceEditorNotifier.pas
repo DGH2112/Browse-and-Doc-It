@@ -4,8 +4,8 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 1.329
-  @Date    28 Mar 2020
+  @Version 1.572
+  @Date    23 May 2020
   
   @license
 
@@ -46,6 +46,7 @@ Type
     FEditViewNotifierIndex : Integer;
     {$ENDIF DXE100}
     FView                  : IOTAEditView;
+    FFilenames             : TStringList;
   Strict Protected
     Procedure ViewActivated(Const View: IOTAEditView);
     Procedure ViewNotification(Const View: IOTAEditView; Operation: TOperation);
@@ -60,6 +61,8 @@ Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF DEBUG}
+  System.SysUtils,
+  System.TypInfo,
   BADI.EditViewNotifier;
 
 (**
@@ -81,6 +84,8 @@ Begin
   FEditViewNotifierIndex := -1;
   {$ENDIF DXE100}
   FView := Nil;
+  FFilenames := TStringList.Create;
+  FFilenames.Sorted := True;
   // Workaround for new modules create after the IDE has started
   If SE.EditViewCount > 0 Then
     ViewNotification(SE.EditViews[0], opInsert);
@@ -96,9 +101,18 @@ End;
 **)
 Destructor TBADISourceEditorNotifier.Destroy;
 
+ResourceString
+  strFilenameOrphaned = 'TBADISourceEditorNotifier.Destroy, Filename "%s" orphaned!';
+
+Var
+  strFileName : String;
+
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   ViewNotification(FView, opRemove);
+  For strFileName In FFilenames Do
+    CodeSite.SendFmtMsg(csmError, strFilenameOrphaned, [strFileName]);
+  FFilenames.Free;
   Inherited Destroy;
 End;
 
@@ -135,30 +149,67 @@ End;
 
 **)
 Procedure TBADISourceEditorNotifier.ViewNotification(Const View: IOTAEditView; Operation: TOperation);
+var
+  iIndex: Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);{$ENDIF}
   {$IFDEF DXE100}
   If Assigned(View) Then
-    Case Operation Of
-      // Only create a notifier if one has not already been created!
-      opInsert:
-        If FEditViewNotifierIndex = -1 Then 
-          Begin
-            FView := View;
-            FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create);
-          End;
-      // opRemove Never gets called!
-      opRemove:
-        If FEditViewNotifierIndex > -1 Then
-          Begin
-            View.RemoveNotifier(FEditViewNotifierIndex);
-            FEditViewNotifierIndex := -1;
-          End;
+    Begin
+      Case Operation Of
+        // Only create a notifier if one has not already been created!
+        opInsert:
+          If FEditViewNotifierIndex = -1 Then 
+            Begin
+              If Not FFilenames.Find(View.Buffer.FileName, iIndex) Then
+                Begin
+                  FFilenames.Add(View.Buffer.FileName);
+                  {$IFDEF CODESITE}
+                  CodeSite.Send(
+                    csmReminder,
+                    'TBADISourceEditorNotifier.ViewNotification.Added',
+                    ExtractFileName(View.Buffer.FileName)
+                  );
+                  {$ENDIF CODESITE}
+                End {$IFDEF CODESITE} Else
+                  CodeSite.Send(
+                    csmWarning,
+                    'TBADISourceEditorNotifier.ViewNotification.Exists',
+                    ExtractFileName(View.Buffer.FileName)
+                  ) {$ENDIF CODESITE};
+              FView := View;
+              FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create);
+            End;
+        // opRemove Never gets called!
+        opRemove:
+          If FEditViewNotifierIndex > -1 Then
+            Begin
+              If FFilenames.Find(View.Buffer.FileName, iIndex) Then
+                Begin
+                  FFilenames.Delete(iIndex);
+                  {$IFDEF CODESITE}
+                  CodeSite.Send(
+                    csmReminder,
+                    'TBADISourceEditorNotifier.ViewNotification.Removed',
+                    ExtractFileName(View.Buffer.FileName)
+                  );
+                  {$ENDIF CODESITE}
+                End {$IFDEF CODESITE} Else
+                  CodeSite.Send(
+                    csmWarning,
+                    'TBADISourceEditorNotifier.ViewNotification.Not found',
+                    ExtractFileName(View.Buffer.FileName)
+                  ) {$ENDIF CODESITE};
+              View.RemoveNotifier(FEditViewNotifierIndex);
+              FEditViewNotifierIndex := -1;
+            End;
+      End;
     End;
   {$ENDIF DXE100}
 End;
 
 End.
+
 
 

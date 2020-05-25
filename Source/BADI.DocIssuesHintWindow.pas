@@ -3,8 +3,8 @@
   This module contains a custom hint window to display the module metric totals.
 
   @Author  David Hoyle
-  @Version 2.238
-  @Date    13 Apr 2020
+  @Version 3.973
+  @Date    25 May 2020
   
   @license
 
@@ -26,6 +26,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+  @todo  Add metrics for the current method to the hint window.
+
 **)
 Unit BADI.DocIssuesHintWindow;
 
@@ -36,10 +38,14 @@ Uses
   Vcl.Graphics,
   Vcl.Controls,
   WinApi.Windows,
+  WinAPI.Messages,
   BADI.Types,
   BADI.Interfaces;
 
 Type
+  (** An enumerate to define the position of the hint window. **)
+  TBADIHintPosition = (hpTop, hpBottom);
+
   (** A class to define a new hint window for the totals to be displayed within on the Code Editor. **)
   TBADIDocIssueHintWindow = Class(THintWindow)
   Strict Private
@@ -52,25 +58,32 @@ Type
       (** A class variable to hold the singleton instance of the code editor totals hint window. **)
       FHintWindow : TBADIDocIssueHintWindow;
   Strict Private
-    FTotals : TArray<TBADITotalInfo>;
+    FTotals         : TArray<TBADITotalInfo>;
     FScopeImageList : TImageList;
-    FCalcHeight : Integer;
-    FCalcNameWidth : Integer;
-    FCalcNumWidth : Integer;
-    FBackColour : TColor;
-    FForeColour : TColor;
+    FCalcHeight     : Integer;
+    FCalcNameWidth  : Integer;
+    FCalcNumWidth   : Integer;
+    FBackColour     : TColor;
+    FForeColour     : TColor;
+    FItemHeight     : Integer;
   Strict Protected
     Procedure Paint; Override;
-    Function CalcHintRect(Const Rect : TRect; Const Totals: IBADIDocIssueTotals): TRect;
-      Reintroduce; Overload;
-    Procedure ActivateHint(Const Rect: TRect); Reintroduce;
-      Overload;
+    Function CalcHintRect(
+      Const Rect : TRect;
+      Const ePosition: TBADIHintPosition;
+      Const Totals: IBADIDocIssueTotals
+    ): TRect; Reintroduce; Overload; Virtual;
+    procedure ActivateHint(Const Rect: TRect); Reintroduce; Overload; Virtual;
     Procedure UpdateBaseFontInfo(Const R: TRect);
     Procedure UpdateFontInfo(Const TotalInfo: TBADITotalInfo);
+    Procedure CreateParams(var Params: TCreateParams); Override;
+    Procedure MakeHintTransparent;
+    Procedure WMNCHitTest(Var Message: TWMNCHitTest); Message WM_NCHITTEST;
+    Procedure MouseDownEvent(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   Public
     Class Constructor Create;
     Class Destructor Destroy;
-    Class Procedure Display(Const R : TRect; Const Totals: IBADIDocIssueTotals);
+    Class Procedure Display(Const Totals: IBADIDocIssueTotals);
     Class Procedure Disappear;
   End;
 
@@ -84,10 +97,13 @@ Uses
   System.Math,
   System.Generics.Collections,
   Vcl.Forms,
+  Vcl.Themes,
+  Vcl.GraphUtil,
   ToolsAPI,
   BADI.Functions,
   BADI.Options,
-  BADI.DockableModuleExplorer;
+  BADI.DockableModuleExplorer,
+  BADI.ToolsAPIUtils;
 
 Const
   (** Text for testing the height of a line of text. **)
@@ -100,14 +116,16 @@ Const
   @precon  None.
   @postcon The hint is displayed.
 
-  @param   Rect as a TRect as a constant
+  @param   Rect      as a TRect as a constant
 
 **)
-Procedure TBADIDocIssueHintWindow.ActivateHint(Const Rect: TRect);
+procedure TBADIDocIssueHintWindow.ActivateHint(Const Rect: TRect);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ActivateHint', tmoTiming);{$ENDIF}
+  MakeHintTransparent;
   ActivateHint(Rect, '');
+  FHintWindow.OnMouseDown := MouseDownEvent;
 End;
 
 (**
@@ -117,12 +135,13 @@ End;
   @precon  None.
   @postcon Calulcates the size and position of the hint window.
 
-  @param   Rect   as a TRect as a constant
-  @param   Totals as an IBADIDocIssueTotals as a constant
+  @param   Rect      as a TRect as a constant
+  @param   ePosition as a TBADIHintPosition as a constant
+  @param   Totals    as an IBADIDocIssueTotals as a constant
   @return  a TRect
 
 **)
-Function TBADIDocIssueHintWindow.CalcHintRect(Const Rect : TRect;
+Function TBADIDocIssueHintWindow.CalcHintRect(Const Rect : TRect; Const ePosition: TBADIHintPosition;
   Const Totals: IBADIDocIssueTotals): TRect;
 
 Var
@@ -140,6 +159,7 @@ Begin
   FCalcHeight := 0;
   FCalcNameWidth := 0;
   FCalcNumWidth := 0;
+  FItemHeight := Max(Canvas.TextHeight(strTextHeightTest), iIconSize) + iPadding;
   SetLength(FTotals, Totals.Totals.Count);
   For Issue In Totals.Totals Do
     Begin
@@ -149,8 +169,10 @@ Begin
       FTotals[iIndex].FBackColour := Issue.Value.FBackColour;
       FTotals[iIndex].FFontStyles := Issue.Value.FFontStyles;
       FTotals[iIndex].FCounter := Issue.Value.FCounter;
+      FTotals[iIndex].FFirstLine := Issue.Value.FFirstLine;
+      FTotals[iIndex].FFirstCol := Issue.Value.FFirstCol;
       UpdateFontInfo(FTotals[iIndex]);
-      Inc(FCalcHeight, Max(Canvas.TextHeight(strTextHeightTest), iIconSize) + iPadding);
+      Inc(FCalcHeight, FItemHeight);
       iTextWidth := Canvas.TextWidth(FTotals[iIndex].FLabel);
       If iTextWidth > FCalcNameWidth Then
         FCalcNameWidth := iTextWidth;
@@ -159,10 +181,18 @@ Begin
         FCalcNumWidth := iTextWidth;
       Inc(iIndex);
     End;
-  Result.Top := Result.Bottom - (FCalcHeight);
+  Case ePosition Of
+    hpTop:    Result.Bottom := Result.Top + FCalcHeight;
+    hpBottom: Result.Top := Result.Bottom - FCalcHeight;
+  End;
   Result.Left := Result.Right -
     (iPadding + FCalcNameWidth + iPadding + iIconSize + iPadding + FCalcNumWidth + iPadding);
   InflateRect(Result, 1, 1);
+  BevelInner := bvNone;
+  BevelOuter := bvNone;
+  BevelEdges := [];
+  BevelKind := bkNone;
+  BorderWidth := 0;
 End;
 
 (**
@@ -178,6 +208,24 @@ Class Constructor TBADIDocIssueHintWindow.Create;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TBADIDocIssueHintWindow.Create', tmoTiming);{$ENDIF}
   FHintWindow := TBADIDocIssueHintWindow.Create(Application.MainForm);
+End;
+
+(**
+
+  This is an overridden CreateParams methods for the control.
+
+  @precon  None.
+  @postcon Removes the windows border from the hint window.
+
+  @param   Params as a TCreateParams as a reference
+
+**)
+Procedure TBADIDocIssueHintWindow.CreateParams(Var Params: TCreateParams);
+
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CreateParams', tmoTiming);{$ENDIF}
+  Inherited CreateParams(Params);
+  Params.Style := WS_POPUP
 End;
 
 (**
@@ -206,6 +254,7 @@ End;
 Class Procedure TBADIDocIssueHintWindow.Disappear;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TBADIDocIssueHintWindow.Disappear', tmoTiming);{$ENDIF}
   FHintWindow.ReleaseHandle;
 End;
 
@@ -216,23 +265,122 @@ End;
   @precon  None.
   @postcon The hint window is displayed.
 
-  @param   R      as a TRect as a constant
   @param   Totals as an IBADIDocIssueTotals as a constant
 
 **)
-Class Procedure TBADIDocIssueHintWindow.Display(Const R : TRect; Const Totals: IBADIDocIssueTotals);
+Class Procedure TBADIDocIssueHintWindow.Display(Const Totals: IBADIDocIssueTotals);
 
+Const
+  strTEditControlClsName = 'TEditControl';
+  
 Var
-  Rect : TRect;
+  ePosition : TBADIHintPosition;
+  ES: IOTAEditorServices;
+  TV: IOTAEditView;
+  R : TRect;
+  C: TWinControl;
+  i: Integer;
   
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TBADIDocIssueHintWindow.Display', tmoTiming);{$ENDIF}
-  Rect := FHintWindow.CalcHintRect(R, Totals);
+  R := Rect(0, 0, 0, 0);
+  ePosition := hpBottom;
+  If Supports(BorlandIDEServices, IOTAEditorServices, ES) Then
+    Begin
+      TV := ES.TopView;
+      If Assigned(TV) Then
+        Begin
+          C := TV.GetEditWindow.Form;
+          For i := 0 To C.ComponentCount - 1 Do
+            If CompareText(C.Components[i].ClassName, strTEditControlClsName) = 0  Then
+              Begin
+                C := (C.Components[i] As TWinControl);
+                R := C.ClientRect;
+                R.TopLeft := C.ClientToScreen(R.TopLeft);
+                R.BottomRight := C.ClientToScreen(R.BottomRight);
+                Dec(R.Bottom, iPadding);
+                Dec(R.Right, iPadding);
+                Break;
+              End;
+          If TV.CursorPos.Line >= TV.TopRow + TV.ViewSize.cy Div 2 Then
+            ePosition := hpTop;
+        End;
+    End;
+  R := FHintWindow.CalcHintRect(R, ePosition, Totals);
   If (doShowDocIssueTotalsInEditor In TBADIOptions.BADIOptions.Options) And
-     (Rect.Height > (iPadding + 1)) Then
-    FHintWindow.ActivateHint(Rect)
+     (R.Height > (iPadding + 1)) Then
+    FHintWindow.ActivateHint(R)
   Else 
     FHintWindow.ReleaseHandle;
+End;
+
+(**
+
+  This method make the hint window transparent.
+
+  @precon  None.
+  @postcon The hint window is made transparent.
+
+**)
+Procedure TBADIDocIssueHintWindow.MakeHintTransparent;
+
+Const
+  iMaxTransparency = 255;
+  iTranparency = 192;
+  
+Var
+  Style: Integer;
+
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MakeHintTransparent', tmoTiming);{$ENDIF}
+  If iTranparency < iMaxTransparency Then
+    Begin
+      Style := GetWindowLong(Handle, GWL_EXSTYLE);
+      Style := Style Or WS_EX_LAYERED;
+      SetWindowLong(Handle, GWL_EXSTYLE, Style);
+      SetLayeredWindowAttributes(Handle, 0, iTranparency, LWA_ALPHA);
+    End Else
+    Begin
+      Style := Style Xor WS_EX_LAYERED;
+      SetWindowLong(Handle, GWL_EXSTYLE, Style);
+    End;
+End;
+
+(**
+
+  This is a mouse down event for the hint window.
+
+  @precon  None.
+  @postcon centrs the editor on the first occurrance of the clicked on document issue.
+
+  @param   Sender as a TObject
+  @param   Button as a TMouseButton
+  @param   Shift  as a TShiftState
+  @param   X      as an Integer
+  @param   Y      as an Integer
+
+**)
+Procedure TBADIDocIssueHintWindow.MouseDownEvent(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+
+Var
+  iIndex: Integer;
+  ES : IOTAEditorServices;
+  EP : TOTAEditPos;
+  
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MouseDownEvent', tmoTiming);{$ENDIF}
+  iIndex := Y Div FItemHeight;
+  If (iIndex >= Low(FTotals)) And (iIndex <= High(FTotals)) Then
+    If Supports(BorlandIDEServices, IOTAEditorServices, ES) Then
+      If Assigned(ES.TopView) Then
+        Begin
+          EP.Line := FTotals[iIndex].FFirstLine;
+          EP.Col := FTotals[iIndex].FFirstCol;
+          ES.TopView.CursorPos := EP;
+          ES.TopView.Center(EP.Line, EP.Col);
+          TBADIToolsAPIFunctions.FocusActiveEditor;
+        End;
 End;
 
 (**
@@ -245,6 +393,9 @@ End;
 **)
 Procedure TBADIDocIssueHintWindow.Paint;
 
+Const
+  dblBlendFactor = 0.25;
+
 Var
   R, S : TRect;
   iDocIssueType: Integer;
@@ -254,8 +405,11 @@ Var
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Paint', tmoTiming);{$ENDIF}
   DoubleBuffered := True;
-  R := Rect(0, 0, Width - 1, Height - 1);
   UpdateBaseFontInfo(R);
+  Canvas.Pen.Color := ColorBlendRGB(Canvas.Brush.Color, clBlack, dblBlendFactor);
+  Canvas.Rectangle(0, 0, Width, Height);
+  R := Rect(0, 0, Width, Height);
+  R.Inflate(-1, -1);
   // Render Totals
   Inc(R.Top, iPadding);
   Dec(R.Right, iPadding);
@@ -306,6 +460,7 @@ Var
   ES: IOTAEditorServices;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateBaseFontInfo', tmoTiming);{$ENDIF}
   // Background
   boolUseIDEColours := TBADIOptions.BADIOptions.UseIDEEditorColours;
   TFI := TBADIOptions.BADIOptions.TokenFontInfo[boolUseIDEColours][ttPlainText];
@@ -317,8 +472,8 @@ Begin
   Font.Color := FForeColour;
   If Supports(BorlandIDEServices, IOTAEditorServices, ES) Then
     Begin
-      Font.Name := ES.EditOptions.FontName;
-      Font.Size := ES.EditOptions.FontSize;
+      Font.Name := TBADIOptions.BADIOptions.TreeFontName;
+      Font.Size := TBADIOptions.BADIOptions.TreeFontSize;
     End;
   Canvas.Font.Assign(Font);
 End;
@@ -336,6 +491,7 @@ End;
 Procedure TBADIDocIssueHintWindow.UpdateFontInfo(Const TotalInfo: TBADITotalInfo);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateFontInfo', tmoTiming);{$ENDIF}
   Canvas.Brush.Color := FBackColour;
   If TotalInfo.FBackColour <> clNone Then
     Canvas.Brush.Color := TotalInfo.FBackColour;
@@ -343,6 +499,24 @@ Begin
   If TotalInfo.FForeColour <> clNone Then
     Canvas.Font.Color := TotalInfo.FForeColour;
   Canvas.Font.Style := TotalInfo.FFontStyles;
+End;
+
+(**
+
+  A windows message hit test message handler to override the THintWindow version and allow the hint
+  window to react to mouse events rather than being transparent.
+
+  @precon  None.
+  @postcon Reverse the transparency of the hint window to accept mouse events.
+
+  @param   Message as a TWMNCHitTest as a reference
+
+**)
+Procedure TBADIDocIssueHintWindow.WMNCHitTest(Var Message: TWMNCHitTest);
+
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WMNCHitTest', tmoTiming);{$ENDIF}
+  Message.Result := HTCLIENT;
 End;
 
 End.

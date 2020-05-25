@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 1.226
-  @Date    28 Mar 2020
+  @Version 2.103
+  @Date    24 May 2020
 
   @license
 
@@ -53,6 +53,7 @@ Type
     FLastCursorPos       : TOTAEditPos;
     FLastParserResult    : Boolean;
     FLastUpdateTickCount : Cardinal;
+    FLastMoveTickCount   : Cardinal;
     FBADIThreadMgr       : TBrowseAndDocItThreadManager;
     FModuleStatsList     : IBADIModuleStatsList;
     FSource              : String;
@@ -64,6 +65,8 @@ Type
     Procedure ExceptionMsg(Const strExceptionMsg : String);
     Function CheckForCursorMovement(Const Editor : IOTASourceEditor) : TOTAEditPos;
     Procedure CheckFileNameAndSize(Const Editor : IOTASourceEditor);
+    procedure CheckForChange(const iUpdateInterval: Cardinal);
+    procedure CheckForMovement(const iUpdateInterval: Cardinal; const CP: TOTAEditPos);
     // INTAEditServicesNotifier
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
@@ -122,6 +125,39 @@ End;
 
 (**
 
+  This method checks for any change in the file.
+
+  @precon  None.
+  @postcon If there is change the module is parsed.
+
+  @param   iUpdateInterval as a Cardinal as a constant
+
+**)
+Procedure TEditorNotifier.CheckForChange(Const iUpdateInterval: Cardinal);
+
+ResourceString
+  strMsg = 'The last parse of the source code failed. Do you want to re-parse the code?';
+
+Begin
+  If (FLastUpdateTickCount > 0) And (GetTickCount > FLastUpdateTickCount + iUpdateInterval) Then
+    Begin
+      If Assigned(Application) And Assigned(Application.MainForm) And Application.MainForm.Visible Then
+        Begin
+          FLastUpdateTickCount := 0;
+          FUpdateTimer.Enabled := False;
+          If Not FLastParserResult Then
+            Case MessageDlg(strMsg, mtWarning, [mbYes, mbNo, mbCancel], 0) Of
+              mrYes: FLastParserResult := True;
+              mrNo: Exit;
+              mrCancel: Abort;
+            End;
+          FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
+      End;
+    End;
+End;
+
+(**
+
   This method checks for cursor movement when the timer is called.
 
   @precon  Editor must be a valid instance.
@@ -147,11 +183,35 @@ Begin
       If (Result.Col <> FLastCursorPos.Col) Or (Result.Line <> FLastCursorPos.Line) Then
         Begin
           FLastCursorPos := Result;
-          If doFollowEditorCursor In TBADIOptions.BADIOptions.Options Then
-            TfrmDockableModuleExplorer.FollowEditorCursor(Result.Line);
           If FLastUpdateTickCount > 0 Then
             FLastUpdateTickCount := GetTickCount;
+          FLastMoveTickCount := GetTickCount;
         End;
+    End;
+End;
+
+(**
+
+  This method checks to see of there has been movement of the cursor sand if so the follow cursor and
+  update the display of the doc issue hint window.
+
+  @precon  None.
+  @postcon If there has been movement in the cursor the follow cursor is triggers and the hint window
+           updated.
+
+  @param   iUpdateInterval as a Cardinal as a constant
+  @param   CP              as a TOTAEditPos as a constant
+
+**)
+Procedure TEditorNotifier.CheckForMovement(Const iUpdateInterval: Cardinal; Const CP: TOTAEditPos);
+
+Begin
+  If (FLastMoveTickCount > 0) And (GetTickCount > FLastMoveTickCount + iUpdateInterval) Then
+    Begin
+      If doFollowEditorCursor In TBADIOptions.BADIOptions.Options Then
+        TfrmDockableModuleExplorer.FollowEditorCursor(CP.Line);
+      TBADIDocIssueHintWindow.Display(TfrmDockableModuleExplorer.DocIssueTotals);
+      FLastMoveTickCount := 0;
     End;
 End;
 
@@ -181,6 +241,7 @@ begin
   FLastParserResult := True;
   FUpdateTimer.Enabled := True;
   FLastUpdateTickCount := 1; // Cause immediate parsing of the current file.
+  FLastMoveTickCount := 0;
 end;
 
 (**
@@ -191,15 +252,16 @@ end;
   @postcon Frees the timer control.
 
 **)
-destructor TEditorNotifier.Destroy;
-begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
-  FupdateTimer.Enabled := False;
+Destructor TEditorNotifier.Destroy;
+
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming); {$ENDIF}
+  FUpdateTimer.Enabled := False;
   FUpdateTimer.OnTimer := Nil;
   FUpdateTimer.Free;
   FBADIThreadMgr.Free;
   Inherited;
-end;
+End;
 
 (**
 
@@ -243,7 +305,7 @@ Begin
   FUpdateTimer.Enabled := True;
   FLastParserResult := True;
   FLastUpdateTickCount := 1;
-  TBADIDocIssueHintWindow.Disappear;
+  FLastMoveTickCount := 1;
 End;
 
 (**
@@ -451,6 +513,7 @@ Begin
   FUpdateTimer.Enabled := True;
   FLastParserResult := True;
   FLastUpdateTickCount := 1;
+  FLastMoveTickCount := 1;
 End;
 
 (**
@@ -573,38 +636,22 @@ end;
 **)
 procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
 
-ResourceString
-  strMsg = 'The last parse of the source code failed. Do you want to re-parse the code?';
-
 Var
   Editor : IOTASourceEditor;
-  P: TOTAEditPos;
+  iUpdateInterval: Cardinal;
+  CP: TOTAEditPos;
 
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'TimerEventHandler', tmoTiming);{$ENDIF}
+  iUpdateInterval := TBADIOptions.BADIOptions.UpdateInterval;
   Editor := TBADIToolsAPIFunctions.ActiveSourceEditor;
-  P := CheckForCursorMovement(Editor);
+  CP := CheckForCursorMovement(Editor);
   CheckFileNameAndSize(Editor);
-  If (FLastUpdateTickCount > 0) And
-    (GetTickCount > FLastUpdateTickCount + TBADIOptions.BADIOptions.UpdateInterval) Then
-    Begin
-      If Assigned(Application) And Assigned(Application.MainForm) And Application.MainForm.Visible Then
-        Begin
-          FLastUpdateTickCount := 0;
-          FUpdateTimer.Enabled := False;
-          If Not FLastParserResult Then
-            Case MessageDlg(strMsg, mtWarning, [mbYes, mbNo, mbCancel], 0) Of
-              mrYes:    FLastParserResult := True;
-              mrNo:     Exit;
-              mrCancel: Abort;
-            End;
-          FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
-          If Assigned(Editor) Then
-            FModuleStatsList.ModuleStats[Editor.FileName].Update(FSource.Length);
-        End;
-    End;
-  If Not Application.Active Then
-    TBADIDocIssueHintWindow.Disappear;
+  CheckForChange(iUpdateInterval);
+  CheckForMovement(iUpdateInterval, CP);
+  If Assigned(Application) And Assigned(Application.MainForm) And Application.MainForm.Visible Then
+    If Not Application.Active Then
+      TBADIDocIssueHintWindow.Disappear;
 end;
 
 (**

@@ -131,6 +131,7 @@ ResourceString
   strDone = 'Done!';
 
 Begin
+  {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
   InitialisingMsg(strCreatingModuleExplorer);
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
@@ -179,6 +180,7 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
+  {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   TBADIIDENotifier.UninstallIDENotifier;
   UnregisterEditorChecksSubView;
   UnregisterEditorMetricsSubView;
@@ -211,6 +213,7 @@ End;
 Procedure TBrowseAndDocItWizard.Execute;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Execute', tmoTiming);{$ENDIF}
   { Do nothing, this is not called }
 End;
 
@@ -227,6 +230,7 @@ End;
 Procedure TBrowseAndDocItWizard.Focus(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Focus', tmoTiming);{$ENDIF}
   If Assigned(FBADIIDEMenuInstaller) Then
     FBADIIDEMenuInstaller.Focus(Sender);
 End;
@@ -336,6 +340,7 @@ End;
 Procedure TBrowseAndDocItWizard.OptionsChange(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OptionsChange', tmoTiming);{$ENDIF}
   If Assigned(FBADIIDEMenuInstaller) Then
     FBADIIDEMenuInstaller.OptionsChange(Sender);
 End;
@@ -355,6 +360,7 @@ End;
 Procedure TBrowseAndDocItWizard.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SelectionChange', tmoTiming);{$ENDIF}
   If Assigned(FBADIIDEMenuInstaller) Then
     FBADIIDEMenuInstaller.SelectionChange(iIdentLine, iIdentCol, iCommentLine);
 End;
@@ -372,11 +378,8 @@ End;
 Procedure TBrowseAndDocItWizard.UpdateMenuShortcuts(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateMenuShortcuts', tmoTiming);{$ENDIF}
   FBADIIDEMenuInstaller.UpdateMenuShortcuts;
 End;
 
 End.
-
-
-
-

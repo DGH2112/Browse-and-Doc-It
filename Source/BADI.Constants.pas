@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.898
-  @Date    25 Apr 2020
+  @Version 1.899
+  @Date    10 May 2020
 
   @license
 
@@ -927,7 +927,7 @@ Const
     'Errors',
     'Warnings',
     'Hints',
-    'DocConflicts',
+    'Conflicts',
     'Checks',
     'Metrics'
   );

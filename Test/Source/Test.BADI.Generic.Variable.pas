@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    24 May 2020
 
   @license
 
@@ -76,7 +76,7 @@ Begin
   CheckEquals(1, FGenericVariable.ElementCount);
   CheckEquals('1) Variable ''MyVariable'' is undocumented.', FGenericVariable.DocConflict(1));
   FGenericVariable.DeleteDocumentConflicts;
-  C := TComment.Create('This is a comment.', 0, 0);
+  C := TComment.Create('This is a comment.', 0, 0, 0);
   Try
     FGenericVariable.Comment := C;
     FGenericVariable.CheckDocumentation(boolCascade);

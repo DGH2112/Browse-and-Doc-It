@@ -4,8 +4,8 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    12 Jul 2019
+  @Version 1.011
+  @Date    24 May 2020
 
   @license
 
@@ -627,7 +627,7 @@ Begin
   For i := 0 To MD.Count - 1 Do
     If Like(MD.Names[i], Func.Identifier) Then
       Begin
-        C := TComment.Create(MD.ValueFromIndex[i], 0, 0);
+        C := TComment.Create(MD.ValueFromIndex[i], 0, 0, 0);
         Try
           strDescription := Indent(C.AsString(iMaxCommentWidth - iIndent - iCommentPadding, True),
             iIndent + iCommentPadding);
@@ -734,12 +734,15 @@ Procedure UpdateComment(Var strCommentText : String; Const Func : TGenericFuncti
     i: Integer;
 
   Begin
-    i := Func.Comment.FindTag(strTag);
-    If i > -1 Then
+    If Assigned(Func.Comment) Then
       Begin
-        strCommentText := strCommentText + OutputTag(iCommentPadding + iIndent, Func.Comment.Tag[i],
-          iMaxCommentWidth);
-        boolCon := True;
+        i := Func.Comment.FindTag(strTag);
+        If i > -1 Then
+          Begin
+            strCommentText := strCommentText + OutputTag(iCommentPadding + iIndent, Func.Comment.Tag[i],
+              iMaxCommentWidth);
+            boolCon := True;
+          End;
       End;
   End;
 

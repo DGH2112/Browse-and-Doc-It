@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    24 May 2020
 
   @license
 
@@ -57,7 +57,7 @@ Uses
 Procedure TestTTag.SetUp;
 
 Begin
-  FTag := TTag.Create('todo', 12, 23);
+  FTag := TTag.Create('todo', scNone, 12, 23);
 End;
 
 Procedure TestTTag.TearDown;

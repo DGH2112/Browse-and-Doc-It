@@ -4,8 +4,8 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.029
+  @Date    25 May 2020
 
   @license
 
@@ -82,7 +82,7 @@ Type
     Function  EndOfTokens : Boolean;
     Procedure NextNonCommentToken; Virtual;
     Procedure ProcessBodyComments;
-    Procedure RollBackToken; deprecated;
+    Procedure RollBackToken; {$IFNDEF DEBUG} deprecated; {$ENDIF DEBUG}
     Procedure PushTokenPosition;
     Procedure PopTokenPosition;
     Function  GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -315,7 +315,7 @@ var
   Cmt: TComment;
 
 begin
-  If C <> Nil Then
+  If Assigned(C) Then
     If (C.TokenCount > 0) Or (C.TagCount > 0) Then
       Begin
         If FBodyComment.Count > 0 Then
@@ -1168,7 +1168,7 @@ end;
   Process any body comments and add them to the body comment collection.
 
   @precon  None.
-  @postcon Any body comments found are processed and added tot he body comment collection.
+  @postcon Any body comments found are processed and added to the body comment collection.
 
 **)
 Procedure TBaseLanguageModule.ProcessBodyComments;

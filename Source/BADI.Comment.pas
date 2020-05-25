@@ -3,8 +3,8 @@
   This module contains a class which represents all comment in the Browse and Doc It system.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.410
+  @Date    25 May 2020
 
   @license
 
@@ -48,15 +48,15 @@ Type
       (** An enumerate to define the types of text block in the parser. **)
       TBlockType = (btNone, btHTML, btLink, btSingle, btDouble);
   Strict Private
-    FTags: TObjectList;
-    FTagMode: Boolean;
-    FLastTag: TTag;
-    FTagLine: Integer;
-    FTagColumn: Integer;
+    FTags        : TObjectList;
+    FTagMode     : Boolean;
+    FLastTag     : TTag;
+    FTokenLine   : Integer;
+    FTokenColumn : Integer;
   Strict Protected
     Function  GetTag(Const iTagIndex: Integer): TTag;
     Function  GetTagCount: Integer;
-    Procedure ParseComment(Const strComment: String);
+    Procedure ParseComment(Const strComment: String; Const iLeadingChars : Integer);
     Procedure ResetTagMode;
     Function  DetermineTokenType(Const Ch : Char;
       Const eLastToken : TBADITokenType) : TBADITokenType; InLine;
@@ -69,10 +69,13 @@ Type
     Procedure TrimStartingWhitespaceONLYIfItEndsWithALineEnd(Const ATag : TTag); InLine;
     Procedure TrimWhitespaceFromFixedTagsIfCommonOnALLLines(Const ATag : TTag); InLine;
   Public
-    Constructor Create(Const srcComment: TComment); Overload;
-    Constructor Create(Const strComment: String; Const iLine, iCol: Integer); Overload;
+    //Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+    //  iColumn : Integer); Overload; Override; 
+    Constructor Create(Const srcComment: TComment); Reintroduce; Overload; Virtual;
+    Constructor Create(Const strComment: String; Const iLine, iCol, iLeadingChars : Integer);
+      Reintroduce; Overload; Virtual;
     Destructor Destroy; Override;
-    Class Function CreateComment(Const strComment: String; Const iLine, iCol: Integer): TComment; Virtual;
+    Class Function CreateComment(Const strComment: String; Const iLine, iCol : Integer): TComment; Virtual;
     Procedure AddToken(Const strToken: String; Const iType: TBADITokenType = ttUnknown); Override;
     Procedure Assign(Const srcComment: TComment); Overload;
     Procedure Assign(Const strComment: String); Overload;
@@ -103,7 +106,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,
@@ -126,23 +129,45 @@ Uses
 **)
 Procedure TComment.AddToken(Const strToken: String; Const iType: TBADITokenType);
 
+Const
+  strDoubleAt = '@@';
+  iSecondChar = 2;
+
 Begin
-  If (strToken[1] = '@') And (Copy(strToken, 1, 2) <> '@@') Then
+  If (strToken[1] = '@') And (Copy(strToken, 1, strDoubleAt.Length) <> strDoubleAt) Then
     Begin
       FTagMode := True;
-      FLastTag := TTag.Create(Copy(strToken, 2, Length(strToken) - 1), FTagLine,
-        FTagColumn - Length(strToken));
+      FLastTag := TTag.Create(
+        Copy(strToken, iSecondChar, Length(strToken) - 1),
+        scNone,
+        FTokenLine,
+        FTokenColumn + 1
+      );
       FTags.Add(FLastTag);
     End
   Else If Not FTagMode Then
     Begin
       If Not((iType = ttWhiteSpace) And (TokenCount = 0)) Then
-        AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType));
+        AddToken(TTokenInfo.Create(
+          strToken,
+          0,
+          FTokenLine,
+          FTokenColumn,
+          Length(strToken),
+          iType
+        ));
     End
   Else
     Begin
       If Not((iType = ttWhiteSpace) And (FLastTag.TokenCount = 0) And Not FLastTag.Fixed) Then
-        FLastTag.AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType));
+        FLastTag.AddToken(TTokenInfo.Create(
+          strToken,
+          0,
+          FTokenLine,
+          FTokenColumn,
+          Length(strToken),
+          iType
+        ));
     End;
 End;
 
@@ -163,21 +188,32 @@ Var
   BC: TBADIBaseContainer;
   i: Integer;
   j: Integer;
+  T: TTag;
 
 Begin
   BC := Source;
+  // Append ofg the last tag of there are tags
   If TagCount > 0 Then
     BC := BaseCmt.Tag[TagCount - 1];
-  BC.AddToken(#32, ttWhiteSpace);
+  // Add space if last char of previous comment / tag is not a space
+  If BC.TokenCount > 0 Then
+    If Not (BC.Tokens[BC.TokenCount - 1].TokenType In [ttUnknown, ttLineEnd, ttWhiteSpace]) Then
+      BC.AddToken(#32, ttWhiteSpace);
+  // Append tokens to last comment / tag
   For i := 0 To Source.TokenCount - 1 Do
-    BC.AddToken(Source.Tokens[i].Token, Source.Tokens[i].TokenType);
+    BC.AppendToken(Source.Tokens[i]);
+  // Append new tags / tokens
   For i := 0 To Source.TagCount - 1 Do
     Begin
-      FTagLine := Source.Tag[i].Line;
-      FTagColumn := Source.Tag[i].Column + Length(Source.Tag[i].Name) + 1;
-      AddToken('@' + Source.Tag[i].Name);
+      T := TTag.Create(
+        Source.Tag[i].TagName,
+        Source.Tag[i].Scope,
+        Source.Tag[i].Line,
+        Source.Tag[i].Column
+      );
+      FTags.Add(T);
       For j := 0 To Source.Tag[i].TokenCount - 1 Do
-        AddToken(Source.Tag[i].Tokens[j].Token, Source.Tag[i].Tokens[j].TokenType);
+        T.AppendToken(Source.Tag[i].Tokens[j]);
     End;
 
 End;
@@ -200,7 +236,7 @@ Procedure TComment.Assign(Const strComment: String);
 
 Begin
   ResetTagMode;
-  ParseComment(strComment);
+  ParseComment(strComment, 0);
 End;
 
 (**
@@ -217,23 +253,31 @@ Procedure TComment.Assign(Const srcComment: TComment);
 
 Var
   i, j: Integer;
+  Tag : TTag;
 
 Begin
-  If srcComment <> Nil Then
+  If Assigned(srcComment) Then
     Begin
-      ResetTagMode;
+      ClearTokens;
+      FTags.Clear;
       Line := srcComment.Line;
       Column := srcComment.Column;
       Fixed := srcComment.Fixed;
       // Add tokens from one to the next.
       For i := 0 To srcComment.TokenCount - 1 Do
-        AddToken(srcComment.Tokens[i].Token, srcComment.Tokens[i].TokenType);
+        AppendToken(srcComment.Tokens[i]);
       // Add tags
       For i := 0 To srcComment.TagCount - 1 Do
         Begin
-          AddToken('@' + srcComment.Tag[i].TagName, ttIdentifier);
+          Tag := TTag.Create(
+            srcComment.Tag[i].TagName,
+            srcComment.Tag[i].Scope,
+            srcComment.Tag[i].Line,
+            srcComment.Tag[i].Column
+          );
+          FTags.Add(Tag);
           For j := 0 To srcComment.Tag[i].TokenCount - 1 Do
-            AddToken(srcComment.Tag[i].Tokens[j].Token, srcComment.Tag[i].Tokens[j].TokenType);
+            Tag.AppendToken(srcComment.Tag[i].Tokens[j]);
         End;
     End;
 End;
@@ -261,26 +305,27 @@ End;
 
 (**
 
-  This is the TComment constructor. It create a token list and a tag list. Then it passes the comment to
+  This is the TComment constructor. It create a token list and a tag list. Then it passes the comment to 
   the comment parser.
 
-  @precon  strComment is a string of text to be parsed as a comment, iLine is the line number of the
+  @precon  strComment is a string of text to be parsed as a comment, iLine is the line number of the 
            comment and iCol is the column number of the comment.
   @postcon It create a token list and a tag list. Then it passes the comment to the comment parser.
 
-  @param   strComment as a String as a constant
-  @param   iLine      as an Integer as a constant
-  @param   iCol       as an Integer as a constant
+  @param   strComment    as a String as a constant
+  @param   iLine         as an Integer as a constant
+  @param   iCol          as an Integer as a constant
+  @param   iLeadingChars as an Integer as a constant
 
 **)
-Constructor TComment.Create(Const strComment: String; Const iLine, iCol: Integer);
+Constructor TComment.Create(Const strComment: String; Const iLine, iCol, iLeadingChars : Integer);
 
 Begin
-  Inherited Create('', iLine, iCol);
+  Inherited Create('', scNone, iLine, iCol);
   FLastTag := Nil;
   FTags := TObjectList.Create(True);
   FTagMode := False;
-  ParseComment(strComment);
+  ParseComment(strComment, iLeadingChars);
 End;
 
 (**
@@ -297,14 +342,20 @@ Constructor TComment.Create(Const srcComment: TComment);
 
 Begin
   If srcComment <> Nil Then
-    Inherited Create('', srcComment.Line, srcComment.Column)
+    Inherited Create('', scNone, srcComment.Line, srcComment.Column)
   Else
-    Inherited Create('', 0, 0);
+    Inherited Create('', scNone, 0, 0);
   FLastTag := Nil;
   FTags := TObjectList.Create(True);
   FTagMode := False;
   Assign(srcComment);
 End;
+
+//Constructor TComment.Create(Const strName: String; Const AScope: TScope; Const iLine, iColumn: Integer);
+//
+//Begin
+//  Inherited Create(strName, AScope, iLine, iColumn);
+//End;
 
 (**
 
@@ -323,7 +374,7 @@ End;
 Class Function TComment.CreateComment(Const strComment: String; Const iLine, iCol: Integer): TComment;
 
 Begin
-  Result := Create(strComment, iLine, iCol);
+  Result := Create(strComment, iLine, iCol, 0);
 End;
 
 (**
@@ -452,17 +503,18 @@ End;
 
 (**
 
-  This method takes the given comment and parses it into tokens. It pulls out
-  all the tags at the same time. Tag should be at the end of the comment.
+  This method takes the given comment and parses it into tokens. It pulls out all the tags at the same 
+  time. Tag should be at the end of the comment.
 
   @precon  strComment is a string of text to be parsed as a comment.
-  @postcon Takes the given comment and parses it into tokens. It pulls out
-           all the tags at the same time. Tag should be at the end of the comment.
+  @postcon Takes the given comment and parses it into tokens. It pulls out all the tags at the same time
+           . Tag should be at the end of the comment.
 
-  @param   strComment as a String as a constant
+  @param   strComment    as a String as a constant
+  @param   iLeadingChars as an Integer as a constant
 
 **)
-Procedure TComment.ParseComment(Const strComment: String);
+Procedure TComment.ParseComment(Const strComment: String; Const iLeadingChars : Integer);
 
 Const
   iTokenCapacity = 25;
@@ -483,8 +535,8 @@ Begin
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
   BlockType := btNone;
-  FTagLine := Line;
-  FTagColumn := Column + 1;
+  FTokenLine := Line;
+  FTokenColumn := Column + iLeadingChars;
   LastTokenAdded := ttUnknown;
   For i := 1 To Length(strComment) Do
     Begin
@@ -495,16 +547,15 @@ Begin
           SetLength(strToken, iTokenLen);
           If iTokenLen > 0 Then
             Begin
-              If Not(IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
+              If Not (IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
                 Begin
                   AddToken(strToken, LastToken);
                   LastTokenAdded := LastToken;
-                End
-              Else
+                End Else
                 Begin
                   If Not Assigned(FLastTag) Or (Assigned(FLastTag) And Not FLastTag.Fixed) Then
                     Begin
-                      If Not(LastTokenAdded In [ttWhiteSpace, ttLineEnd]) Then
+                      If Not (LastTokenAdded In [ttWhiteSpace, ttLineEnd]) Then
                         Begin
                           AddToken(#32, ttWhiteSpace);
                           LastTokenAdded := ttWhiteSpace;
@@ -513,6 +564,8 @@ Begin
                       AddToken(strToken, LastToken);
                 End;
               LastToken := CurToken;
+              If Not IsInSet(strToken[1], strLineEnd) Then
+                Inc(FTokenColumn, Length(strToken));
             End;
           iTokenLen := 1;
           SetLength(strToken, iTokenCapacity);
@@ -529,11 +582,9 @@ Begin
       ProcessStringLiterals(CurToken, BlockType);
       If strComment[i] = #10 Then
         Begin
-          FTagColumn := Column + 1;
-          Inc(FTagLine);
-        End
-      Else
-        Inc(FTagColumn);
+          FTokenColumn := 1;
+          Inc(FTokenLine);
+        End;
     End;
   If (iTokenLen > 0) Then
     Begin
@@ -562,6 +613,9 @@ End;
 Procedure TComment.ProcessBlocks(Const strToken : String; Const iTokenIndex : Integer;
   Var eBlockType : TBlockType; Var eCurToken : TBADITokenType);
 
+Const
+  iSecondChar = 2;
+
 Begin
   If (eBlockType = btNone) And (strToken[1] = '{') Then
     eBlockType := btLink
@@ -575,7 +629,7 @@ Begin
   If (eBlockType = btHTML) And (strToken[iTokenIndex] = '>') Then
     Begin
       eBlockType := btNone;
-      If strToken[2] = '/' Then
+      If strToken[iSecondChar] = '/' Then
         eCurToken := ttHTMLEndTag
       Else
         eCurToken := ttHTMLStartTag;

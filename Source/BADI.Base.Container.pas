@@ -4,8 +4,8 @@
   the Browse and Doc It system.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.050
+  @Date    25 May 2020
 
   @license
 
@@ -47,27 +47,29 @@ Type
       TElementContainer. **)
   TBADIBaseContainer = Class Abstract
   Strict Private
-    FName : String;
-    FLine : Integer;
+    FName   : String;
+    FScope  : TScope;
+    FLine   : Integer;
     FColumn : Integer;
     FTokens : TObjectList;
-    FFixed : Boolean;
+    FFixed  : Boolean;
   Strict Protected
     Function GetTokenCount : Integer;
     Function GetTokens(Const iIndex : Integer) : TTokenInfo;
     Function GetName: String; Virtual;
     Procedure SetName(Const Value : String); Virtual;
   Public
-    Constructor Create(Const strName : String; Const iLine, iColumn  : Integer);
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer); Virtual;
     Destructor Destroy; Override;
     Procedure AddToken(Const strToken : String; Const ATokenType : TBADITokenType = ttUnknown);
       Overload; Virtual;
     Procedure AddToken(Const AToken : TTokenInfo); Overload; Virtual;
     Procedure AppendToken(Const AToken : TTokenInfo); Virtual;
     Procedure InsertToken(Const strToken : String; Const iIndex : Integer;
-      Const ATokenType : TBADITokenType = ttUnknown);
-    Procedure DeleteToken(Const iIndex : Integer);
-    Procedure ClearTokens;
+      Const ATokenType : TBADITokenType = ttUnknown); Virtual;
+    Procedure DeleteToken(Const iIndex : Integer); Virtual;
+    Procedure ClearTokens; Virtual;
     //: @nometric LongParameterList
     Function BuildStringRepresentation(Const boolIdentifier, boolForDocumentation : Boolean;
       Const strDelimiter : String; Const iMaxWidth : Integer;
@@ -103,6 +105,13 @@ Type
       @return  an Integer
     **)
     Property Column : Integer Read FColumn Write FColumn;
+    (**
+      This property returns the Scope of the element.
+      @precon  None.
+      @postcon Returns the Scope of the element.
+      @return  a TScope
+    **)
+    Property Scope : TScope Read FScope Write FScope;
     (**
       This property returns an instance of the indexed token from the
       collection.
@@ -220,6 +229,7 @@ Function TBADIBaseContainer.BuildStringRepresentation(
 
 Const
   strLFCRSpaceSpace = #13#10#32#32;
+  iTwoSpaces = 2;
 
 Var
   iToken: Integer;
@@ -264,7 +274,7 @@ Begin
               Else
                 Begin
                   Result := Result + strLFCRSpaceSpace;
-                  iLength := 2;
+                  iLength := iTwoSpaces;
                 End;
           Result := Result + T.Token;
           Inc(iLength, T.Length);
@@ -297,15 +307,18 @@ End;
   @postcon Create the token collection and initialises the Line and Column data.
 
   @param   strName as a String as a constant
+  @param   AScope  as a TScope as a constant
   @param   iLine   as an Integer as a constant
   @param   iColumn as an Integer as a constant
 
 **)
-Constructor TBADIBaseContainer.Create(Const strName : String; Const iLine, iColumn  : Integer);
+Constructor TBADIBaseContainer.Create(Const strName : String; Const AScope: TScope; Const iLine,
+  iColumn  : Integer);
 
 Begin
   FTokens := TObjectList.Create(True);
   FName := strName;
+  FScope := AScope;
   FLine := iLine;
   FColumn := iColumn;
   FFixed := False;

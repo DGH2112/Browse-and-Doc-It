@@ -3,8 +3,8 @@
   This module contains a class to represent a VB property declaration.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.002
+  @Date    24 May 2020
 
   @license
 
@@ -51,7 +51,7 @@ Type
   Public
     Constructor Create(APropertyType : TVBPropertyType; strName : String;
       AScope : TScope; iLine, iCol : Integer; iImageIndex : TBADIImageIndex;
-      AComment : TComment); Reintroduce; Virtual;
+      AComment : TComment);
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     (**

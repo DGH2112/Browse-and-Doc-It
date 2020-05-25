@@ -3,8 +3,8 @@
   This module contains a class that represents a generic method declaration.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.003
+  @Date    24 May 2020
 
   @license
 
@@ -61,7 +61,7 @@ Type
     Procedure CheckMethodReturns;
   Public
     Constructor Create(Const MethodType: TMethodType; const strName: String; Const AScope: TScope;
-      Const iLine, iCol: Integer); ReIntroduce; Virtual;
+      Const iLine, iCol: Integer); Virtual;
     Destructor Destroy; Override;
     Procedure CheckDocumentation(Var boolCascade: Boolean); Override;
     (**

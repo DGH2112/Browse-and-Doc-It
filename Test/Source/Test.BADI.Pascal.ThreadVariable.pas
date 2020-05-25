@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    24 May 2020
 
   @license
 
@@ -77,7 +77,7 @@ Begin
   CheckEquals(1, FThreadVar.ElementCount);
   CheckEquals('1) Thread variable ''MyThreadVar'' is undocumented.', FThreadVar.DocConflict(1));
   FThreadVar.DeleteDocumentConflicts;
-  C := TComment.Create('This is a comment for the threadvar.', 0, 0);
+  C := TComment.Create('This is a comment for the threadvar.', 0, 0, 0);
   Try
     FThreadVar.Comment := C;
     FThreadVar.CheckDocumentation(boolCascade);

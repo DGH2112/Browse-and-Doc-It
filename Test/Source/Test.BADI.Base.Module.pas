@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.003
-  @Date    13 Apr 2020
+  @Version 1.011
+  @Date    24 May 2020
 
   @license
 
@@ -672,14 +672,14 @@ end;
 
 procedure TestTBaseLanguageModule.TestBodyComment;
 begin
-  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0));
+  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0, 0));
   CheckEquals('Hello.', FBaseLanguageModule.BodyComment[0].AsString(99, False));
 end;
 
 procedure TestTBaseLanguageModule.TestBodyCommentCount;
 begin
   CheckEquals(0, FBaseLanguageModule.BodyCommentCount);
-  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0));
+  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0, 0));
   CheckEquals(1, FBaseLanguageModule.BodyCommentCount);
 end;
 
@@ -696,7 +696,7 @@ begin
   FBaseLanguageModule.CheckDocumentation(boolCascade);
   Checkequals('1) This module has no document comment.', FBaseLanguageModule.DocConflict(1));
   FBaseLanguageModule.DeleteDocumentConflicts;
-  C := TComment.Create('This is a description.', 0, 0);
+  C := TComment.Create('This is a description.', 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);
@@ -707,7 +707,7 @@ begin
   End;
   FBaseLanguageModule.DeleteDocumentConflicts;
   C := TComment.Create('This is a description.'#13#10 +
-    '@date ' + FormatDateTime('dd mmm yyyy', Now - 7), 0, 0);
+    '@date ' + FormatDateTime('dd mmm yyyy', Now - 7), 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);
@@ -719,7 +719,7 @@ begin
   End;
   FBaseLanguageModule.DeleteDocumentConflicts;
   C := TComment.Create('This is a description.'#13#10 +
-    '@date ' + FormatDateTime('dd mmm yyyy', Now), 0, 0);
+    '@date ' + FormatDateTime('dd mmm yyyy', Now), 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);
@@ -730,7 +730,7 @@ begin
   FBaseLanguageModule.DeleteDocumentConflicts;
   C := TComment.Create('This is a description.'#13#10 +
     '@date ' + FormatDateTime('dd mmm yyyy', Now) +#13#10+
-    '@version 1.0', 0, 0);
+    '@version 1.0', 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);
@@ -740,7 +740,7 @@ begin
   End;
   FBaseLanguageModule.DeleteDocumentConflicts;
   C := TComment.Create('This is a description.'#13#10 +
-    '@date 32 jan 2008', 0, 0);
+    '@date 32 jan 2008', 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);

@@ -3,8 +3,8 @@
   This module contains a class to represent a VB comment.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.003
+  @Date    24 May 2020
 
   @license
 
@@ -118,7 +118,7 @@ begin
                   sl.Delete(iCommentLine);
           End;
         If boolDocComment Then
-          Result := Create(sl.Text, iLine, iCol);
+          Result := Create(sl.Text, iLine, iCol, 2);
       Finally
         sl.Free;
       End;

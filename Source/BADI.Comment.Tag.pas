@@ -1,10 +1,10 @@
 (**
 
-  This module contains a class that represents a tag in a comment (@name...).
+  This module contains a class that represents a tag in a comment (@@name...).
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.189
+  @Date    25 May 2020
 
   @license
 
@@ -32,6 +32,7 @@ Unit BADI.Comment.Tag;
 Interface
 
 Uses
+  BADI.Types,
   BADI.Base.Container;
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -43,9 +44,10 @@ Type
   Strict Protected
     Function GetTagName : String;
   Public
-    Constructor Create(const strName : String; iLine, iColumn : Integer); Overload;
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer); Override;
     Destructor Destroy; Override;
-    Function AsString(iMaxWidth : Integer; boolShowHTML : Boolean) : String;
+    Function AsString(Const iMaxWidth: Integer; Const boolShowHTML: Boolean): String;
     (**
       Returns the tag name as a string.
       @precon  None.
@@ -60,30 +62,47 @@ Implementation
 
 Uses
   BADI.Functions,
-  BADI.Options,
-  BADI.Types;
+  BADI.Options;
 
+(**
+
+  This method returns all the tags tokens as a string with spaces in between.
+
+  @precon  ShowHTML determines of the routine output the HTML tags in the resulting string.
+  @postcon Returns a string representation of the tag.
+
+  @param   iMaxWidth    as an Integer as a constant
+  @param   boolShowHTML as a Boolean as a constant
+  @return  a String
+
+**)
+Function TTag.AsString(Const iMaxWidth: Integer; Const boolShowHTML: Boolean): String;
+
+Begin
+  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML, Fixed);
+End;
 
 (**
 
   This is the TTag class`s constructor method. It creates the token list.
 
-  @precon  strName is the name of the new tag to be created, iLine is the line
-           number of the tag and iColumn is the column position of the tag.
+  @precon  strName is the name of the new tag to be created, iLine is the line number of the tag and 
+           iColumn is the column position of the tag.
   @postcon Initialises the comment tag class.
 
   @param   strName as a String as a constant
-  @param   iLine   as an Integer
-  @param   iColumn as an Integer
+  @param   AScope  as a TScope as a constant
+  @param   iLine   as an Integer as a constant
+  @param   iColumn as an Integer as a constant
 
 **)
-Constructor TTag.Create(const strName: String; iLine, iColumn: Integer);
+Constructor TTag.Create(const strName: String; Const AScope : TScope; Const iLine, iColumn : Integer);
 
 Var
   iTag: Integer;
 
 Begin
-  Inherited Create(strName, iLine, iColumn);
+  Inherited Create(strName, AScope, iLine, iColumn);
   For iTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
     If strName = TBADIOptions.BADIOptions.SpecialTags[iTag].FName Then
       Begin
@@ -120,25 +139,6 @@ Function TTag.GetTagName: String;
 
 Begin
   Result := Identifier;
-End;
-
-(**
-
-  This method returns all the tags tokens as a string with spaces in between.
-
-  @precon  ShowHTML determines of the routine output the HTML tags in the
-           resulting string.
-  @postcon Returns a string representation of the tag.
-
-  @param   iMaxWidth    as an Integer
-  @param   boolShowHTML as a Boolean
-  @return  a String
-
-**)
-Function TTag.AsString(iMaxWidth: Integer; boolShowHTML: Boolean): String;
-
-Begin
-  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML, Fixed);
 End;
 
 End.

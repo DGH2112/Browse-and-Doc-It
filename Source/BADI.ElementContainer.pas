@@ -4,8 +4,8 @@
   and a label container for tree view headers adn the like.
 
   @Author  David Hoyle
-  @Version 1.11
-  @Date    19 Jan 2020
+  @Version 1.168
+  @Date    24 May 2020
 
   @license
 
@@ -55,7 +55,6 @@ Type
   Strict Private
     FElements : TObjectList;
     FComment : TComment;
-    FScope : TScope;
     FImageIndex : TBADIImageIndex;
     FSorted  : Boolean;
     FReferenced : Boolean;
@@ -99,7 +98,8 @@ Type
     Property BADIOptions : IBADIOptions Read FBADIOptions;
   Public
     Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
-      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Virtual;
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); 
+        Reintroduce; overload; Virtual;
     Destructor Destroy; Override;
     //: @nowarnings
     Function  Add(Const AElement : TElementContainer) : TElementContainer; Overload; Virtual;
@@ -157,13 +157,6 @@ Type
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
-    (**
-      This property returns the Scope of the element.
-      @precon  None.
-      @postcon Returns the Scope of the element.
-      @return  a TScope
-    **)
-    Property Scope : TScope Read FScope Write FScope;
     (**
       This property returns the Image Index of the element.
       @precon  None.
@@ -726,7 +719,7 @@ Var
 
 Begin
   Name := Source.Name;
-  FScope := Source.FScope;
+  Scope := Source.Scope;
   Line := Source.Line;
   Column := Source.Column;
   FComment := Source.Comment;
@@ -1124,10 +1117,9 @@ Constructor TElementContainer.Create(Const strName: String; Const AScope: TScope
   Const iLine, iColumn: Integer; Const AImageIndex: TBADIImageIndex; Const AComment: TComment);
 
 Begin
-  Inherited Create(strName, iLine, iColumn);
+  Inherited Create(strName, AScope, iLine, iColumn);
   FElements := TObjectList.Create(True);
   FComment := AComment;
-  FScope := AScope;
   FImageIndex := AImageIndex;
   FSorted := True;
   FReferenced := False;
@@ -1434,7 +1426,7 @@ End;
 Function TElementContainer.GetImageIndexAdjustedForScope: Integer;
 
 Begin
-  Result := BADIImageIndex(FImageIndex, FScope);
+  Result := BADIImageIndex(FImageIndex, Scope);
 End;
 
 (**

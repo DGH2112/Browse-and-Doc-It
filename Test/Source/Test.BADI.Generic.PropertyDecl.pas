@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.004
+  @Date    24 May 2020
 
   @license
 
@@ -134,7 +134,7 @@ Begin
       FGenericProperty.DocConflict(1));
     FGenericProperty.DeleteDocumentConflicts;
     C := TComment.Create(
-      '', 0, 0);
+      '', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -145,7 +145,7 @@ Begin
     End;
     FGenericProperty.DeleteDocumentConflicts;
     C := TComment.Create(
-      'This is a description.', 0, 0);
+      'This is a description.', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -168,7 +168,7 @@ Begin
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a Boolean', 0, 0);
+      '  @return  a Boolean', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -187,7 +187,7 @@ Begin
       '  @param   Param1 as a String'#13#10 +
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
-      '  @param   Param4 as a Double as an out parameter', 0, 0);
+      '  @param   Param4 as a Double as an out parameter', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -206,7 +206,7 @@ Begin
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a String', 0, 0);
+      '  @return  a String', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -224,7 +224,7 @@ Begin
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a Boolean', 0, 0);
+      '  @return  a Boolean', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -243,7 +243,7 @@ Begin
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a Boolean', 0, 0);
+      '  @return  a Boolean', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -262,7 +262,7 @@ Begin
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a Boolean', 0, 0);
+      '  @return  a Boolean', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -280,7 +280,7 @@ Begin
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a Boolean', 0, 0);
+      '  @return  a Boolean', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -300,7 +300,7 @@ Begin
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a Boolean', 0, 0);
+      '  @return  a Boolean', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
@@ -320,7 +320,7 @@ Begin
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a Boolean', 0, 0);
+      '  @return  a Boolean', 0, 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);

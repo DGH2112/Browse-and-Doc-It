@@ -3,8 +3,8 @@
   This module contains a class the presentat a generic parameter.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.003
+  @Date    24 May 2020
 
   @license
 
@@ -49,7 +49,6 @@ Type
   Public
     Constructor Create(ParamMod: TParamModifier; const Ident: String; boolArrayOf: Boolean;
       AType: TGenericTypeDecl; const Value: String; AScope: TScope; iLine, iCol: Integer);
-      ReIntroduce; Overload;
     Destructor Destroy; Override;
     Function IsEquals(Parameter: TGenericParameter): Boolean; Virtual;
     (**

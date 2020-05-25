@@ -5,8 +5,8 @@
   @note       This unit ONLY tokenizes C++ at the moment - the parser HAS NOT BEEN WRITTEN!
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    17 Aug 2019
+  @Version 1.003
+  @Date    24 May 2020
 
   @license
 
@@ -1120,7 +1120,7 @@ begin
               If (IsInSet(strText[1], [':', '*'])) Then
                 Begin;
                   strText := Copy(strText, 2, Length(strText) - 1);
-                  Result := Create(strText, iLine, iCol);
+                  Result := Create(strText, iLine, iCol, 3);
                 End;
             End;
         End;

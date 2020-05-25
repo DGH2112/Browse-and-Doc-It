@@ -3,8 +3,8 @@
   This module contains class to represent document issues and conflicts.
 
   @Author  David Hoyle
-  @Version 1.1
-  @Date    19 Jan 2020
+  @Version 1.106
+  @Date    25 May 2020
 
   @license
 
@@ -53,7 +53,7 @@ Type
     Property Msg : String Read FMsg;
   Public
     Constructor Create(Const strMsg: String; Const AScope: TScope; Const iLine, iCol: Integer;
-      Const eErrorType : TErrorType); Reintroduce; Overload;
+      Const eErrorType : TErrorType);
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property returns the error type of the issue.
@@ -75,7 +75,7 @@ Type
     //: @nometric LongParameterList
     Constructor Create(Const Args: Array Of Const; Const iIdentLine, iIdentColumn, iCommentLine,
       iCommentCol : Integer; Const strDocConflictMsg, strDocConflictDesc : String;
-      Const AImageIndex : TBADIImageIndex; Const eConflictType : TBADIConflictType); ReIntroduce;
+      Const AImageIndex : TBADIImageIndex; Const eConflictType : TBADIConflictType);
     Destructor Destroy; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
@@ -204,7 +204,7 @@ End;
   @precon  None.
   @postcon Initialises the Conflict class.
 
-  @nometricLongParameterList
+  @nometric LongParameterList
 
   @param   Args               as an Array Of Const as a constant
   @param   iIdentLine         as an Integer as a constant
@@ -235,7 +235,7 @@ Begin
     FMessage := strDocConflictMsg;
   FCommentLine := iCommentLine;
   FCommentColumn := iCommentCol;
-  Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol);
+  Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol, 0);
 End;
 
 (**

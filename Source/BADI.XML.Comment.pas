@@ -3,8 +3,8 @@
   This module contains a class to represent an XML Comment.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.002
+  @Date    24 May 2020
 
   @license
 
@@ -86,12 +86,12 @@ begin //: @note Not currently configured or used.
               If strText[1] = ':' Then
                 Begin;
                   strText := Copy(strText, iSecondChar, Length(strText) - 1);
-                  Result := Create(strText, iLine, iCol);
+                  Result := Create(strText, iLine, iCol, 3);
                 End
               Else If strText[1] = '*' Then
                 Begin;
                   strText := Copy(strText, iSecondChar, Length(strText) - iSecondChar);
-                  Result := Create(strText, iLine, iCol);
+                  Result := Create(strText, iLine, iCol, 3);
                 End;
             End;
         End;

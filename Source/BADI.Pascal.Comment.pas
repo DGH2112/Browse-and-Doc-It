@@ -3,8 +3,8 @@
   This module contains an Object Pascal specific comment implementation.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.072
+  @Date    25 May 2020
 
   @license
 
@@ -71,19 +71,34 @@ Const
   iSecondChar = 2;
   iThirdChar = 3;
   iFourthChar = 4;
-  
+  iOffsetInc = 2;
+
 Var
   strText: String;
+  iColOffset : Integer;
 
 Begin
   Result := Nil;
+  iColOffset := 0;
   strText := strComment;
   If Length(strText) > 0 Then
     Begin
       Case strText[1] Of
-        '/': strText := Copy(strText, iThirdChar, Length(strText) - iSecondChar);
-        '{': strText := Copy(strText, iSecondChar, Length(strText) - iSecondChar);
-        '(': strText := Copy(strText, iThirdChar, Length(strText) - iFourthChar);
+        '/':
+          Begin
+            strText := Copy(strText, iThirdChar, Length(strText) - iSecondChar);
+            Inc(iColOffset, iOffsetInc);
+          End;
+        '{':
+          Begin
+            strText := Copy(strText, iSecondChar, Length(strText) - iSecondChar);
+            Inc(iColOffset);
+          End;
+        '(':
+          Begin
+            strText := Copy(strText, iThirdChar, Length(strText) - iFourthChar);
+            Inc(iColOffset, iOffsetInc);
+          End;
       End;
       If Length(strText) > 0 Then
         Begin
@@ -94,7 +109,8 @@ Begin
               If (IsInSet(strText[1], [':', '*'])) Then
                 Begin;
                   strText := Copy(strText, iSecondChar, Length(strText) - 1);
-                  Result := Create(strText, iLine, iCol);
+                  Inc(iColOffset);
+                  Result := Create(strText, iLine, iCol, iColOffset);
                 End;
             End;
         End;

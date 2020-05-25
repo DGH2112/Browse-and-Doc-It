@@ -3,8 +3,8 @@
   This module contains a class to represent a Backus-Naur comment.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.047
+  @Date    24 May 2020
 
   @license
 
@@ -40,11 +40,13 @@ Type
   (** A pascal specific implementation of comments. **)
   TBackusNaurComment = Class(TComment)
   Public
-    Class Function CreateComment(Const strComment: String; Const iLine,
-      iCol: Integer): TComment; Override;
+    Class Function CreateComment(Const strComment: String; Const iLine, iCol : Integer): TComment; Override;
   End;
 
 Implementation
+
+Uses
+  BADI.Types;
 
 (**
 
@@ -61,8 +63,7 @@ Implementation
   @return  a TComment
 
 **)
-Class Function TBackusNaurComment.CreateComment(Const strComment: String; Const iLine,
-  iCol: Integer): TComment;
+Class Function TBackusNaurComment.CreateComment(Const strComment: String; Const iLine, iCol : Integer): TComment;
 
 Var
   strText: String;
@@ -88,12 +89,12 @@ Begin
                   If strText[1] = ':' Then
                     Begin;
                       strText := Copy(strText, 2, Length(strText) - 1);
-                      Result := Create(strText, iLine, iCol);
+                      Result := Create(strText, iLine, iCol, 3);
                     End
                   Else If strText[1] = '*' Then
                     Begin;
                       strText := Copy(strText, 2, Length(strText) - 2);
-                      Result := Create(strText, iLine, iCol);
+                      Result := Create(strText, iLine, iCol, 3);
                     End;
                 End;
             End;

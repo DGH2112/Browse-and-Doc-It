@@ -68,6 +68,7 @@
         <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
         <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Library (LIVE)\FastMM;$(BDSPROJECTSDIR)\Binaries\CS5\Lib\RX10.3\Win32;$(BDSPROJECTSDIR)\Binaries\TestInsight\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_Warnings>error</DCC_Warnings>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <VerInfo_Release>0</VerInfo_Release>
@@ -112,6 +113,7 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.10.2626;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_Warnings>error</DCC_Warnings>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -366,15 +368,15 @@
                 <Platform value="Win32">True</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="BrowseAndDocItTests.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>BrowseAndDocItTests.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="BrowseAndDocItTests.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>BrowseAndDocItTests.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

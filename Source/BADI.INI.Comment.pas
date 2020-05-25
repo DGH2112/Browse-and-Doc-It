@@ -3,8 +3,8 @@
   This module contains a class to represent an INI comment.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.006
+  @Date    24 May 2020
 
   @license
 
@@ -45,6 +45,9 @@ Type
   End;
 
 Implementation
+
+Uses
+  BADI.Types;
 
 (**
 
@@ -90,12 +93,12 @@ Begin //: @note Not currently configured or used.
               If strText[1] = ':' Then
                 Begin;
                   strText := Copy(strText, iSecondChar, Length(strText) - 1);
-                  Result     := Create(strText, iLine, iCol);
+                  Result     := Create(strText, scNone, iLine, iCol);
                 End
               Else If strText[1] = '*' Then
                 Begin;
                   strText := Copy(strText, iSecondChar, Length(strText) - iSecondChar);
-                  Result     := Create(strText, iLine, iCol);
+                  Result     := Create(strText, iLine, iCol, 3);
                 End;
             End;
         End;

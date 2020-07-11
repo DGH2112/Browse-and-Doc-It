@@ -3,8 +3,8 @@
   This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 5.159
-  @Date    09 May 2020
+  @Version 5.164
+  @Date    17 Jun 2020
   
   @license
 
@@ -319,7 +319,7 @@ Procedure TBADIEditViewNotifier.EndPaint(Const View: IOTAEditView);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EndPaint', tmoTiming);{$ENDIF}
-  If FFullRepaint And Application.MainForm.Visible Then
+  If FFullRepaint And Application.MainForm.Visible And (Application.MainForm.WindowState <> wsMinimized) Then
     TBADIDocIssueHintWindow.Display(TfrmDockableModuleExplorer.DocIssueTotals);
   FFullRepaint := False;
 End;

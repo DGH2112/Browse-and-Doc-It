@@ -3,8 +3,8 @@
   This module contains an interfaced class which manages module notifier indexes using their filenames.
 
   @Author  David Hoyle
-  @Version 1.013
-  @Date    09 May 2020
+  @Version 1.293
+  @Date    09 Jul 2020
 
   @license
 
@@ -70,7 +70,7 @@ Type
     Procedure Add(Const strFileName : String; Const iIndex : Integer);
     Function  Remove(Const strFileName: String): Integer;
     Procedure Rename(Const strOldFileName: String; Const strNewFileName: String);
-    Function Find(Const strFileName : String; Var iIndex : Integer) : Boolean;
+    Function  Find(Const strFileName : String; Var iIndex : Integer) : Boolean;
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -86,14 +86,14 @@ Uses
 
 (**
 
-  This is a constructor for the TModNotRec record which describes the attributes
-  to be stored for each module / project / form notifier registered.
+  This is a constructor for the TModNotRec record which describes the attributes to be stored for each 
+  module / project / form notifier registered.
 
   @precon  None.
   @postcon Initialises the record.
 
-  @param   strFileName   as a String as a constant
-  @param   iIndex        as an Integer as a constant
+  @param   strFileName  as a String as a constant
+  @param   iIndex       as an Integer as a constant
 
 **)
 Constructor TBADIModuleNotifierList.TModuleNotifierRec.Create(Const strFileName: String;
@@ -112,8 +112,8 @@ End;
   @precon  None.
   @postcon The modules filename and index is added to the list.
 
-  @param   strFileName as a String as a constant
-  @param   iIndex      as an Integer as a constant
+  @param   strFileName  as a String as a constant
+  @param   iIndex       as an Integer as a constant
 
 **)
 Procedure TBADIModuleNotifierList.Add(Const strFileName: String; Const iIndex: Integer);
@@ -148,7 +148,7 @@ End;
 **)
 Destructor TBADIModuleNotifierList.Destroy;
 
-ResourceString
+Const
   strDestroyOrphanedModuleNotifier = 'TBADIModuleNotifierList.Destroy(Orphaned Module Notifier): %s';
 
 Var
@@ -212,7 +212,7 @@ End;
   @precon  None.
   @postcon The named file is removed from the notifier list if found.
 
-  @param   strFileName as a String as a constant
+  @param   strFileName  as a String as a constant
   @return  an Integer
 
 **)
@@ -262,4 +262,3 @@ Begin
 End;
 
 End.
-

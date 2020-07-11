@@ -4,8 +4,8 @@
   change of a module.
 
   @Author  David Hoyle
-  @Version 2.054
-  @Date    09 May 2020
+  @Version 2.164
+  @Date    09 Jul 2020
   
   @license
 
@@ -45,7 +45,7 @@ Type
   Strict Protected
     Procedure Reset();
     Function  SizeChange: Int64;
-    Procedure Update(Const iSize: Int64);
+    Procedure Update(Const iSize, iModifiedCount: Int64);
     Procedure Rename(Const strFileName : String);
   Public
     Constructor Create(Const strFileName : String);
@@ -59,8 +59,6 @@ Uses
   CodeSiteLogging,
   {$ENDIF DEBUG}
   SysUtils;
-
-{$DEFINE CODESITE}
 
 (**
 
@@ -96,6 +94,16 @@ Begin
   Inherited;
 End;
 
+(**
+
+  This method updates the internal filename to that given.
+
+  @precon  None.
+  @postcon The internal filenam eis updated to reflect strFileName.
+
+  @param   strFileName as a String as a constant
+
+**)
 Procedure TBADIModuleStats.Rename(Const strFileName: String);
 
 Begin
@@ -132,9 +140,9 @@ Function TBADIModuleStats.SizeChange: Int64;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SizeChange', tmoTiming);{$ENDIF}
   Result := FSizeDelta;
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSite.SendFmtMsg(csmNote, 'Filename: %s, Size: %1.0n', [ExtractFileName(FFilename), Int(Result)]);
-  {$ENDIF}
+  {$ENDIF DEBUG}
 End;
 
 (**
@@ -145,19 +153,28 @@ End;
   @precon  None.
   @postcon The size and size delta are updated.
 
-  @param   iSize as an Int64 as a constant
+  @param   iSize          as an Int64 as a constant
+  @param   iModifiedCount as an Int64 as a constant
 
 **)
-Procedure TBADIModuleStats.Update(Const iSize: Int64);
+Procedure TBADIModuleStats.Update(Const iSize, iModifiedCount: Int64);
+
+Var
+  iDelta: Int64;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Update', tmoTiming);{$ENDIF}
   If FSize > -1 Then
-    Inc(FSizeDelta, Abs(FSize - iSize));
-  {$IFDEF CODESITE}
+    Begin
+      iDelta := Abs(FSize - iSize);
+      Inc(FSizeDelta, iDelta);
+      If (iDelta = 0) And (iModifiedCount > 0) Then
+        Inc(FSizeDelta);
+    End;
+  {$IFDEF DEBUG}
   CodeSite.SendFmtMsg(csmNote, 'Filename: %s, Old Size: %1.0n, New Size: %1.0n, Delta: %1.0n', [
     ExtractFileName(FFileName), Int(FSize), Int(iSize), Int(FSizeDelta)]);
-  {$ENDIF}
+  {$ENDIF DEBUG}
   FSize := iSize;
 End;
 

@@ -2,9 +2,9 @@
 
   This module contains a frame for editing the BADI special tags.
 
-  @Version 1.284
+  @Version 1.286
   @Author  David Hoyle
-  @Date    13 Apr 2020
+  @Date    27 May 2020
 
   @license
 
@@ -83,7 +83,7 @@ Type
     Procedure vstSpecialTagsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     Procedure vstSpecialTagsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean; Var ImageIndex: TImageIndex);
+      Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean; Var ImageIndex: UITypes.TImageIndex);
   Strict Private
     FSpecialTags    : TList<TBADISpecialTag>;
     FVSTSpecialTags : TBADISpecialTagsOptionsVirtualStringTree;
@@ -610,7 +610,7 @@ End;
 **)
 Procedure TfmBADISpecialTagsFrame.vstSpecialTagsGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean;
-  Var ImageIndex: TImageIndex);
+  Var ImageIndex: UITypes.TImageIndex);
 
 Var
   NodeData : PSpecialTagNodeData;

@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 2.103
-  @Date    24 May 2020
+  @Version 2.120
+  @Date    09 Jul 2020
 
   @license
 
@@ -139,6 +139,7 @@ ResourceString
   strMsg = 'The last parse of the source code failed. Do you want to re-parse the code?';
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckForChange', tmoTiming);{$ENDIF}
   If (FLastUpdateTickCount > 0) And (GetTickCount > FLastUpdateTickCount + iUpdateInterval) Then
     Begin
       If Assigned(Application) And Assigned(Application.MainForm) And Application.MainForm.Visible Then
@@ -206,6 +207,7 @@ End;
 Procedure TEditorNotifier.CheckForMovement(Const iUpdateInterval: Cardinal; Const CP: TOTAEditPos);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckForMovement', tmoTiming);{$ENDIF}
   If (FLastMoveTickCount > 0) And (GetTickCount > FLastMoveTickCount + iUpdateInterval) Then
     Begin
       If doFollowEditorCursor In TBADIOptions.BADIOptions.Options Then
@@ -255,7 +257,7 @@ end;
 Destructor TEditorNotifier.Destroy;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming); {$ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   FUpdateTimer.Enabled := False;
   FUpdateTimer.OnTimer := Nil;
   FUpdateTimer.Free;
@@ -301,7 +303,7 @@ end;
 Procedure TEditorNotifier.DockFormUpdated(Const EditWindow: INTAEditWindow; DockForm: TDockableForm);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DockFormUpdated', tmoTiming); {$ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DockFormUpdated', tmoTiming);{$ENDIF}
   FUpdateTimer.Enabled := True;
   FLastParserResult := True;
   FLastUpdateTickCount := 1;
@@ -713,7 +715,7 @@ end;
 Procedure TEditorNotifier.WindowNotification(Const EditWindow: INTAEditWindow; Operation: TOperation);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowNotification', tmoTiming); {$ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowNotification', tmoTiming);{$ENDIF}
 End;
 
 (**
@@ -738,3 +740,4 @@ begin
 end;
 
 End.
+

@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.440
-  @Date    24 May 2020
+  @Version 1.694
+  @Date    09 Jul 2020
 
   @license
 
@@ -474,7 +474,7 @@ Type
       file. **)
   IBADIModuleStats = Interface
   ['{525A3C3C-AB11-48C4-835D-ADA5A88B848C}']
-    Procedure Update(Const iSize : Int64);
+    Procedure Update(Const iSize, iModifiedCount : Int64);
     Function  SizeChange : Int64;
     Procedure Reset();
     Procedure Rename(Const strFileName : String);
@@ -564,7 +564,7 @@ Type
     **)
     Property Totals : TDictionary<String, TBADITotalInfo> Read GetTotals;
   End;
-  
+
 Implementation
 
 End.

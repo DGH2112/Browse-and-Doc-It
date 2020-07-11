@@ -4,14 +4,14 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 2.191
-  @Date    23 May 2020
+  @Version 6.755
+  @Date    09 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
-    
+
     Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
@@ -49,6 +49,7 @@ Type
     FModuleDateTime       : TRegEx;
     FModuleVersion        : TRegEx;
     FLastUpdatedTickCount : Cardinal;
+    FModifiedCount        : Integer;
   Strict Protected
     // IOTAModuleNotifier
     Procedure AfterSave;
@@ -68,11 +69,12 @@ Type
     // General Methods
     procedure UpdateDateTimeAndVersion;
     Function  ModuleSource : String;
-    Procedure OutputMsg(Const strMsg : String);
+    Procedure OutputMsg(Const strMsg: String; Const iLine, iColumn : Integer);
     Procedure CheckForLastSecondUpdates;
-    Procedure UpdateModuleVersion(Const Match : TMatch);
-    Procedure UpdateModuleDate(Const Match : TMatch);
+    Procedure UpdateModuleVersion(Const strComment : String; Const Match : TMatch; Var iLine, iColumn : Integer);
+    Procedure UpdateModuleDate(Const strComment : String; Const Match : TMatch; Var iLine, iColumn : Integer);
     Procedure OutputSource(Const strText : String; Const iOffset, iLength : Integer);
+    Procedure LineAndColumn(Const strText : String; Const iIndex : Integer; Var iLine, iColumn: Integer);
     // Properties
     (**
       This property provides access to the ModuleRenameEvent.
@@ -115,6 +117,7 @@ Uses
   @precon  None.
   @postcon Updated the internal filename.
 
+  @nocheck EmptyMethod
   @nohint  OldFileName NewFileName
 
   @param   OldFileName as a String as a constant
@@ -166,7 +169,7 @@ End;
   @precon  None.
   @postcon Not Used.
 
-  @nocheck EmptyMethod 
+  @nocheck EmptyMethod
   @nohint  OldFileName NewFileName
 
   @param   OldFileName as a String as a constant
@@ -208,10 +211,11 @@ Procedure TBADIModuleNotifier.CheckForLastSecondUpdates;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckForLastSecondUpdates', tmoTiming);{$ENDIF}
-  If (FLastUpdatedTickCount > 0) And (FLastUpdatedTickCount <> GetTickCount) Then
+  If ((FLastUpdatedTickCount > 0) And (FLastUpdatedTickCount <> GetTickCount)) Or (FModifiedCount > 0) Then
     Begin
-      FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length);
+      FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length, FModifiedCount);
       FLastUpdatedTickCount := 0;
+      FModifiedCount := 0;
     End;
 End;
 
@@ -259,8 +263,9 @@ Begin
   FModuleHeader := TRegEx.Create(strModuleHeaderRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
   FModuleDateTime := TRegEx.Create(strDateRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
   FModuleVersion := TRegEx.Create(strVersionRegEx, [roIgnoreCase, roSingleLine, roCompiled]);
-  FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length);
+  FModuleStatsList.ModuleStats[FFileName].Update(ModuleSource.Length, 0);
   FLastUpdatedTickCount := 0;
+  FModifiedCount := 0;
 End;
 
 (**
@@ -335,6 +340,39 @@ End;
 
 (**
 
+  This method increments the determines the line anc column of the index position into the given text.
+
+  @precon  Line and Column are the position of the start of the given text.
+  @postcon The Line and Column of the index into the string are returned through the var parameters.
+
+  @param   strText as a String as a constant
+  @param   iIndex  as an Integer as a constant
+  @param   iLine   as an Integer as a reference
+  @param   iColumn as an Integer as a reference
+
+**)
+Procedure TBADIModuleNotifier.LineAndColumn(Const strText : String; Const iIndex : Integer; Var iLine,
+  iColumn: Integer);
+
+Var
+  i : Integer;
+
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LineAndColumn', tmoTiming);{$ENDIF}
+  For i := 1 To Min(strText.Length, iIndex - 1) Do
+    Case strText[i] Of
+      #10:
+        Begin
+          Inc(iLine);
+          iColumn := 1;
+        End;
+    Else
+      Inc(iColumn);
+    End;
+End;
+
+(**
+
   This method is called when a module is modified.
 
   @precon  None.
@@ -350,6 +388,7 @@ Const
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Modified', tmoTiming);{$ENDIF}
+  Inc(FModifiedCount);
   If (FLastUpdatedTickCount > 0) And (GetTickCount - FLastUpdatedTickCount >= iUpdateInterval) Then
     CheckForLastSecondUpdates
   Else
@@ -390,7 +429,7 @@ Var
   MS : IOTAModuleServices;
   M: IOTAModule;
   SE: IOTASourceEditor;
-  
+
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleSource', tmoTiming);{$ENDIF}
   Result := '';
@@ -413,10 +452,12 @@ End;
   @precon  None.
   @postcon A message is output to the IDEs message window.
 
-  @param   strMsg as a String as a constant
+  @param   strMsg  as a String as a constant
+  @param   iLine   as an Integer as a constant
+  @param   iColumn as an Integer as a constant
 
 **)
-Procedure TBADIModuleNotifier.OutputMsg(Const strMsg: String);
+Procedure TBADIModuleNotifier.OutputMsg(Const strMsg: String; Const iLine, iColumn : Integer);
 
 Const
   strBADI = 'BADI';
@@ -434,8 +475,8 @@ Begin
       FFileName,
       strMsg,
       strBADI,
-      1,
-      1
+      iLine,
+      iColumn
     );
 End;
 
@@ -459,7 +500,7 @@ Var
   M: IOTAModule;
   SE: IOTASourceEditor;
   Writer: IOTAEditWriter;
-  
+
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OutputSource', tmoTiming);{$ENDIF}
   If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
@@ -472,7 +513,7 @@ Begin
             Begin
               Writer := SE.CreateUndoableWriter;
               Writer.CopyTo(iOffset);
-              Writer.DeleteTo(iOffset + iLength);
+              Writer.DeleteTo(iOffset + iLength); //: @bug IDE AVs here IF editor is closed while modified
               Writer.Insert(PAnsiChar(UTF8Encode(strText)));
             End;
         End;
@@ -516,31 +557,38 @@ Var
   MHMC: TMatchCollection;
   strHeaderComment: String;
   MM: TMatch;
+  iLine, iColumn : Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateDateTimeAndVersion', tmoTiming);{$ENDIF}
+  iLine := 1;
+  iColumn := 1;
   If doAutoUpdateModuleVersion In TBADIOptions.BADIOptions.Options Then
     Begin
       strSource := ModuleSource;
       MHMC := FModuleHeader.Matches(strSource);
       If MHMC.Count > 0 Then
         Begin
+          LineAndColumn(strSource, MHMC.Item[0].Groups[0].Index, iLine, iColumn);
           strHeaderComment := MHMC.Item[0].Groups[0].Value;
           MM := FModuleVersion.Match(strHeaderComment);
-          UpdateModuleVersion(MM);
+          UpdateModuleVersion(strHeaderComment, MM, iLine, iColumn);
         End;
     End;
+  iLine := 1;
+  iColumn := 1;
   If doAutoUpdateModuleVersion In TBADIOptions.BADIOptions.Options Then
     Begin
       strSource := ModuleSource;
       MHMC := FModuleHeader.Matches(strSource);
       If MHMC.Count > 0 Then
         Begin
+          LineAndColumn(strSource, MHMC.Item[0].Groups[0].Index, iLine, iColumn);
           strHeaderComment := MHMC.Item[0].Groups[0].Value;
           MM := FModuleDateTime.Match(strHeaderComment);
-          UpdateModuleDate(MM);
+          UpdateModuleDate(strHeaderComment, MM, iLine, iColumn);
         End Else
-          OutputMsg(strNoModuleComment);
+          OutputMsg(strNoModuleComment, 1, 1);
     End;
 End;
 
@@ -551,10 +599,14 @@ End;
   @precon  None.
   @postcon The module date is updated if the existing date is valid.
 
-  @param   Match as a TMatch as a constant
+  @param   strComment as a String as a constant
+  @param   Match      as a TMatch as a constant
+  @param   iLine      as an Integer as a reference
+  @param   iColumn    as an Integer as a reference
 
 **)
-Procedure TBADIModuleNotifier.UpdateModuleDate(Const Match : TMatch);
+Procedure TBADIModuleNotifier.UpdateModuleDate(Const strComment : String; Const Match : TMatch;
+  Var iLine, iColumn : Integer);
 
 ResourceString
   strModuleDateUpdated = 'Module date updated from %s to %s.';
@@ -569,6 +621,7 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateModuleDate', tmoTiming);{$ENDIF}
   If Match.Success Then
     Begin
+      LineAndColumn(strComment, Match.Groups[1].Index, iLine, iColumn);
       strDate := Match.Groups[1].Value;
       Try
         dtDate := ConvertDate(strDate);
@@ -580,11 +633,11 @@ Begin
               Match.Groups[1].Index - 1,
               Match.Groups[1].Length
             );
-            OutputMsg(Format(strModuleDateUpdated, [strDate, strNewDate]));
+            OutputMsg(Format(strModuleDateUpdated, [strDate, strNewDate]), iLine, iColumn);
           End;
       Except
         On E : EBADIParserError Do
-          OutputMsg(Format(strNotValidDate, [strDate]));
+          OutputMsg(Format(strNotValidDate, [strDate]), iLine, iColumn);
       End;
     End;
 End;
@@ -596,10 +649,14 @@ End;
   @precon  None.
   @postcon The module version number is updated if the existing version number is valid.
 
-  @param   Match as a TMatch as a constant
+  @param   strComment as a String as a constant
+  @param   Match      as a TMatch as a constant
+  @param   iLine      as an Integer as a reference
+  @param   iColumn    as an Integer as a reference
 
 **)
-Procedure TBADIModuleNotifier.UpdateModuleVersion(Const Match : TMatch);
+Procedure TBADIModuleNotifier.UpdateModuleVersion(Const strComment : String; Const Match : TMatch;
+  Var iLine, iColumn : Integer);
 
 ResourceString
   strVerIncremented = 'Module version number incremented from %s to %s!';
@@ -619,6 +676,7 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateModuleVersion', tmoTiming);{$ENDIF}
   If Match.Success Then
     Begin
+      LineAndColumn(strComment, Match.Groups[1].Index, iLine, iColumn);
       strVersion := Match.Groups[1].Value;
       Val(strVersion, dblVersion, iErrorCode);
       If iErrorCode = 0 Then
@@ -634,14 +692,13 @@ Begin
             Match.Groups[1].Index - 1,
             Match.Groups[1].Length
           );
-          OutputMsg(Format(strVerIncremented, [strVersion, strNewVersion]));
+          OutputMsg(Format(strVerIncremented, [strVersion, strNewVersion]), iLine, iColumn);
         End Else
-          OutputMsg(Format(strNotValidVerNum, [strVersion]));
+          OutputMsg(Format(strNotValidVerNum, [strVersion]), iLine, iColumn);
     End;
 End;
 
 End.
-
 
 
 

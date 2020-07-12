@@ -3,7 +3,7 @@
   This module contain a class which represents a frame for the modue explorer options.
 
   @Author  David Hoyle
-  @Version 1.129
+  @Version 1.137
   @Date    12 Jul 2020
 
   @license
@@ -107,7 +107,6 @@ Type
       NewValue: {$IFDEF DXE50}Integer{$ELSE}SmallInt{$ENDIF}; Direction: TUpDownDirection);
   Public
     { Public declarations }
-    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -124,9 +123,6 @@ uses
   BADI.ResourceStrings;
 
 {$R *.dfm}
-
-
-{ TfmBADIModuleExplorerFrame }
 
 (**
 

@@ -3,7 +3,7 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 2.526
+  @Version 2.595
   @Date    12 Jul 2020
 
   @license
@@ -1230,15 +1230,9 @@ End;
 Procedure TBADIOptions.LoadDictionaries(Const iniFile: TMemIniFile);
 
 Begin
-  FLanguageDictionaryFile := iniFile.ReadString(strSetup, strLanguageDictionaryINIKey, '');
-  If FileExists(FLanguageDictionaryFile) Then
-    FLanguageDictionary.LoadFromFile(FLanguageDictionaryFile);
-  FLocalDictionaryFile := iniFile.ReadString(strSetup, strLocalDictionaryINIKey, '');
-  If FileExists(FLocalDictionaryFile) Then
-    FLocalDictionary.LoadFromFile(FLocalDictionaryFile);
-  FIgnoreDictionaryFile := iniFile.ReadString(strSetup, strIgnoreDictionaryINIKey, '');
-  If FileExists(FLocalDictionaryFile) Then
-    FLocalDictionary.LoadFromFile(FLocalDictionaryFile);
+  SetLanguageDictionaryFile(iniFile.ReadString(strSetup, strLanguageDictionaryINIKey, ''));
+  SetLocalDictionaryFile(iniFile.ReadString(strSetup, strLocalDictionaryINIKey, ''));
+  SetIgnoreDictionaryFile(iniFile.ReadString(strSetup, strIgnoreDictionaryINIKey, ''));
 End;
 
 (**
@@ -1778,8 +1772,6 @@ Procedure TBADIOptions.SaveDictionaries(Const iniFile: TMemIniFile);
 
 Begin
   iniFile.WriteString(strSetup, strLanguageDictionaryINIKey, FLanguageDictionaryFile);
-  If FileExists(FLanguageDictionaryFile) Then
-    FLanguageDictionary.SaveToFile(FLanguageDictionaryFile);
   iniFile.WriteString(strSetup, strLocalDictionaryINIKey, FLocalDictionaryFile);
   If FileExists(FLocalDictionaryFile) Then
     FLocalDictionary.SaveToFile(FLocalDictionaryFile);
@@ -2052,6 +2044,7 @@ Begin
     SaveExtensions(iniFile);
     SaveMetrics(iniFile);
     SaveChecks(iniFile);
+    SaveDictionaries(iniFile);
     iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
     iniFile.WriteString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey, FModuleDateFmt);
     iniFile.WriteFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey, FModuleVersionIncrement);
@@ -2207,7 +2200,11 @@ End;
 Procedure TBADIOptions.SetIgnoreDictionaryFile(Const strValue: String);
 
 Begin
+  If FileExists(FIgnoreDictionaryFile) Then
+    FIgnoreDictionary.SaveToFile(FIgnoreDictionaryFile);
   FIgnoreDictionaryFile := strValue;
+  If FileExists(FIgnoreDictionaryFile) Then
+    FIgnoreDictionary.LoadFromFile(FIgnoreDictionaryFile);
 End;
 
 (**
@@ -2241,6 +2238,8 @@ Procedure TBADIOptions.SetLanguageDictionaryFile(Const strValue: String);
 
 Begin
   FLanguageDictionaryFile := strValue;
+  If FileExists(FLanguageDictionaryFile) Then
+    FLanguageDictionary.LoadFromFile(FLanguageDictionaryFile);
 End;
 
 (**
@@ -2256,7 +2255,11 @@ End;
 Procedure TBADIOptions.SetLocalDictionaryFile(Const strValue: String);
 
 Begin
+  If FileExists(FLocalDictionaryFile) Then
+    FLocalDictionary.SaveToFile(FLocalDictionaryFile);
   FLocalDictionaryFile := strValue;
+  If FileExists(FLocalDictionaryFile) Then
+    FLocalDictionary.LoadFromFile(FLocalDictionaryFile);
 End;
 
 (**

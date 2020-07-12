@@ -4,15 +4,15 @@
   dialogue.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.045
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ Type
     FBADISpecialtags      : TBADIIDEOptionsHandler;
     FBADIModuleMetrics    : TBADIIDEOptionsHandler;
     FBADIModuleChecks     : TBADIIDEOptionsHandler;
+    FBADIModuleSpelling   : TBADIIDEOptionsHandler;
     FBADIModuleExplorer   : TBADIIDEOptionsHandler;
     FBADICodeBrowsing     : TBADIIDEOptionsHandler;
     FBADIExcludedDocs     : TBADIIDEOptionsHandler;
@@ -82,9 +83,8 @@ Uses
   BADI.ModuleExtensionsFrame,
   BADI.ModuleExplorerFrame,
   BADI.Module.Metrics.Options.Frame,
-  BADI.Module.Checks.Options.Frame;
-
-{ TBADIIDEOptionsInstaller }
+  BADI.Module.Checks.Options.Frame,
+  BADI.Spelling.OpsFrame;
 
 (**
 
@@ -103,6 +103,7 @@ Resourcestring
   strSpecialTags           = 'Special Tags';
   strModuleMetrics         = 'Metrics';
   strModuleChecks          = 'Checks';
+  strModuleSpelling        = 'Spelling';
   strModuleExplorer        = 'Explorer';
   strCodeBrowsing          = 'Code Browsing';
   strExcludedDocumentation = 'Excluded Documentation';
@@ -127,6 +128,8 @@ Begin
       NEOS.RegisterAddInOptions(FBADIModuleMetrics);
       FBADIModuleChecks := TBADIIDEOptionsHandler.Create(TframeBADIModuleChecksOptions, strModuleChecks);
       NEOS.RegisterAddInOptions(FBADIModuleChecks);
+      FBADIModuleSpelling := TBADIIDEOptionsHandler.Create(TframeBADISpellingOpions, strModuleSpelling);
+      NEOS.RegisterAddInOptions(FBADIModuleSpelling);
       FBADIModuleExplorer := TBADIIDEOptionsHandler.Create(TfmBADIModuleExplorerFrame, strModuleExplorer);
       NEOS.RegisterAddInOptions(FBADIModuleExplorer);
       FBADICodeBrowsing := TBADIIDEOptionsHandler.Create(TfmBADICodeBrowsingFrame, strCodeBrowsing);
@@ -166,6 +169,7 @@ Begin
       NEOS.UnregisterAddInOptions(FBADISpecialtags);
       NEOS.UnregisterAddInOptions(FBADIModuleMetrics);
       NEOS.UnregisterAddInOptions(FBADIModuleChecks);
+      NEOS.UnregisterAddInOptions(FBADIModuleSpelling);
       NEOS.UnregisterAddInOptions(FBADIModuleExplorer);
       NEOS.UnregisterAddInOptions(FBADICodeBrowsing);
       NEOS.UnregisterAddInOptions(FBADIExcludedDocs);

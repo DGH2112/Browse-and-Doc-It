@@ -3,15 +3,15 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.334
-  @Date    12 Apr 2020
+  @Version 1.484
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ ResourceString
   strOptionGroupChecks = 'Checks';
   (** An option group description for Metric options. **)
   strOptionGroupMetrics = 'Metrics';
+  (** An option group description for Spelling options. **)
+  strOptionGroupSpelling = 'Spelling';
   (** An option group description for issues if present prevent the editor from being followed
       in the module explorer options. **)
   strOptionGroupDoNotFollow = 'Do Not Follow Edit IF...';
@@ -90,6 +92,8 @@ ResourceString
   strAutoUpdateModuleVersion = 'Automatically update the module version on saving';
   (** Options text for Showing Module Metrics. **)
   strShowModuleMetrics = 'Show Module Metrics';
+  (** Options text for Showing Module Spelling mistakes. **)
+  strShowModuleSpelling = 'Show Module Spelling Mistakes';
   (** Options text for Showing Module Checks. **)
   strShowModuleChecks = 'Show Module Checks';
   (** Options text for showing child counts. **)
@@ -108,6 +112,8 @@ ResourceString
   strExpandChecks = 'Automatically Expand Checks';
   (** Options text for automatically expanding modules metrics. **)
   strExpandMetrics = 'Automatically Expand Metrics';
+  (** Options text for automatically expanding modules spelling mistakes. **)
+  strExpandSpelling = 'Automatically Expand Spelling Mistakes';
   (** Options text for Syntax Highlight Errors **)
   strSyntaxHighlightErrors = 'Syntax Highlight Module Errors';
   (** Options text for Showing Error Icons in the Code Editor **)
@@ -140,10 +146,16 @@ ResourceString
   strShowCheckMsgsInEditor = 'Show Check Messages in the Code Editor';
   (** Options text for Syntax Highlight Metrics **)
   strSyntaxHighlightMetrics = 'Syntax Highlight Metrics';
+  (** Options text for Syntax Highlight Spelling **)
+  strSyntaxHighlightSpelling = 'Syntax Highlight Spelling Mistakes';
   (** Options text for Showing Metric Icons in the Code Editor **)
   strShowMetricIconsInEditor = 'Show Metric Icons in the Code Editor';
+  (** Options text for Showing Spelling Mistakes Icons in the Code Editor **)
+  strShowSpellingIconsInEditor = 'Show Spelling Mistakes Icons in the Code Editor';
   (** Options text for Showing Metric Messages in the Code Editor **)
   strShowMetricMsgsInEditor = 'Show Metric Messages in the Code Editor';
+  (** Options text for Showing Spelling Messages in the Code Editor **)
+  strShowSpellingMsgsInEditor = 'Show Spelling Mistakes Messages in the Code Editor';
   (** Options text for preventing the module explorer following the Code Editor if there are errors **)
   strDoNotFollowEditorIfErrors = 'Errors';
   (** Options text for preventing the module explorer following the Code Editor if there are warnings **)
@@ -157,11 +169,15 @@ ResourceString
   strDoNotFollowEditorIfChecks = 'Code Checks';
   (** Options text for preventing the module explorer following the Code Editor if there are metrics **)
   strDoNotFollowEditorIfMetrics = 'Code Metrics';
+  (** Options text for preventing the module explorer following the Code Editor if there are spelling **)
+  strDoNotFollowEditorIfSpelling = 'Code Spelling Mistakes';
 
   (** Options text for auto hiding checks in the editoe views if they have no issues. **)
   strAutoHideChecksWithNoIssues = 'Auto Hide Checks with no issues in the Editor Views';
   (** Options text for auto hiding metrics in the editoe views if they have no issues. **)
   strAutoHideMetricsWithNoIssues = 'Auto Hide Metrics with no issues in the Editor Views';
+  (** Options text for auto hiding spelling mistakes in the editoe views if they have no issues. **)
+  strAutoHideSpellingWithNoIssues = 'Auto Hide Spelling Mistakes with no issues in the Editor Views';
   
   (** Options text for Show Missing Method Documentation **)
   strShowMissingMethodDocumentation = 'Show Missing Method Documentation';

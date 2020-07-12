@@ -318,16 +318,16 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
           BevelOuter = bvNone
           ColumnCollection = <
             item
-              Value = 24.999999709293510000
+              Value = 24.685464234117820000
             end
             item
-              Value = 25.000000211276160000
+              Value = 24.685464729784820000
             end
             item
-              Value = 25.000000139723180000
+              Value = 24.685464659132070000
             end
             item
-              Value = 24.999999939707150000
+              Value = 25.974025974025970000
             end>
           ControlCollection = <
             item
@@ -359,7 +359,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             AlignWithMargins = True
             Left = 8
             Top = 3
-            Width = 137
+            Width = 136
             Height = 35
             Margins.Left = 8
             Margins.Right = 8
@@ -367,12 +367,13 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             Caption = '&Bold'
             TabOrder = 0
             OnClick = chkBoldClick
+            ExplicitWidth = 137
           end
           object chkItalic: TCheckBox
             AlignWithMargins = True
-            Left = 161
+            Left = 160
             Top = 3
-            Width = 138
+            Width = 136
             Height = 35
             Margins.Left = 8
             Margins.Right = 8
@@ -380,12 +381,14 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             Caption = '&Italic'
             TabOrder = 1
             OnClick = chkItalicClick
+            ExplicitLeft = 161
+            ExplicitWidth = 137
           end
           object chkStrikeout: TCheckBox
             AlignWithMargins = True
-            Left = 315
+            Left = 312
             Top = 3
-            Width = 138
+            Width = 136
             Height = 35
             Margins.Left = 8
             Margins.Right = 8
@@ -393,12 +396,14 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             Caption = '&Strikeout'
             TabOrder = 2
             OnClick = chkStrikeoutClick
+            ExplicitLeft = 314
+            ExplicitWidth = 137
           end
           object chkUnderline: TCheckBox
             AlignWithMargins = True
-            Left = 469
+            Left = 464
             Top = 3
-            Width = 139
+            Width = 144
             Height = 35
             Margins.Left = 8
             Margins.Right = 8
@@ -406,6 +411,8 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
             Caption = '&Underline'
             TabOrder = 3
             OnClick = chkUnderlineClick
+            ExplicitLeft = 467
+            ExplicitWidth = 141
           end
         end
       end

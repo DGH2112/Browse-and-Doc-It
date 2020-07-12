@@ -3,15 +3,15 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.899
-  @Date    10 May 2020
+  @Version 2.085
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ Const
     strOptionGroupConflicts,
     strOptionGroupChecks,
     strOptionGroupMetrics,
+    strOptionGroupSpelling,
     strOptionGroupDoNotFollow,
     strOptionGroupTypes,
     strOptionGroupModule,
@@ -127,12 +128,20 @@ Const
     (FDescription : strShowMetricIconsInEditor;               FEnabled :  True; FGroup: dogMetrics),
     (FDescription : strShowMetricMsgsInEditor;                FEnabled : False; FGroup: dogMetrics),
 
+    (FDescription : strShowModuleSpelling;                    FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strExpandSpelling;                        FEnabled:   True; FGroup: dogSpelling),
+    (FDescription : strSyntaxHighlightSpelling;               FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strAutoHideSpellingWithNoIssues;          FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strShowSpellingIconsInEditor;             FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strShowSpellingMsgsInEditor;              FEnabled : False; FGroup: dogSpelling),
+
     (FDescription : strDoNotFollowEditorIfErrors;             FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfWarnings;           FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfHints;              FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfConflicts;          FEnabled : False; FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfChecks;             FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfMetrics;            FEnabled : False; FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfSpelling;           FEnabled : False; FGroup: dogDoNotFollow),
 
     (FDescription : strShowUndocumentedTypes;                 FEnabled : False; FGroup: dogTypes),
     (FDescription : strShowUndocumentedRecords;               FEnabled : False; FGroup: dogTypes),
@@ -328,6 +337,9 @@ Const
     (FResourceName : 'GreenToDoCross';                FMaskColour: clFuchsia),
     (FResourceName : 'BlueToDoCross';                 FMaskColour: clFuchsia),
 
+    (FResourceName : 'SpellingFolder';                FMaskColour: clLime),
+    (FResourceName : 'SpellingItem';                  FMaskColour: clLime),
+    
     (FResourceName : 'BadTag';                        FMaskColour: clLime),
     
     (FResourceName : 'UsesLabel';                     FMaskColour: clLime),
@@ -929,7 +941,8 @@ Const
     'Hints',
     'Conflicts',
     'Checks',
-    'Metrics'
+    'Metrics',
+    'Spellings'
   );
   
 Implementation

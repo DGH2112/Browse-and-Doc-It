@@ -3,15 +3,15 @@
   This module contain a class which represents a frame for the modue explorer options.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    22 Sep 2019
+  @Version 1.129
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -100,8 +100,8 @@ Type
     procedure cbxLimitsChange(Sender: TObject);
   Private
     { Private declarations }
-    FTokenFontInfo: Array [Low(TBADITokenType) .. High(TBADITokenType)] Of TTokenFontInfo;
-    FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
+    FTokenFontInfo: Array [TBADITokenType] Of TTokenFontInfo;
+    FIssueLimits : Array[TLimitType] Of Integer;
   Protected
     procedure udLimitsChangingEx(Sender: TObject; var AllowChange: Boolean;
       NewValue: {$IFDEF DXE50}Integer{$ELSE}SmallInt{$ENDIF}; Direction: TUpDownDirection);
@@ -287,6 +287,7 @@ Constructor TfmBADIModuleExplorerFrame.Create(AOwner: TComponent);
 Var
   i: Integer;
   j: TBADITokenType;
+  strLimit : String;
 
 Begin
   Inherited Create(AOwner);
@@ -298,12 +299,8 @@ Begin
   For j := Low(TBADITokenType) To High(TBADITokenType) Do
     lbxTokenTypes.Items.Add(strTokenType[j]);
   lbxTokenTypes.ItemIndex := 0;
-  cbxLimits.Items.Add(strErrors);
-  cbxLimits.Items.Add(strWarnings);
-  cbxLimits.Items.Add(strHints);
-  cbxLimits.Items.Add(strDocumentationConflicts);
-  cbxLimits.Items.Add(strChecks);
-  cbxLimits.Items.Add(strMetrics);
+  For strLimit In astrLimitType Do
+    cbxLimits.Items.Add(strLimit);
   udLimits.OnChangingEx := udLimitsChangingEx;
 End;
 
@@ -350,6 +347,7 @@ Procedure TfmBADIModuleExplorerFrame.LoadSettings;
 Var
   j: Integer;
   k: TBADITokenType;
+  eLimitType : TLimitType;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
@@ -374,12 +372,8 @@ Begin
   udTokenLimit.Position := TBADIOptions.BADIOptions.TokenLimit;
   clbxTreeColour.Selected := TBADIOptions.BADIOptions.TreeColour;
   lbxTokenTypesClick(Nil);
-  FIssueLimits[ltErrors] := TBADIOptions.BADIOptions.IssueLimits[ltErrors];
-  FIssueLimits[ltWarnings] := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];
-  FIssueLimits[ltHints] := TBADIOptions.BADIOptions.IssueLimits[ltHints];
-  FIssueLimits[ltConflicts] := TBADIOptions.BADIOptions.IssueLimits[ltConflicts];
-  FIssueLimits[ltChecks] := TBADIOptions.BADIOptions.IssueLimits[ltChecks];
-  FIssueLimits[ltMetrics] := TBADIOptions.BADIOptions.IssueLimits[ltMetrics];
+  For eLimitType := Low(TLimitType) To High(TLimitType) Do
+    FIssueLimits[eLimitType] := TBADIOptions.BADIOptions.IssueLimits[eLimitType];
   cbxLimits.ItemIndex := 0;
   cbxLimitsChange(Nil);
 End;
@@ -397,6 +391,7 @@ Procedure TfmBADIModuleExplorerFrame.SaveSettings;
 Var
   k: TBADITokenType;
   TokenFontInfo: TBADITokenFontInfoTokenSet;
+  eLimitType : TLimitType;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
@@ -412,12 +407,8 @@ Begin
   TBADIOptions.BADIOptions.BGColour[False] := cbxBGColour.Selected;
   TBADIOptions.BADIOptions.TokenLimit := udTokenLimit.Position;
   TBADIOptions.BADIOptions.TreeColour := clbxTreeColour.Selected;
-  TBADIOptions.BADIOptions.IssueLimits[ltErrors] := FIssueLimits[ltErrors];
-  TBADIOptions.BADIOptions.IssueLimits[ltWarnings] := FIssueLimits[ltWarnings];
-  TBADIOptions.BADIOptions.IssueLimits[ltHints] := FIssueLimits[ltHints];
-  TBADIOptions.BADIOptions.IssueLimits[ltConflicts] := FIssueLimits[ltConflicts];
-  TBADIOptions.BADIOptions.IssueLimits[ltChecks] := FIssueLimits[ltChecks];
-  TBADIOptions.BADIOptions.IssueLimits[ltMetrics] := FIssueLimits[ltMetrics];
+  For eLimitType := Low(TLimitType) To High(TLimitType) Do
+    TBADIOptions.BADIOptions.IssueLimits[eLimitType] := FIssueLimits[eLimitType];
 End;
 
 (**

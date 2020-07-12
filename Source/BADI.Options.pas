@@ -3,15 +3,15 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 1.555
-  @Date    13 Apr 2020
+  @Version 2.526
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,13 +71,13 @@ Type
     FManagedNodesLife                 : Integer;
     FTreeColour                       : TColor;
     FProfilingCode                    : TStringList;
-    FIssueLimits                      : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
-    FBADIMenuShortCuts                : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
-    FModuleMetrics                    : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
+    FIssueLimits                      : Array[TLimitType] Of Integer;
+    FBADIMenuShortCuts                : Array[TBADIMenu] Of String;
+    FModuleMetrics                    : Array[TBADIModuleMetric] Of TBADIMetricRecord;
     FModuleMetricSubOps               : TBADIModuleMetricSubOps;
     FToxicityPower                    : Integer;
     FToxicitySummation                : TBADIToxicitySummation;
-    FModuleChecks                     : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord;
+    FModuleChecks                     : Array[TBADIModuleCheck] Of TBADICheckRecord;
     FModuleCheckSubOps                : TBADIModuleCheckSubOps;
     FLowMetricMargin                  : Double;
     FHighMetricMargin                 : Double;
@@ -87,6 +87,12 @@ Type
     FModuleVersionIncrement           : Double;
     FDoNotFollowEditor                : TArray<String>;
     FScopeImageList                   : TImageList;
+    FLanguageDictionaryFile           : String;
+    FLanguageDictionary               : TStringList;
+    FLocalDictionaryFile              : String;
+    FLocalDictionary                  : TStringList;
+    FIgnoreDictionaryFile             : String;
+    FIgnoreDictionary                 : TStringList;
   Strict Protected
     // IBADIOptions
     Function  GetOptions : TDocOptions;
@@ -175,6 +181,7 @@ Type
     Procedure LoadExtensions(Const iniFile: TMemIniFile);
     Procedure LoadMetrics(Const iniFile: TMemIniFile);
     Procedure LoadChecks(Const iniFile: TMemIniFile);
+    Procedure LoadDictionaries(Const iniFile: TMemIniFile);
     Procedure UpdateDoNotFollowEditor();
     Procedure SaveDocOptions(Const iniFile: TMemIniFile);
     Procedure SaveSpecialTags(Const iniFile: TMemIniFile);
@@ -188,7 +195,17 @@ Type
     Procedure SaveExtensions(Const iniFile: TMemIniFile);
     Procedure SaveMetrics(Const iniFile: TMemIniFile);
     Procedure SaveChecks(Const iniFile: TMemIniFile);
+    Procedure SaveDictionaries(Const iniFile: TMemIniFile);
     Function  GetScopeImageList : TImageList;
+    Function  GetLanguageDictionary : TStringList;
+    Function  GetLanguageDictionaryFile : String;
+    Procedure SetLanguageDictionaryFile(Const strValue : String);
+    Function  GetLocalDictionaryFile : String;
+    Procedure SetLocalDictionaryFile(Const strValue : String);
+    Function  GetLocalDictionary : TStringList;
+    Function  GetIgnoreDictionaryFile : String;
+    Procedure SetIgnoreDictionaryFile(Const strValue : String);
+    Function  GetIgnoreDictionary : TStringList;
   Public
     Constructor Create(Const IDEEditorColours : IBADIIDEEditorColours);
     Destructor Destroy; Override;
@@ -276,18 +293,6 @@ Const
   strProfilingCode = 'ProfilingCode';
   (** An ini key for issue limits **)
   strIssuesLimits = 'Issues Limits';
-  (** An ini key for errors **)
-  strErrors = 'Errors';
-  (** An ini key for warnings **)
-  strWarnings = 'Warnings';
-  (** An ini key for hints **)
-  strHints = 'Hints';
-  (** An ini key for conflicts **)
-  strConflicts = 'Conflicts';
-  (** An ini key for metrics **)
-  strMetrics = 'Metrics';
-  (** An ini key for checks **)
-  strChecks = 'Checks';
   (** An ini section name for the module metrics **)
   strModuleMetrics = 'Module Metrics';
   (** An ini section name for the module checks **)
@@ -322,6 +327,12 @@ Const
   strDateFormatINIKey = 'Date Format';
   (** A constant for the module version increment. **)
   strIncrementINIKey = 'Increment';
+  (** A constant for the language dictionary INI Key. **)
+  strLanguageDictionaryINIKey = 'LanguageDictionary';
+  (** A constant for the local dictionary INI Key. **)
+  strLocalDictionaryINIKey = 'LocalDictionary';
+  (** A constant for the ingore dictionary INI Key. **)
+  strIgnoreDictionaryINIKey = 'IgnoreDictionary';
 
 Var
   (** This is a class varaiable to hide and hold the BADI Options instance reference. **)
@@ -406,6 +417,15 @@ Begin
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
   FExpandedNodes.Duplicates := dupIgnore;
+  FLanguageDictionary := TStringList.Create;
+  FLanguageDictionary.Sorted := True;
+  FLanguageDictionary.Duplicates := dupIgnore;
+  FLocalDictionary := TStringList.Create;
+  FLocalDictionary.Sorted := True;
+  FLocalDictionary.Duplicates := dupIgnore;
+  FignoreDictionary := TStringList.Create;
+  FignoreDictionary.Sorted := True;
+  FignoreDictionary.Duplicates := dupIgnore;
   FINIFileName := BuildRootKey;
   FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
   FExclusions := TBADIExclusions.Create;
@@ -434,6 +454,9 @@ Begin
   FProfilingCode.Free;
   FMethodDescriptions.Free;
   FExpandedNodes.Free;
+  FLanguageDictionary.Free;
+  FLocalDictionary.Free;
+  FIgnoreDictionary.Free;
   FSpecialTags.Free;
   FDefines.Free;
   Inherited Destroy;
@@ -569,6 +592,38 @@ End;
 
 (**
 
+  This is a getter method for the IgnoreDictionary property.
+
+  @precon  None.
+  @postcon Returns the string list for the ignore dictionary.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetIgnoreDictionary: TStringList;
+
+Begin
+  Result := FIgnoreDictionary;
+End;
+
+(**
+
+  This is a getter method for the IgnoreDictionFile property.
+
+  @precon  None.
+  @postcon Returns the filename of the ignore dictionary.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetIgnoreDictionaryFile: String;
+
+Begin
+  Result := FIgnoreDictionaryFile;
+End;
+
+(**
+
   This is a getter method for the INIFileName property.
 
   @precon  None.
@@ -598,6 +653,70 @@ Function TBADIOptions.GetIssueLimit(Const eLimitType: TLimitType): Integer;
 
 Begin
   Result := FIssueLimits[eLimitType];
+End;
+
+(**
+
+  This is a getter method for the LanguageDictionary property.
+
+  @precon  None.
+  @postcon Returns the string list for the language dictionary.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetLanguageDictionary: TStringList;
+
+Begin
+  Result := FLanguageDictionary;
+End;
+
+(**
+
+  This is a getter method for the LanguageDictionFile property.
+
+  @precon  None.
+  @postcon Returns the filename of the language dictionary.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetLanguageDictionaryFile: String;
+
+Begin
+  Result := FLanguageDictionaryFile;
+End;
+
+(**
+
+  This is a getter method for the LocalDictionary property.
+
+  @precon  None.
+  @postcon Returns the string list for the local dictionary.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetLocalDictionary: TStringList;
+
+Begin
+  REsult := FLocalDictionary;
+End;
+
+(**
+
+  This is a getter method for the LocalDictionFile property.
+
+  @precon  None.
+  @postcon Returns the filename of the local dictionary.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetLocalDictionaryFile: String;
+
+Begin
+  Result := FLocalDictionaryFile;
 End;
 
 (**
@@ -1099,6 +1218,31 @@ End;
 
 (**
 
+  This method loads the dictionary filenames from the INI File and loads the dctionaries into string
+  lists.
+
+  @precon  None.
+  @postcon The dictionary filernames are set and the dictionaries loaded if the filenames are valid.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadDictionaries(Const iniFile: TMemIniFile);
+
+Begin
+  FLanguageDictionaryFile := iniFile.ReadString(strSetup, strLanguageDictionaryINIKey, '');
+  If FileExists(FLanguageDictionaryFile) Then
+    FLanguageDictionary.LoadFromFile(FLanguageDictionaryFile);
+  FLocalDictionaryFile := iniFile.ReadString(strSetup, strLocalDictionaryINIKey, '');
+  If FileExists(FLocalDictionaryFile) Then
+    FLocalDictionary.LoadFromFile(FLocalDictionaryFile);
+  FIgnoreDictionaryFile := iniFile.ReadString(strSetup, strIgnoreDictionaryINIKey, '');
+  If FileExists(FLocalDictionaryFile) Then
+    FLocalDictionary.LoadFromFile(FLocalDictionaryFile);
+End;
+
+(**
+
   This method loads the documentation options.
 
   @precon  iniFile must be a valid instance.
@@ -1245,13 +1389,13 @@ Procedure TBADIOptions.LoadLimits(Const iniFile: TMemIniFile);
 Const
   iDefaultLimit = 10;
 
+Var
+  eLimitType : TLimitType;
+
 Begin
-  FIssueLimits[ltErrors] := iniFile.ReadInteger(strIssuesLimits, strErrors, iDefaultLimit);
-  FIssueLimits[ltWarnings] := iniFile.ReadInteger(strIssuesLimits, strWarnings, iDefaultLimit);
-  FIssueLimits[ltHints] := iniFile.ReadInteger(strIssuesLimits, strHints, iDefaultLimit);
-  FIssueLimits[ltConflicts] := iniFile.ReadInteger(strIssuesLimits, strConflicts, iDefaultLimit);
-  FIssueLimits[ltMetrics] := iniFile.ReadInteger(strIssuesLimits, strMetrics, iDefaultLimit);
-  FIssueLimits[ltChecks] := iniFile.ReadInteger(strIssuesLimits, strChecks, iDefaultLimit);
+  For eLimitType := Low(TLimitType) To High(TLimitType) Do
+    FIssueLimits[eLimitType] :=
+      iniFile.ReadInteger(strIssuesLimits, astrLimitType[eLimitType], iDefaultLimit);
 End;
 
 (**
@@ -1481,6 +1625,7 @@ Begin
     LoadExtensions(iniFile);
     LoadMetrics(iniFile);
     LoadChecks(iniFile);
+    LoadDictionaries(iniFile);
     UpdateDoNotFollowEditor();
     FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
     FModuleDateFmt := iniFile.ReadString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey,
@@ -1621,6 +1766,30 @@ End;
 
 (**
 
+  This method saves the dictionary filenames and dictionaries.
+
+  @precon  None.
+  @postcon Saves the dictionary filenames and dictionaries.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveDictionaries(Const iniFile: TMemIniFile);
+
+Begin
+  iniFile.WriteString(strSetup, strLanguageDictionaryINIKey, FLanguageDictionaryFile);
+  If FileExists(FLanguageDictionaryFile) Then
+    FLanguageDictionary.SaveToFile(FLanguageDictionaryFile);
+  iniFile.WriteString(strSetup, strLocalDictionaryINIKey, FLocalDictionaryFile);
+  If FileExists(FLocalDictionaryFile) Then
+    FLocalDictionary.SaveToFile(FLocalDictionaryFile);
+  iniFile.WriteString(strSetup, strIgnoreDictionaryINIKey, FIgnoreDictionaryFile);
+  If FileExists(FLocalDictionaryFile) Then
+    FLocalDictionary.SaveToFile(FLocalDictionaryFile);
+End;
+
+(**
+
   This method saves the documentation options to the INI file.
 
   @precon  iniFile must be a valid instance.
@@ -1698,13 +1867,12 @@ End;
 **)
 Procedure TBADIOptions.SaveLimits(Const iniFile: TMemIniFile);
 
+Var
+  eLimitType : TLimitType;
+
 Begin
-  iniFile.WriteInteger(strIssuesLimits, strErrors, FIssueLimits[ltErrors]);
-  iniFile.WriteInteger(strIssuesLimits, strWarnings, FIssueLimits[ltWarnings]);
-  iniFile.WriteInteger(strIssuesLimits, strHints, FIssueLimits[ltHints]);
-  iniFile.WriteInteger(strIssuesLimits, strConflicts, FIssueLimits[ltConflicts]);
-  iniFile.WriteInteger(strIssuesLimits, strMetrics, FIssueLimits[ltMetrics]);
-  iniFile.WriteInteger(strIssuesLimits, strChecks, FIssueLimits[ltChecks]);
+  For eLimitType := Low(TLimitType) To High(TLimitType) Do
+    iniFile.WriteInteger(strIssuesLimits, astrLimitType[eLimitType], FIssueLimits[eLimitType]);
 End;
 
 (**
@@ -2028,6 +2196,22 @@ End;
 
 (**
 
+  This is a setter method for the IgnoreDictionFile property.
+
+  @precon  None.
+  @postcon Returns the filename of the ignore dictionary.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetIgnoreDictionaryFile(Const strValue: String);
+
+Begin
+  FIgnoreDictionaryFile := strValue;
+End;
+
+(**
+
   This is a setter method for the IssueLimit property.
 
   @precon  None.
@@ -2041,6 +2225,38 @@ Procedure TBADIOptions.SetIssueLimit(Const eLimitType: TLimitType; Const iLimit:
 
 Begin
   FIssueLimits[eLimitType] := iLimit;
+End;
+
+(**
+
+  This is a setter method for the LanguageDictionFile property.
+
+  @precon  None.
+  @postcon Returns the filename of the language dictionary.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetLanguageDictionaryFile(Const strValue: String);
+
+Begin
+  FLanguageDictionaryFile := strValue;
+End;
+
+(**
+
+  This is a setter method for the LocalDictionFile property.
+
+  @precon  None.
+  @postcon Returns the filename of the local dictionary.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetLocalDictionaryFile(Const strValue: String);
+
+Begin
+  FLocalDictionaryFile := strValue;
 End;
 
 (**
@@ -2474,7 +2690,8 @@ Const
     doDoNotFollowEditorIfHints,
     doDoNotFollowEditorIfConflicts,
     doDoNotFollowEditorIfChecks,
-    doDoNotFollowEditorIfMetrics
+    doDoNotFollowEditorIfMetrics,
+    doDoNotFollowEditorIfSpelling
   );
 
 Var

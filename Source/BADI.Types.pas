@@ -3,15 +3,15 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.361
-  @Date    25 Apr 2020
+  @Version 1.416
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ Type
   (** An enumerate for warning and errors. **)
   TErrorType = (etHint, etWarning, etError);
   (** An enumerate for the type of documentation conflict. **)
-  TBADIConflictType = (ctDocumentation, ctMetric, ctCheck);
+  TBADIConflictType = (ctDocumentation, ctMetric, ctCheck, ctSpelling);
   (** A type to return an array of strings **)
   TKeyWords = Array of String;
   (** A type for a set of AnsiChar - used for the function IsInSet() **)
@@ -109,6 +109,7 @@ Type
     dogConflicts,
     dogChecks,
     dogMetrics,
+    dogSpelling,
     dogDoNotFollow,
     dogTypes,
     dogModule,
@@ -167,12 +168,20 @@ Type
     doShowMetricIconsInEditor,
     doShowMetricMsgsInEditor,
 
+    doShowSpelling,
+    doExpandSpelling,
+    doSyntaxHighlightSpelling,
+    doAutoHideSpellingWithNoissues,
+    doShowSpellingIconsInEditor,
+    doShowSpellingMsgsInEditor,
+
     doDoNotFollowEditorIfErrors,
     doDoNotFollowEditorIfWarnings,
     doDoNotFollowEditorIfHints,
     doDoNotFollowEditorIfConflicts,
     doDoNotFollowEditorIfChecks,
     doDoNotFollowEditorIfMetrics,
+    doDoNotFollowEditorIfSpelling,
 
     doShowUndocumentedTypes,
     doShowUndocumentedRecords,
@@ -322,6 +331,9 @@ Type
     iiYellowToDoCross,
     iiGreenToDoCross,
     iiBlueToDoCross,
+
+    iiSpellingFolder,
+    iiSpellingItem,
 
     iiBadTag,
 
@@ -533,7 +545,7 @@ Type
   TBADITokenFontInfoTokenSet = Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
 
   (** An enumerate to define the different types of issues to limit output for. **)
-  TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts, ltChecks, ltMetrics);
+  TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts, ltChecks, ltMetrics, ltSpelling);
   (** A set of the above enumerates. **)
   TLimitTypes = Set of TLimitType;
 

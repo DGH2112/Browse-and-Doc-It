@@ -3,15 +3,15 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.694
-  @Date    09 Jul 2020
+  @Version 1.955
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -146,6 +146,15 @@ Type
     Function  GetDoNotFollowEditor : TArray<String>;
     Procedure SetDoNotFollowEditor(Const astrDoNotFollowTypes : TArray<String>);
     Function  GetScopeImageList : TImageList;
+    Function  GetLanguageDictionaryFile : String;
+    Procedure SetLanguageDictionaryFile(Const strValue : String);
+    Function  GetLanguageDictionary : TStringList;
+    Function  GetLocalDictionaryFile : String;
+    Procedure SetLocalDictionaryFile(Const strValue : String);
+    Function  GetLocalDictionary : TStringList;
+    Function  GetIgnoreDictionaryFile : String;
+    Procedure SetIgnoreDictionaryFile(Const strValue : String);
+    Function  GetIgnoreDictionary : TStringList;
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -449,6 +458,48 @@ Type
       @return  a TImageList
     **)
     Property ScopeImageList : TImageList Read GetScopeImageList;
+    (**
+      This property returns a sorted string list of language specific dictionary words.
+      @precon  None.
+      @postcon Returns a sorted string list of language specific dictionary words.
+      @return  a String
+    **)
+    Property LanguageDictionaryFile : String Read GetLanguageDictionaryFile Write SetLanguageDictionaryFile;
+    (**
+      This property gets and sets the filename for the language dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the language dictionary.
+      @return  a TStringList
+    **)
+    Property LanguageDictionary : TStringList Read GetLanguageDictionary;
+    (**
+      This property returns a sorted string list of local dictionary words.
+      @precon  None.
+      @postcon Returns a sorted string list of local dictionary words.
+      @return  a String
+    **)
+    Property LocalDictionaryFile : String Read GetLocalDictionaryFile Write SetLocalDictionaryFile;
+    (**
+      This property gets and sets the filename for the local dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the local dictionary.
+      @return  a TStringList
+    **)
+    Property LocalDictionary : TStringList Read GetLocalDictionary;
+    (**
+      This property gets and sets the filename for the ignore dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the ignore dictionary.
+      @return  a String
+    **)
+    Property IgnoreDictionaryFile : String Read GetIgnoreDictionaryFile Write SetIgnoreDictionaryFile;
+    (**
+      This property returns a sorted string list of dictionary words to ignore.
+      @precon  None.
+      @postcon Returns a sorted string list of dictionary words to ignore.
+      @return  a TStringList
+    **)
+    Property IgnoreDictionary : TStringList Read GetIgnoreDictionary;
   End;
 
   (** An interface to get the IDE Editor Colours from the Registry. **)

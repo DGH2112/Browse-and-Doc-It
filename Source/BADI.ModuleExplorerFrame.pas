@@ -4,15 +4,15 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 3.006
-  @Date    24 May 2020
+  @Version 3.078
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1614,6 +1614,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
 
     @param   Tag   as a TSpecialTagNode as a constant
     @param   iLine as an Integer as a constant
+    @param   iCol  as an Integer as a constant
 
   **)
   Procedure AddTotalInfo(Const Tag : TSpecialTagNode; Const iLine, iCol : Integer); Overload;
@@ -1640,6 +1641,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
 
     @param   strTagName as a String as a constant
     @param   iLine      as an Integer as a constant
+    @param   iCol       as an Integer as a constant
 
   **)
   Procedure AddTotalInfo(Const strTagName : String; Const iLine, iCol : Integer); Overload;
@@ -1939,6 +1941,7 @@ Procedure TframeModuleExplorer.LogDocIssueConflict(Const Element: TElementContai
       ctDocumentation: Result := ltConflicts;
       ctMetric:        Result := ltMetrics;
       ctCheck:         Result := ltChecks;
+      ctSpelling:      Result := ltSpelling;
     Else
       Result := ltErrors;
     End;
@@ -1951,7 +1954,8 @@ Const
     iiHint,
     iiDocConflictItem,
     iiCheckItem,
-    iiMetricItem
+    iiMetricItem,
+    iiSpellingItem
   );
 
 Var
@@ -2059,6 +2063,7 @@ Begin
         ctDocumentation: Result := TBADIOptions.BADIOptions.IssueLimits[ltConflicts];
         ctMetric:        Result := TBADIOptions.BADIOptions.IssueLimits[ltMetrics];
         ctCheck:         Result := TBADIOptions.BADIOptions.IssueLimits[ltChecks];
+        ctSpelling:      Result := TBADIOptions.BADIOptions.IssueLimits[ltSpelling];
       End
     Else If Container.Elements[1] Is TDocIssue Then
       Case TDocIssue(Container.Elements[1]).ErrorType Of

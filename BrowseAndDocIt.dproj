@@ -380,6 +380,11 @@
         <DCCReference Include="Source\BADI.DocIssueTotals.pas"/>
         <DCCReference Include="Source\BADI.DocIssuesHintWindow.pas"/>
         <DCCReference Include="Source\BADI.ProjectNotifier.pas"/>
+        <DCCReference Include="Source\BADI.Spelling.OpsFrame.pas">
+            <Form>frameBADISpellingOpions</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

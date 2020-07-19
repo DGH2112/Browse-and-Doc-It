@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.416
-  @Date    12 Jul 2020
+  @Version 1.417
+  @Date    18 Jul 2020
 
   @license
 
@@ -721,7 +721,7 @@ Type
   TBADIToxicitySummation = (tsAddBeforePower, tsAddAfterPower);
 
   (** An enumerate to define the type of exclusion **)
-  TBADIExclusionType = (etDocumentation, etMetrics, etChecks);
+  TBADIExclusionType = (etDocumentation, etMetrics, etChecks, etSpelling);
   (** A set of the above exclusion types to be referenced against each exclusion pattern. **)
   TBADIExclusionTypes = Set Of TBADIExclusionType;
 

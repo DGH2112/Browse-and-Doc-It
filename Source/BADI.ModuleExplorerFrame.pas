@@ -4,8 +4,8 @@
   module browser so that it can be independant of the application specifics.
 
   @Author  David Hoyle
-  @Version 3.078
-  @Date    12 Jul 2020
+  @Version 3.095
+  @Date    18 Jul 2020
 
   @license
 
@@ -1665,14 +1665,16 @@ ResourceString
 Const
   iTreeLevel = 2;
   astrTagsToIgnore : TArray<String> = [
-    'nocheck',
-    'nochecks',
-    'nodocumentation',
-    'nohint',
-    'nohints',
-    'nometric',
-    'nometrics',
-    'stopdocumentation'
+    strnocheck,
+    strnochecks,
+    strnodocumentation,
+    strnohint,
+    strnohints,
+    strnometric,
+    strnometrics,
+    strnospelling,
+    strnospellings,
+    strstopdocumentation
   ];
   
 Var
@@ -2086,8 +2088,15 @@ End;
 procedure TframeModuleExplorer.OutputModuleInfo(Const Container : TElementContainer);
 
 Const
-  strPromotedLabels : Array[1..6] Of String = (strMetrics, strChecks, strDocumentationConflicts,
-    strHints, strWarnings, strErrors);
+  strPromotedLabels : Array[1..7] Of String = (
+    strSpelling,
+    strMetrics,
+    strChecks,
+    strDocumentationConflicts,
+    strHints,
+    strWarnings,
+    strErrors    
+  );
 
 Var
   i: Integer;

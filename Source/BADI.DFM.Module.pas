@@ -3,8 +3,8 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    17 Aug 2019
+  @Version 1.007
+  @Date    12 Jul 2020
 
   @license
 
@@ -201,6 +201,8 @@ Begin
       Add(strHints, iiHintFolder, scNone);
       Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       AddTickCount('Refs');
+      CheckStringSpelling;
+      AddTickCount('Spelling');
       TidyUpEmptyElements;
     End;
 End;

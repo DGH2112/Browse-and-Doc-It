@@ -3,7 +3,7 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.484
+  @Version 1.493
   @Date    12 Jul 2020
 
   @license
@@ -280,6 +280,8 @@ ResourceString
   strChecks = 'Checks';
   (** Label for Metrics **)
   strMetrics = 'Metrics';
+  (** Label for Spelling **)
+  strSpelling = 'Spelling';
   (** Label for Uses Clause **)
   strUses = 'Uses';
   (** Label for Types Clause **)

@@ -1,10 +1,10 @@
 (**
   
-  This module contains a class whichi implements the INTAEditViewNotifier for drawing on the editor.
+  This module contains a class which implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 5.164
-  @Date    17 Jun 2020
+  @Version 5.353
+  @Date    18 Jul 2020
   
   @license
 
@@ -45,14 +45,14 @@ Uses
 
 {$IFDEF DXE100}
 Type
-  (** A class which implements the INTAEditorViewNotifier for drawing on the editor. **)
+  (** A class which implements the INTAEditViewNotifier for drawing on the editor. **)
   TBADIEditViewNotifier = Class(TNotifierObject, INTAEditViewNotifier)
   Strict Private
     Const
       (** A constant to define the padding between the editor content, doc issue icons and text. **)
       iPadding = 5;
     Class Var
-      (** A class varaiable to determine whether the paint cycle is a full cycle or not. **)
+      (** A class variable to determine whether the paint cycle is a full cycle or not. **)
       FFullRepaint : Boolean;
   Strict Private
     FPlainTextFontInfo   : TTokenFontInfo;
@@ -83,6 +83,9 @@ Type
       Const eDocIssueType : TLimitType);
     Procedure MsgsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
       Const eDocIssueType : TLimitType);
+    Procedure UnderlineSpelling(Const Canvas : TCanvas;  Const strDocIssue : String;
+      Var DocIssueInfo : TBADIDocIssueInfo; Const LineText: PAnsiChar; Const TextRect : TRect;
+      Const CellSize: TSize);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -141,6 +144,7 @@ Begin
   If FTokenFontInfo.FForeColour = clNone Then
     FTokenFontInfo.FForeColour := FPlainTextFontInfo.FForeColour;
   DocOps := TBADIOptions.BADIOptions.Options;
+  //: @refactor Needs to be based on enumerate so it updated automatically
   FIconsToRender.Clear;
   IconsToRender(DocOps, doShowErrorIconsInEditor, ltErrors);
   IconsToRender(DocOps, doShowWarningIconsInEditor, ltWarnings);
@@ -148,9 +152,11 @@ Begin
   IconsToRender(DocOps, doShowConflictIconsInEditor, ltConflicts);
   IconsToRender(DocOps, doShowCheckIconsInEditor, ltChecks);
   IconsToRender(DocOps, doShowMetricIconsInEditor, ltMetrics);
+  IconsToRender(DocOps, doShowSpellingIconsInEditor, ltSpelling);
   For iTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
     If tpShowInEditor In TBADIOptions.BADIOptions.SpecialTags[iTag].FTagProperties Then
       FIconsToRender.Add(TBADIOptions.BADIOptions.SpecialTags[iTag].FName);
+  //: @refactor Needs to be based on enumerate so it updated automatically
   FMsgsToRender.Clear;
   MsgsToRender(DocOps, doShowErrorMsgsInEditor, ltErrors);
   MsgsToRender(DocOps, doShowWarningMsgsInEditor, ltWarnings);
@@ -158,6 +164,7 @@ Begin
   MsgsToRender(DocOps, doShowConflictMsgsInEditor, ltConflicts);
   MsgsToRender(DocOps, doShowCheckMsgsInEditor, ltChecks);
   MsgsToRender(DocOps, doShowMetricMsgsInEditor, ltMetrics);
+  //: @debug MsgsToRender(DocOps, doShowSpellingMsgsInEditor, ltSpelling);
   FindHorizontalScrollPosition(View);
 End;
 
@@ -166,7 +173,7 @@ End;
   A constructor for the TBADIEditViewNotifier class.
 
   @precon  None.
-  @postcon Creates 2 strings list for the icons and msgs to render.
+  @postcon Creates 2 strings list for the icons and messages to render.
 
 **)
 Constructor TBADIEditViewNotifier.Create;
@@ -285,7 +292,7 @@ End;
 
 (**
 
-  This method is called whent he editor is idle.
+  This method is called when the editor is idle.
 
   @precon  None.
   @postcon Not used.
@@ -304,7 +311,7 @@ End;
 
 (**
 
-  This method is called then aining in the editor has finished.
+  This method is called then paining in the editor has finished.
 
   @precon  None.
   @postcon No used.
@@ -403,7 +410,7 @@ End;
 
 (**
 
-  This method overwrite sthe tag name in the comment with a coloured version.
+  This method overwrites the tag name in the comment with a coloured version.
 
   @precon  Canvas and LineText must be valid instances.
   @postcon The special tags are overwritten with coloured text.
@@ -447,7 +454,7 @@ End;
 
 (**
 
-  This procedure updates the FMsgoRender set with a limit type if the given doc option is in the
+  This procedure updates the FMsgsToRender set with a limit type if the given doc option is in the
   given doc option set.
 
   @precon  None.
@@ -471,7 +478,7 @@ End;
   This method is called after each line in the editor is painted.
 
   @precon  None.
-  @postcon This method renders text and images ontot he editor associated with Docuemnt issues and
+  @postcon This method renders text and images onto the editor associated with Document issues and
            conflicts.
 
   @nocheck MissingCONSTInParam
@@ -527,8 +534,38 @@ Begin
             Inc(R.Left, iPadding);
           End;
         MarkUpdateSpecialTags(Canvas, strDocIssue, recDocIssue, LineText, TextRect, CellSize);
+        If CompareText(strDocIssue, astrLimitType[ltSpelling]) = 0 Then
+          UnderlineSpelling(Canvas, strDocIssue, recDocIssue, LineText, TextRect, CellSize);
      End;
 End;
+
+Procedure TBADIEditViewNotifier.UnderlineSpelling(Const Canvas : TCanvas; Const strDocIssue : String;
+  Var DocIssueInfo : TBADIDocIssueInfo; Const LineText: PAnsiChar; Const TextRect: TRect;
+  Const CellSize: TSize);
+  
+Var
+  R: TRect;
+  iPos: Integer;
+  strText: String;
+  
+Begin
+  strText := UTF8ToString(LineText);
+  iPos := Pos(LowerCase(DocIssueInfo.FMessage), LowerCase(strText));
+  If iPos > 0 Then
+    Begin
+      strText := Copy(strText, iPos, DocIssueInfo.FMessage.Length);
+      R := TextRect;
+      iPos := iPos - 1 - FHorizontalScroll;
+      If iPos > 0 Then
+        Inc(R.Left, iPos * CellSize.cx)
+      Else
+        Delete(strText, 1, -iPos);
+      DocIssueInfo.FForeColour := clRed;
+      If strText.Length > 0 Then
+        DrawCommentTag(Canvas, R, strText, DocIssueInfo);
+    End;
+End;
+
 {$ENDIF DXE100}
 
 End.

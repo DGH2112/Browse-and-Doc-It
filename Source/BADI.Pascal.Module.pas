@@ -3,8 +3,8 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Author  David Hoyle
-  @Version 2.085
-  @Date    12 Apr 2020
+  @Version 2.151
+  @Date    18 Jul 2020
 
   @license
 
@@ -538,6 +538,7 @@ begin
             AddIssue(Format(strDuplicateIdentifierFound, [Method.Identifier,
               Method.Line, Method.Column]), scNone, tmpMethod.Line, tmpMethod.Column, etError, Self);
         End;
+      AddIdentifier(Method.Identifier);
     End;
 end;
 
@@ -1910,8 +1911,6 @@ End;
            determines if the source code module has been modified since the last save to disk.
   @postcon Creates an instance of the module parser.
 
-  @nometricHardString
-
   @param   Source        as a String as a constant
   @param   strFileName   as a String as a constant
   @param   IsModified    as a Boolean as a constant
@@ -1921,13 +1920,15 @@ End;
 Constructor TPascalModule.CreateParser(Const Source, strFileName : String;
   Const IsModified : Boolean; Const ModuleOptions : TModuleOptions);
 
-Const
+ResourceString
   strStart = 'Start';
   strTokenize = 'Tokenize';
   strParse = 'Parse';
   strResolve = 'Resolve';
   strRefs = 'Refs';
-  strChecks = 'Check';
+  strChecks = 'Checks';
+  strMetrics = 'Metrics';
+  strSpelling = 'Spelling';
   
 Var
   boolCascade: Boolean;
@@ -1977,6 +1978,13 @@ Begin
       AddTickCount(strChecks);
       TidyUpEmptyElements;
       MetricsUnsortedMethods;
+      AddTickCount(strMetrics);
+      If doShowSpelling In BADIOptions.Options Then
+        Begin
+          CheckCommentSpelling;
+          CheckStringSpelling;
+          AddTickCount(strSpelling);
+        End;
     End;
 End;
 
@@ -2680,8 +2688,6 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the next series of tokens as an expression.
-
-  @grammer Expression -> SimpleExpression [RelOp SimpleExpression]
 
   @param   C        as a TElementContainer as a constant
   @param   ExprType as a TPascalExprTypes as a reference
@@ -3771,6 +3777,7 @@ Begin
     Repeat
       If IsIdentifier(Token) Then
         Begin
+          AddIdentifier(Token.Token);
           C := GetComment;
           If C <> Nil then
             Begin
@@ -6626,6 +6633,7 @@ begin
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         Begin
+          AddIdentifier(Token.Token);
           PropertiesLabel := Cls.FindElement(strPropertiesLabel) As TLabelContainer;
           If PropertiesLabel = Nil Then
             PropertiesLabel := Cls.Add(strPropertiesLabel, iiPropertiesLabel, scNone) As TLabelContainer;
@@ -8478,8 +8486,6 @@ End;
            the implemenation section or public if in the interface section .
   @postcon This method returns True if this method handles a constant declaration section .
 
-  @see     For object pascal grammar see {@link TPascalDocModule.VarSection} .
-
   @param   AScope    as a TScope as a constant
   @param   Container as a TElementContainer as a constant
   @return  a Boolean
@@ -8923,6 +8929,7 @@ Begin
       TypeParams(AToken.FIdentifier);
       If Token.Token = '=' Then
         Begin
+          AddIdentifier(AToken.FIdentifier);
           NextNonCommentToken;
           boolIsType := False;
           If Token.UToken = strTYPE Then

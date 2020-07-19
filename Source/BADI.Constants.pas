@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 2.085
-  @Date    12 Jul 2020
+  @Version 2.224
+  @Date    18 Jul 2020
 
   @license
 
@@ -664,6 +664,31 @@ Const
   (** A constant name for the Missign Const in Parameters Ignore Event handlers metric so it can be
       disabled. **)
   strMCParmListIgnoreEventsNoMetric = 'MCParmListIgnoreEvents';
+  (** A resource for disabling all errors on an element and its sub elements. **)
+  strNoError = 'noerror';
+  (** A resource for disabling all warnings on an element and its sub elements. **)
+  strNoWarning = 'nowarning';
+  (** A resource for disabling all hints on an element and its sub elements. **)
+  strNoHint = 'nohint';
+  (** A resource for disabling all hints on an element and its sub elements. **)
+  strNoHints = 'nohints';
+  (** A resource for disabling all metrics on an element and its sub elements. **)
+  strNoMetrics = 'nometrics';
+  (** A resource for disabling all checks on an element and its sub elements. **)
+  strNoChecks = 'nochecks';
+  (** A resource for disabling all spellings on an element and its sub elements. **)
+  strNoSpellings = 'nospellings';
+  (** A resource for disabling a metric on an element and its sub elements. **)
+  strNoMetric = 'nometric';
+  (** A resource for disabling a check on an element and its sub elements. **)
+  strNoCheck = 'nocheck';
+  (** A resource for disabling a spelling on an element and its sub elements. **)
+  strNoSpelling = 'nospelling';
+  (** A resource for disabling documentation on an element and its sub elements. **)
+  strStopDocumentation = 'stopdocumentation';
+  (** A resource for disabling documentation on an element and its sub elements. **)
+  strNoDocumentation = 'nodocumentation';
+
 
   (** A constant array of default options for the Module Metrics. **)
   ModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord = (

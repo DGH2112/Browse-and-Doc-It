@@ -4,7 +4,7 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 1.887
+  @Version 1.903
   @Date    19 Jul 2020
 
   @license
@@ -158,7 +158,7 @@ Type
     Procedure CheckCommentSpelling; Virtual;
     Procedure CheckStringSpelling; Virtual;
     procedure CheckSpelling(Const strWord : String; Const iLine, iColumn : Integer;
-      Const Comment : TComment);
+      Const eSpellingCategory : TBADISpellingCategory; Const Comment : TComment);
     Procedure AddIdentifier(Const strIdentifier : String);
     Class Function  DefaultProfilingTemplate : String; Virtual;
     { Properties }
@@ -487,7 +487,7 @@ Begin
         Begin
           Token := Cmt.Tokens[iToken];
           If (Token.TokenType In [ttIdentifier]) And (Token.Length > 1) Then
-            CheckSpelling(Token.Token, Token.Line, Token.Column, Cmt);
+            CheckSpelling(Token.Token, Token.Line, Token.Column, scComments, Cmt);
         End;
       CheckTagSpelling(Cmt, strPrecon);
       CheckTagSpelling(Cmt, strPostcon);
@@ -645,7 +645,7 @@ End;
 
 **)
 procedure TBaseLanguageModule.CheckSpelling(Const strWord : String; Const
-    iLine, iColumn : Integer; Const Comment : TComment);
+    iLine, iColumn : Integer; Const eSpellingCategory : TBADISpellingCategory; Const Comment : TComment);
 
 Var
   boolFound: Boolean;
@@ -658,7 +658,7 @@ Begin
     BADIOptions.IgnoreDictionary.Find(strWord, iIndex) Or
     FIdentifierList.Find(strWord, iIndex);
   If Not boolFound Then
-    AddSpelling(strWord, iLine, iColumn, Comment);
+    AddSpelling(strWord, iLine, iColumn, eSpellingCategory, Comment);
 End;
 
 (**
@@ -689,7 +689,7 @@ Begin
             For i := 0 To sl.Count - 1 Do
               If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
                 If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
-                  CheckSpelling(sl[i], Token.Line, Token.Column, Nil);
+                  CheckSpelling(sl[i], Token.Line, Token.Column, scLiterals, Nil);
           Finally
             sl.Free;
           End;
@@ -726,7 +726,7 @@ Begin
         Begin
           Token := T.Tokens[iToken];
           If (Token.TokenType In [ttIdentifier]) And (Token.Length > 1) Then
-            CheckSpelling(Token.Token, Token.Line, Token.Column, Comment);
+            CheckSpelling(Token.Token, Token.Line, Token.Column, scComments, Comment);
         End;
     End;
 End;

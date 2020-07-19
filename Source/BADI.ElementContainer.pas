@@ -4,7 +4,7 @@
   and a label container for tree view headers and the like.
 
   @Author  David Hoyle
-  @Version 1.936
+  @Version 2.045
   @Date    19 Jul 2020
 
   @license
@@ -131,7 +131,7 @@ Type
     Function AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
       Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : TBADIIssueState;
     Function AddSpelling(Const strWord: String; Const iWordLine, iWordColumn: Integer;
-  Const Comment: TComment) : TBADIIssueState;
+      Const eSpellingCategory : TBADISpellingCategory; Const Comment: TComment) : TBADIIssueState;
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
@@ -315,7 +315,7 @@ End;
   This method adds and passed element container to this classes element collection.
 
   @precon  AElement must be a valid TElementContainer.
-  @postcon Adds and passed elemtn container to this classes element collection.
+  @postcon Adds and passed element container to this classes element collection.
 
   @param   AElement as a TElementContainer as a constant
   @return  a TElementContainer
@@ -471,7 +471,7 @@ End;
   This method adds a specific documentation conflict to the Documentation conflict collection.
 
   @precon  None.
-  @postcon Adds a specific documentation conflict to the Docuemntation conflict collection.
+  @postcon Adds a specific documentation conflict to the Documentation conflict collection.
 
   @param   Args           as an Array Of Const as a constant
   @param   iIdentLine     as an Integer as a constant
@@ -619,7 +619,7 @@ End;
   metrics, etc.
 
   @precon  Container must be a valid instance.
-  @postcon A container is added to the geiven container if it does not already exist.
+  @postcon A container is added to the given container if it does not already exist.
 
   @param   Container    as a TElementContainer as a constant
   @param   strLabelText as a String as a constant
@@ -642,17 +642,18 @@ End;
   Added a method to add spelling mistakes to the modules list of issues.
 
   @precon  None.
-  @postcon If spelling is not disabled the given word is added to the spelling m istakes list.
+  @postcon If spelling is not disabled the given word is added to the spelling mistakes list.
 
-  @param   strWord     as a String as a constant
-  @param   iWordLine   as an Integer as a constant
-  @param   iWordColumn as an Integer as a constant
-  @param   Comment     as a TComment as a constant
+  @param   strWord           as a String as a constant
+  @param   iWordLine         as an Integer as a constant
+  @param   iWordColumn       as an Integer as a constant
+  @param   eSpellingCategory as a TBADISpellingCategory as a constant
+  @param   Comment           as a TComment as a constant
   @return  a TBADIIssueState
 
 **)
 Function TElementContainer.AddSpelling(Const strWord: String; Const iWordLine, iWordColumn: Integer;
-  Const Comment: TComment) : TBADIIssueState;
+  Const eSpellingCategory : TBADISpellingCategory; Const Comment: TComment) : TBADIIssueState;
 
 ResourceString
   strSpellingMistakes = 'Spelling Mistakes';
@@ -680,6 +681,7 @@ Begin
     End;
   E := FindRoot;
   E := AddCategory(E, strSpellingMistakes, iiSpellingFolder);
+  E := AddCategory(E, astrSpellingCategory[eSpellingCategory], iiSpellingFolder);
   iL := iWordLine;
   iC := iWordColumn;
   If Assigned(Comment) Then
@@ -921,7 +923,7 @@ End;
   This method checks whether there are tag t disable spelling in general or on a specific word.
 
   @precon  None.
-  @postcon Returns return if spelling shoudl be disabled.
+  @postcon Returns return if spelling should be disabled.
 
   @param   Comment       as a TComment as a constant
   @param   strIdentifier as a String as a constant
@@ -960,7 +962,7 @@ End;
   implement document checking.
 
   @precon  None.
-  @postcon Recrusively checks the documentation of the module.
+  @postcon Recursively checks the documentation of the module.
 
   @param   boolCascade as a Boolean as a reference
 
@@ -1012,7 +1014,7 @@ End;
   of one of the parent comments.
 
   @precon  None.
-  @postcon Checks for a stop or no documnetation tag and returns true if found in the elements comment
+  @postcon Checks for a stop or no documentation tag and returns true if found in the elements comment
            of one of the parent comments.
 
   @param   Container as a TElementContainer as a constant
@@ -1080,7 +1082,7 @@ End;
   This method looks for the given identifier in the given containers tag comment tokens.
 
   @precon  Container must be a valid instance.
-  @postcon Trues true if the identifier is a token of the containers comment tag.
+  @postcon Returns true if the identifier is a token of the containers comment tag.
 
   @param   Container     as a TElementContainer as a constant
   @param   strIdentifier as a String as a constant
@@ -1121,7 +1123,7 @@ End;
 
   @precon  None.
   @postcon Recursively checks the referenced property and outputs a hint if any element is not
-           refrernced which has a scope of Local or Private.
+           referenced which has a scope of Local or Private.
 
 **)
 Procedure TElementContainer.CheckReferences;
@@ -1437,7 +1439,7 @@ End;
   This function finds the occurrence of the token and returns its index if found else returns -1.
 
   @precon  None.
-  @postcon Finds the occurance of the token and returns its index if found else returns -1.
+  @postcon Finds the occurrence of the token and returns its index if found else returns -1.
 
   @param   strToken as a String as a constant
   @return  an Integer

@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 2.224
-  @Date    18 Jul 2020
+  @Version 2.242
+  @Date    19 Jul 2020
 
   @license
 
@@ -56,7 +56,7 @@ Const
   (** A default list of symbols which should have spaces after them. **)
   strSpaceAfterSymbols = ['=', ':', '+', '-', '*', '\', ','];
 
-  (** A set of characters for whitespace **)
+  (** A set of characters for white space **)
   strWhiteSpace : Set Of AnsiChar = [#32, #9];
   (** A set of characters for line feed and carriage return **)
   strLineEnd : Set of AnsiChar = [#10, #13];
@@ -224,7 +224,7 @@ Const
     (FForeColour : clFuchsia;    FStyles : [];                     FBackColour: clNone)
   );
 
-  (** This is a list of image resource masks to be placed of the below images to create vesions
+  (** This is a list of image resource masks to be placed of the below images to create versions
       for different scopes. **)
   BADIScopeList : Array[Low(TScope)..High(TScope)] Of TImageIndexInfo = (
     (FResourceName : 'NoneMask';                      FMaskColour: clLime),
@@ -237,7 +237,7 @@ Const
     (FResourceName : 'FriendMask';                    FMaskColour: clLime)
   );
 
-  (** This is a list of Image Resource name to be loaded fom the executable. **)
+  (** This is a list of Image Resource name to be loaded from the executable. **)
   BADIImageList : Array[TBADIImageIndex] Of TImageIndexInfo = (
     (FResourceName : 'Module';                        FMaskColour: clLime),
 
@@ -615,7 +615,7 @@ Const
   strHCNumIgmoreZeroNoMetric = 'HCNumIgmoreZero';
   (** A constant name for the Hard Coded Strings metric so it can be disabled. **)
   strHardCodedStringNoMetric = 'HardCodedString';
-  (** A constant name for the Hard Coded Strings Igmore Empty metric so it can be disabled. **)
+  (** A constant name for the Hard Coded Strings Ignore Empty metric so it can be disabled. **)
   strHCStrIgnoreEmptyNoMetric = 'HCStrIgnoreEmpty';
   (** A constant name for the Hard Coded String Ignore Single metric so it can be disabled. **)
   strHCStrIgnoreSingleNoMetric = 'HCStrIgnoreSingle';
@@ -629,7 +629,7 @@ Const
   strNestedIFDepthNoMetric = 'NestedIFDepth';
   (** A constant name for the Cyclometric Complexity metric so it can be disabled. **)
   strCyclometricComplexityNoMetric = 'CyclometricComplexity';
-  (** A constant name for the Cyclometric Complexity Igmore Expressions metric so it can be disabled. **)
+  (** A constant name for the Cyclometric Complexity Ignore Expressions metric so it can be disabled. **)
   strCCIncludeExpressionNoMetric = 'CCIncludeExpression';
   (** A constant name for the Toxicity metric so it can be disabled. **)
   strToxicityNoMetric = 'Toxicity';
@@ -661,7 +661,7 @@ Const
   strEmptyMethodNoMetric = 'EmptyMethod';
   (** A constant name for the Missing CONST in Parameters metric so it can be disabled. **)
   strMissingCONSTInParamNoMetric = 'MissingCONSTInParam';
-  (** A constant name for the Missign Const in Parameters Ignore Event handlers metric so it can be
+  (** A constant name for the Missing Const in Parameters Ignore Event handlers metric so it can be
       disabled. **)
   strMCParmListIgnoreEventsNoMetric = 'MCParmListIgnoreEvents';
   (** A resource for disabling all errors on an element and its sub elements. **)
@@ -748,7 +748,7 @@ Const
       FLimitType: ltFloat)
   );
 
-  (** A constant array of information for the mnetric sub-options. **)
+  (** A constant array of information for the metric sub-options. **)
   ModuleMetricSubOps : Array[Low(TBADIModuleMetricSubOp)..High(TBADIModuleMetricSubOp)] Of
     TBADIMetricSubOpRecord = (
     (FName: 'MethodCCIncIF';         FDescription: strMethodCCIncIF;         FParentMetric: mmCyclometricComplexity),
@@ -969,6 +969,9 @@ Const
     'Metrics',
     'Spellings'
   );
+
+  (** A constant array of strings for the spelling issue categories. **)
+  astrSpellingCategory : Array[TBADISpellingCategory] of String = ('Comments', 'Literals');
   
 Implementation
 

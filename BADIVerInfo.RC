@@ -1,8 +1,8 @@
 LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
 
 1 VERSIONINFO LOADONCALL MOVEABLE DISCARDABLE IMPURE
-FILEVERSION 1, 3, 2, 8962
-PRODUCTVERSION 1, 3, 2, 8962
+FILEVERSION 1, 3, 2, 9024
+PRODUCTVERSION 1, 3, 2, 9024
 FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
 FILEOS VOS__WINDOWS32
 FILETYPE VFT_APP
@@ -11,16 +11,16 @@ FILETYPE VFT_APP
   {
     BLOCK "040904E4"
     {
-      VALUE "CompanyName", "Season's Fall Music\000"
-      VALUE "FileDescription", "Browse and Doc It: A RAD Studio IDE plug-in to help you browse and document your code.\000"
-      VALUE "FileVersion", "1.3.2.8962\000"
-      VALUE "InternalName", "BrowseAndDocItTests\000"
-      VALUE "LegalCopyright", "Season's Fall Music\000"
-      VALUE "LegalTrademarks", "Season's Fall Music\000"
-      VALUE "OriginalFilename", "BrowseAndDocItTests\000"
-      VALUE "ProductName", "BrowseAndDocItTests\000"
+      VALUE "CompanyName", "Season's Fall Music Limited (c) 1989\000"
+      VALUE "FileDescription", "A Delphi IDE adding for browsing and documenting code\000"
+      VALUE "FileVersion", "1.3.2.9024\000"
+      VALUE "InternalName", "Season's Fall Music Limited (c) 1989\000"
+      VALUE "LegalCopyright", "Season's Fall Music Limited (c) 1989\000"
+      VALUE "LegalTrademarks", "Season's Fall Music Limited (c) 1989\000"
+      VALUE "OriginalFilename", "BrowseAndDocIt\000"
+      VALUE "ProductName", "BrowseAndDocIt\000"
       VALUE "ProductVersion", "1.3b\000"
-      VALUE "Comments", "Browse and Doc It: A RAD Studio IDE plug-in to help you browse and document your code.\000"
+      VALUE "Comments", "\000"
     }
   }
   BLOCK "VarFileInfo"

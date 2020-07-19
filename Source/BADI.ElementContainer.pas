@@ -4,8 +4,8 @@
   and a label container for tree view headers and the like.
 
   @Author  David Hoyle
-  @Version 1.923
-  @Date    18 Jul 2020
+  @Version 1.936
+  @Date    19 Jul 2020
 
   @license
 
@@ -230,7 +230,8 @@ Uses
   BADI.Functions,
   BADI.Constants,
   BADI.Comment.Tag,
-  BADI.Base.Module;
+  BADI.Base.Module,
+  BADI.SpellingIssue;
 
 Type
   (** A record to describe error, warning, and hint messages. **)
@@ -686,7 +687,7 @@ Begin
       iL := Comment.Line;
       iC := Comment.Column;
     End;
-  E.Add(TDocumentConflict.Create([], iWordLine, iWordColumn, iL, iC, strWord, '', iiSpellingItem, ctSpelling));
+  E.Add(TBADISpellingIssue.Create(strWord, '', iWordLine, iWordColumn, iL, iC));
 End;
 
 (**

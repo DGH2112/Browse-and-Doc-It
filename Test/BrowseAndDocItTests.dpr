@@ -185,7 +185,8 @@ uses
   BADI.ModuleStats in '..\Source\BADI.ModuleStats.pas',
   Test.BADI.ModuleStats in 'Source\Test.BADI.ModuleStats.pas',
   BADI.ModuleStatsList in '..\Source\BADI.ModuleStatsList.pas',
-  Test.BADI.ModuleStatsList in 'Source\Test.BADI.ModuleStatsList.pas';
+  Test.BADI.ModuleStatsList in 'Source\Test.BADI.ModuleStatsList.pas',
+  BADI.SpellingIssue in '..\Source\BADI.SpellingIssue.pas';
 
 {$R *.RES}
 

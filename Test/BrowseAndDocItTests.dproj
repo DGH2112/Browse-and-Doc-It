@@ -301,6 +301,7 @@
         <DCCReference Include="Source\Test.BADI.ModuleStats.pas"/>
         <DCCReference Include="..\Source\BADI.ModuleStatsList.pas"/>
         <DCCReference Include="Source\Test.BADI.ModuleStatsList.pas"/>
+        <DCCReference Include="..\Source\BADI.SpellingIssue.pas"/>
         <None Include="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage"/>
         <None Include="..\Source\CompilerDefinitions.inc"/>
         <BuildConfiguration Include="Debug">
@@ -367,15 +368,15 @@
                 <Platform value="Win32">True</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="BrowseAndDocItTests.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>BrowseAndDocItTests.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_BrowseAndDocItTestsXE2\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

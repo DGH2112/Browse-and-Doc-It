@@ -228,7 +228,8 @@ uses
   BADI.DocIssueTotals in 'Source\BADI.DocIssueTotals.pas',
   BADI.DocIssuesHintWindow in 'Source\BADI.DocIssuesHintWindow.pas',
   BADI.ProjectNotifier in 'Source\BADI.ProjectNotifier.pas',
-  BADI.Spelling.OpsFrame in 'Source\BADI.Spelling.OpsFrame.pas' {frameBADISpellingOpions: TFrame};
+  BADI.Spelling.OpsFrame in 'Source\BADI.Spelling.OpsFrame.pas' {frameBADISpellingOpions: TFrame},
+  BADI.SpellingIssue in 'Source\BADI.SpellingIssue.pas';
 
 {$R *.res}
 

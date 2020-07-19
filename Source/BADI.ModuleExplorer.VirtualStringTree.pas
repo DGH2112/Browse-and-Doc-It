@@ -3,8 +3,8 @@
   This module contains a custom virtual string tree class for the BADI module explorer.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    17 Aug 2019
+  @Version 1.008
+  @Date    19 Jul 2020
 
   @license
 
@@ -37,17 +37,15 @@ Uses
   BADI.ModuleExplorer.TreeNodeInfo;
 
 Type
-  (** This is a descendant of the TVirtualStringTree in order to override the
-      OnGetNodeWidth method. **)
+  (** This is a descendant of the TVirtualStringTree in order to override the OnGetNodeWidth method. **)
   TBADIVirtualStringTree = Class(TVirtualStringTree)
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    //: @nometric MissingCONSTInParam
-    Function DoGetNodeWidth(Node: PVirtualNode; Column: TColumnIndex;
-      Canvas: TCanvas = Nil) : Integer; Override;
+    Function DoGetNodeWidth(Node: PVirtualNode; Column: TColumnIndex; Canvas: TCanvas = Nil) : Integer;
+      Override;
   End;
 
   (** This is an enumerate to defines the information type in the explorer module tree nodes. **)
-  TBADINodeType = (ntLabel, ntDocConflict, ntDocIssue, ntElement);
+  TBADINodeType = (ntLabel, ntDocConflict, ntDocIssue, ntElement, ntSpellingIssue);
 
   (** This record described the data sorted in the virtual tree view. **)
   TBADITreeData = Record

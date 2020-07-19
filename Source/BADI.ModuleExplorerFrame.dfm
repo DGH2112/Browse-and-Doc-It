@@ -556,7 +556,7 @@ object frameModuleExplorer: TframeModuleExplorer
   object alToolbar: TActionList
     Images = ilToolbar
     Left = 33
-    Top = 173
+    Top = 189
     object actLocal: TAction
       Category = 'Scope'
       Caption = 'actLocal'
@@ -699,11 +699,33 @@ object frameModuleExplorer: TframeModuleExplorer
       OnExecute = actLocalExecute
       OnUpdate = actLocalUpdate
     end
+    object actAddToDictionary: TAction
+      Category = 'Spelling'
+      Caption = '&Add to Dictionary'
+      OnExecute = actAddToDictionaryExecute
+      OnUpdate = actSpellingUpdate
+    end
+    object actIgnoreSpellingMistake: TAction
+      Category = 'Spelling'
+      Caption = '&Ignore Spelling Mistake'
+      OnExecute = actIgnoreSpellingMistakeExecute
+      OnUpdate = actSpellingUpdate
+    end
   end
   object tmFilter: TTimer
     Interval = 100
     OnTimer = tmFilterTimer
     Left = 32
     Top = 232
+  end
+  object pmExplorerContext: TPopupMenu
+    Left = 176
+    Top = 128
+    object AddtoDictionary1: TMenuItem
+      Action = actAddToDictionary
+    end
+    object IgnoreSpellingMistake1: TMenuItem
+      Action = actIgnoreSpellingMistake
+    end
   end
 end

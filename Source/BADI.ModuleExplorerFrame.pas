@@ -1,11 +1,11 @@
 ﻿(**
 
   This module contains a frame which holds all the functionality of the
-  module browser so that it can be independant of the application specifics.
+  module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 3.095
-  @Date    18 Jul 2020
+  @Version 22.924
+  @Date    19 Jul 2020
 
   @license
 
@@ -26,8 +26,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-  @nometric UnsortedModule
 
 **)
 Unit BADI.ModuleExplorerFrame;
@@ -60,7 +58,7 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types, System.Actions, System.ImageList;
+  BADI.Types, System.Actions, System.ImageList, Vcl.Menus;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
@@ -116,6 +114,14 @@ Type
     actMetrics: TAction;
     tbtnMetrics: TToolButton;
     tmFilter: TTimer;
+    pmExplorerContext: TPopupMenu;
+    actAddToDictionary: TAction;
+    actIgnoreSpellingMistake: TAction;
+    AddtoDictionary1: TMenuItem;
+    IgnoreSpellingMistake1: TMenuItem;
+    procedure actAddToDictionaryExecute(Sender: TObject);
+    procedure actSpellingUpdate(Sender: TObject);
+    procedure actIgnoreSpellingMistakeExecute(Sender: TObject);
     Procedure actLocalUpdate(Sender: TObject);
     Procedure actLocalExecute(Sender: TObject);
     Procedure FilterChange;
@@ -185,6 +191,8 @@ Type
     FLastFilterUpdate  : Int64;
     FLineDocIssues     : TDictionary<Integer,IBADILineDocIssues>;
     FDocIssueTotals    : IBADIDocIssueTotals;
+  private
+    procedure DoRefresh(Sender: TObject);
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -286,9 +294,9 @@ Type
     **)
     Property OnRefresh : TNotifyEvent Read FRefresh Write FRefresh;
     (**
-      This property exposes the virtual tree view to ouside sources.
+      This property exposes the virtual tree view to outside sources.
       @precon  None.
-      @postcon Exposes the virtual tree view to ouside sources.
+      @postcon Exposes the virtual tree view to outside sources.
       @return  a TBADIVirtualStringTree
     **)
     Property Explorer : TBADIVirtualStringTree Read FExplorer;
@@ -330,7 +338,8 @@ Uses
   BADI.ModuleExplorer.TreeNodeInfo,
   BADI.DocIssue,
   BADI.LineDocIssue,
-  BADI.DocIssueTotals;
+  BADI.DocIssueTotals,
+  BADI.SpellingIssue;
 
 Resourcestring
   (** A format pattern for the bytes statusbar text. **)
@@ -361,6 +370,44 @@ Const
   iDivisor = 2;
 
 {$R *.dfm}
+
+(**
+
+  This is an on execute event handler for the Add to Dictionary action.
+
+  @precon  None.
+  @postcon Adds the selected word to the local dictionary.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actAddToDictionaryExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.LocalDictionary.Add(FExplorer.Text[FExplorer.FocusedNode, 0]);
+  (*TODO: extracted code
+  If Assigned(FRefresh) Then
+    FRefresh(Sender);
+  *)
+  DoRefresh(Sender);
+End;
+
+(**
+
+  This is an on execute event handler for the Ignore Spelling Mistake action.
+
+  @precon  None.
+  @postcon Adds the selected word to the ignore dictionary.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actIgnoreSpellingMistakeExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.IgnoreDictionary.Add(FExplorer.Text[FExplorer.FocusedNode, 0]);
+  DoRefresh(Sender);
+End;
 
 (**
 
@@ -455,13 +502,12 @@ begin
       UpdateOptions(doShowUndocumentedClasses);
       UpdateOptions(doShowUndocumentedInterfaces);
     End;
-  If Assigned(FRefresh) Then
-    FRefresh(Sender);
+  DoRefresh(Sender);
 end;
 
 (**
 
-  This is an on update event handler for the sceop actions.
+  This is an on update event handler for the scope actions.
 
   @precon  None.
   @postcon Checks the action depending on the scopes in ScopesToRender.
@@ -509,6 +555,38 @@ begin
   Else If Sender = actTypes Then
     (Sender As TAction).Checked := doShowUndocumentedTypes In TBADIOptions.BADIOptions.Options
 end;
+
+(**
+
+  This is an on update event handler for the Spelling actions.
+
+  @precon  None.
+  @postcon Enables the context menus for spelling actions.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actSpellingUpdate(Sender: TObject);
+
+Var
+  A: TAction;
+  boolEnabled : Boolean;
+  NodeData : PBADITreeData;
+
+Begin
+  If Sender Is TAction Then
+    Begin
+      A := Sender As TAction;
+      boolEnabled := A.Enabled;
+      If Assigned(FExplorer.FocusedNode) Then
+        Begin
+          NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
+          boolEnabled := (NodeData.FNodeType = ntSpellingIssue)
+        End;
+      If boolEnabled <> A.Enabled Then
+        A.Enabled := boolEnabled;
+    End;
+End;
 
 (**
 
@@ -574,6 +652,8 @@ begin
     NodeData.FNodeType := ntDocConflict
   Else If Element Is TDocIssue Then
     NodeData.FNodeType := ntDocIssue
+  Else If Element Is TBADISpellingIssue Then
+    NodeData.FNodeType := ntSpellingIssue
   Else
     NodeData.FNodeType := ntElement;
   N := TBADITreeNodeInfo.Create(Element, iLevel);
@@ -678,6 +758,7 @@ begin
   FExplorer.Images := TBADIOptions.BADIOptions.ScopeImageList;
   FExplorer.TabOrder := iTabOrder;
   FExplorer.TreeOptions.MiscOptions := FExplorer.TreeOptions.MiscOptions + [toVariableNodeHeight];
+  FExplorer.TreeOptions.SelectionOptions := FExplorer.TreeOptions.SelectionOptions + [toRightClickSelect];
   FExplorer.EmptyListMessage := strBrowseAndDocItCannotParse;
   FExplorer.OnAfterCellPaint := tvExplorerAfterCellPaint;
   FExplorer.OnBeforeItemPaint := tvExplorerBeforeItemPaint;
@@ -689,6 +770,7 @@ begin
   FExplorer.OnExpanded := tvExplorerNodeExpanded;
   FExplorer.OnCollapsed := tvExplorerNodeExpanded;
   FExplorer.OnChange := tvExplorerChange;
+  FExplorer.PopupMenu := pmExplorerContext;
   FMouseEnter := False;
   FFiltering := False;
   FExplorer.NodeDataSize := SizeOf(TBADITreeData);
@@ -705,10 +787,10 @@ end;
 
 (**
 
-  This method create both the todo folder node and the document conflict folders in the treeview.
+  This method create the special tags folder nodes and the document conflict folders in the treeview.
 
   @precon  None.
-  @postcon Creates the special tag noNode.
+  @postcon Creates the special tag nodes.
 
 **)
 Procedure TframeModuleExplorer.CreateSpecialTagNodes();
@@ -758,6 +840,23 @@ begin
   FNodeInfo.Free;
   Inherited;
 end;
+
+(**
+
+  This method refreshes the module explorer by asking for the module to be re-parsed.
+
+  @precon  None.
+  @postcon The module is re-parsed.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.DoRefresh(Sender: TObject);
+
+Begin
+  If Assigned(FRefresh) Then
+    FRefresh(Sender);
+End;
 
 (**
 
@@ -847,7 +946,7 @@ End;
 
   This method renders a selection rectangle around the selected note.
 
-  @precon  NodeData must be a valid pointer to a TTreeData node fo the node being rendered and sl
+  @precon  NodeData must be a valid pointer to a TTreeData node of the node being rendered and sl
            must contain the string tokens to be rendered.
   @postcon The selection rectangle is rendered (accounting for extra width due to font
            preferences).
@@ -1205,7 +1304,7 @@ procedure TframeModuleExplorer.ExpandNodes;
     children).
 
     @precon  None.
-    @postcon Returns true if the node text matches the requried text.
+    @postcon Returns true if the node text matches the required text.
 
     @param   strNodeText  as a String as a constant
     @param   strMatchText as a String as a constant
@@ -1308,7 +1407,7 @@ end;
   This method updates the filtering of the treeview.
 
   @precon  None.
-  @postcon The treeview filter is updated onyl showing node that match the filter text.
+  @postcon The treeview filter is updated only showing node that match the filter text.
 
 **)
 Procedure TframeModuleExplorer.FilterChange;
@@ -1424,7 +1523,7 @@ End;
   This method attempts to focus the FFollowNode in the treeview.
 
   @precon  None.
-  @postcon If the FFollowNode is not visible the ifrst visible parent node is focused.
+  @postcon If the FFollowNode is not visible the first visible parent node is focused.
 
 **)
 Procedure TframeModuleExplorer.FocusFollowedNode;
@@ -1452,7 +1551,7 @@ End;
   This method attempts to focus the node (element) which contains the cursor line provided.
 
   @precon  None.
-  @postcon If found the elements or its first visibel parent is focused.
+  @postcon If found the elements or its first visible parent is focused.
 
   @param   iLine as an Integer as a constant
 
@@ -1552,7 +1651,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     This procedure adds a doc issue to the module based on a line and tag record.
 
     @precon  None.
-    @postcon A doc issue is aded tot he module.
+    @postcon A doc issue is added to the module.
 
     @param   iLine as an Integer as a constant
     @param   Tag   as a TSpecialTagNode as a constant
@@ -1581,7 +1680,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     This procedure adds a doc issue to the module based on a line and tag name.
 
     @precon  None.
-    @postcon A doc issue is aded tot he module.
+    @postcon A doc issue is added to the module.
 
     @param   iLine      as an Integer as a constant
     @param   strTagName as a String as a constant
@@ -1743,7 +1842,7 @@ End;
   This method gets the tree nodes that are currently expanded and stores them in a string list.
 
   @precon  Node is the tree node to be tested for expansion.
-  @postcon Adds, update or deletes nodes from the expanded node list depending whether thhey are
+  @postcon Adds, update or deletes nodes from the expanded node list depending whether they are
            now expanded.
 
   @param   StartNode as a PVirtualNode as a constant
@@ -1829,7 +1928,7 @@ End;
 
 (**
 
-  This method initalises a TMatchResult record as we cannot define constructors for annoymous
+  This method initialises a TMatchResult record as we cannot define constructors for anonymous
   records.
 
   @precon  None.
@@ -1967,6 +2066,7 @@ Var
   DC: TDocumentConflict;
   recTotalInfo : TBADITotalInfo;
   recDocIssueInfo : TBADIDocIssueInfo;
+  SI: TBADISpellingIssue;
 
 Begin
   If Element Is TDocIssue Then
@@ -2002,14 +2102,34 @@ Begin
       If FLineDocIssues.TryGetValue(DC.Line, LineDocIssues) Then
         LineDocIssues.AddIssue(astrLimitType[eLimitType], recDocIssueInfo)
       Else
-        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType],
-          recDocIssueInfo));
+        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo));
       recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
       recTotalInfo.FForeColour := clNone;
       recTotalInfo.FBackColour := clNone;
       recTotalInfo.FFontStyles := [];
       recTotalInfo.FFirstLine := DC.Line;
       recTotalInfo.FFirstCol := DC.Column;
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);    
+    End
+  Else If Element Is TBADISpellingIssue Then
+    Begin
+      SI := Element As TBADISpellingIssue;
+      eLimitType := ConflictTypeToLimitType(ctSpelling);
+      recDocIssueInfo.FName := astrLimitType[eLimitType];
+      recDocIssueInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recDocIssueInfo.FForeColour := clNone;
+      recDocIssueInfo.FBackColour := clNone;
+      recDocIssueInfo.FMessage := Element.AsString(False, False);
+      If FLineDocIssues.TryGetValue(SI.Line, LineDocIssues) Then
+        LineDocIssues.AddIssue(astrLimitType[eLimitType], recDocIssueInfo)
+      Else
+        FLineDocIssues.Add(SI.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo));
+      recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recTotalInfo.FForeColour := clNone;
+      recTotalInfo.FBackColour := clNone;
+      recTotalInfo.FFontStyles := [];
+      recTotalInfo.FFirstLine := SI.Line;
+      recTotalInfo.FFirstCol := SI.Column;
       FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);    
     End;
 End;
@@ -2264,10 +2384,10 @@ End;
 
 (**
 
-  This method expands the tree view nodes if they are foudn in the list.
+  This method expands the tree view nodes if they are found in the list.
 
   @precon  Node is the tree node to be expanded.
-  @postcon Sets the node as expanded if it was in the edpanded node list.
+  @postcon Sets the node as expanded if it was in the expanded node list.
 
   @param   StartNode as a PVirtualNode as a constant
 
@@ -2299,7 +2419,7 @@ End;
   This is a setter method for the ExplorerFilter property.
 
   @precon  None.
-  @postcon Sets the FExplorerFilter field and determiens whether a simple panel is to be displayed for
+  @postcon Sets the FExplorerFilter field and determines whether a simple panel is to be displayed for
            the filter text information.
 
   @param   strValue as a String as a constant
@@ -2348,7 +2468,7 @@ End;
 
 (**
 
-  This is an on timer event handelr for the filter text.
+  This is an on timer event handler for the filter text.
 
   @precon  None.
   @postcon Attempts to filter the text in the treeview.
@@ -2397,7 +2517,7 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     This local method highlights the text matches passed in the given colour.
 
     @precon  None.
-    @postcon If there are matches these are highlighed.
+    @postcon If there are matches these are highlighted.
 
     @param   MC      as a TMatchCollection as a constant
     @param   strText as a String as a constant
@@ -2523,12 +2643,12 @@ Begin
     Exit;
   FSelectionChanging := True;
   Try
-    If FExplorer.FocusedNode <> Nil Then
+    If Assigned(FExplorer.FocusedNode) Then
       If Assigned(FSelectionChange) And Not FRendering Then
         Begin
           NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
-          If NodeData.FNode <> Nil Then
-            If NodeData.FNode.Comment = Nil Then
+          If Assigned(NodeData.FNode) Then
+            If Not Assigned(NodeData.FNode.Comment) Then
               FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line)
             Else
               FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);
@@ -2756,7 +2876,7 @@ end;
   This is an on node expanded / collapsed event handler for the explorer view.
 
   @precon  None.
-  @postcon Attempts tto re-focus the followed node when nodes are expanded or collapsed.
+  @postcon Attempts to re-focus the followed node when nodes are expanded or collapsed.
 
   @param   Sender as a TBaseVirtualTree
   @param   Node   as a PVirtualNode

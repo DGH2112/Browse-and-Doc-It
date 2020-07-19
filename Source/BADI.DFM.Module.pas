@@ -1,10 +1,10 @@
 (**
 
-  DFMModule : A unit to tokenize DFM code.
+  DFMModule : A unit to tokenise DFM code.
 
   @Author  David Hoyle
-  @Version 1.007
-  @Date    12 Jul 2020
+  @Version 1.780
+  @Date    19 Jul 2020
 
   @license
 
@@ -56,24 +56,24 @@ Type
     FSource                  : String;
     { Grammar Parsers }
     Procedure Goal;
-    Function  DFMObject(Container : TElementContainer) : Boolean;
-    Function  DFMProperty(Container : TElementContainer) : Boolean;
-    Function  DFMIdentifier(Container : TElementContainer) : Boolean;
-    Function  StringLiteral(Container : TElementContainer) : Boolean;
-    Function  Number(Container : TElementContainer) : Boolean;
-    Function  DFMSet(Container : TElementContainer) : Boolean;
-    Function  ItemList(Container : TElementContainer) : Boolean;
-    Function  BinaryData(Container : TElementContainer) : Boolean;
-    Function  ListData(Container : TElementContainer) : Boolean;
+    Function  DFMObject(Const Container : TElementContainer) : Boolean;
+    Function  DFMProperty(Const Container : TElementContainer) : Boolean;
+    Function  DFMIdentifier(Const Container : TElementContainer) : Boolean;
+    Function  StringLiteral(Const Container : TElementContainer) : Boolean;
+    Function  Number(Const Container : TElementContainer) : Boolean;
+    Function  DFMSet(Const Container : TElementContainer) : Boolean;
+    Function  ItemList(Const Container : TElementContainer) : Boolean;
+    Function  BinaryData(Const Container : TElementContainer) : Boolean;
+    Function  ListData(Const Container : TElementContainer) : Boolean;
     Function  QualifiedIdent : String;
-    Procedure IdentList(Container : TElementContainer);
-    Function  Item(Container : TElementContainer) : Boolean;
-    Procedure DFMIndex(Container : TElementContainer);
+    Procedure IdentList(Const Container : TElementContainer);
+    Function  Item(Const Container : TElementContainer) : Boolean;
+    Procedure DFMIndex(Const Container : TElementContainer);
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
     Procedure TidyUpEmptyElements;
-    Procedure ConcatStrings(Container : TElementContainer);
+    Procedure ConcatStrings(Const Container : TElementContainer);
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetModuleName : String; Override;
     Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -118,35 +118,56 @@ Const
 
 (**
 
+  This function returns a string representation of the unit.
+
+  @precon  None .
+  @postcon Returns a string representation of the unit .
+
+  @nohints
+
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
+  @return  a String
+
+**)
+function TDFMModule.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean): String;
+
+begin
+  Result := ExtractFileName(Identifier);
+end;
+
+(**
+
   This method parses the BinaryData element of the grammar.
 
   @precon  Container must be a valid instance of TElementContainer class.
   @postcon Returns true if a BinaryData element was parsed.
 
-  @param   Container as a TElementContainer
+  @param   Container as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-function TDFMModule.BinaryData(Container: TElementContainer): Boolean;
-begin
+Function TDFMModule.BinaryData(Const Container: TElementContainer): Boolean;
+
+Begin
   Result := Token.TokenType In [ttCustomUserToken];
   If Result Then
     AddToExpression(Container);
-end;
+End;
 
 (**
 
-  This method concatenates single and double string literal is they are on
-  the same line and occur next to each other without spaces.
+  This method concatenates single and double string literal is they are on the same line and occur next 
+  to each other without spaces.
 
   @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Concatenates single and double string literal is they are on
-           the same line and occur next to each other without spaces.
+  @postcon Concatenates single and double string literal is they are on the same line and occur next to 
+           each other without spaces.
 
-  @param   Container as a TElementContainer
+  @param   Container as a TElementContainer as a constant
 
 **)
-procedure TDFMModule.ConcatStrings(Container: TElementContainer);
+procedure TDFMModule.ConcatStrings(Const Container: TElementContainer);
 
 Var
   L : TTokenInfo;
@@ -168,7 +189,7 @@ end;
 
 (**
 
-  This is the constructor method for the TPascalDocModule class.
+  This is the constructor method for the TDFMModule class.
 
   @precon  Source is a valid TStream descendant containing as stream of text, that is the contents of a 
            source code module and Filename is the file name of the module being parsed and IsModified 
@@ -184,25 +205,32 @@ end;
 Constructor TDFMModule.CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
   Const ModuleOptions : TModuleOptions);
 
+Const
+  strStart = 'Start';
+  strTokenize = 'Tokenize';
+  strParse = 'Parse';
+  strRefs = 'Refs';
+  strSpelling = 'Spelling';
+
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   CompilerDefines.Assign(BADIOptions.Defines);
   FSource := Source;
-  AddTickCount('Start');
+  AddTickCount(strStart);
   CommentClass := Nil;
   TokenizeStream;
-  AddTickCount('Tokenize');
+  AddTickCount(strTokenize);
   If moParse In ModuleOptions Then
     Begin
       ParseTokens;
-      AddTickCount('Parse');
+      AddTickCount(strParse);
       Add(strErrors, iiErrorFolder, scNone);
       Add(strWarnings, iiWarningFolder, scNone);
       Add(strHints, iiHintFolder, scNone);
       Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
-      AddTickCount('Refs');
+      AddTickCount(strRefs);
       CheckStringSpelling;
-      AddTickCount('Spelling');
+      AddTickCount(strSpelling);
       TidyUpEmptyElements;
     End;
 End;
@@ -213,7 +241,7 @@ End;
   This is a destructor for the TDFMModule class.
 
   @precon  None.
-  @postcon Fress the memory fo this instance.
+  @postcon Frees the memory for this instance.
 
 
 **)
@@ -224,16 +252,65 @@ end;
 
 (**
 
-  Thids method parses the Object element of the grammar.
+  This method parses the Identifier element of the grammar.
 
   @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Returns true if an onject was found.
+  @postcon Returns true IF the current token is an identifier.
 
-  @param   Container as a TElementContainer
+  @param   Container as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-function TDFMModule.DFMObject(Container : TElementContainer): Boolean;
+function TDFMModule.DFMIdentifier(Const Container: TElementContainer): Boolean;
+begin
+  Result := Token.TokenType In [ttIdentifier];
+  If Result Then
+    Container.AddToken(QualifiedIdent);
+end;
+
+(**
+
+  This method parses the Index element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Parses the Index element of the grammar.
+
+  @param   Container as a TElementContainer as a constant
+
+**)
+procedure TDFMModule.DFMIndex(Const Container: TElementContainer);
+begin
+  If Token.Token = '[' Then
+    Begin
+      AddToExpression(Container);
+      Number(Container);
+      If Token.Token = ']' Then
+        AddToExpression(Container)
+      Else
+        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual, Self);
+    End;
+end;
+
+(**
+
+  This method parses the Object element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Returns true if an object was found.
+
+  @nocheck EmptyWhile
+
+  @param   Container as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+function TDFMModule.DFMObject(Const Container : TElementContainer): Boolean;
+
+Const
+  astrObjects : TArray<String> = ['inherited', 'inline', 'object'];
+  strINHERITED = 'INHERITED';
+  strINLINE = 'INLINE';
+  strEND = 'END';
 
 Var
   O : TDFMObject;
@@ -241,13 +318,13 @@ Var
 
 begin
   Result := False;
-  If IsKeyWord(Token.UToken, ['inherited', 'inline', 'object']) Then
+  If IsKeyWord(Token.UToken, astrObjects) Then
     Begin
       Result := True;
       AObjectType := otObject;
-      If Token.UToken = 'INHERITED' Then
+      If Token.UToken = strINHERITED Then
         AObjectType := otInherited
-      Else If Token.UToken = 'INLINE' Then
+      Else If Token.UToken = strINLINE Then
         AObjectType := otinline;
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier] Then
@@ -264,10 +341,10 @@ begin
                   AddToExpression(O);
                   DFMIndex(O);
                   While DFMObject(O) Or DFMProperty(O) Do;
-                  If Token.UToken = 'END' Then
+                  If Token.UToken = strEND Then
                     NextNonCommentToken
                   Else
-                    ErrorAndSeekToken(strReservedWordExpected, 'END', strSeekableOnErrorTokens,
+                    ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens,
                       stActual, Self);
                 End Else
                   ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual,
@@ -286,11 +363,13 @@ end;
   @precon  Container must be a valid instance of TElementContainer class.
   @postcon Returns true is a property was parsed.
 
-  @param   Container as a TElementContainer
+  @nocheck EmptyThen
+
+  @param   Container as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-function TDFMModule.DFMProperty(Container: TElementContainer): Boolean;
+function TDFMModule.DFMProperty(Const Container: TElementContainer): Boolean;
 
 Var
   P: TDFMProperty;
@@ -322,11 +401,11 @@ end;
   @precon  Container must be a valid instance of TElementContainer class.
   @postcon Returns true if a DFM Set was parsed.
 
-  @param   Container as a TElementContainer
+  @param   Container as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-function TDFMModule.DFMSet(Container: TElementContainer): Boolean;
+function TDFMModule.DFMSet(Const Container: TElementContainer): Boolean;
 begin
   Result := False;
   If Token.Token = '[' Then
@@ -339,6 +418,380 @@ begin
       Else
         ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual, Self);
     End;
+end;
+
+(**
+
+  This method returns an array of key words for use in the explorer module.
+
+  @precon  None.
+  @postcon Returns an array of key words for use in the explorer module.
+
+  @return  a TKeyWords
+
+**)
+function TDFMModule.Directives: TKeyWords;
+
+begin
+  Result := Nil;
+end;
+
+(**
+
+  This is an overridden GetComment which only returns Nil. Comments aren`t used.
+
+  @precon  None.
+  @postcon Returns nil.
+
+  @nohints
+
+  @param   CommentPosition as a TCommentPosition as a constant
+  @return  a TComment
+
+**)
+function TDFMModule.GetComment(Const CommentPosition: TCommentPosition): TComment;
+
+Begin
+  Result := Nil;
+End;
+
+(**
+
+  This is a getter method for the ModuleName property.
+
+  @precon  None.
+  @postcon Overrides the inherited method to place the module type in front of
+           the module name.
+
+  @return  a String
+
+**)
+Function TDFMModule.GetModuleName : String;
+
+Begin
+  Result := Inherited GetModuleName;
+End;
+
+(**
+
+  This method is the starting position for the parsing of an object pascal
+  module. It finds the first non comment token and begins the grammar checking
+  from their by delegating to the program, library, unit and package methods.
+
+  @precon  None.
+  @postcon It finds the first non comment token and begins the grammar checking
+           from their by delegating to the program, library, unit and package
+           methods.
+
+**)
+procedure TDFMModule.Goal;
+
+begin
+  Try
+    If TokenCount > 0 Then
+      Begin
+        // Find first non comment token
+        While (Token.TokenType In [ttLineComment, ttBlockComment,
+          ttCompilerDirective]) And Not EndOfTokens Do
+          NextNonCommentToken;
+        // Check for end of file else must be identifier
+        If Not EndOfTokens Then
+          Begin
+            DFMObject(Self);
+            If Not (Token.TokenType In [ttFileEnd]) Then
+              AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError, Self);
+          End Else
+          Begin
+            AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError, Self);
+            Raise EBADIParserAbort.Create(strParsingAborted);
+          End;
+      End;
+  Except
+    On E : EBADIParserAbort Do
+      AddIssue(E.Message, scNone, 0, 0, etError, Self);
+  End;
+end;
+
+(**
+
+  This method parses the IdentList element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Adds an list of comma separated identifiers to the container.
+
+  @param   Container as a TElementContainer as a constant
+
+**)
+procedure TDFMModule.IdentList(Const Container: TElementContainer);
+
+begin
+  If Token.TokenType In [ttIdentifier] Then
+    Begin
+      AddToExpression(Container);
+      While Token.Token = ',' Do
+        Begin
+          AddToExpression(Container);
+          If Token.TokenType In [ttIdentifier] Then
+            AddToExpression(Container)
+          Else
+            ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+        End;
+    End;
+end;
+
+(**
+
+  This method parses the item element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Parses an item if found.
+
+  @nocheck EmptyWhile
+
+  @param   Container as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+Function TDFMModule.Item(Const Container: TElementContainer) : Boolean;
+
+Const
+  strItem = 'Item';
+  strEND = 'END';
+
+Var
+  I : TDFMItem;
+
+begin
+  Result := False;
+  If CompareText(Token.Token, strItem) = 0 Then
+    Begin
+      Result := True;
+      I := Container.Add(TDFMItem.Create(Token.Token, scPublic, Token.Line,
+        Token.Column, iiPublicField, Nil)) As TDFMItem;
+      NextNonCommentToken;
+      While DFMProperty(I) Do;
+      If Token.UToken = strEND Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual, Self);
+    End;
+end;
+
+(**
+
+  This method parses the ItemList element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Returns true if a ItemList was parsed.
+
+  @nocheck EmptyWhile
+
+  @param   Container as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+function TDFMModule.ItemList(Const Container: TElementContainer): Boolean;
+
+Begin
+  Result := False;
+  If Token.Token = '<' Then
+    Begin
+      Result := True;
+      AddToExpression(Container);
+      While Item(Container) Do;
+      If Token.Token = '>' Then
+        AddToExpression(Container)
+      Else
+        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
+    End;
+End;
+
+(**
+
+  This method parses the list data element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Returns if a list data element was parsed.
+
+  @param   Container as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+function TDFMModule.ListData(Const Container: TElementContainer): Boolean;
+begin
+  Result := False;
+  If Token.Token = '(' Then
+    Begin
+      Result := True;
+      AddToExpression(Container);
+      While Token.TokenType In [ttNumber, ttSingleLiteral, ttDoubleLiteral] Do
+        Case Token.Create.TokenType Of
+          ttSingleLiteral, ttDoubleLiteral: StringLiteral(Container);
+        Else
+          AddToExpression(Container);
+        End;
+      If Token.Token = ')' Then
+        AddToExpression(Container)
+      Else
+        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+    End;
+end;
+
+(**
+
+  This method parses the number element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Returns true IF the current token is a number.
+
+  @param   Container as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+function TDFMModule.Number(Const Container: TElementContainer): Boolean;
+
+begin
+  Result := (Token.TokenType In [ttNumber]) Or (Token.Token = '-');
+  If Result Then
+    Begin
+      If Token.Token = '-' Then
+        Begin
+          AddToExpression(Container);
+          If Not (Token.TokenType In [ttNumber]) Then
+            ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+        End;
+      AddToExpression(Container);
+    End;
+end;
+
+(**
+
+  This is the method that should be called to parse the previously parse tokens.
+
+  @precon  None.
+  @postcon Attempts to parse the token list and check it grammatically for
+           Errors while providing declaration elements for browsing.
+
+**)
+Procedure TDFMModule.ParseTokens;
+
+Begin
+  Goal;
+End;
+
+(**
+
+  This method processes a compiler directive looking for conditional statements.
+
+  @precon  None.
+  @postcon Processes a compiler directive looking for conditional statements.
+
+  @nohints
+  @nocheck EmptyMethod
+
+  @param   iSkip as an Integer as a reference
+
+**)
+procedure TDFMModule.ProcessCompilerDirective(Var iSkip: Integer);
+
+Begin
+End;
+
+(**
+
+  This method parses the QualifiedIdent element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Returns the fully qualified (multi-part) identifier.
+
+  @return  a String
+
+**)
+function TDFMModule.QualifiedIdent: String;
+begin
+  Result := Token.Token;
+  NextNonCommentToken;
+  While Token.Token = '.' Do
+    Begin
+      NextNonCommentToken;
+      If Token.TokenType In [ttIdentifier] Then
+        Begin
+          Result := Result + '.' + Token.Token;
+          NextNonCommentToken;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+    End;
+end;
+
+(**
+
+  This method returns an array of key words for use in the explorer module.
+
+  @precon  None.
+  @postcon Returns an array of key words for use in the explorer module.
+
+  @return  a TKeyWords
+
+**)
+function TDFMModule.ReservedWords: TKeyWords;
+
+Var
+  i : Integer;
+
+begin
+  SetLength(Result, Succ(High(strReservedWords)));
+  For i := Low(strReservedWords) To High(strReservedWords) Do
+    Result[i] := strReservedWords[i];
+end;
+
+(**
+
+  This method parses the stringliteral element of the grammar.
+
+  @precon  Container must be a valid instance of TElementContainer class.
+  @postcon Returns true IF the current token is a string literal.
+
+  @param   Container as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+function TDFMModule.StringLiteral(Const Container: TElementContainer): Boolean;
+begin
+  Result := Token.TokenType In [ttSingleLiteral, ttDoubleLiteral];
+  If Result Then
+    Begin
+      ConcatStrings(Container);
+      While Token.Token = '+' Do
+        Begin
+          AddToExpression(Container);
+          If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
+            ConcatStrings(Container)
+          Else
+            ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+        End;
+    End;
+end;
+
+(**
+
+  This method remove the Implement Methods and Exported Headings IF they have
+  no elements.
+
+  @precon  None.
+  @postcon Remove the Implement Methods and Exported Headings IF they have
+           no elements.
+
+**)
+procedure TDFMModule.TidyUpEmptyElements;
+
+Var
+  iElement : Integer;
+
+begin
+  For iElement := ElementCount DownTo 1 Do
+    If Elements[iElement].ElementCount = 0 Then
+      If Not (Elements[iElement] Is TDFMObject) Then
+        DeleteElement(iElement);
 end;
 
 (**
@@ -358,7 +811,7 @@ Type
   TBlockType = (btNoBlock, btStringLiteral, btBinaryData, btChar);
 
 Const
-  (** A set of characters for alpha characaters **)
+  (** A set of characters for alpha characters **)
   strTokenChars : Set Of AnsiChar = ['_', 'a'..'z', 'A'..'Z'];
   (** A set of numbers **)
   strNumbers : Set Of AnsiChar = ['$', '0'..'9'];
@@ -372,6 +825,7 @@ Const
   iTokenCapacity = 100;
   strSingleSymbols : Set Of AnsiChar = ['(', ')', ';', ',', '[', ']', '^',
     '-', '+', '/', '*', '<', '>'];
+  strFileEnd = '<FileEnd>';
 
 Var
   (** Token buffer. **)
@@ -383,7 +837,7 @@ Var
   iLine : Integer;
   (** Current column number **)
   iColumn : Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
+  (** Token stream position. Fast to increment this than read the stream position. **)
   iStreamPos : Integer;
   (** Token line **)
   iTokenLine : Integer;
@@ -539,425 +993,8 @@ Begin
           AddToken(TTokenInfo.Create(strToken, iStreamPos,
             iTokenLine, iTokenColumn, Length(strToken), CurCharType));
       End;
-  AddToken(TTokenInfo.Create('<FileEnd>', iTokenLine, iTokenColumn,
+  AddToken(TTokenInfo.Create(strFileEnd, iTokenLine, iTokenColumn,
     Length(FSource), 0, ttFileEnd));
 End;
-
-(**
-
-  This is the method that should be called to parse the previously parse tokens.
-
-  @precon  None.
-  @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
-
-**)
-procedure TDFMModule.ParseTokens;
-begin
-  Goal;
-end;
-
-(**
-
-  This method parses the list data elmement of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Returns if a list data element was parsed.
-
-  @param   Container as a TElementContainer
-  @return  a Boolean
-
-**)
-function TDFMModule.ListData(Container: TElementContainer): Boolean;
-begin
-  Result := False;
-  If Token.Token = '(' Then
-    Begin
-      Result := True;
-      AddToExpression(Container);
-      While Token.TokenType In [ttNumber, ttSingleLiteral, ttDoubleLiteral] Do
-        Case Token.Create.TokenType Of
-          ttSingleLiteral, ttDoubleLiteral: StringLiteral(Container);
-        Else
-          AddToExpression(Container);
-        End;
-      If Token.Token = ')' Then
-        AddToExpression(Container)
-      Else
-        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
-    End;
-end;
-
-(**
-
-  This method returns an array of key words for use in the explorer module.
-
-  @precon  None.
-  @postcon Returns an array of key words for use in the explorer module.
-
-  @return  a TKeyWords
-
-**)
-function TDFMModule.ReservedWords: TKeyWords;
-
-Var
-  i : Integer;
-
-begin
-  SetLength(Result, Succ(High(strReservedWords)));
-  For i := Low(strReservedWords) To High(strReservedWords) Do
-    Result[i] := strReservedWords[i];
-end;
-
-(**
-
-  This method returns an array of key words for use in the explorer module.
-
-  @precon  None.
-  @postcon Returns an array of key words for use in the explorer module.
-
-  @return  a TKeyWords
-
-**)
-function TDFMModule.Directives: TKeyWords;
-
-begin
-  Result := Nil;
-end;
-
-(**
-
-  This method parses the number element of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Returns true IF the current token is a number.
-
-  @param   Container as a TElementContainer
-  @return  a Boolean
-
-**)
-function TDFMModule.Number(Container: TElementContainer): Boolean;
-begin
-  Result := (Token.TokenType In [ttNumber]) Or (Token.Token = '-');
-  If Result Then
-    Begin
-      If Token.Token = '-' Then
-        Begin
-          AddToExpression(Container);
-          If Not (Token.TokenType In [ttNumber]) Then
-            ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
-        End;
-      AddToExpression(Container);
-    End;
-end;
-
-(**
-
-  This is an overridden GetComment which only returns Nil. Comments aren`t used.
-
-  @precon  None.
-  @postcon Returns nil.
-
-  @param   CommentPosition as a TCommentPosition as a constant
-  @return  a TComment
-
-**)
-function TDFMModule.GetComment(Const CommentPosition: TCommentPosition): TComment;
-begin
-  Result := Nil;
-end;
-
-(**
-
-  This is a getter method for the ModuleName property.
-
-  @precon  None.
-  @postcon Overrides the inherited method to place the module type in front of
-           the module name.
-
-  @return  a String
-
-**)
-Function TDFMModule.GetModuleName : String;
-
-Begin
-  Result := Inherited GetModuleName;
-End;
-
-(**
-
-  This method is the starting position for the parsing of an object pascal
-  module. It finds the first non comment token and begins the grammar checking
-  from their by deligating to the program, library, unit and package methods.
-
-  @grammar Goal -> ( Program | Package | Library | Unit )
-
-  @precon  None.
-  @postcon It finds the first non comment token and begins the grammar checking
-           from their by deligating to the program, library, unit and package
-           methods.
-
-**)
-procedure TDFMModule.Goal;
-
-begin
-  Try
-    If TokenCount > 0 Then
-      Begin
-        // Find first non comment token
-        While (Token.TokenType In [ttLineComment, ttBlockComment,
-          ttCompilerDirective]) And Not EndOfTokens Do
-          NextNonCommentToken;
-        // Check for end of file else must be identifier
-        If Not EndOfTokens Then
-          Begin
-            DFMObject(Self);
-            If Not (Token.TokenType In [ttFileEnd]) Then
-              AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError, Self);
-          End Else
-          Begin
-            AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError, Self);
-            Raise EBADIParserAbort.Create(strParsingAborted);
-          End;
-      End;
-  Except
-    On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 0, 0, etError, Self);
-  End;
-end;
-
-(**
-
-  This method parses the IdentList element of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Adds an list of comma separated identifiers to the container.
-
-  @param   Container as a TElementContainer
-
-**)
-procedure TDFMModule.IdentList(Container: TElementContainer);
-begin
-  If Token.TokenType In [ttIdentifier] Then
-    Begin
-      AddToExpression(Container);
-      While Token.Token = ',' Do
-        Begin
-          AddToExpression(Container);
-          If Token.TokenType In [ttIdentifier] Then
-            AddToExpression(Container)
-          Else
-            ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
-        End;
-    End;
-end;
-
-(**
-
-  This method parses the item element of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Parses an item if found.
-
-  @param   Container as a TElementContainer
-  @return  a Boolean
-
-**)
-Function TDFMModule.Item(Container: TElementContainer) : Boolean;
-
-Var
-  I : TDFMItem;
-
-begin
-  Result := False;
-  If CompareText(Token.Token, 'Item') = 0 Then
-    Begin
-      Result := True;
-      I := Container.Add(TDFMItem.Create(Token.Token, scPublic, Token.Line,
-        Token.Column, iiPublicField, Nil)) As TDFMItem;
-      NextNonCommentToken;
-      While DFMProperty(I) Do;
-      If Token.UToken = 'END' Then
-        NextNonCommentToken
-      Else
-        ErrorAndSeekToken(strReservedWordExpected, 'END', strSeekableOnErrorTokens, stActual, Self);
-    End;
-end;
-
-(**
-
-  This method parses the ItemList element of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Returns true if a ItemList was parsed.
-
-  @param   Container as a TElementContainer
-  @return  a Boolean
-
-**)
-function TDFMModule.ItemList(Container: TElementContainer): Boolean;
-begin
-  Result := False;
-  If Token.Token = '<' Then
-    Begin
-      Result := True;
-      AddToExpression(Container);
-      While Item(Container) Do;
-      If Token.Token = '>' Then
-        AddToExpression(Container)
-      Else
-        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
-    End;
-end;
-
-(**
-
-  This method parses the Identifier element of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Returns true IF the current token is an identifier.
-
-  @param   Container as a TElementContainer
-  @return  a Boolean
-
-**)
-function TDFMModule.DFMIdentifier(Container: TElementContainer): Boolean;
-begin
-  Result := Token.TokenType In [ttIdentifier];
-  If Result Then
-    Container.AddToken(QualifiedIdent);
-end;
-
-(**
-
-  This method parses the Index element of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Parses the Index element of the grammar.
-
-  @param   Container as a TElementContainer
-
-**)
-procedure TDFMModule.DFMIndex(Container: TElementContainer);
-begin
-  If Token.Token = '[' Then
-    Begin
-      AddToExpression(Container);
-      Number(Container);
-      If Token.Token = ']' Then
-        AddToExpression(Container)
-      Else
-        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual, Self);
-    End;
-end;
-
-(**
-
-  This method remove the Implement Methods and Exported Headings IF they have
-  no elements.
-
-  @precon  None.
-  @postcon Remove the Implement Methods and Exported Headings IF they have
-           no elements.
-
-**)
-procedure TDFMModule.TidyUpEmptyElements;
-
-Var
-  iElement : Integer;
-
-begin
-  For iElement := ElementCount DownTo 1 Do
-    If Elements[iElement].ElementCount = 0 Then
-      If Not (Elements[iElement] Is TDFMObject) Then
-        DeleteElement(iElement);
-end;
-
-(**
-
-  This function returns a string repreentation of the unit.
-
-  @precon  None .
-  @postcon Returns a string repreentation of the unit .
-
-  @param   boolShowIdentifier   as a Boolean as a constant
-  @param   boolForDocumentation as a Boolean as a constant
-  @return  a String
-
-**)
-function TDFMModule.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-begin
-  Result := ExtractFileName(Identifier);
-end;
-
-(**
-
-  This method processes a compiler directive looking for conditional statements.
-
-  @precon  None.
-  @postcon Processes a compiler directive looking for conditional statements.
-
-  @param   iSkip as an Integer as a reference
-
-**)
-procedure TDFMModule.ProcessCompilerDirective(var iSkip : Integer);
-
-begin
-end;
-
-(**
-
-  This method parses the QualifiedIdent element of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Returns the fully qualified (multi-part) identifier.
-
-  @return  a String
-
-**)
-function TDFMModule.QualifiedIdent: String;
-begin
-  Result := Token.Token;
-  NextNonCommentToken;
-  While Token.Token = '.' Do
-    Begin
-      NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier] Then
-        Begin
-          Result := Result + '.' + Token.Token;
-          NextNonCommentToken;
-        End Else
-          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
-    End;
-end;
-
-(**
-
-  This method parses the stringliteral element of the grammar.
-
-  @precon  Container must be a valid instance of TElementContainer class.
-  @postcon Returns true IF the current token is a string literal.
-
-  @param   Container as a TElementContainer
-  @return  a Boolean
-
-**)
-function TDFMModule.StringLiteral(Container: TElementContainer): Boolean;
-begin
-  Result := Token.TokenType In [ttSingleLiteral, ttDoubleLiteral];
-  If Result Then
-    Begin
-      ConcatStrings(Container);
-      While Token.Token = '+' Do
-        Begin
-          AddToExpression(Container);
-          If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
-            ConcatStrings(Container)
-          Else
-            ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
-        End;
-    End;
-end;
 
 End.

@@ -3,8 +3,8 @@
   This module contains a class to represent spelling issues in a module.
 
   @Author  David Hoyle
-  @Version 1.659
-  @Date    19 Jul 2020
+  @Version 1.768
+  @Date    21 Jul 2020
 
   @license
 
@@ -44,8 +44,8 @@ Type
     FWord          : String;
   Strict Protected
   Public
-    Constructor Create(Const strWord, strDocConflictDesc : String; Const iLine, iCol, iCommentLine,
-      iCommentCol: Integer);
+    Constructor Create(Const strWord, strDocConflictDesc : String; Const AScope : TScope; Const iLine,
+      iCol, iCommentLine, iCommentCol: Integer);
     Destructor Destroy; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
@@ -89,20 +89,21 @@ End;
 
   @param   strWord            as a String as a constant
   @param   strDocConflictDesc as a String as a constant
+  @param   AScope             as a TScope as a constant
   @param   iLine              as an Integer as a constant
   @param   iCol               as an Integer as a constant
   @param   iCommentLine       as an Integer as a constant
   @param   iCommentCol        as an Integer as a constant
 
 **)
-Constructor TBADISpellingIssue.Create(Const strWord, strDocConflictDesc : String; Const iLine, iCol,
-  iCommentLine, iCommentCol: Integer);
+Constructor TBADISpellingIssue.Create(Const strWord, strDocConflictDesc : String; Const AScope : TScope;
+  Const iLine, iCol, iCommentLine, iCommentCol: Integer);
 
 Const
   strOutputFmt = '%6.6d';
 
 Begin
-  Inherited Create(Format(strOutputFmt, [iSpellingCounter]), scNone, iLine, iCol, iiSpellingItem, Nil);
+  Inherited Create(Format(strOutputFmt, [iSpellingCounter]), AScope, iLine, iCol, iiSpellingItem, Nil);
   Inc(iSpellingCounter);
   FWord := strWord;
   Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol, 0);

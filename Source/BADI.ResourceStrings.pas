@@ -3,8 +3,8 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.493
-  @Date    12 Jul 2020
+  @Version 1.601
+  @Date    23 Jul 2020
 
   @license
 
@@ -63,7 +63,7 @@ ResourceString
   strOptionGroupMethods = 'Methods';
   (** An option group description for Property options. **)
   strOptionGroupProperties = 'Properties';
-  (** An option group description for Inital/Finalization options. **)
+  (** An option group description for Initial/Finalization options. **)
   strOptionGroupInitializationFinalization = 'Initialization / Finalization';
   (** An option group description for miscellaneous options. **)
   strOptionGroupMiscellaneous = 'Miscellaneous';
@@ -84,7 +84,7 @@ ResourceString
   strShowHints = 'Show Module Hints';
   (** Options text for Showing Documentation Conflicts **)
   strShowDocumentationConflicts = 'Show Documentation Conflicts';
-  (** Options text for showing the doc issue ttoals in the Code Editor. **)
+  (** Options text for showing the doc issue totals in the Code Editor. **)
   strShowDocIssueTotalsInEditor = 'Show Documentation Issue Totals in the Code Editor';
   (** Options text for automatically update the module date when the module is saved. **)
   strAutoUpdateModuleDate = 'Automatically update the module date on saving';
@@ -156,6 +156,16 @@ ResourceString
   strShowMetricMsgsInEditor = 'Show Metric Messages in the Code Editor';
   (** Options text for Showing Spelling Messages in the Code Editor **)
   strShowSpellingMsgsInEditor = 'Show Spelling Mistakes Messages in the Code Editor';
+  (** Options text for Spell checking main comment text **)
+  strSpellCheckComments = ' - Spell check the main comment text';
+  (** Options text for Spell checking precon and postcon tags in comments **)
+  strSpellCheckTags = ' - Spell check @precon and @postcon tags in comments';
+  (** Options text for Spell checking resource strings **)
+  strSpellCheckResourceStrings = ' - Spell check resource strings';
+  (** Options text for Spell checking constants **)
+  strSpellCheckConstants = ' - Spell check constants';
+  (** Options text for Spell checking literals **)
+  strSpellCheckLiterals = ' - Spell check string literals';
   (** Options text for preventing the module explorer following the Code Editor if there are errors **)
   strDoNotFollowEditorIfErrors = 'Errors';
   (** Options text for preventing the module explorer following the Code Editor if there are warnings **)
@@ -172,11 +182,11 @@ ResourceString
   (** Options text for preventing the module explorer following the Code Editor if there are spelling **)
   strDoNotFollowEditorIfSpelling = 'Code Spelling Mistakes';
 
-  (** Options text for auto hiding checks in the editoe views if they have no issues. **)
+  (** Options text for auto hiding checks in the editor views if they have no issues. **)
   strAutoHideChecksWithNoIssues = 'Auto Hide Checks with no issues in the Editor Views';
-  (** Options text for auto hiding metrics in the editoe views if they have no issues. **)
+  (** Options text for auto hiding metrics in the editor views if they have no issues. **)
   strAutoHideMetricsWithNoIssues = 'Auto Hide Metrics with no issues in the Editor Views';
-  (** Options text for auto hiding spelling mistakes in the editoe views if they have no issues. **)
+  (** Options text for auto hiding spelling mistakes in the editor views if they have no issues. **)
   strAutoHideSpellingWithNoIssues = 'Auto Hide Spelling Mistakes with no issues in the Editor Views';
   
   (** Options text for Show Missing Method Documentation **)
@@ -209,8 +219,8 @@ ResourceString
   strShowUndocumentedConstants = 'Show Undocumented Constants';
   (** Options text for Show Undocumented Fields **)
   strShowUndocumentedFields = 'Show Undocumented Fields';
-  (** Options text for Show Undocumented Class Decls **)
-  strShowUndocumentedClassDecls = 'Show Undocumented Class Types, Vars and Consts';
+  (** Options text for Show Undocumented Class Declarations **)
+  strShowUndocumentedClassDecls = 'Show Undocumented Class Types, Variables and Constants';
   (** Options text for Show Undocumented Module **)
   strShowUndocumentedModule = 'Show Undocumented Module';
   (** Options text for Show Missing Module Date **)
@@ -253,10 +263,10 @@ ResourceString
   strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
   (** Options text for showing unreferenced locals and privates. **)
   strShowUnreferencedSymbols = 'Show all unreferenced symbols.';
-  (** Options text for showing preformance counters in the module explorer. **)
+  (** Options text for showing performance counters in the module explorer. **)
   strShowPerfCountersInModuleExplorer = 'Show performance counters in the statusbar of the module explorer.';
-  (** Options text for showing preformance counters in the documentation summary. **)
-  strShowPerfCountersInDocSummary = 'Show performance counters in the documenation summary.';
+  (** Options text for showing performance counters in the documentation summary. **)
+  strShowPerfCountersInDocSummary = 'Show performance counters in the documentation summary.';
   (** Options text for strict evaluation of constant expressions. **)
   strStrictConstantExpressions = 'Strict evaluation of constant expressions.';
   (** Options text for showing missing VB/VBA exception warnings. **)
@@ -359,8 +369,8 @@ ResourceString
   strTypeNotFound = 'Type declaration missing but found ''%s'' at line %d column %d.';
   (** An error message when a TypeID is expected. **)
   strTypeIDExpected = 'A TypeID was expected but found ''%s'' at line %d column %d.';
-  (** An execption message when a Expr conflict occurs in an expression **)
-  strExprConflict = 'The token ''%s'' conflicts with the TYPE of the preceeding ' +
+  (** An exeception message when a Expr conflict occurs in an expression **)
+  strExprConflict = 'The token ''%s'' conflicts with the TYPE of the preceding ' +
     'expression at line %d column %d.';
   (** An error message if a function is used in a constant expression **)
   strConstExprDesignator = 'The token ''%s'' at line %d column %d is not allowed ' +
@@ -416,16 +426,16 @@ ResourceString
   strModuleMissingDateDesc = 'Each module comment required an @@Date tag to ' +
     'describe the date on which the module was last edited. #Example: ' +
     '@@Date 07 Jan 1970';
-  (** This is a documentation error for an incorrect documenation date **)
+  (** This is a documentation error for an incorrect documentation date **)
   strModuleIncorrectDate = 'The module documentation date ''%s'' is incorrect (''%s'').';
-  (** This is a documentation error description for an incorrect documenation
+  (** This is a documentation error description for an incorrect documentation
       date **)
   strModuleIncorrectDateDesc = 'The module date must be either the date of the ' +
     'file saved to disk for the current date if the module is being edited. ' +
     '#Example: @@Date 12/Jan/2006';
-  (** This is a documentation error for an invalid documenation date **)
+  (** This is a documentation error for an invalid documentation date **)
   strModuleCheckDateError = 'The module documentation date ''%s'' is not valid (''%s'').';
-  (** This is a documentation error description for an invalid documenation date **)
+  (** This is a documentation error description for an invalid documentation date **)
   strModuleCheckDateErrorDesc = 'The module date must be a valid date and be ' +
     'either the date of the file saved to disk for the current date if the ' +
     'module is being edited. #Example: @@Date 12/Jan/2006';
@@ -450,7 +460,7 @@ ResourceString
   (** Document conflict message description for an undocumented type clause
       item. **)
   strTypeClauseUndocumentedDesc = 'Each Type declaration should have a short ' +
-    'description which attempts to decribed what the type should be used for.';
+    'description which attempts to described what the type should be used for.';
 
   (** This is the tree branch under which constant documentation error appear **)
   strConstantDocumentation = 'Constant Documentation';
@@ -459,7 +469,7 @@ ResourceString
   (** Document conflict message description for an undocumented constant clause
       item. **)
   strConstantClauseUndocumentedDesc = 'Each Constant declaration should have ' +
-    'a short description which attempts to decribed what the constant ' +
+    'a short description which attempts to described what the constant ' +
     'represents.';
 
   (** This is the tree branch under which resource string documentation error appear **)
@@ -469,7 +479,7 @@ ResourceString
   (** Document conflict message description for an undocumented resource string
       clause item. **)
   strResourceStringClauseUndocumentedDesc = 'Each Resource String declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'resource string represents.';
 
   (** This is the tree branch under which variable documentation error appear **)
@@ -479,7 +489,7 @@ ResourceString
   (** Document conflict message description for an undocumented variable clause
       item. **)
   strVariableClauseUndocumentedDesc = 'Each Variable declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'variable is used for.';
 
   (** This is the tree branch under which thread variable documentation error appear **)
@@ -489,7 +499,7 @@ ResourceString
   (** Document conflict message description for an undocumented thread variable
       clause item. **)
   strThreadVarClauseUndocumentedDesc = 'Each Thread Variable declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'thread variable is used for.';
 
   (** This is the tree branch under which field documentation error appear **)
@@ -499,7 +509,7 @@ ResourceString
   (** Document conflict message description for an undocumented Field
       clause item. **)
   strFieldClauseUndocumentedDesc = 'Each Field declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'field is used for.';
 
   (** This is the tree branch under which record documentation error appear **)
@@ -509,7 +519,7 @@ ResourceString
   (** Document conflict message description for an undocumented record clause
       item. **)
   strRecordClauseUndocumentedDesc = 'Each Record declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'record represents.';
 
   (** This is the tree branch under which object documentation error appear **)
@@ -519,7 +529,7 @@ ResourceString
   (** Document conflict message description for an undocumented object clause
       item. **)
   strObjectClauseUndocumentedDesc = 'Each Object declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'object represents.';
 
   (** This is the tree branch under which class documentation error appear **)
@@ -529,7 +539,7 @@ ResourceString
   (** Document conflict message description for an undocumented class variable
       clause item. **)
   strClassClauseUndocumentedDesc = 'Each Class declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'class represents.';
 
   (** This is the tree branch under which interface documentation error appear **)
@@ -539,7 +549,7 @@ ResourceString
   (** Document conflict message description for an undocumented interface
       variable clause item. **)
   strInterfaceClauseUndocumentedDesc = 'Each Interface declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'interface represents.';
 
   (** This is the tree branch under which dispinterface documentation error appear **)
@@ -549,7 +559,7 @@ ResourceString
   (** Document conflict message description for an undocumented dispinterface
       variable clause item. **)
   strDispInterfaceClauseUndocumentedDesc = 'Each DispInterface declaration ' +
-    'should have a short description which attempts to decribed what the ' +
+    'should have a short description which attempts to described what the ' +
     'dispinterface represents.';
 
   (** Label for Method Documentation Conflicts **)
@@ -565,9 +575,9 @@ ResourceString
     'there should be a list of the parameters and any return types.';
   (** Document conflict message for missing method description. **)
   strFunctionHasNoDesc = '%s ''%s'' has no description.';
-  (** Document conflict message descritpion for missing method description. **)
+  (** Document conflict message description for missing method description. **)
   strFunctionHasNoDescDesc = 'Each method or property declaration should have ' +
-    'a description which should provide information to furture developers ' +
+    'a description which should provide information to future developers ' +
     'regarding the purpose of the method or property.';
 
   (** Document conflict message for different number of parameters and tags. **)
@@ -575,7 +585,7 @@ ResourceString
   (** Document conflict message description for different number of parameters
       and tags. **)
   strFunctionDiffParamCountDesc = 'There are a different number of @@param tags ' +
-    'in the comment compared to the prameters passed to the method or property.';
+    'in the comment compared to the parameters passed to the method or property.';
   (** Document conflict message for an undocumented parameter. **)
   strFunctionUndocumentedParam = 'Parameter ''%s'' in %s ''%s'' is not ' +
     'documented.';
@@ -588,12 +598,12 @@ ResourceString
     'incorrect (''%s'').';
   (** Document conflict message description for an incorrect parameter type. **)
   strFunctionIncorrectParamTypeDesc = 'The type of the specified parameter ' +
-    'differents from the type provided in the @@param tag of the method or ' +
+    'differs from the type provided in the @@param tag of the method or ' +
     'property comment.';
 
   (** Document conflict message for an undocumented return type. **)
   strFunctionUndocumentedReturn = '%s ''%s''`s return type is not documented.';
-  (** Document conflict message descritpion for an undocumented return type. **)
+  (** Document conflict message description for an undocumented return type. **)
   strFunctionUndocumentedReturnDesc = 'A return type requires an @@return tag ' +
     'in the method or property comment.';
   (** Document conflict message for an incorrect return type. **)
@@ -653,9 +663,9 @@ ResourceString
 
   (** Label for Finalization Documentation Conflicts **)
   strModuleInitSection = 'Module Initialization Section';
-  (** Document conflict message for a missing Finalialization Comment. **)
+  (** Document conflict message for a missing Finalization Comment. **)
   strMissingInitComment = 'The module is missing an Initialization comment.';
-  (** Document conflict message description a missing Finalialization Comment. **)
+  (** Document conflict message description a missing Finalization Comment. **)
   strMissingInitCommentDesc = 'It is usually advised able to document the ' +
     'code contain in the Initialization section of the module so that ' +
     'developers known which portion of the module are automatically ' +
@@ -680,9 +690,9 @@ ResourceString
       with the same name. **)
   strTryingToAddType = 'Trying to add type ''%s'' but found type ''%s'' with the' +
   ' same name (%s).';
-  (** An error message for trying to pop a compiler condition where there isnt one. **)
+  (** An error message for trying to pop a compiler condition where there isn`t one. **)
   strCannotPopCompilerCondition = 'Cannot pop the token position stack.';
-  (** An error message for trying to peek a compiler condition where there isnt one. **)
+  (** An error message for trying to peek a compiler condition where there isn`t one. **)
   strCannotPeekTheCompilerCondition = 'Cannot peek the compiler condition stack.';
 
   (** An error message for a method with a missing parameter. **)
@@ -697,11 +707,11 @@ ResourceString
   
   (** A text string to represents an Unknown token. **)
   strTokenUnknown = 'Unknown';
-  (** A text string to represents a Whitespace token. **)
+  (** A text string to represents a white space token. **)
   strTokenWhiteSpace = 'White Space';
   (** A text string to represents a Reserved Word token. **)
   strTokenReservedWord = 'Reserved Word';
-  (** A text string to represents an Identifer token. **)
+  (** A text string to represents an Identifier token. **)
   strTokenIdentifier = 'Identifier';
   (** A text string to represents a Number token. **)
   strTokenNumber = 'Number';
@@ -850,7 +860,7 @@ ResourceString
   (** A resource string for the Including Parameter list Length in toxicity calc. **)
   strToxicityIncParamLen = 'Include Parameter List Length in the Toxicity Calculation';
   (** A resource string for the Including variable list Length in toxicity calc. **)
-  strToxicityIncVarLen = 'Include Variabe List Length in the Toxicity Calculation';
+  strToxicityIncVarLen = 'Include Variable List Length in the Toxicity Calculation';
   (** A resource string for the Including nested IF depth in toxicity calc. **)
   strToxicityIncIFDepth = 'Include Nested IF Depth in the Toxicity Calculation';
   (** A resource string for the Including cyclometric complexity in toxicity calc. **)
@@ -877,9 +887,9 @@ ResourceString
   (** A message for a method with a high cyclometric complexity. **)
   strMethodHasHighCyclometricComplexityMsg = 'The method "%s" has a high cyclometric complexity ' +
     '(%1.0f/%1.0f).';
-  (** A descrpition for a method with a high cyclometric complexity. **)
+  (** A description for a method with a high cyclometric complexity. **)
   strMethodHasHighCyclometricComplexityDesc = 'The cyclometric complexity of a method is a measure of ' +
-    'its number of branch points and therefore the number of unit test that could be neede to test ' +
+    'its number of branch points and therefore the number of unit test that could be needed to test ' +
     'the code. If this value is too high it might make your ability to test your code more difficult.';
   (** A message for a method with a high toxicity. **)
   strMethodHasHighToxocityValueMsg = 'The method "%s" has a high toxocity value (%1.3f/%1.3f).';
@@ -920,7 +930,7 @@ ResourceString
   strEmptyForBlocksCat = 'Empty FOR Blocks';
   (** A resource string for the Empty While BLocks Category. **)
   strEmptyWhileBlocksCat = 'Empty WHILE Blocks';
-  (** A resource string for the Empty Repat BLocks Category. **)
+  (** A resource string for the Empty Repeat BLocks Category. **)
   strEmptyRepeatBlocksCat = 'Empty REPEAT Blocks';
   (** A resource string for the Empty BEGIN END Blocks Category. **)
   strEmptyBeginEndBlocksCat = 'Empty BEGIN END Blocks';
@@ -976,12 +986,12 @@ ResourceString
   strEXCEPTClauseMethodEmptyMsg = 'The EXCEPT clause of the method "%s" is empty!';
   (** A description for an empty EXCEPT block in an implementation. **)
   strEXCEPTClauseMethodEmptyDesc = 'An empty EXCEPT clause will hide exception that are raised in ' + 
-    'the preceeding code. Add code to handle the exception or remove the TRY EXCEPT END block.';
+    'the preceding code. Add code to handle the exception or remove the TRY EXCEPT END block.';
   (** A message for an empty FINALLY block in an implementation. **)
   strFINALLYClauseMethodEmptyMsg = 'The FINALLY clause of the method "%s" is empty!';
   (** A description for an empty FINALLY block in an implementation. **)
   strFINALLYClauseMethodEmptyDesc = 'An empty FINALLY clause provide no benefit or you have ' + 
-    'forgotted to free a resource. Add code to handle the resource or remove the TRY FINALLY END ' + 
+    'forgotten to free a resource. Add code to handle the resource or remove the TRY FINALLY END ' + 
     'block.';
   (** A message for an exception eating implementation. **)
   strONStmtCaptureAllExcepsMsg = 'The ON statement in %s "%s" will capture all exceptions.';
@@ -1025,21 +1035,21 @@ ResourceString
   (** A message for an empty INITIALIZATION block in an implementation. **)
   strINITIALIZATIONClauseInModuleEmptyMsg = 'The INITIALIZATION clause in the module is empty!';
   (** A description for an empty INITIALIZATION block in an implementation. **)
-  strINITIALIZATIONClauseInModuleEmptyDesc = 'If the initializatino cause is empty either you do not ' + 
-    'need it or perhaps you have forgotten to implement some initalisation code.';
+  strINITIALIZATIONClauseInModuleEmptyDesc = 'If the initialization cause is empty either you do not ' + 
+    'need it or perhaps you have forgotten to implement some initalization code.';
   (** A message for an empty FINALIZATION block in an implementation. **)
   strFINALIZATIONClauseInModuleEmptyMsg = 'The FINALIZATION clause in the module is empty!';
   (** A description for an empty FINALIZATION block in an implementation. **)
-  strFINALIZATIONClauseInModuleEmptyDesc = 'If the finalizatino cause is empty either you do not ' + 
+  strFINALIZATIONClauseInModuleEmptyDesc = 'If the finalization cause is empty either you do not ' + 
     'need it or perhaps you have forgotten to implement some finalisation code.';
   (** A message for a  method with an empty implementation. **)
   strMethodDoesNotHaveImplementationMsg = 'The method "%s" does not have an implementation!';
   (** A description for a  method with an empty implementation. **)
   strMethodDoesNotHaveImplementationDesc = 'The method does not have an implementation. You may not ' + 
     'need the method and therefore it could be removed.';
-  (** A message for a  method with an parameters whic are not VAR or CONST. **)
+  (** A message for a  method with an parameters which are not VAR or CONST. **)
   strParameterInMethodMissingCONSTMsg = 'The parameter "%s" in method "%s" is missing CONST!';
-  (** A description for a  method with an parameters whic are not VAR or CONST. **)
+  (** A description for a  method with an parameters which are not VAR or CONST. **)
   strParameterInMethodMissingCONSTDesc = 'The use of CONST parameters is preferred to prevent ' + 
     'parameters from being modified. it also allow the compiler to optimism the passed data.';
 

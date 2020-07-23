@@ -1,16 +1,16 @@
 ﻿(**
 
-  ObjectPascalModule : A unit to tokenize Pascal source code.
+  Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 2.151
-  @Date    18 Jul 2020
+  @Version 2.839
+  @Date    23 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
-    
+
     Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
@@ -298,6 +298,9 @@ Type
     Function  GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     Procedure CheckFunctionReturn(Const Func : TPascalMethod);
+    Procedure CheckResourceStringSpelling(Const Element : TElementContainer);
+    Procedure CheckConstantStringSpelling(Const Element : TElementContainer);
+    Procedure ProcessLiteralsForSpelling(Const E: TElementContainer; Const strCategory : String);
     (**
       This property returns the method on top of the method stack.
       @precon  None.
@@ -367,7 +370,7 @@ Uses
   BADI.Pascal.UsesList,
   BADI.Generic.Parameter,
   Generics.Collections,
-  System.Character;
+  System.Character, BADI.Generic.Tokenizer;
 
 Const
   (** Constant for the keyword ABSTRACT. **)
@@ -1033,6 +1036,36 @@ End;
 
 (**
 
+  This method iterates the given element and all its child elements recursively checking the spelling of
+  constant string declarations.
+
+  @precon  Element must be a valid instance.
+  @postcon All spelling mistakes in the string constants in the element hierarchy are output.
+
+  @param   Element as a TElementContainer as a constant
+
+**)
+Procedure TPascalModule.CheckConstantStringSpelling(Const Element: TElementContainer);
+
+ResourceString
+  strConstants = 'Constants';
+
+Var
+  iElement: Integer;
+  E: TElementContainer;
+
+Begin
+  For iElement := 1 To Element.ElementCount Do
+    Begin
+      E := Element.Elements[iElement];
+      If (E Is TConstant) And Not (E Is TResourceString) Then
+        ProcessLiteralsForSpelling(E, strConstants);
+      CheckConstantStringSpelling(Element.Elements[iElement]);
+    End;
+End;
+
+(**
+
   This method checks that function returns are present for non-aliased or external functions. If not 
   present adds an issue.
 
@@ -1085,6 +1118,36 @@ End;
 
 (**
 
+  This method iterates the given element and all its child elements recursively checking the spelling of
+  resource string declarations.
+
+  @precon  Element must be a valid instance.
+  @postcon All spelling mistakes in the resource strings in the element hierarchy are output.
+
+  @param   Element as a TElementContainer as a constant
+
+**)
+Procedure TPascalModule.CheckResourceStringSpelling(Const Element : TElementContainer);
+
+ResourceString
+  strResourceStrings = 'Resource Strings';
+
+Var
+  iElement: Integer;
+  E: TElementContainer;
+
+Begin
+  For iElement := 1 To Element.ElementCount Do
+    Begin
+      E := Element.Elements[iElement];
+      If E Is TResourceString Then
+        ProcessLiteralsForSpelling(E, strResourceStrings);
+      CheckResourceStringSpelling(Element.Elements[iElement]);
+    End;
+End;
+
+(**
+
   This method checks the returns value of the function.
 
   @precon  Method must be a valid TPascalMethod instance .
@@ -1108,11 +1171,11 @@ End;
 
 (**
 
-  This method cross reference the methods in class, exported and implemented and marsk the as resolved 
+  This method cross reference the methods in class, exported and implemented and marks the as resolved 
   and output error messages for those that are still unresolved.
 
   @precon  None.
-  @postcon Cross reference the methods in class, exported and implemented and marsk the as resolved and 
+  @postcon Cross reference the methods in class, exported and implemented and marks the as resolved and 
            output error messages for those that are still unresolved.
 
 **)
@@ -1143,7 +1206,7 @@ end;
   following object pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -1922,7 +1985,7 @@ Constructor TPascalModule.CreateParser(Const Source, strFileName : String;
 
 ResourceString
   strStart = 'Start';
-  strTokenize = 'Tokenize';
+  strTokenize = 'Tokenise';
   strParse = 'Parse';
   strResolve = 'Resolve';
   strRefs = 'Refs';
@@ -1982,6 +2045,10 @@ Begin
       If doShowSpelling In BADIOptions.Options Then
         Begin
           CheckCommentSpelling;
+          If doSpellCheckResourceStrings In TBADIOptions.BADIOptions.Options Then
+            CheckResourceStringSpelling(Self);
+          If doSpellCheckConstants In TBADIOptions.BADIOptions.Options Then
+            CheckConstantStringSpelling(Self);
           CheckStringSpelling;
           AddTickCount(strSpelling);
         End;
@@ -6556,6 +6623,44 @@ Begin
         sl.Free;
       End;
     End;
+End;
+
+(**
+
+  This method processes the the spell checking of the string literals for the given element.
+
+  @precon  E must be a valid instance.
+  @postcon All spelling mistakes in the string literals of the given element are output.
+
+  @param   E           as a TElementContainer as a constant
+  @param   strCategory as a String as a constant
+
+**)
+Procedure TPascalModule.ProcessLiteralsForSpelling(Const E: TElementContainer; Const strCategory : String);
+
+Var
+  iToken: Integer;
+  T: TTokenInfo;
+  sl: TStringList;
+  i: Integer;
+
+Begin
+  Begin
+    For iToken := 0 To E.TokenCount - 1 Do
+      If E.Tokens[iToken].TokenType In [ttSingleLiteral] Then
+        Begin
+          T := E.Tokens[iToken];
+          sl := Tokenize(T.Token.DeQuotedString, [], []);
+          Try
+            For i := 0 To sl.Count - 1 Do
+              If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
+                If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
+                  CheckSpelling(sl[i], strCategory, E.Scope, T.Line, T.Column, Nil);
+          Finally
+            sl.Free;
+          End;
+        End;
+  End;
 End;
 
 (**

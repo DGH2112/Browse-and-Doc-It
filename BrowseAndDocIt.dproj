@@ -380,6 +380,11 @@
         <DCCReference Include="Source\BADI.DocIssueTotals.pas"/>
         <DCCReference Include="Source\BADI.DocIssuesHintWindow.pas"/>
         <DCCReference Include="Source\BADI.ProjectNotifier.pas"/>
+        <DCCReference Include="Source\BADI.Module.Spelling.EditorView.Frame.pas">
+            <Form>frameBADIModuleSpellingEditorView</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <DCCReference Include="Source\BADI.Spelling.OpsFrame.pas">
             <Form>frameBADISpellingOpions</Form>
             <FormType>dfm</FormType>

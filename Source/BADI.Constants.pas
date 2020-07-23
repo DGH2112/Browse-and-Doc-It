@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 2.242
-  @Date    19 Jul 2020
+  @Version 2.330
+  @Date    23 Jul 2020
 
   @license
 
@@ -134,6 +134,11 @@ Const
     (FDescription : strAutoHideSpellingWithNoIssues;          FEnabled : False; FGroup: dogSpelling),
     (FDescription : strShowSpellingIconsInEditor;             FEnabled :  True; FGroup: dogSpelling),
     (FDescription : strShowSpellingMsgsInEditor;              FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckComments;                    FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckTags;                        FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckResourceStrings;             FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckConstants;                   FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckLiterals;                    FEnabled : False; FGroup: dogSpelling),
 
     (FDescription : strDoNotFollowEditorIfErrors;             FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfWarnings;           FEnabled : True;  FGroup: dogDoNotFollow),
@@ -970,9 +975,6 @@ Const
     'Spellings'
   );
 
-  (** A constant array of strings for the spelling issue categories. **)
-  astrSpellingCategory : Array[TBADISpellingCategory] of String = ('Comments', 'Literals');
-  
 Implementation
 
 End.

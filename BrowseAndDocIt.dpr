@@ -228,6 +228,7 @@ uses
   BADI.DocIssueTotals in 'Source\BADI.DocIssueTotals.pas',
   BADI.DocIssuesHintWindow in 'Source\BADI.DocIssuesHintWindow.pas',
   BADI.ProjectNotifier in 'Source\BADI.ProjectNotifier.pas',
+  BADI.Module.Spelling.EditorView.Frame in 'Source\BADI.Module.Spelling.EditorView.Frame.pas' {frameBADIModuleSpellingEditorView: TFrame},
   BADI.Spelling.OpsFrame in 'Source\BADI.Spelling.OpsFrame.pas' {frameBADISpellingOpions: TFrame},
   BADI.SpellingIssue in 'Source\BADI.SpellingIssue.pas';
 

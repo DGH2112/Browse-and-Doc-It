@@ -4,8 +4,10 @@
   and a label container for tree view headers and the like.
 
   @Author  David Hoyle
-  @Version 2.045
-  @Date    19 Jul 2020
+  @Version 2.169
+  @Date    21 Jul 2020
+
+  @nospelling noXxxxx
 
   @license
 
@@ -130,8 +132,8 @@ Type
       Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : TBADIIssueState;
     Function AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
       Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : TBADIIssueState;
-    Function AddSpelling(Const strWord: String; Const iWordLine, iWordColumn: Integer;
-      Const eSpellingCategory : TBADISpellingCategory; Const Comment: TComment) : TBADIIssueState;
+    Function AddSpelling(Const strWord, strCategory : String; Const AScope : TScope;Const iWordLine,
+      iWordColumn: Integer; Const Comment: TComment) : TBADIIssueState;
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
@@ -644,16 +646,17 @@ End;
   @precon  None.
   @postcon If spelling is not disabled the given word is added to the spelling mistakes list.
 
-  @param   strWord           as a String as a constant
-  @param   iWordLine         as an Integer as a constant
-  @param   iWordColumn       as an Integer as a constant
-  @param   eSpellingCategory as a TBADISpellingCategory as a constant
-  @param   Comment           as a TComment as a constant
+  @param   strWord     as a String as a constant
+  @param   strCategory as a String as a constant
+  @param   AScope      as a TScope as a constant
+  @param   iWordLine   as an Integer as a constant
+  @param   iWordColumn as an Integer as a constant
+  @param   Comment     as a TComment as a constant
   @return  a TBADIIssueState
 
 **)
-Function TElementContainer.AddSpelling(Const strWord: String; Const iWordLine, iWordColumn: Integer;
-  Const eSpellingCategory : TBADISpellingCategory; Const Comment: TComment) : TBADIIssueState;
+Function TElementContainer.AddSpelling(Const strWord, strCategory : String; Const AScope : TScope;
+  Const iWordLine, iWordColumn: Integer; Const Comment: TComment) : TBADIIssueState;
 
 ResourceString
   strSpellingMistakes = 'Spelling Mistakes';
@@ -681,7 +684,7 @@ Begin
     End;
   E := FindRoot;
   E := AddCategory(E, strSpellingMistakes, iiSpellingFolder);
-  E := AddCategory(E, astrSpellingCategory[eSpellingCategory], iiSpellingFolder);
+  E := AddCategory(E, strCategory, iiSpellingFolder);
   iL := iWordLine;
   iC := iWordColumn;
   If Assigned(Comment) Then
@@ -689,7 +692,7 @@ Begin
       iL := Comment.Line;
       iC := Comment.Column;
     End;
-  E.Add(TBADISpellingIssue.Create(strWord, '', iWordLine, iWordColumn, iL, iC));
+  E.Add(TBADISpellingIssue.Create(strWord, '', AScope, iWordLine, iWordColumn, iL, iC));
 End;
 
 (**
@@ -1043,11 +1046,11 @@ End;
 
 (**
 
-  This method checks the container comment (and its parents) for noXxxx(s) tags and returns true if they 
+  This method checks the container comment (and its parents) for noXxxxx(s) tags and returns true if they 
   were found to signify that an issue is not required.
 
   @precon  None.
-  @postcon Checks the container comment (and its parents) for noXxxx(s) tags and returns true if they 
+  @postcon Checks the container comment (and its parents) for noXxxxx(s) tags and returns true if they 
            were found to signify that an issue is not required.
 
   @param   ErrorType     as a TErrorType as a constant

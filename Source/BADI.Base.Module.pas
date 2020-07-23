@@ -4,7 +4,7 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 2.218
+  @Version 2.232
   @Date    23 Jul 2020
 
   @license
@@ -292,14 +292,16 @@ Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF DEBUG}
-  SysUtils,
+  System.SysUtils,
+  System.StrUtils,
+  System.INIFiles,
   Windows,
-  INIFiles,
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.Comment.Tag,
   BADI.Constants,
-  BADI.TickOption, BADI.Generic.Tokenizer;
+  BADI.TickOption,
+  BADI.Generic.Tokenizer;
 
 Const
   (** A constant for the growth capacity of the compiler definitions stack. **)
@@ -665,7 +667,7 @@ Begin
     BADIOptions.LocalDictionary.Find(strWord, iIndex) Or
     BADIOptions.IgnoreDictionary.Find(strWord, iIndex) Or
     FIdentifierList.Find(strWord, iIndex);
-  If Not boolFound Then
+  If Not boolFound And (strWord.ToUpper <> strWord) Then
     AddSpelling(strWord, strCategory, AScope, iLine, iColumn, Comment);
 End;
 

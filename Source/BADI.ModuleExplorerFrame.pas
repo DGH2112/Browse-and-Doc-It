@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 22.924
-  @Date    19 Jul 2020
+  @Version 42.142
+  @Date    25 Jul 2020
 
   @license
 
@@ -115,11 +115,14 @@ Type
     tbtnMetrics: TToolButton;
     tmFilter: TTimer;
     pmExplorerContext: TPopupMenu;
-    actAddToDictionary: TAction;
+    actAddToLocalDictionary: TAction;
     actIgnoreSpellingMistake: TAction;
     AddtoDictionary1: TMenuItem;
     IgnoreSpellingMistake1: TMenuItem;
-    procedure actAddToDictionaryExecute(Sender: TObject);
+    actAddToProjectDictionary: TAction;
+    AddtoProjectDictionary1: TMenuItem;
+    procedure actAddToLocalDictionaryExecute(Sender: TObject);
+    procedure actAddToProjectDictionaryExecute(Sender: TObject);
     procedure actSpellingUpdate(Sender: TObject);
     procedure actIgnoreSpellingMistakeExecute(Sender: TObject);
     Procedure actLocalUpdate(Sender: TObject);
@@ -381,14 +384,17 @@ Const
   @param   Sender as a TObject
 
 **)
-Procedure TframeModuleExplorer.actAddToDictionaryExecute(Sender: TObject);
+Procedure TframeModuleExplorer.actAddToLocalDictionaryExecute(Sender: TObject);
 
 Begin
   TBADIOptions.BADIOptions.LocalDictionary.Add(FExplorer.Text[FExplorer.FocusedNode, 0]);
-  (*TODO: extracted code
-  If Assigned(FRefresh) Then
-    FRefresh(Sender);
-  *)
+  DoRefresh(Sender);
+End;
+
+Procedure TframeModuleExplorer.actAddToProjectDictionaryExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.ProjectDictionary.Add(FExplorer.Text[FExplorer.FocusedNode, 0]);
   DoRefresh(Sender);
 End;
 
@@ -881,7 +887,7 @@ End;
 
   This method draws the icon for the current tree node.
 
-  @precon  NodeData must be the TTreeData for the current node.
+  @precon  None.
   @postcon The nodes icon is drawn.
 
   @param   R            as a TRect as a reference
@@ -902,7 +908,7 @@ End;
 
 (**
 
-  This method draws the treenode button containing the + or - signs for expanding and collapsing .
+  This method draws the tree node button containing the + or - signs for expanding and collapsing .
 
   @precon  None.
   @postcon The button is drawn.
@@ -1112,7 +1118,7 @@ End;
   This procedure draws the text on the explorer tree view.
 
   @precon  NodeData and sl must be valid instance.
-  @postcon The treenode text is drawn.
+  @postcon The tree node text is drawn.
 
   @param   sl as a TStringList as a constant
   @param   R  as a TRect as a reference
@@ -1878,7 +1884,7 @@ End;
 
 (**
 
-  This is a getter method for the DocIssueConflicts property.
+  This is a getter method for the Line Doc Issue conflicts property.
 
   @precon  None.
   @postcon Returns a set of limit types for the given line number to indicate issues on that line.
@@ -2270,6 +2276,7 @@ Begin
     If Container.Elements[i].Scope In TBADIOptions.BADIOptions.ScopesToRender + [scNone, scGlobal] Then
       Begin
         LogDocIssueConflict(Container.Elements[i]);
+        //: @bug Limits are not working for spelling mistakes in categories
         If iCount < iLimit Then
           Begin
             NewNode := AddNode(RootNode, Container.Elements[i], iLevel);
@@ -2286,8 +2293,7 @@ End;
 
   This method displays the specified module in the treeview.
 
-  @precon  M is a valid instance of a TBaseLanguageModule that has been parsed and strStatus is a
-           text string to be displayed in the forms status bar.
+  @precon  Module is a valid instance of a TBaseLanguageModule that has been parsed.
   @postcon Renders the module information for the given module.
 
   @param   Module as a TBaseLanguageModule as a constant
@@ -2628,7 +2634,7 @@ End;
   This is an on click event handler for the explorer tree view.
 
   @precon  None.
-  @postcon Fires a SelectionChange event for the specifically selected item.
+  @postcon Fires a Selection Change event for the specifically selected item.
 
   @param   Sender as a TObject
 

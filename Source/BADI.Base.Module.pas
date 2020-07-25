@@ -4,8 +4,8 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 2.232
-  @Date    23 Jul 2020
+  @Version 2.247
+  @Date    25 Jul 2020
 
   @license
 
@@ -666,6 +666,7 @@ Begin
     BADIOptions.LanguageDictionary.Find(strWord, iIndex) Or
     BADIOptions.LocalDictionary.Find(strWord, iIndex) Or
     BADIOptions.IgnoreDictionary.Find(strWord, iIndex) Or
+    BADIOptions.ProjectDictionary.Find(strWord, iIndex) Or
     FIdentifierList.Find(strWord, iIndex);
   If Not boolFound And (strWord.ToUpper <> strWord) Then
     AddSpelling(strWord, strCategory, AScope, iLine, iColumn, Comment);

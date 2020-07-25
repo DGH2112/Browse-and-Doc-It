@@ -699,10 +699,16 @@ object frameModuleExplorer: TframeModuleExplorer
       OnExecute = actLocalExecute
       OnUpdate = actLocalUpdate
     end
-    object actAddToDictionary: TAction
+    object actAddToLocalDictionary: TAction
       Category = 'Spelling'
-      Caption = '&Add to Dictionary'
-      OnExecute = actAddToDictionaryExecute
+      Caption = '&Add to Local Dictionary'
+      OnExecute = actAddToLocalDictionaryExecute
+      OnUpdate = actSpellingUpdate
+    end
+    object actAddToProjectDictionary: TAction
+      Category = 'Spelling'
+      Caption = 'Add to &Project Dictionary'
+      OnExecute = actAddToProjectDictionaryExecute
       OnUpdate = actSpellingUpdate
     end
     object actIgnoreSpellingMistake: TAction
@@ -722,7 +728,10 @@ object frameModuleExplorer: TframeModuleExplorer
     Left = 176
     Top = 128
     object AddtoDictionary1: TMenuItem
-      Action = actAddToDictionary
+      Action = actAddToLocalDictionary
+    end
+    object AddtoProjectDictionary1: TMenuItem
+      Action = actAddToProjectDictionary
     end
     object IgnoreSpellingMistake1: TMenuItem
       Action = actIgnoreSpellingMistake

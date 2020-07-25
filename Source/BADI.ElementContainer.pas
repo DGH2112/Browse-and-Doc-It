@@ -4,8 +4,8 @@
   and a label container for tree view headers and the like.
 
   @Author  David Hoyle
-  @Version 2.169
-  @Date    21 Jul 2020
+  @Version 2.170
+  @Date    25 Jul 2020
 
   @nospelling noXxxxx
 
@@ -923,7 +923,7 @@ End;
 
 (**
 
-  This method checks whether there are tag t disable spelling in general or on a specific word.
+  This method checks whether there are tag to disable spelling in general or on a specific word.
 
   @precon  None.
   @postcon Returns return if spelling should be disabled.

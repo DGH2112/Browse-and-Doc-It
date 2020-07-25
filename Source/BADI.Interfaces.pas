@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.955
-  @Date    12 Jul 2020
+  @Version 2.128
+  @Date    25 Jul 2020
 
   @license
 
@@ -65,7 +65,7 @@ Type
     (**
       This property returns the number of items in the collection.
       @precon  None.
-      @postcon The number of items in the excluions collection is returned.
+      @postcon The number of items in the exclusions collection is returned.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
@@ -152,6 +152,9 @@ Type
     Function  GetLocalDictionaryFile : String;
     Procedure SetLocalDictionaryFile(Const strValue : String);
     Function  GetLocalDictionary : TStringList;
+    Function  GetProjectDictionaryFile : String;
+    Procedure SetProjectDictionaryFile(Const strValue : String);
+    Function  GetProjectDictionary : TStringList;
     Function  GetIgnoreDictionaryFile : String;
     Procedure SetIgnoreDictionaryFile(Const strValue : String);
     Function  GetIgnoreDictionary : TStringList;
@@ -161,9 +164,9 @@ Type
     Procedure RequiresIDEEditorColoursUpdate;
     // Properties
     (**
-      This property contains the basic toggleable options for the application.
+      This property contains the basic boolean toggle options for the application.
       @precon  None.
-      @postcon Contains the basic toggleable options for the application.
+      @postcon Contains the basic boolean toggle options for the application.
       @return  a TDocOptions
     **)
     Property Options : TDocOptions Read GetOptions Write SetOptions;
@@ -189,7 +192,7 @@ Type
     **)
     Property ExpandedNodes : TStringList Read GetExpandedNodes;
     (**
-      This property determines the amount of time in milliseonds between the
+      This property determines the amount of time in milliseconds between the
       last editor update and the next refresh. Interval only, the application
       needs to implement the logic.
       @precon  None.
@@ -281,9 +284,9 @@ Type
     Property BGColour[Const boolUseIDEEditorColours : Boolean] : TColor Read GetModuleExplorerBGColour 
       Write SetModuleExplorerBGColour;
     (**
-      This property gets ans sets the token limit to the module explorer.
+      This property gets and sets the token limit to the module explorer.
       @precon  None.
-      @postcon Gets ans sets the token limit to the module explorer.
+      @postcon Gets and sets the token limit to the module explorer.
       @return  an Integer
     **)
     Property TokenLimit : Integer Read GetTokenLimit Write SetTokenLimit;
@@ -313,9 +316,9 @@ Type
     **)
     Property TreeColour : TColor Read GetTreeColour Write SetTreeColour;
     (**
-      This property returns the name of the inifile.
+      This property returns the name of the INI file.
       @precon  None.
-      @postcon Returns the name of the inifile.
+      @postcon Returns the name of the INI file.
       @return  a String
     **)
     Property INIFileName : String Read GetINIFileName;
@@ -366,7 +369,7 @@ Type
     Property ModuleMetricSubOptions : TBADIModuleMetricSubOps Read GetModuleMetricSubOps
       Write SetModuleMEtricSubOps;
     (**
-      This property defines the power of the y = x ^ z equiation used to combine the metrics for
+      This property defines the power of the y = x ^ z equation used to combine the metrics for
       toxicity.
       @precon  None.
       @postcon Gets ad sets the power of the toxicity summation.
@@ -416,7 +419,7 @@ Type
       A property to determine of a constant refactoring should have a new line between declaration
       sections.
       @precon  None.
-      @postcon Gets or set the boolena value.
+      @postcon Gets or set the boolean value.
       @return  a Boolean
     **)
     Property RefactorConstNewLine : Boolean Read GetRefactorConstNewLine Write SetRefactorConstNewLine;
@@ -487,9 +490,23 @@ Type
     **)
     Property LocalDictionary : TStringList Read GetLocalDictionary;
     (**
-      This property gets and sets the filename for the ignore dictionary.
+      This property returns a sorted string list of project dictionary words.
       @precon  None.
-      @postcon Gets and sets the filename for the ignore dictionary.
+      @postcon Returns a sorted string list of project dictionary words.
+      @return  a String
+    **)
+    Property ProjectDictionaryFile : String Read GetProjectDictionaryFile Write SetProjectDictionaryFile;
+    (**
+      This property gets and sets the filename for the local dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the local dictionary.
+      @return  a TStringList
+    **)
+    Property ProjectDictionary : TStringList Read GetProjectDictionary;
+    (**
+      This property gets and sets the filename for the project dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the project dictionary.
       @return  a String
     **)
     Property IgnoreDictionaryFile : String Read GetIgnoreDictionaryFile Write SetIgnoreDictionaryFile;
@@ -531,7 +548,7 @@ Type
     Procedure Rename(Const strFileName : String);
   End;
 
-  (** An interface to manage a dictionary of IBADT=IModuleStats. **)
+  (** An interface to manage a dictionary of IBADIModuleStats. **)
   IBADIModuleStatsList = Interface
   ['{C64AD7A8-8A15-4114-90DD-E689D8193CA5}']
     // Getter and Setters
@@ -541,9 +558,9 @@ Type
     Procedure Remove(Const strFileName : String);
     // Properties
     (**
-      This method returns an interfaces of the module stats for the given filename.
+      This method returns an interfaces of the module statistics for the given filename.
       @precon  None.
-      @postcon Returns an interfaces of the module stats for the given filename.
+      @postcon Returns an interfaces of the module statistics for the given filename.
       @param   strFileName as a String as a constant
       @return  an IBADIModuleStats
     **)

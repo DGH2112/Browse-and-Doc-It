@@ -2198,7 +2198,9 @@ Begin
         etHint:    Result := TBADIOptions.BADIOptions.IssueLimits[ltHints];
         etWarning: Result := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];
         etError:   Result := TBADIOptions.BADIOptions.IssueLimits[ltErrors];  
-      End;
+      End
+    Else If Container.Elements[1] Is TBADISpellingIssue Then
+      Result := TBADIOptions.BADIOptions.IssueLimits[ltSpelling];
 End;
 
 (**

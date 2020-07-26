@@ -93,9 +93,6 @@ object frameBADISpellingOpions: TframeBADISpellingOpions
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 3
-    ExplicitLeft = 136
-    ExplicitTop = 152
-    ExplicitWidth = 185
     object btnEditDictionaries: TButton
       Left = 3
       Top = 8
@@ -104,6 +101,40 @@ object frameBADISpellingOpions: TframeBADISpellingOpions
       Caption = '&Edit Dictionaries'
       TabOrder = 0
       OnClick = btnEditDictionariesClick
+    end
+  end
+  object pnlClientArea: TPanel
+    Left = 0
+    Top = 156
+    Width = 462
+    Height = 153
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 4
+    ExplicitLeft = 136
+    ExplicitTop = 152
+    ExplicitWidth = 185
+    ExplicitHeight = 41
+    DesignSize = (
+      462
+      153)
+    object lblSpellingMistakeColour: TLabel
+      AlignWithMargins = True
+      Left = 3
+      Top = 6
+      Width = 305
+      Height = 16
+      Anchors = [akLeft, akTop, akRight]
+      Caption = 'Spelling Mistake &Colour'
+    end
+    object clbxSpellingMistakeColour: TColorBox
+      Left = 314
+      Top = 3
+      Width = 145
+      Height = 22
+      Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames, cbCustomColors]
+      Anchors = [akTop, akRight]
+      TabOrder = 0
     end
   end
   object ilBUttons: TImageList

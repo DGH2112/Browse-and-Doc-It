@@ -3,8 +3,8 @@
   This module contains a class which implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 5.353
-  @Date    18 Jul 2020
+  @Version 5.359
+  @Date    26 Jul 2020
   
   @license
 
@@ -560,7 +560,7 @@ Begin
         Inc(R.Left, iPos * CellSize.cx)
       Else
         Delete(strText, 1, -iPos);
-      DocIssueInfo.FForeColour := clRed;
+      DocIssueInfo.FForeColour := TBADIOptions.BADIOptions.SpellingMistakeColour;
       If strText.Length > 0 Then
         DrawCommentTag(Canvas, R, strText, DocIssueInfo);
     End;

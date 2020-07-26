@@ -3,8 +3,8 @@
   This module contains a frame for configuring the dictionaries.
 
   @Author  David Hoyle
-  @Version 1.213
-  @Date    25 Jul 2020
+  @Version 1.243
+  @Date    26 Jul 2020
   
   @license
 
@@ -61,6 +61,9 @@ Type
     dlgOpenTextFile: TOpenTextFileDialog;
     pnlButtons: TPanel;
     btnEditDictionaries: TButton;
+    pnlClientArea: TPanel;
+    lblSpellingMistakeColour: TLabel;
+    clbxSpellingMistakeColour: TColorBox;
     procedure btnEditDictionariesClick(Sender: TObject);
     Procedure edtDictionaryRightButtonClick(Sender: TObject);
   Strict Private
@@ -126,6 +129,7 @@ Begin
   edtLanguageDictionary.Text := TBADIOptions.BADIOptions.LanguageDictionaryFile;
   edtLocalDictionary.Text := TBADIOptions.BADIOptions.LocalDictionaryFile;
   edtIgnoreDictionary.Text := TBADIOptions.BADIOptions.IgnoreDictionaryFile;
+  clbxSpellingMistakeColour.Selected := TBADIOptions.BADIOptions.SpellingMistakeColour;
 End;
 
 (**
@@ -142,6 +146,7 @@ Begin
   TBADIOptions.BADIOptions.LanguageDictionaryFile := edtLanguageDictionary.Text;
   TBADIOptions.BADIOptions.LocalDictionaryFile := edtLocalDictionary.Text;
   TBADIOptions.BADIOptions.IgnoreDictionaryFile := edtIgnoreDictionary.Text;
+  TBADIOptions.BADIOptions.SpellingMistakeColour := clbxSpellingMistakeColour.Selected;
 End;
 
 End.

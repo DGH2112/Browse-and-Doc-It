@@ -3,8 +3,8 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 2.951
-  @Date    25 Jul 2020
+  @Version 3.098
+  @Date    26 Jul 2020
 
   @license
 
@@ -95,6 +95,7 @@ Type
     FProjectDictionary                : TStringList;
     FIgnoreDictionaryFile             : String;
     FIgnoreDictionary                 : TStringList;
+    FSpellingMistakeColour            : TColor;
   Strict Protected
     // IBADIOptions
     Function  GetOptions : TDocOptions;
@@ -211,6 +212,8 @@ Type
     Function  GetIgnoreDictionaryFile : String;
     Procedure SetIgnoreDictionaryFile(Const strValue : String);
     Function  GetIgnoreDictionary : TStringList;
+    Function  GetSpellingMistakeColour : TColor;
+    Procedure SetSpellingMistakeColour(Const iColour : TColor);
   Public
     Constructor Create(Const IDEEditorColours : IBADIIDEEditorColours);
     Destructor Destroy; Override;
@@ -338,6 +341,8 @@ Const
   strLocalDictionaryINIKey = 'LocalDictionary';
   (** A constant for the ignore dictionary INI Key. **)
   strIgnoreDictionaryINIKey = 'IgnoreDictionary';
+  (** A constant for the Spelling Mistake Colour INI Key. **)
+  strSpellingMistakeColourINIKey = 'Spelling Mistake Colour';
 
 Var
   (** This is a class variable to hide and hold the BADI Options instance reference. **)
@@ -1082,6 +1087,22 @@ End;
 
 (**
 
+  This is a getter method for the Spelling Mistake Colour property.
+
+  @precon  None.
+  @postcon Returns the colour to be used for the spelling mistake colour.
+
+  @return  a TColor
+
+**)
+Function TBADIOptions.GetSpellingMistakeColour: TColor;
+
+Begin
+  Result := FSpellingMistakeColour;
+End;
+
+(**
+
   This is a getter method for the Token Font Info property.
 
   @precon  None.
@@ -1640,6 +1661,7 @@ Procedure TBADIOptions.LoadSettings;
 Const
   strDefaultDateFmt = 'dd mmm yyyy';
   dblDefaultIncrement = 0.00001;
+  strDefaultSpellingMistakeColour = 'clRed';
 
 Var
   iniFile : TMemIniFile;
@@ -1668,6 +1690,8 @@ Begin
       strDefaultDateFmt);
     FModuleVersionIncrement := iniFile.ReadFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey,
       dblDefaultIncrement);
+    FSpellingMistakeColour := StringToColor(iniFile.ReadString(strSetup, strSpellingMistakeColourINIKey,
+      strDefaultSpellingMistakeColour));
   Finally
     iniFile.Free;
   End;
@@ -2092,6 +2116,7 @@ Begin
     iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
     iniFile.WriteString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey, FModuleDateFmt);
     iniFile.WriteFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey, FModuleVersionIncrement);
+    iniFile.WriteString(strSetup, strSpellingMistakeColourINIKey, ColorToString(FSpellingMistakeColour));
     UpdateDoNotFollowEditor();
     iniFile.UpdateFile;
   Finally
@@ -2600,6 +2625,22 @@ Procedure TBADIOptions.SetScopesToRender(Const setScopes: TScopes);
 
 Begin
   FScopesToRender := setScopes;
+End;
+
+(**
+
+  This is a setter method for the Spelling Mistake Colour property.
+
+  @precon  None.
+  @postcon Sets the colour to be used for spelling mistakes in the editor.
+
+  @param   iColour as a TColor as a constant
+
+**)
+Procedure TBADIOptions.SetSpellingMistakeColour(Const iColour: TColor);
+
+Begin
+  FSpellingMistakeColour := iColour;
 End;
 
 (**

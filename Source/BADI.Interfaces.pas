@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 2.128
-  @Date    25 Jul 2020
+  @Version 2.172
+  @Date    26 Jul 2020
 
   @license
 
@@ -158,6 +158,8 @@ Type
     Function  GetIgnoreDictionaryFile : String;
     Procedure SetIgnoreDictionaryFile(Const strValue : String);
     Function  GetIgnoreDictionary : TStringList;
+    Function  GetSpellingMistakeColour : TColor;
+    Procedure SetSpellingMistakeColour(Const iColour : TColor);
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -517,6 +519,13 @@ Type
       @return  a TStringList
     **)
     Property IgnoreDictionary : TStringList Read GetIgnoreDictionary;
+    (**
+      This property determines the colour of the highlighted text for spelling mistakes.
+      @precon  None.
+      @postcon Gets and sets the spelling mistake colours.
+      @return  a TColor
+    **)
+    Property SpellingMistakeColour : TColor Read GetSpellingMistakeColour Write SetSpellingMistakeColour;
   End;
 
   (** An interface to get the IDE Editor Colours from the Registry. **)

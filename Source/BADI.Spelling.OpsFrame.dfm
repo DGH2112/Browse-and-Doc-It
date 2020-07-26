@@ -85,6 +85,27 @@ object frameBADISpellingOpions: TframeBADISpellingOpions
     Text = 'edtIgnoreDictionary'
     OnRightButtonClick = edtDictionaryRightButtonClick
   end
+  object pnlButtons: TPanel
+    Left = 0
+    Top = 309
+    Width = 462
+    Height = 41
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 3
+    ExplicitLeft = 136
+    ExplicitTop = 152
+    ExplicitWidth = 185
+    object btnEditDictionaries: TButton
+      Left = 3
+      Top = 8
+      Width = 134
+      Height = 25
+      Caption = '&Edit Dictionaries'
+      TabOrder = 0
+      OnClick = btnEditDictionariesClick
+    end
+  end
   object ilBUttons: TImageList
     Left = 120
     Top = 192

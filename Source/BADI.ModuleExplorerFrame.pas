@@ -4,7 +4,7 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 42.142
+  @Version 42.165
   @Date    25 Jul 2020
 
   @license
@@ -391,6 +391,16 @@ Begin
   DoRefresh(Sender);
 End;
 
+(**
+
+  This is an on execute event handler for the Add To Project Dictionary action.
+
+  @precon  None.
+  @postcon The selected spelling mistake is added to the project dictionary.
+
+  @param   Sender as a TObject
+
+**)
 Procedure TframeModuleExplorer.actAddToProjectDictionaryExecute(Sender: TObject);
 
 Begin

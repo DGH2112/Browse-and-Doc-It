@@ -3,8 +3,8 @@
   This module contains a frame for configuring the dictionaries.
 
   @Author  David Hoyle
-  @Version 1.164
-  @Date    12 Jul 2020
+  @Version 1.213
+  @Date    25 Jul 2020
   
   @license
 
@@ -59,6 +59,9 @@ Type
     edtIgnoreDictionary: TButtonedEdit;
     lblIgnoreDictionary: TLabel;
     dlgOpenTextFile: TOpenTextFileDialog;
+    pnlButtons: TPanel;
+    btnEditDictionaries: TButton;
+    procedure btnEditDictionariesClick(Sender: TObject);
     Procedure edtDictionaryRightButtonClick(Sender: TObject);
   Strict Private
   Strict Protected
@@ -73,7 +76,24 @@ Implementation
 
 
 Uses
-  BADI.Options;
+  BADI.Options,
+  BADI.Spelling.DictionaryEditorForm;
+
+(**
+
+  This is an on click event handler for the Edit Dictionaries button.
+
+  @precon  None.
+  @postcon Displays the dictionary editor form.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADISpellingOpions.btnEditDictionariesClick(Sender: TObject);
+
+Begin
+  TfrmDictionaryEditor.Execute;
+End;
 
 (**
 

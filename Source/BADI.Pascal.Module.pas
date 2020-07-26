@@ -3,8 +3,8 @@
   Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 2.839
-  @Date    23 Jul 2020
+  @Version 2.963
+  @Date    26 Jul 2020
 
   @license
 
@@ -300,7 +300,6 @@ Type
     Procedure CheckFunctionReturn(Const Func : TPascalMethod);
     Procedure CheckResourceStringSpelling(Const Element : TElementContainer);
     Procedure CheckConstantStringSpelling(Const Element : TElementContainer);
-    Procedure ProcessLiteralsForSpelling(Const E: TElementContainer; Const strCategory : String);
     (**
       This property returns the method on top of the method stack.
       @precon  None.
@@ -6623,44 +6622,6 @@ Begin
         sl.Free;
       End;
     End;
-End;
-
-(**
-
-  This method processes the the spell checking of the string literals for the given element.
-
-  @precon  E must be a valid instance.
-  @postcon All spelling mistakes in the string literals of the given element are output.
-
-  @param   E           as a TElementContainer as a constant
-  @param   strCategory as a String as a constant
-
-**)
-Procedure TPascalModule.ProcessLiteralsForSpelling(Const E: TElementContainer; Const strCategory : String);
-
-Var
-  iToken: Integer;
-  T: TTokenInfo;
-  sl: TStringList;
-  i: Integer;
-
-Begin
-  Begin
-    For iToken := 0 To E.TokenCount - 1 Do
-      If E.Tokens[iToken].TokenType In [ttSingleLiteral] Then
-        Begin
-          T := E.Tokens[iToken];
-          sl := Tokenize(T.Token.DeQuotedString, [], []);
-          Try
-            For i := 0 To sl.Count - 1 Do
-              If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
-                If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
-                  CheckSpelling(sl[i], strCategory, E.Scope, T.Line, T.Column, Nil);
-          Finally
-            sl.Free;
-          End;
-        End;
-  End;
 End;
 
 (**

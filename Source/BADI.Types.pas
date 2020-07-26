@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.464
-  @Date    23 Jul 2020
+  @Version 1.467
+  @Date    26 Jul 2020
 
   @license
 
@@ -178,6 +178,7 @@ Type
     doSpellCheckResourceStrings,
     doSpellCheckConstants,
     doSpellCheckLiterals,
+    doSpellCheckDFMLiterals,
 
     doDoNotFollowEditorIfErrors,
     doDoNotFollowEditorIfWarnings,

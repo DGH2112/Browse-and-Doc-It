@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 2.330
-  @Date    23 Jul 2020
+  @Version 2.341
+  @Date    26 Jul 2020
 
   @license
 
@@ -139,6 +139,7 @@ Const
     (FDescription : strSpellCheckResourceStrings;             FEnabled :  True; FGroup: dogSpelling),
     (FDescription : strSpellCheckConstants;                   FEnabled : False; FGroup: dogSpelling),
     (FDescription : strSpellCheckLiterals;                    FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckDFMLiterals;                 FEnabled :  True; FGroup: dogSpelling),
 
     (FDescription : strDoNotFollowEditorIfErrors;             FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfWarnings;           FEnabled : True;  FGroup: dogDoNotFollow),

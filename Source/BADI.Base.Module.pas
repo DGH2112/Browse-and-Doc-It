@@ -4,8 +4,8 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 2.247
-  @Date    25 Jul 2020
+  @Version 2.442
+  @Date    26 Jul 2020
 
   @license
 
@@ -33,8 +33,9 @@ Unit BADI.Base.Module;
 Interface
 
 Uses
-  Classes,
-  Contnrs,
+  System.Classes,
+  System.Contnrs,
+  System.RegularExpressions,
   BADI.Options,
   BADI.Types,
   BADI.TokenInfo,
@@ -49,26 +50,27 @@ Type
       derived. **)
   TBaseLanguageModule = Class Abstract (TElementContainer)
   Strict Private
-    FOwnedItems : TObjectList;
-    FTokenIndex : TTokenIndex;
-    FDocErrors: TElementContainer;
-    FTickList : TObjectList;
-    FModuleName : String;
-    FBodyComment : TObjectList;
-    FFileName: String;
-    FModified : Boolean;
-    FCompilerDefs : TStringList;
-    FPreviousTokenIndex : TTokenIndex;
-    FCompilerConditionStack : TCompilerConditionStack;
+    FOwnedItems                 : TObjectList;
+    FTokenIndex                 : TTokenIndex;
+    FDocErrors                  : TElementContainer;
+    FTickList                   : TObjectList;
+    FModuleName                 : String;
+    FBodyComment                : TObjectList;
+    FFileName                   : String;
+    FModified                   : Boolean;
+    FCompilerDefs               : TStringList;
+    FPreviousTokenIndex         : TTokenIndex;
+    FCompilerConditionStack     : TCompilerConditionStack;
     FCompilerConditionUndoStack : TCompilerConditionStack;
-    FLastComment: TTokenInfo;
-    FCommentClass : TCommentClass;
-    FShouldUndoCompilerStack: Boolean;
-    FLastBodyCommentLine: Integer;
-    FModuleOptions : TModuleOptions;
-    FTokenStack : TArrayOfInteger;
-    FTokenStackTop : Integer;
-    FIdentifierList : TStringList;
+    FLastComment                : TTokenInfo;
+    FCommentClass               : TCommentClass;
+    FShouldUndoCompilerStack    : Boolean;
+    FLastBodyCommentLine        : Integer;
+    FModuleOptions              : TModuleOptions;
+    FTokenStack                 : TArrayOfInteger;
+    FTokenStackTop              : Integer;
+    FIdentifierList             : TStringList;
+    FReplaceAmpersandRegEx      : TRegEx;
   Strict Protected
     Function  GetToken : TTokenInfo;
     function  GetOpTickCountName(Const iIndex: Integer): String;
@@ -160,6 +162,7 @@ Type
     procedure CheckSpelling(Const strWord, strCategory : String; Const AScope : TScope; Const iLine,
       iColumn : Integer; Const Comment : TComment);
     Procedure AddIdentifier(Const strIdentifier : String);
+    Procedure ProcessLiteralsForSpelling(Const E: TElementContainer; Const strCategory : String);
     Class Function  DefaultProfilingTemplate : String; Virtual;
     { Properties }
     (**
@@ -754,7 +757,7 @@ End;
   This is the constructor method for the TBaseLanguageModule class.
 
   @precon  None.
-  @postcon Initialise this base class and Tokenizes the passed stream of characters.
+  @postcon Initialise this base class and Tokenises the passed stream of characters.
 
   @nohint  Source
 
@@ -769,6 +772,7 @@ constructor TBaseLanguageModule.CreateParser(Const Source, strFileName : String;
 
 begin
   Inherited Create(strFileName, scGlobal, 0, 0, iiModule, Nil);
+  FReplaceAmpersandRegEx := TRegEx.Create('&(\w)', [roIgnoreCase, roCompiled, roSingleLine]);
   FModuleOptions := ModuleOptions;
   FFileName := strFileName;
   FModified := IsModified;
@@ -1374,6 +1378,47 @@ Begin
           FLastComment := Token;
         End;
     End;
+End;
+
+(**
+
+  This method processes the the spell checking of the string literals for the given element.
+
+  @precon  E must be a valid instance.
+  @postcon All spelling mistakes in the string literals of the given element are output.
+
+  @param   E           as a TElementContainer as a constant
+  @param   strCategory as a String as a constant
+
+**)
+Procedure TBaseLanguageModule.ProcessLiteralsForSpelling(Const E: TElementContainer;
+  Const strCategory : String);
+
+Var
+  iToken: Integer;
+  T: TTokenInfo;
+  sl: TStringList;
+  i: Integer;
+
+Begin
+  Begin
+    For iToken := 0 To E.TokenCount - 1 Do
+      If E.Tokens[iToken].TokenType In [ttSingleLiteral] Then
+        Begin
+          T := E.Tokens[iToken];
+          Var strToken := T.Token.DeQuotedString;
+          strToken := FReplaceAmpersandRegEx.Replace(strToken, '\1');
+          sl := Tokenize(strToken, [], []);
+          Try
+            For i := 0 To sl.Count - 1 Do
+              If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
+                If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
+                  CheckSpelling(sl[i], strCategory, E.Scope, T.Line, T.Column, Nil);
+          Finally
+            sl.Free;
+          End;
+        End;
+  End;
 End;
 
 (**

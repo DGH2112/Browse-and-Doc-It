@@ -3,8 +3,8 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.601
-  @Date    23 Jul 2020
+  @Version 1.613
+  @Date    26 Jul 2020
 
   @license
 
@@ -166,6 +166,8 @@ ResourceString
   strSpellCheckConstants = ' - Spell check constants';
   (** Options text for Spell checking literals **)
   strSpellCheckLiterals = ' - Spell check string literals';
+  (** Options text for Spell checking DFM literals **)
+  strSpellCheckDFMLiterals = ' - Spell check DFM string literals';
   (** Options text for preventing the module explorer following the Code Editor if there are errors **)
   strDoNotFollowEditorIfErrors = 'Errors';
   (** Options text for preventing the module explorer following the Code Editor if there are warnings **)

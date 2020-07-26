@@ -3,8 +3,8 @@
   DFMModule : A unit to tokenise DFM code.
 
   @Author  David Hoyle
-  @Version 1.780
-  @Date    19 Jul 2020
+  @Version 1.857
+  @Date    26 Jul 2020
 
   @license
 
@@ -90,13 +90,19 @@ Type
 
 Implementation
 
-uses
+Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   BADI.Options,
   BADI.TokenInfo,
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.Constants,
-  BADI.Module.Dispatcher, BADI.DFM.ObjectDecl, BADI.DFM.Types, BADI.DFM.PropertyDecl,
+  BADI.Module.Dispatcher,
+  BADI.DFM.ObjectDecl,
+  BADI.DFM.Types,
+  BADI.DFM.PropertyDecl,
   BADI.DFM.Item;
 
 Const
@@ -184,7 +190,7 @@ begin
       strToken := strToken + Token.Token;
       NextNonCommentToken;
     End;
-  Container.AddToken(strToken);
+  Container.AddToken(strToken, ttSingleLiteral);
 end;
 
 (**
@@ -229,7 +235,6 @@ Begin
       Add(strHints, iiHintFolder, scNone);
       Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       AddTickCount(strRefs);
-      CheckStringSpelling;
       AddTickCount(strSpelling);
       TidyUpEmptyElements;
     End;
@@ -329,6 +334,7 @@ begin
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier] Then
         Begin
+          AddIdentifier(Token.Token);
           O := Container.Add(TDFMObject.Create(Token.Token, scPublic, Token.Line,
             Token.Column, iiPublicObject, Nil)) As TDFMObject;
           O.ObjectType := AObjectType;
@@ -755,8 +761,12 @@ end;
   @return  a Boolean
 
 **)
-function TDFMModule.StringLiteral(Const Container: TElementContainer): Boolean;
-begin
+Function TDFMModule.StringLiteral(Const Container: TElementContainer): Boolean;
+
+ResourceString
+  strLiterals = 'Literals';
+
+Begin
   Result := Token.TokenType In [ttSingleLiteral, ttDoubleLiteral];
   If Result Then
     Begin
@@ -769,8 +779,10 @@ begin
           Else
             ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
         End;
+      If doSpellCheckDFMLiterals In TBADIOptions.BADIOptions.Options Then
+        ProcessLiteralsForSpelling(Container, strLiterals);
     End;
-end;
+End;
 
 (**
 

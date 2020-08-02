@@ -143,8 +143,8 @@ Type
     Procedure SetModuleDateFmt(Const strValue : String);
     Function  GetModuleVersionIncrement : Double;
     Procedure SetModuleVersionIncrement(Const dblValue : Double);
-    Function  GetDoNotFollowEditor : TArray<String>;
-    Procedure SetDoNotFollowEditor(Const astrDoNotFollowTypes : TArray<String>);
+    Function  GetDoNotFollowEditor : TLimitTypes;
+    Procedure SetDoNotFollowEditor(Const setDoNotFollowTypes : TLimitTypes);
     Function  GetScopeImageList : TImageList;
     Function  GetLanguageDictionaryFile : String;
     Procedure SetLanguageDictionaryFile(Const strValue : String);
@@ -453,9 +453,9 @@ Type
       selection from following the editor cursor.
       @precon  None.
       @postcon Gets and sets the limits to not follow.
-      @return  a TArray<String>
+      @return  a TLimitTypes
     **)
-    Property DoNotFollowEditor : TArray<String> Read GetDoNotFollowEditor Write SetDoNotFollowEditor;
+    Property DoNotFollowEditor : TLimitTypes Read GetDoNotFollowEditor Write SetDoNotFollowEditor;
     (**
       This property returns a single scope image list for use throughout the application.
       @precon  None.
@@ -652,7 +652,7 @@ Type
   ['{FE2ACA7E-03A5-4C12-A872-A8A4F33AC809}']
     // Getters and Setters
     Function  GetTotals : TDictionary<String, TBADITotalInfo>;
-    Function  ContainsAny(Const astrValue : TArray<String>) : Boolean;
+    Function  ContainsAny(Const setDocIssues : TLimitTypes) : Boolean;
     // General Methods
     Procedure IncDocIssue(Const strDocIssueType : String; Const TotalInfo : TBADITotalInfo);
     Procedure Clear;

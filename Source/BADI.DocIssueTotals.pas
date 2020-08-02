@@ -4,8 +4,8 @@
   document issues totals for a module.
 
   @Author  David Hoyle
-  @Version 1.484
-  @Date    13 Apr 2020
+  @Version 1.566
+  @Date    02 Aug 2020
   
   @license
 
@@ -45,7 +45,7 @@ Type
   Strict Protected
     // IBADIDocIssueTotals
     Function  GetTotals : TDictionary<String, TBADITotalInfo>;
-    Function  ContainsAny(Const astrValue : TArray<String>) : Boolean;
+    Function  ContainsAny(Const setDocIssues : TLimitTypes) : Boolean;
     Procedure IncDocIssue(Const strDocIssueType : String; Const TotalInfo : TBADITotalInfo);
     Procedure Clear;
   Public
@@ -55,6 +55,9 @@ Type
 
 Implementation
 
+Uses
+  BADI.Constants;
+  
 (**
 
   This method resets the totals for all doc issues to zero.
@@ -63,6 +66,7 @@ Implementation
   @postcon The totals are reset to zero.
 
 **)
+
 Procedure TBADIDocIssueTotals.Clear;
 
 Begin
@@ -76,19 +80,19 @@ End;
   @precon  None.
   @postcon Returns true of any values are keys in the dictionary.
 
-  @param   astrValue as a TArray<String> as a constant
+  @param   setDocIssues as a TLimitTypes as a constant
   @return  a Boolean
 
 **)
-Function TBADIDocIssueTotals.ContainsAny(Const astrValue: TArray<String>): Boolean;
+Function TBADIDocIssueTotals.ContainsAny(Const setDocIssues: TLimitTypes): Boolean;
 
 Var
-  strKey : String;
+  eDocIssue : TLimitType;
   
 Begin
   Result := False;
-  For strKey In astrValue Do
-    If FTotals.ContainsKey(strKey) Then
+  For eDocIssue := Low(TLimitType) To High(TLimitType) Do
+    If (eDocIssue In setDocIssues) And FTotals.ContainsKey(astrLimitType[eDocIssue]) Then
       Begin
         Result := True;
         Break;

@@ -3,8 +3,8 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 3.098
-  @Date    26 Jul 2020
+  @Version 3.388
+  @Date    02 Aug 2020
 
   @license
 
@@ -85,7 +85,7 @@ Type
     FRequiresIDEEditorColoursUpdating : Boolean;
     FModuleDateFmt                    : String;
     FModuleVersionIncrement           : Double;
-    FDoNotFollowEditor                : TArray<String>;
+    FDoNotFollowEditor                : TLimitTypes;
     FScopeImageList                   : TImageList;
     FLanguageDictionaryFile           : String;
     FLanguageDictionary               : TStringList;
@@ -166,8 +166,8 @@ Type
     Procedure SetModuleDateFmt(Const strValue : String);
     Function  GetModuleVersionIncrement : Double;
     Procedure SetModuleVersionIncrement(Const dblValue : Double);
-    Function  GetDoNotFollowEditor : TArray<String>;
-    Procedure SetDoNotFollowEditor(Const astrDoNotFollowTypes : TArray<String>);
+    Function  GetDoNotFollowEditor : TLimitTypes;
+    Procedure SetDoNotFollowEditor(Const setLimitTypes : TLimitTypes);
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure RequiresIDEEditorColoursUpdate;
@@ -516,10 +516,10 @@ End;
   @precon  None.
   @postcon Returns the set of limits which should prevent the module explorer following the editor.
 
-  @return  a TArray<String>
+  @return  a TLimitTypes
 
 **)
-Function TBADIOptions.GetDoNotFollowEditor: TArray<String>;
+Function TBADIOptions.GetDoNotFollowEditor: TLimitTypes;
 
 Begin
   Result := FDoNotFollowEditor;
@@ -2198,13 +2198,13 @@ End;
   @precon  None.
   @postcon Set the set of limits which should prevent the module explorer following the editor.
 
-  @param   astrDoNotFollowTypes as a TArray<String> as a constant
+  @param   setLimitTypes as a TLimitTypes as a constant
 
 **)
-Procedure TBADIOptions.SetDoNotFollowEditor(Const astrDoNotFollowTypes : TArray<String>);
+Procedure TBADIOptions.SetDoNotFollowEditor(Const setLimitTypes : TLimitTypes);
 
 Begin
-  FDoNotFollowEditor := astrDoNotFollowTypes;
+  FDoNotFollowEditor := setLimitTypes;
 End;
 
 (**
@@ -2818,14 +2818,15 @@ Var
 Begin
   FDoNotFollowEditor := [];
   iIndex := 0;
-  SetLength(FDoNotFollowEditor, Integer(High(TLimitType)) - Integer(Low(TLimitType)) + 1);
+  //SetLength(FDoNotFollowEditor, Integer(High(TLimitType)) - Integer(Low(TLimitType)) + 1);
   For eDocIssue := Low(TLimitType) To High(TLimitType) Do
     If aLimitOptions[eDocIssue] In FOptions Then
-      Begin
-        FDoNotFollowEditor[iIndex] := astrLimitType[eDocIssue];
-        Inc(iIndex);
-      End;
-  SetLength(FDoNotFollowEditor, iIndex);
+      Include(FDoNotFollowEditor, eDocIssue);
+  //    Begin
+  //      FDoNotFollowEditor[iIndex] := astrLimitType[eDocIssue];
+  //      Inc(iIndex);
+  //    End;
+  //SetLength(FDoNotFollowEditor, iIndex);
 End;
 
 End.

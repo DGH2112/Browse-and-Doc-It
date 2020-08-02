@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 2.172
-  @Date    26 Jul 2020
+  @Version 2.317
+  @Date    02 Aug 2020
 
   @license
 
@@ -585,14 +585,23 @@ Type
     FMessage    : String;
   End;
 
+  (** A record for the spelling mistakes: The WORD and the Column position. **)
+  TBADISpellingMistake = Record
+    FWord   : String;
+    FColumn : Integer;
+  End;
+
   (** An interface for the Documentation Issues for a line of code. **)
   IBADILineDocIssues = Interface
   ['{6D94887A-69E7-4736-A1B1-6BB533DE9D9F}']
     // Getters and Setters
     Function  GetLimitTypes : TArray<String>;
     Function  GetMessage(Const strDocIssueType : String) : TBADIDocIssueInfo;
+    Function  GetSpellingMistakeCount : Integer;
+    Function  GetSpellingMistake(Const iIndex : Integer) : TBADISpellingMistake;
     // General Methods
     Procedure AddIssue(Const strDocIssueType : String; Const DocIssueInfo : TBADIDocIssueInfo);
+    Procedure AddSpellingMistake(Const strWord : String; Const iColumn : Integer);
     // Properties
     (**
       This property returns a set of enumerates which define the doc issues for the line.
@@ -609,6 +618,21 @@ Type
       @return  a TBADIDocIssueInfo
     **)
     Property Message[Const strDocIssueType : String] : TBADIDocIssueInfo Read GetMessage; Default;
+    (**
+      This property returns the number of spelling mistakes for the line.
+      @precon  None.
+      @postcon Returns the number of spelling mistakes for the line.
+      @return  an Integer
+    **)
+    Property SpellingMistakeCount : Integer Read GetSpellingMistakeCount;
+    (**
+      This property returns the spelling mistake information for the indexed item.
+      @precon  iiNdex must be between 0 and SpellingMistakeCount - 1.
+      @postcon Returns the spelling mistake information for the indexed item.
+      @param   iIndex as an Integer as a constant
+      @return  a TBADISpellingMistake
+    **)
+    Property SpellingMistake[Const iIndex : Integer] : TBADISpellingMistake Read GetSpellingMistake;
   End;
 
   (** A record to describe the information inside the Totals dictionary. **)

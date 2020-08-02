@@ -3,8 +3,8 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.613
-  @Date    26 Jul 2020
+  @Version 1.624
+  @Date    02 Aug 2020
 
   @license
 
@@ -157,17 +157,17 @@ ResourceString
   (** Options text for Showing Spelling Messages in the Code Editor **)
   strShowSpellingMsgsInEditor = 'Show Spelling Mistakes Messages in the Code Editor';
   (** Options text for Spell checking main comment text **)
-  strSpellCheckComments = ' - Spell check the main comment text';
+  strSpellCheckComments = 'Spell check the main comment text';
   (** Options text for Spell checking precon and postcon tags in comments **)
-  strSpellCheckTags = ' - Spell check @precon and @postcon tags in comments';
+  strSpellCheckTags = 'Spell check @precon and @postcon tags in comments';
   (** Options text for Spell checking resource strings **)
-  strSpellCheckResourceStrings = ' - Spell check resource strings';
+  strSpellCheckResourceStrings = 'Spell check resource strings';
   (** Options text for Spell checking constants **)
-  strSpellCheckConstants = ' - Spell check constants';
+  strSpellCheckConstants = 'Spell check constants';
   (** Options text for Spell checking literals **)
-  strSpellCheckLiterals = ' - Spell check string literals';
+  strSpellCheckLiterals = 'Spell check string literals';
   (** Options text for Spell checking DFM literals **)
-  strSpellCheckDFMLiterals = ' - Spell check DFM string literals';
+  strSpellCheckDFMLiterals = 'Spell check DFM string literals';
   (** Options text for preventing the module explorer following the Code Editor if there are errors **)
   strDoNotFollowEditorIfErrors = 'Errors';
   (** Options text for preventing the module explorer following the Code Editor if there are warnings **)
@@ -369,9 +369,9 @@ ResourceString
   strUnSatisfiedDeclaration = 'Method ''%s'' has an unsatisfied declaration.';
   (** An error message for a type not found. **)
   strTypeNotFound = 'Type declaration missing but found ''%s'' at line %d column %d.';
-  (** An error message when a TypeID is expected. **)
-  strTypeIDExpected = 'A TypeID was expected but found ''%s'' at line %d column %d.';
-  (** An exeception message when a Expr conflict occurs in an expression **)
+  (** An error message when a Type ID is expected. **)
+  strTypeIDExpected = 'A Type ID was expected but found ''%s'' at line %d column %d.';
+  (** An exception message when a Expression conflict occurs in an expression **)
   strExprConflict = 'The token ''%s'' conflicts with the TYPE of the preceding ' +
     'expression at line %d column %d.';
   (** An error message if a function is used in a constant expression **)
@@ -641,11 +641,11 @@ ResourceString
   strFunctionTooManyPreConsDesc = 'The method or property comment has too many ' +
     'pre-condition tags (@@precon).';
 
-  (** A documentation message for missing postcondition text. **)
+  (** A documentation message for missing post condition text. **)
   strFunctionPostConNotDocumented = 'A post-condition in %s ''%s'' is not ' +
     'documented.';
-  (** A documentation message description for missing postcondition text. **)
-  strFunctionPostConNotDocumentedDesc = 'The @@prepost tag in the specified ' +
+  (** A documentation message description for missing post condition text. **)
+  strFunctionPostConNotDocumentedDesc = 'The @@postcon tag in the specified ' +
     'method or property is either not present or does not contain a ' +
     'statement. A post-condition statement says something about the status of ' +
     'the output from the method or property which will be valid for the method ' +
@@ -800,10 +800,10 @@ ResourceString
   strMenuBlockComment = 'Block &Comment';
   (** A label for the Line COmment Menu. **)
   strMenuLineComment = '&Line Comment';
-  (** A label for the InSitu Comment Menu. **)
+  (** A label for the in-situ Comment Menu. **)
   strMenuInSituComment = '&In-Situ Comment';
-  (** A label for the ToDoComment Menu. **)
-  strMenuToDoComment = '&ToDo Comment';
+  (** A label for the To Do Comment Menu. **)
+  strMenuToDoComment = '&To Do Comment';
   (** A label for the Refactor Constant Menu. **)
   strMenuRefactorConstant = '&Refactor Constant...';
   (** A label for the module metrics. **)
@@ -843,29 +843,29 @@ ResourceString
   (** A resource string for the Nested IF Depth Category. **)
   strNestedIFDepthCat = 'Nested IF Depths';
   (** A resource string for the Method Cyclometric Complexity Category. **)
-  strMethodCyclometricComplexityCat = 'Method Cylometric Complexity';
+  strMethodCyclometricComplexityCat = 'Method Cyclometric Complexity';
   (** A resource string for the Method Toxicity Category. **)
   strMethodToxicityCat = 'Method Toxicity';
 
-  (** A resource string for the Including IF Statements in the cyclometric complexity calc. **)
+  (** A resource string for the Including IF Statements in the cyclometric complexity calculation. **)
   strMethodCCIncIF= 'Include IF Statements in the Cyclometric Complexity Calculation';
-  (** A resource string for the Including CASE Statements in the cyclometric complexity calc. **)
+  (** A resource string for the Including CASE Statements in the cyclometric complexity calculation. **)
   strMethodCCIncCASE = 'Include CASE Statements in the Cyclometric Complexity Calculation';
-  (** A resource string for the Including WHILE Statements in the cyclometric complexity calc. **)
+  (** A resource string for the Including WHILE Statements in the cyclometric complexity calculation. **)
   strMethodCCIncWHILE = 'Include WHILE Statements in the Cyclometric Complexity Calculation';
-  (** A resource string for the Including REPEAT Statements in the cyclometric complexity calc. **)
+  (** A resource string for the Including REPEAT Statements in the cyclometric complexity calculation. **)
   strMethodCCIncREPEAT = 'Include REPEAT Statements in the Cyclometric Complexity Calculation';
   (** A resource string for the Ignore Boolean Expressions Category. **)
   strMethodCCSubExprCat = 'Include Boolean Sub-Expressions';
-  (** A resource string for the Including Method Length in toxicity calc. **)
+  (** A resource string for the Including Method Length in toxicity calculation. **)
   strToxicityIncMethodLen = 'Include Method Length in the Toxicity Calculation';
-  (** A resource string for the Including Parameter list Length in toxicity calc. **)
+  (** A resource string for the Including Parameter list Length in toxicity calculation. **)
   strToxicityIncParamLen = 'Include Parameter List Length in the Toxicity Calculation';
-  (** A resource string for the Including variable list Length in toxicity calc. **)
+  (** A resource string for the Including variable list Length in toxicity calculation. **)
   strToxicityIncVarLen = 'Include Variable List Length in the Toxicity Calculation';
-  (** A resource string for the Including nested IF depth in toxicity calc. **)
+  (** A resource string for the Including nested IF depth in toxicity calculation. **)
   strToxicityIncIFDepth = 'Include Nested IF Depth in the Toxicity Calculation';
-  (** A resource string for the Including cyclometric complexity in toxicity calc. **)
+  (** A resource string for the Including cyclometric complexity in toxicity calculation. **)
   strToxicityIncCycloComp = 'Include Cyclometric Complexity in the Toxicity Calculation';
 
   (** A message for a method with a long implementation. **)
@@ -894,7 +894,7 @@ ResourceString
     'its number of branch points and therefore the number of unit test that could be needed to test ' +
     'the code. If this value is too high it might make your ability to test your code more difficult.';
   (** A message for a method with a high toxicity. **)
-  strMethodHasHighToxocityValueMsg = 'The method "%s" has a high toxocity value (%1.3f/%1.3f).';
+  strMethodHasHighToxocityValueMsg = 'The method "%s" has a high toxicity value (%1.3f/%1.3f).';
   (** A description with a high toxicity. **)
   strMethodHasHighToxocityValueDesc = 'The toxicity of a method is a measure of the overall ' +
     'combination of metrics and is an indication of whether the method should be refactored into ' +
@@ -983,7 +983,7 @@ ResourceString
   (** A message for the use of a GOTO statement in an implementation. **)
   strGOTOUsedInMethodMsg = 'The "GOTO" is used in the method "%s"!';
   (** A description for the use of a GOTO statement in an implementation. **)
-  strGOTOUsedInMethodDesc = 'GOTO statments are considered bad programming practice especially with structured programming. Consider refactoring your code to replace their use with BREAK and CONTINUE.';
+  strGOTOUsedInMethodDesc = 'GOTO statements are considered bad programming practice especially with structured programming. Consider refactoring your code to replace their use with BREAK and CONTINUE.';
   (** A message for an empty EXCEPT block in an implementation. **)
   strEXCEPTClauseMethodEmptyMsg = 'The EXCEPT clause of the method "%s" is empty!';
   (** A description for an empty EXCEPT block in an implementation. **)
@@ -1038,7 +1038,7 @@ ResourceString
   strINITIALIZATIONClauseInModuleEmptyMsg = 'The INITIALIZATION clause in the module is empty!';
   (** A description for an empty INITIALIZATION block in an implementation. **)
   strINITIALIZATIONClauseInModuleEmptyDesc = 'If the initialization cause is empty either you do not ' + 
-    'need it or perhaps you have forgotten to implement some initalization code.';
+    'need it or perhaps you have forgotten to implement some initialization code.';
   (** A message for an empty FINALIZATION block in an implementation. **)
   strFINALIZATIONClauseInModuleEmptyMsg = 'The FINALIZATION clause in the module is empty!';
   (** A description for an empty FINALIZATION block in an implementation. **)

@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 42.165
-  @Date    25 Jul 2020
+  @Version 5.503
+  @Date    02 Aug 2020
 
   @license
 
@@ -263,6 +263,7 @@ Type
     Function  GetLineDocIssue(Const iLine : Integer) : IBADILineDocIssues;
     Function  GetDocIssueTotals : IBADIDocIssueTotals;
     Procedure LogDocIssueConflict(Const Element : TElementContainer);
+    Function  ExtractSpellingWord : String;
     (**
       This property gets and set the filter text for the explorer view.
       @precon  None.
@@ -387,7 +388,7 @@ Const
 Procedure TframeModuleExplorer.actAddToLocalDictionaryExecute(Sender: TObject);
 
 Begin
-  TBADIOptions.BADIOptions.LocalDictionary.Add(FExplorer.Text[FExplorer.FocusedNode, 0]);
+  TBADIOptions.BADIOptions.LocalDictionary.Add(ExtractSpellingWord);
   DoRefresh(Sender);
 End;
 
@@ -404,7 +405,7 @@ End;
 Procedure TframeModuleExplorer.actAddToProjectDictionaryExecute(Sender: TObject);
 
 Begin
-  TBADIOptions.BADIOptions.ProjectDictionary.Add(FExplorer.Text[FExplorer.FocusedNode, 0]);
+  TBADIOptions.BADIOptions.ProjectDictionary.Add(ExtractSpellingWord);
   DoRefresh(Sender);
 End;
 
@@ -421,7 +422,7 @@ End;
 Procedure TframeModuleExplorer.actIgnoreSpellingMistakeExecute(Sender: TObject);
 
 Begin
-  TBADIOptions.BADIOptions.IgnoreDictionary.Add(FExplorer.Text[FExplorer.FocusedNode, 0]);
+  TBADIOptions.BADIOptions.IgnoreDictionary.Add(ExtractSpellingWord);
   DoRefresh(Sender);
 End;
 
@@ -962,8 +963,7 @@ End;
 
   This method renders a selection rectangle around the selected note.
 
-  @precon  NodeData must be a valid pointer to a TTreeData node of the node being rendered and sl
-           must contain the string tokens to be rendered.
+  @precon  sl must contain the string tokens to be rendered.
   @postcon The selection rectangle is rendered (accounting for extra width due to font
            preferences).
 
@@ -1417,6 +1417,23 @@ begin
       Node := FExplorer.GetNextSibling(Node);
     End;
 end;
+
+(**
+
+  This method extracts the spelling mistake word from the current tree node text.
+
+  @precon  The focused node is a spelling mistake.
+  @postcon The spelling mistake word is returned.
+
+  @return  a String
+
+**)
+Function TframeModuleExplorer.ExtractSpellingWord: String;
+
+Begin
+  Result := FExplorer.Text[FExplorer.FocusedNode, 0];
+  Result := Copy(Result, 1, Pos('(', Result) - 1).Trim;
+End;
 
 (**
 
@@ -1913,7 +1930,7 @@ End;
 
   This method returns the path of the specified tree node.
 
-  @precon  Node is the tree node to be pathed.
+  @precon  Node is the tree node to be calculate the path to.
   @postcon Returns a string representation of the tree nodes path excluding the root item.
 
   @param   Node as a PVirtualNode as a constant
@@ -2135,11 +2152,15 @@ Begin
       recDocIssueInfo.FImageIndex := aLimitImageIndex[eLimitType];
       recDocIssueInfo.FForeColour := clNone;
       recDocIssueInfo.FBackColour := clNone;
-      recDocIssueInfo.FMessage := Element.AsString(False, False);
+      recDocIssueInfo.FMessage := '';
       If FLineDocIssues.TryGetValue(SI.Line, LineDocIssues) Then
-        LineDocIssues.AddIssue(astrLimitType[eLimitType], recDocIssueInfo)
+        LineDocIssues.AddSpellingMistake(SI.Identifier, SI.Column)
       Else
-        FLineDocIssues.Add(SI.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo));
+        Begin
+         LineDocIssues := TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo);
+         LineDocissues.AddSpellingMistake(SI.Identifier, SI.Column);
+         FLineDocIssues.Add(SI.Line, LineDocIssues);
+        End;
       recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
       recTotalInfo.FForeColour := clNone;
       recTotalInfo.FBackColour := clNone;
@@ -2288,7 +2309,6 @@ Begin
     If Container.Elements[i].Scope In TBADIOptions.BADIOptions.ScopesToRender + [scNone, scGlobal] Then
       Begin
         LogDocIssueConflict(Container.Elements[i]);
-        //: @bug Limits are not working for spelling mistakes in categories
         If iCount < iLimit Then
           Begin
             NewNode := AddNode(RootNode, Container.Elements[i], iLevel);

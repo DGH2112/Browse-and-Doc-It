@@ -3,8 +3,8 @@
   This module contains a class which implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 5.359
-  @Date    26 Jul 2020
+  @Version 5.516
+  @Date    02 Aug 2020
   
   @license
 
@@ -83,8 +83,8 @@ Type
       Const eDocIssueType : TLimitType);
     Procedure MsgsToRender(Const DocOps : TDocOptions; Const eDocOption : TDocOption;
       Const eDocIssueType : TLimitType);
-    Procedure UnderlineSpelling(Const Canvas : TCanvas;  Const strDocIssue : String;
-      Var DocIssueInfo : TBADIDocIssueInfo; Const LineText: PAnsiChar; Const TextRect : TRect;
+    Procedure HighlightSpellingMistakes(Const Canvas : TCanvas;
+      Const LineDocIssues : IBADILineDocIssues; Const LineText: PAnsiChar; Const TextRect : TRect;
       Const CellSize: TSize);
   Public
     Constructor Create;
@@ -389,6 +389,55 @@ End;
 
 (**
 
+  This method highlights spelling mistakes in comments and literals.
+
+  @precon  Canvas and LineDocIssues must be valid instances.
+  @postcon All spelling mistakes on the current line are highlighted.
+
+  @param   Canvas        as a TCanvas as a constant
+  @param   LineDocIssues as an IBADILineDocIssues as a constant
+  @param   LineText      as a PAnsiChar as a constant
+  @param   TextRect      as a TRect as a constant
+  @param   CellSize      as a TSize as a constant
+
+**)
+Procedure TBADIEditViewNotifier.HighlightSpellingMistakes(Const Canvas : TCanvas;
+  Const LineDocIssues : IBADILineDocIssues; Const LineText: PAnsiChar; Const TextRect: TRect;
+  Const CellSize: TSize);
+  
+Var
+  i : Integer;
+  recSpellingMistake: TBADISpellingMistake;
+  R: TRect;
+  iPos: Integer;
+  strText: String;
+  DocIssueInfo: TBADIDocIssueInfo;
+
+Begin
+  For i := 0 To LineDocIssues.SpellingMistakeCount - 1 Do
+    Begin
+      strText := UTF8ToString(LineText);
+      recSpellingMistake := LineDocIssues.SpellingMistake[i];
+      iPos := Pos(LowerCase(recSpellingMistake.FWord), LowerCase(strText), recSpellingMistake.FColumn);
+      If iPos > 0 Then
+        Begin
+          strText := Copy(strText, iPos, recSpellingMistake.FWord.Length);
+          R := TextRect;
+          iPos := iPos - 1 - FHorizontalScroll;
+          If iPos > 0 Then
+            Inc(R.Left, iPos * CellSize.cx)
+          Else
+            Delete(strText, 1, -iPos);
+          DocIssueInfo.FBackColour := clNone;
+          DocIssueInfo.FForeColour := TBADIOptions.BADIOptions.SpellingMistakeColour;
+          If strText.Length > 0 Then
+            DrawCommentTag(Canvas, R, strText, DocIssueInfo);
+        End;
+    End;
+End;
+
+(**
+
   This procedure updates the FIconsToRender set with a limit type if the given doc option is in the
   given doc option set.
 
@@ -502,19 +551,19 @@ Procedure TBADIEditViewNotifier.PaintLine(Const View: IOTAEditView; LineNumber: 
 
 Var
   R : TRect;
-  LineDocIssue : IBADILineDocIssues;
+  LineDocIssues : IBADILineDocIssues;
   strDocIssue: String;
   recDocIssue : TBADIDocIssueInfo;
   iIndex: Integer;
   
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PaintLine', tmoTiming);{$ENDIF}
-  LineDocIssue := TfrmDockableModuleExplorer.LineDocIssue(LineNumber);
+  LineDocIssues := TfrmDockableModuleExplorer.LineDocIssue(LineNumber);
   R := LineRect;
-  If Assigned(LineDocIssue) Then
-    For strDocIssue In LineDocIssue.Issues Do
+  If Assigned(LineDocIssues) Then
+    For strDocIssue In LineDocIssues.Issues Do
       Begin
-        recDocIssue := LineDocIssue[strDocIssue];
+        recDocIssue := LineDocIssues[strDocIssue];
         If FIconsToRender.Find(recDocIssue.FName, iIndex) Or (recDocIssue.FImageIndex In [iiBadTag]) Then
           Begin
             TBADIOptions.BADIOptions.ScopeImageList.Draw(
@@ -535,35 +584,8 @@ Begin
           End;
         MarkUpdateSpecialTags(Canvas, strDocIssue, recDocIssue, LineText, TextRect, CellSize);
         If CompareText(strDocIssue, astrLimitType[ltSpelling]) = 0 Then
-          UnderlineSpelling(Canvas, strDocIssue, recDocIssue, LineText, TextRect, CellSize);
+          HighlightSpellingMistakes(Canvas, LineDocIssues, LineText, TextRect, CellSize);
      End;
-End;
-
-Procedure TBADIEditViewNotifier.UnderlineSpelling(Const Canvas : TCanvas; Const strDocIssue : String;
-  Var DocIssueInfo : TBADIDocIssueInfo; Const LineText: PAnsiChar; Const TextRect: TRect;
-  Const CellSize: TSize);
-  
-Var
-  R: TRect;
-  iPos: Integer;
-  strText: String;
-  
-Begin
-  strText := UTF8ToString(LineText);
-  iPos := Pos(LowerCase(DocIssueInfo.FMessage), LowerCase(strText));
-  If iPos > 0 Then
-    Begin
-      strText := Copy(strText, iPos, DocIssueInfo.FMessage.Length);
-      R := TextRect;
-      iPos := iPos - 1 - FHorizontalScroll;
-      If iPos > 0 Then
-        Inc(R.Left, iPos * CellSize.cx)
-      Else
-        Delete(strText, 1, -iPos);
-      DocIssueInfo.FForeColour := TBADIOptions.BADIOptions.SpellingMistakeColour;
-      If strText.Length > 0 Then
-        DrawCommentTag(Canvas, R, strText, DocIssueInfo);
-    End;
 End;
 
 {$ENDIF DXE100}

@@ -3,8 +3,8 @@
   This module contains a class to represent spelling issues in a module.
 
   @Author  David Hoyle
-  @Version 1.768
-  @Date    21 Jul 2020
+  @Version 1.830
+  @Date    02 Aug 2020
 
   @license
 
@@ -41,8 +41,9 @@ Type
   (** This class defines a document error. **)
   TBADISpellingIssue = Class(TElementContainer)
   Strict Private
-    FWord          : String;
+    FUniqueReference : Integer;
   Strict Protected
+    Function  GetName : String; Override;
   Public
     Constructor Create(Const strWord, strDocConflictDesc : String; Const AScope : TScope; Const iLine,
       iCol, iCommentLine, iCommentCol: Integer);
@@ -77,7 +78,7 @@ Var
 Function TBADISpellingIssue.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
-  Result := FWord;
+  Result := Format('%s (%d,%d)', [Identifier, Line, Column]);
 End;
 
 (**
@@ -99,13 +100,10 @@ End;
 Constructor TBADISpellingIssue.Create(Const strWord, strDocConflictDesc : String; Const AScope : TScope;
   Const iLine, iCol, iCommentLine, iCommentCol: Integer);
 
-Const
-  strOutputFmt = '%6.6d';
-
 Begin
-  Inherited Create(Format(strOutputFmt, [iSpellingCounter]), AScope, iLine, iCol, iiSpellingItem, Nil);
+  Inherited Create(strWord, AScope, iLine, iCol, iiSpellingItem, Nil);
+  FUniqueReference := iSpellingCounter;
   Inc(iSpellingCounter);
-  FWord := strWord;
   Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol, 0);
 End;
 
@@ -122,6 +120,26 @@ Destructor TBADISpellingIssue.Destroy;
 Begin
   Comment.Free;
   Inherited Destroy;
+End;
+
+(**
+
+  This is an overridden getter method for the Name property.
+
+  @precon  None.
+  @postcon Returns a unique name for the spelling mistake.
+
+  @return  a String
+
+**)
+Function TBADISpellingIssue.GetName: String;
+
+Const
+  strOutputFmt = '%s%6.6d';
+
+Begin
+  Result := Inherited GetName;
+  Result := Format(strOutputFmt, [Result, FUniqueReference]);
 End;
 
 (** Initialises a counter to make the spelling issues unique. **)

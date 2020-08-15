@@ -3,8 +3,8 @@
   This module contains a class which represents all comment in the Browse and Doc It system.
 
   @Author  David Hoyle
-  @Version 1.443
-  @Date    21 Jul 2020
+  @Version 1.465
+  @Date    15 Aug 2020
 
   @license
 
@@ -76,7 +76,8 @@ Type
       Reintroduce; Overload; Virtual;
     Destructor Destroy; Override;
     Class Function CreateComment(Const strComment: String; Const iLine, iCol : Integer): TComment; Virtual;
-    Procedure AddToken(Const strToken: String; Const iType: TBADITokenType = ttUnknown); Override;
+    Procedure AddToken(Const strToken: String; Const iType: TBADITokenType = ttUnknown;
+      Const iLine : Integer = 0; Const iColumn : Integer = 0); Override;
     Procedure Assign(Const srcComment: TComment); Overload;
     Procedure Assign(Const strComment: String); Overload;
     Function  AsString(Const iMaxWidth: Integer; Const boolShowHTML: Boolean): String;
@@ -121,13 +122,16 @@ Uses
   @precon  strToken is a string to be added as a token and iType is the tokens type.
   @postcon Added a token and its type to the token list.
 
-  @nometric HardCodedInteger HardCodedString
+  @nohint iLine iColumn
 
   @param   strToken as a String as a constant
-  @param   iType    as a TBADITokenType as a Constant
+  @param   iType    as a TBADITokenType as a constant
+  @param   iLine    as an Integer as a constant
+  @param   iColumn  as an Integer as a constant
 
 **)
-Procedure TComment.AddToken(Const strToken: String; Const iType: TBADITokenType);
+Procedure TComment.AddToken(Const strToken: String; Const iType: TBADITokenType  = ttUnknown;
+  Const iLine : Integer = 0; Const iColumn : Integer = 0);
 
 Const
   strDoubleAt = '@@';

@@ -3,8 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.402
-  @Date    18 Apr 2020
+  @Version 1.404
+  @Date    02 Aug 2020
 
   @license
 
@@ -102,7 +102,7 @@ Uses
 
 (**
 
-  This is the constructor method for the TPascalDocWizard class. This constructor create
+  This is the constructor method for the TBrowseAndDocItWizard class. This constructor create
   the explorer form and menus.
 
   @precon  None.
@@ -127,7 +127,7 @@ ResourceString
   strRegisteringChecksEditorView = 'Registering Checks Editor View...';
   strRegisteringMetricsEditorSubView = 'Registering Metrics Editor Sub-View...';
   strRegisteringChecksEditorSubView = 'Registering Checks Editor Sub-View...';
-  strCreatingIDENotifer = 'Creating IDE Notifer...';
+  strCreatingIDENotifer = 'Creating IDE Notifier...';
   strDone = 'Done!';
 
 Begin
@@ -201,7 +201,7 @@ End;
 
 (**
 
-  This is an exceute method for the wizard. Since this wizard is not implemented
+  This is an execute method for the wizard. Since this wizard is not implemented
   as a menu wizard this method has no code but is required for the interface.
 
   @nocheck EmptyMethod
@@ -258,7 +258,7 @@ End;
   This is a getter method for the MenuText property.
 
   @precon  None.
-  @postcon Reutns the Menu text for the wizard.
+  @postcon Returns the Menu text for the wizard.
 
   @return  a string
 

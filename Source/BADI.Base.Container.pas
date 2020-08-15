@@ -4,8 +4,8 @@
   the Browse and Doc It system.
 
   @Author  David Hoyle
-  @Version 1.051
-  @Date    21 Jul 2020
+  @Version 1.075
+  @Date    15 Aug 2020
 
   @license
 
@@ -62,8 +62,8 @@ Type
     Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
       iColumn : Integer); Virtual;
     Destructor Destroy; Override;
-    Procedure AddToken(Const strToken : String; Const ATokenType : TBADITokenType = ttUnknown);
-      Overload; Virtual;
+    Procedure AddToken(Const strToken : String; Const ATokenType : TBADITokenType = ttUnknown;
+      Const iLine : Integer = 0; Const iColumn : Integer = 0); Overload; Virtual;
     Procedure AddToken(Const AToken : TTokenInfo); Overload; Virtual;
     Procedure AppendToken(Const AToken : TTokenInfo); Virtual;
     Procedure InsertToken(Const strToken : String; Const iIndex : Integer;
@@ -152,13 +152,15 @@ Uses
 
   @param   strToken   as a String as a constant
   @param   ATokenType as a TBADITokenType as a constant
+  @param   iLine      as an Integer as a constant
+  @param   iColumn    as an Integer as a constant
 
 **)
 Procedure TBADIBaseContainer.AddToken(Const strToken: String;
-  Const ATokenType: TBADITokenType = ttUnknown);
+  Const ATokenType: TBADITokenType = ttUnknown; Const iLine : Integer = 0; Const iColumn : Integer = 0);
 
 Begin
-  AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), ATokenType));
+  AddToken(TTokenInfo.Create(strToken, 0, iLine, iColumn, Length(strToken), ATokenType));
 End;
 
 (**

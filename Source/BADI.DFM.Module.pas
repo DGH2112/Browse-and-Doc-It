@@ -3,8 +3,8 @@
   DFMModule : A unit to tokenise DFM code.
 
   @Author  David Hoyle
-  @Version 1.857
-  @Date    26 Jul 2020
+  @Version 1.861
+  @Date    15 Aug 2020
 
   @license
 
@@ -190,7 +190,7 @@ begin
       strToken := strToken + Token.Token;
       NextNonCommentToken;
     End;
-  Container.AddToken(strToken, ttSingleLiteral);
+  Container.AddToken(strToken, ttSingleLiteral, L.Line, L.Column);
 end;
 
 (**

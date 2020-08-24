@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 2.341
-  @Date    26 Jul 2020
+  @Version 2.353
+  @Date    24 Aug 2020
 
   @license
 
@@ -95,6 +95,7 @@ Const
     (FDescription : strSyntaxHighlightErrors;                 FEnabled : False; FGroup: dogErrors),
     (FDescription : strShowErrorIconsInEditor;                FEnabled :  True; FGroup: dogErrors),
     (FDescription : strShowErrorMsgsInEditor;                 FEnabled : False; FGroup: dogErrors),
+    (FDescription : strShowIDEErrors;                         FEnabled : False; FGroup: dogErrors),
 
     (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogWarnings),
     (FDescription : strExpandWarnings;                        FEnabled:   True; FGroup: dogWarnings),
@@ -631,7 +632,7 @@ Const
   strWithStatementNoMetric = 'WithStatement';
   (** A constant name for the Goto Statement metric so it can be disabled. **)
   strGotoStatementNoMetric = 'GotoStatement';
-  (** A constant name for the NestedIFDepth metric so it can be disabled. **)
+  (** A constant name for the Nested IF Depth metric so it can be disabled. **)
   strNestedIFDepthNoMetric = 'NestedIFDepth';
   (** A constant name for the Cyclometric Complexity metric so it can be disabled. **)
   strCyclometricComplexityNoMetric = 'CyclometricComplexity';
@@ -667,7 +668,7 @@ Const
   strEmptyMethodNoMetric = 'EmptyMethod';
   (** A constant name for the Missing CONST in Parameters metric so it can be disabled. **)
   strMissingCONSTInParamNoMetric = 'MissingCONSTInParam';
-  (** A constant name for the Missing Const in Parameters Ignore Event handlers metric so it can be
+  (** A constant name for the Missing Constant in Parameters Ignore Event handlers metric so it can be
       disabled. **)
   strMCParmListIgnoreEventsNoMetric = 'MCParmListIgnoreEvents';
   (** A resource for disabling all errors on an element and its sub elements. **)

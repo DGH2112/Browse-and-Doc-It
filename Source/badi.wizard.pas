@@ -3,8 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.404
-  @Date    02 Aug 2020
+  @Version 1.546
+  @Date    24 Aug 2020
 
   @license
 
@@ -75,6 +75,7 @@ Type
     Procedure OptionsChange(Sender: TObject);
     Procedure UpdateMenuShortcuts(Sender : TObject);
     Procedure InitialisingMsg(Const strMsg : String);
+    Procedure IDEErrors(Const slIDEErrors : TStringList);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -135,7 +136,7 @@ Begin
   Inherited Create;
   InitialisingMsg(strCreatingModuleExplorer);
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
+  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange, IDEErrors);
   InitialisingMsg(strCreatingSplashScreenEntry);
   AddSplashScreen;
   InitialisingMsg(strCreatingAboutBoxEntry);
@@ -305,6 +306,47 @@ Function TBrowseAndDocItWizard.GetState: TWizardState;
 
 Begin
   Result := [wsEnabled];
+End;
+
+(**
+
+  This is an event handler to extract IDE Error messages to be displayed in the module explorer.
+
+  @precon  slIDEErrors must be a valid instance passed to the event handler.
+  @postcon IDE Errors are added to the string list.
+
+  @param   slIDEErrors as a TStringList as a constant
+
+**)
+Procedure TBrowseAndDocItWizard.IDEErrors(Const slIDEErrors: TStringList);
+
+Const
+  strErrorRecord = '%s|%s|%d|%d';
+
+Var
+  MS : IOTAModuleServices;
+  Module : IOTAModule;
+  ModuleErrors : IOTAModuleErrors;
+  Errors: TOTAErrors;
+  iError: Integer;
+
+Begin
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      Module := MS.CurrentModule;
+      If Assigned(Module) Then
+        If Supports(Module, IOTAModuleErrors, ModuleErrors) Then
+          Begin
+            Errors := ModuleErrors.GetErrors;
+            For iError := Low(Errors) To High(Errors) Do
+              slIDEErrors.Add(Format(strErrorRecord, [
+                Module.FileName,
+                Errors[iError].Text,
+                Errors[iError].Start.Line,
+                Errors[iError].Start.CharIndex
+              ]));
+          End;
+    End;
 End;
 
 (**

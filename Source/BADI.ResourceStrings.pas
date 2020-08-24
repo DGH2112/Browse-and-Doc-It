@@ -3,8 +3,8 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.624
-  @Date    02 Aug 2020
+  @Version 1.643
+  @Date    24 Aug 2020
 
   @license
 
@@ -120,6 +120,8 @@ ResourceString
   strShowErrorIconsInEditor = 'Show Error Icons in the Code Editor';
   (** Options text for Showing Error Messages in the Code Editor **)
   strShowErrorMsgsInEditor = 'Show Error Messages in the Code Editor';
+  (** Options text for Showing IDE Error Messages in the Module Explorer **)
+  strShowIDEErrors = 'Show IDE Errors in the Module Explorer';
   (** Options text for Syntax Highlight Warnings **)
   strSyntaxHighlightWarnings = 'Syntax Highlight Module Warnings';
   (** Options text for Showing Warning Icons in the Code Editor **)

@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.467
-  @Date    26 Jul 2020
+  @Version 1.469
+  @Date    24 Aug 2020
 
   @license
 
@@ -134,6 +134,7 @@ Type
     doSyntaxHighlightErrors,
     doShowErrorIconsInEditor,
     doShowErrorMsgsInEditor,
+    doShowIDEErrors,
 
     doShowWarnings,
     doExpandWarnings,

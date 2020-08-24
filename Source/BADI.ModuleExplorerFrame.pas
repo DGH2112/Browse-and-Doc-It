@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 5.503
-  @Date    02 Aug 2020
+  @Version 5.774
+  @Date    24 Aug 2020
 
   @license
 
@@ -64,6 +64,9 @@ Type
   (** This is a procedure type for the positioning of the cursor in the
       current module. **)
   TSelectionChange = Procedure(Const iIdentLine, iIdentCol, iCommentLine : Integer) Of Object;
+
+  (** This is a method signature for getting IDE errors for the module explorer to display. **)
+  TBADIIDEErrors = Procedure(Const slErrors : TStringList) Of Object;
 
   (** This is a frame class to contain all the functionality of the module
       explorer so that it can be placed inside any container required and
@@ -194,6 +197,7 @@ Type
     FLastFilterUpdate  : Int64;
     FLineDocIssues     : TDictionary<Integer,IBADILineDocIssues>;
     FDocIssueTotals    : IBADIDocIssueTotals;
+    FIDEErrors         : TBADIIDEErrors;
   private
     procedure DoRefresh(Sender: TObject);
   Strict Protected
@@ -264,6 +268,7 @@ Type
     Function  GetDocIssueTotals : IBADIDocIssueTotals;
     Procedure LogDocIssueConflict(Const Element : TElementContainer);
     Function  ExtractSpellingWord : String;
+    Procedure CheckForIDEErrors(Const Container : TElementContainer);
     (**
       This property gets and set the filter text for the explorer view.
       @precon  None.
@@ -297,6 +302,13 @@ Type
       @return  a TNotifyEvent
     **)
     Property OnRefresh : TNotifyEvent Read FRefresh Write FRefresh;
+    (**
+      This is an event handler for the IDE Errors.
+      @precon  None.
+      @postcon Implement a event handler for add errors to the module explorer.
+      @return  a TBADIIDEErrors
+    **)
+    Property OnIDEErrors : TBADIIDEErrors Read FIDEErrors Write FIDEErrors;
     (**
       This property exposes the virtual tree view to outside sources.
       @precon  None.
@@ -716,6 +728,55 @@ Begin
   FNodeInfo.Add(N);
   NodeData.FNode := N;
   FExplorer.InvalidateNode(Result); //: @note Used to recalc node height due to bug in VTV
+End;
+
+(**
+
+  This method checks the if the IDE has any error messages for the current module and adds them to the
+  list of errors.
+
+  @precon  Container must be a valid instance.
+  @postcon Any IDE errors are added to the module.
+
+  @param   Container as a TElementContainer as a constant
+
+**)
+Procedure TframeModuleExplorer.CheckForIDEErrors(Const Container: TElementContainer);
+
+Type
+  //: @nohints
+  TBADIErrorFields = (efFilename, efMessage, efLine, efColumn);
+  
+Var
+  Errors: TElementContainer;
+  sl: TStringList;
+  strError: String;
+  astrError: TArray<String>;
+
+Begin
+  Errors := Container.FindElement(strErrors);
+  If Not Assigned(Errors) And (doShowIDEErrors In TBADIOptions.BADIOPtions.Options) Then
+    If Assigned(FIDEErrors) Then
+      Begin
+        sl := TStringList.Create;
+        Try
+          FIDEErrors(sl);
+          For strError In sl Do
+            Begin
+              astrError := strError.Split(['|']);
+              Container.AddIssue(
+                astrError[Integer(efMessage)],
+                scGlobal,
+                astrError[Integer(efLine)].ToInteger,
+                astrError[Integer(efColumn)].ToInteger + 1,
+                etError,
+                Container
+              );
+            End;
+        Finally
+          sl.Free;
+        End;
+      End;
 End;
 
 (**
@@ -2378,18 +2439,9 @@ Begin
       Module.AddTickCount(strClear);
       SetLength(FSpecialTagNodes, TBADIOptions.BADIOptions.SpecialTags.Count);
       // Create Root Tree Node
-      FModule := AddNode(
-        Nil,
-        Module, //.AsString(True, False),
-        //Module.Name,
-        0 //,
-        //Module.ImageIndexAdjustedForScope,
-        //Module.ModuleNameLine,
-        //Module.ModuleNameCol,
-        //False,
-        //Module.Comment
-      );
+      FModule := AddNode(Nil, Module, 0);
       CreateSpecialTagNodes();
+      CheckForIDEErrors(Module);
       OutputModuleInfo(Module);
       Module.AddTickCount(strBuild);
       SetExpandedNodes(FModule);

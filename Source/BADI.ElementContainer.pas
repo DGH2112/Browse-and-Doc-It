@@ -4,8 +4,8 @@
   and a label container for tree view headers and the like.
 
   @Author  David Hoyle
-  @Version 2.170
-  @Date    25 Jul 2020
+  @Version 2.202
+  @Date    30 Aug 2020
 
   @nospelling noXxxxx
 
@@ -132,8 +132,9 @@ Type
       Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : TBADIIssueState;
     Function AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
       Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : TBADIIssueState;
-    Function AddSpelling(Const strWord, strCategory : String; Const AScope : TScope;Const iWordLine,
-      iWordColumn: Integer; Const Comment: TComment) : TBADIIssueState;
+    Function AddSpelling(Const strWord : String; Const AScope : TScope;
+      Const eSpellingIssueType : TBADISpellingIssueType;  Const iWordLine, iWordColumn: Integer;
+      Const Comment: TComment) : TBADIIssueState;
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
@@ -646,20 +647,18 @@ End;
   @precon  None.
   @postcon If spelling is not disabled the given word is added to the spelling mistakes list.
 
-  @param   strWord     as a String as a constant
-  @param   strCategory as a String as a constant
-  @param   AScope      as a TScope as a constant
-  @param   iWordLine   as an Integer as a constant
-  @param   iWordColumn as an Integer as a constant
-  @param   Comment     as a TComment as a constant
+  @param   strWord            as a String as a constant
+  @param   AScope             as a TScope as a constant
+  @param   eSpellingIssueType as a TBADISpellingIssueType as a constant
+  @param   iWordLine          as an Integer as a constant
+  @param   iWordColumn        as an Integer as a constant
+  @param   Comment            as a TComment as a constant
   @return  a TBADIIssueState
 
 **)
-Function TElementContainer.AddSpelling(Const strWord, strCategory : String; Const AScope : TScope;
-  Const iWordLine, iWordColumn: Integer; Const Comment: TComment) : TBADIIssueState;
-
-ResourceString
-  strSpellingMistakes = 'Spelling Mistakes';
+Function TElementContainer.AddSpelling(Const strWord : String; Const AScope : TScope;
+  Const eSpellingIssueType : TBADISpellingIssueType; Const iWordLine, iWordColumn: Integer;
+  Const Comment: TComment) : TBADIIssueState;
 
 Var
   E: TElementContainer;
@@ -684,7 +683,7 @@ Begin
     End;
   E := FindRoot;
   E := AddCategory(E, strSpellingMistakes, iiSpellingFolder);
-  E := AddCategory(E, strCategory, iiSpellingFolder);
+  E := AddCategory(E, astrSpellingIssueType[eSpellingIssueType], iiSpellingFolder);
   iL := iWordLine;
   iC := iWordColumn;
   If Assigned(Comment) Then
@@ -692,7 +691,7 @@ Begin
       iL := Comment.Line;
       iC := Comment.Column;
     End;
-  E.Add(TBADISpellingIssue.Create(strWord, '', AScope, iWordLine, iWordColumn, iL, iC));
+  E.Add(TBADISpellingIssue.Create(strWord, AScope, eSpellingIssueType, iWordLine, iWordColumn, iL, iC));
 End;
 
 (**

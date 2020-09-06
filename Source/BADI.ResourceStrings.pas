@@ -3,8 +3,8 @@
   This module contains all the resource string used in the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.643
-  @Date    24 Aug 2020
+  @Version 1.718
+  @Date    30 Aug 2020
 
   @license
 
@@ -290,6 +290,8 @@ ResourceString
   strHints = 'Hints';
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
+  (** Label for Conflicts **)
+  strConflicts = 'Conflicts';
   (** Label for Checks **)
   strChecks = 'Checks';
   (** Label for Metrics **)
@@ -332,6 +334,18 @@ ResourceString
   strPropertiesLabel = 'Properties';
   (** Label for Methods. **)
   strMethodsLabel = 'Methods';
+  (** Label for Spelling Mistakes. **)
+  strSpellingMistakes = 'Spelling Mistakes';
+  (** Label for Methods. **)
+  strComment = 'Comment';
+  (** Label for Tags. **)
+  strTag = 'Tag';
+  (** Label for Resource Strings. **)
+  strResourceString = 'Resource String';
+  (** Label for Constants. **)
+  strConstant = 'Constant';
+  (** Label for Literals. **)
+  strLiteral = 'Literal';
 
   //
   // Parser error messages.
@@ -812,6 +826,8 @@ ResourceString
   strMenuMetrics = 'Module &Metrics...';
   (** A label for the module checks. **)
   strMenuChecks = 'Module &Checks...';
+  (** A label for the module spelling. **)
+  strMenuSpelling = 'Module &Spelling...';
   (** A label for the Options Menu. **)
   strMenuOptions = '&Options...';
 

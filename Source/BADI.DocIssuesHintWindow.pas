@@ -3,8 +3,8 @@
   This module contains a custom hint window to display the module metric totals.
 
   @Author  David Hoyle
-  @Version 3.973
-  @Date    25 May 2020
+  @Version 3.986
+  @Date    30 Aug 2020
   
   @license
 
@@ -160,26 +160,29 @@ Begin
   FCalcNameWidth := 0;
   FCalcNumWidth := 0;
   FItemHeight := Max(Canvas.TextHeight(strTextHeightTest), iIconSize) + iPadding;
-  SetLength(FTotals, Totals.Totals.Count);
-  For Issue In Totals.Totals Do
+  If Assigned(Totals) Then
     Begin
-      FTotals[iIndex].FLabel := Issue.Key;
-      FTotals[iIndex].FImageIndex := Issue.Value.FImageIndex;
-      FTotals[iIndex].FForeColour := Issue.Value.FForeColour;
-      FTotals[iIndex].FBackColour := Issue.Value.FBackColour;
-      FTotals[iIndex].FFontStyles := Issue.Value.FFontStyles;
-      FTotals[iIndex].FCounter := Issue.Value.FCounter;
-      FTotals[iIndex].FFirstLine := Issue.Value.FFirstLine;
-      FTotals[iIndex].FFirstCol := Issue.Value.FFirstCol;
-      UpdateFontInfo(FTotals[iIndex]);
-      Inc(FCalcHeight, FItemHeight);
-      iTextWidth := Canvas.TextWidth(FTotals[iIndex].FLabel);
-      If iTextWidth > FCalcNameWidth Then
-        FCalcNameWidth := iTextWidth;
-      iTextWidth := Canvas.TextWidth(Format('%d', [FTotals[iIndex].FCounter]));
-      If iTextWidth > FCalcNumWidth Then
-        FCalcNumWidth := iTextWidth;
-      Inc(iIndex);
+  SetLength(FTotals, Totals.Totals.Count);
+      For Issue In Totals.Totals Do
+        Begin
+          FTotals[iIndex].FLabel := Issue.Key;
+          FTotals[iIndex].FImageIndex := Issue.Value.FImageIndex;
+          FTotals[iIndex].FForeColour := Issue.Value.FForeColour;
+          FTotals[iIndex].FBackColour := Issue.Value.FBackColour;
+          FTotals[iIndex].FFontStyles := Issue.Value.FFontStyles;
+          FTotals[iIndex].FCounter := Issue.Value.FCounter;
+          FTotals[iIndex].FFirstLine := Issue.Value.FFirstLine;
+          FTotals[iIndex].FFirstCol := Issue.Value.FFirstCol;
+          UpdateFontInfo(FTotals[iIndex]);
+          Inc(FCalcHeight, FItemHeight);
+          iTextWidth := Canvas.TextWidth(FTotals[iIndex].FLabel);
+          If iTextWidth > FCalcNameWidth Then
+            FCalcNameWidth := iTextWidth;
+          iTextWidth := Canvas.TextWidth(Format('%d', [FTotals[iIndex].FCounter]));
+          If iTextWidth > FCalcNumWidth Then
+            FCalcNumWidth := iTextWidth;
+          Inc(iIndex);
+        End;
     End;
   Case ePosition Of
     hpTop:    Result.Bottom := Result.Top + FCalcHeight;

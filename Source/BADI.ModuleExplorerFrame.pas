@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 5.774
-  @Date    24 Aug 2020
+  @Version 5.798
+  @Date    25 Aug 2020
 
   @license
 
@@ -746,6 +746,9 @@ Procedure TframeModuleExplorer.CheckForIDEErrors(Const Container: TElementContai
 Type
   //: @nohints
   TBADIErrorFields = (efFilename, efMessage, efLine, efColumn);
+
+ResourceString
+  strMsg = '%s found at line %d column %d.';
   
 Var
   Errors: TElementContainer;
@@ -765,7 +768,11 @@ Begin
             Begin
               astrError := strError.Split(['|']);
               Container.AddIssue(
-                astrError[Integer(efMessage)],
+                Format(strMsg, [
+                  astrError[Integer(efMessage)], 
+                  astrError[Integer(efLine)].ToInteger,
+                  astrError[Integer(efColumn)].ToInteger + 1
+                ]),
                 scGlobal,
                 astrError[Integer(efLine)].ToInteger,
                 astrError[Integer(efColumn)].ToInteger + 1,

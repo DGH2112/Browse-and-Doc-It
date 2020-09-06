@@ -3,8 +3,8 @@
   DFMModule : A unit to tokenise DFM code.
 
   @Author  David Hoyle
-  @Version 1.861
-  @Date    15 Aug 2020
+  @Version 1.870
+  @Date    29 Aug 2020
 
   @license
 
@@ -763,9 +763,6 @@ end;
 **)
 Function TDFMModule.StringLiteral(Const Container: TElementContainer): Boolean;
 
-ResourceString
-  strLiterals = 'Literals';
-
 Begin
   Result := Token.TokenType In [ttSingleLiteral, ttDoubleLiteral];
   If Result Then
@@ -780,7 +777,7 @@ Begin
             ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
         End;
       If doSpellCheckDFMLiterals In TBADIOptions.BADIOptions.Options Then
-        ProcessLiteralsForSpelling(Container, strLiterals);
+        ProcessLiteralsForSpelling(Container, sitLiteral);
     End;
 End;
 

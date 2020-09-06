@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.469
-  @Date    24 Aug 2020
+  @Version 1.562
+  @Date    29 Aug 2020
 
   @license
 
@@ -584,6 +584,7 @@ Type
     bmRefactorConstant,
     bmBADIMetrics,
     bmBADIChecks,
+    bmBADISpelling,
     bmSep3,
     bmOptions
   );
@@ -749,6 +750,22 @@ Type
     alImplementedMethodsLabel
   );
 
+  (** An enumerate to define the type of information stored in each node - used for counting later. **)
+  TBADINodeType = (ntUnkown, ntModule, ntMethod);
+
+  (** An enumerate to define some options for when rendering the module metrics, checks, etc. **)
+  TBADIRenderOption = (
+    roClear,            // Clears the treeview before rendering
+    roAutoExpand,       // Auto expands the the treeview for the rendered module
+    roAutoExpandOnError // Auto expands the the treeview for the rendered module ONLY IF there are
+                        // issued
+  );
+  (** A set of the above enumerate options. **)
+  TBADIRenderOptions = Set Of TBADIRenderOption;
+
+  (** An enumerate to define the types of spelling issue. **)
+  TBADISpellingIssueType = (sitComment, sitTag, sitResourceString, sitConstant, sitLiteral);
+  
 Implementation
 
 (**

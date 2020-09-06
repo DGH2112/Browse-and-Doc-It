@@ -4,8 +4,8 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 2.442
-  @Date    26 Jul 2020
+  @Version 2.631
+  @Date    29 Aug 2020
 
   @license
 
@@ -159,10 +159,12 @@ Type
     Procedure AddBodyComment(Const C : TComment);
     Procedure CheckCommentSpelling; Virtual;
     Procedure CheckStringSpelling; Virtual;
-    procedure CheckSpelling(Const strWord, strCategory : String; Const AScope : TScope; Const iLine,
-      iColumn : Integer; Const Comment : TComment);
+    procedure CheckSpelling(Const strWord : String; Const AScope : TScope;
+      Const eSpellingIssueType : TBADISpellingIssueType; Const iLine, iColumn : Integer;
+      Const Comment : TComment);
     Procedure AddIdentifier(Const strIdentifier : String);
-    Procedure ProcessLiteralsForSpelling(Const E: TElementContainer; Const strCategory : String);
+    Procedure ProcessLiteralsForSpelling(Const E: TElementContainer;
+      Const eSpellingIssueType : TBADISpellingIssueType);
     Class Function  DefaultProfilingTemplate : String; Virtual;
     { Properties }
     (**
@@ -474,9 +476,6 @@ end;
 **)
 Procedure TBaseLanguageModule.CheckCommentSpelling;
 
-ResourceString
-  strComments = 'Comments';
-
 Const
   strPrecon = 'precon';
   strPostcon = 'postcon';
@@ -496,7 +495,7 @@ Begin
           Begin
             Token := Cmt.Tokens[iToken];
             If (Token.TokenType In [ttIdentifier]) And (Token.Length > 1) Then
-              CheckSpelling(Token.Token, strComments, scNone, Token.Line, Token.Column, Cmt);
+              CheckSpelling(Token.Token, scNone, sitComment, Token.Line, Token.Column, Cmt);
           End;
         If doSpellCheckTags In TBADIOptions.BADIOptions.Options Then
           Begin
@@ -649,16 +648,17 @@ End;
   @precon  None.
   @postcon The word is added to the spelling mistakes list of not in any dictionary or ignore list.
 
-  @param   strWord     as a String as a constant
-  @param   strCategory as a String as a constant
-  @param   AScope      as a TScope as a constant
-  @param   iLine       as an Integer as a constant
-  @param   iColumn     as an Integer as a constant
-  @param   Comment     as a TComment as a constant
+  @param   strWord            as a String as a constant
+  @param   AScope             as a TScope as a constant
+  @param   eSpellingIssueType as a TBADISpellingIssueType as a constant
+  @param   iLine              as an Integer as a constant
+  @param   iColumn            as an Integer as a constant
+  @param   Comment            as a TComment as a constant
 
 **)
-procedure TBaseLanguageModule.CheckSpelling(Const strWord, strCategory : String; Const AScope : TScope;
-  Const iLine, iColumn : Integer; Const Comment : TComment);
+procedure TBaseLanguageModule.CheckSpelling(Const strWord : String; Const AScope : TScope;
+  Const eSpellingIssueType : TBADISpellingIssueType; Const iLine, iColumn : Integer;
+  Const Comment : TComment);
 
 Var
   boolFound: Boolean;
@@ -672,7 +672,7 @@ Begin
     BADIOptions.ProjectDictionary.Find(strWord, iIndex) Or
     FIdentifierList.Find(strWord, iIndex);
   If Not boolFound And (strWord.ToUpper <> strWord) Then
-    AddSpelling(strWord, strCategory, AScope, iLine, iColumn, Comment);
+    AddSpelling(strWord, AScope, eSpellingIssueType, iLine, iColumn, Comment);
 End;
 
 (**
@@ -685,9 +685,6 @@ End;
 
 **)
 Procedure TBaseLanguageModule.CheckStringSpelling;
-
-ResourceString
-  strLiterals = 'Literals';
 
 Var
   iToken: Integer;
@@ -707,7 +704,7 @@ Begin
               For i := 0 To sl.Count - 1 Do
                 If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
                   If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
-                    CheckSpelling(sl[i], strLiterals, scNone, Token.Line, Token.Column, Nil);
+                    CheckSpelling(sl[i], scNone, sitLiteral, Token.Line, Token.Column, Nil);
             Finally
               sl.Free;
             End;
@@ -729,9 +726,6 @@ End;
 **)
 Procedure TBaseLanguageModule.CheckTagSpelling(Const Comment : TComment; Const strTagName : String);
 
-ResourceString
-  strTags = 'Tags';
-
 Var
   iIndex: Integer;
   T: TTag;
@@ -747,7 +741,7 @@ Begin
         Begin
           Token := T.Tokens[iToken];
           If (Token.TokenType In [ttIdentifier]) And (Token.Length > 1) Then
-            CheckSpelling(Token.Token, strTags, scNone, Token.Line, Token.Column, Comment);
+            CheckSpelling(Token.Token, scNone, sitTag, Token.Line, Token.Column, Comment);
         End;
     End;
 End;
@@ -1387,18 +1381,19 @@ End;
   @precon  E must be a valid instance.
   @postcon All spelling mistakes in the string literals of the given element are output.
 
-  @param   E           as a TElementContainer as a constant
-  @param   strCategory as a String as a constant
+  @param   E                  as a TElementContainer as a constant
+  @param   eSpellingIssueType as a TBADISpellingIssueType as a constant
 
 **)
 Procedure TBaseLanguageModule.ProcessLiteralsForSpelling(Const E: TElementContainer;
-  Const strCategory : String);
+  Const eSpellingIssueType : TBADISpellingIssueType);
 
 Var
   iToken: Integer;
   T: TTokenInfo;
   sl: TStringList;
   i: Integer;
+  strToken: String;
 
 Begin
   Begin
@@ -1406,14 +1401,14 @@ Begin
       If E.Tokens[iToken].TokenType In [ttSingleLiteral] Then
         Begin
           T := E.Tokens[iToken];
-          Var strToken := T.Token.DeQuotedString;
+          strToken := T.Token.DeQuotedString;
           strToken := FReplaceAmpersandRegEx.Replace(strToken, '\1');
           sl := Tokenize(strToken, [], []);
           Try
             For i := 0 To sl.Count - 1 Do
               If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
                 If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
-                  CheckSpelling(sl[i], strCategory, E.Scope, T.Line, T.Column, Nil);
+                  CheckSpelling(sl[i], E.Scope, eSpellingIssueType, T.Line, T.Column, Nil);
           Finally
             sl.Free;
           End;

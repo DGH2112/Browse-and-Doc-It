@@ -3,8 +3,8 @@
   This module contains a class to represent spelling issues in a module.
 
   @Author  David Hoyle
-  @Version 1.830
-  @Date    02 Aug 2020
+  @Version 1.891
+  @Date    29 Aug 2020
 
   @license
 
@@ -42,13 +42,22 @@ Type
   TBADISpellingIssue = Class(TElementContainer)
   Strict Private
     FUniqueReference : Integer;
+    FSpellingIssueType : TBADISpellingIssueType;
   Strict Protected
     Function  GetName : String; Override;
   Public
-    Constructor Create(Const strWord, strDocConflictDesc : String; Const AScope : TScope; Const iLine,
-      iCol, iCommentLine, iCommentCol: Integer);
-    Destructor Destroy; Override;
+    Constructor Create(Const strWord : String; Const AScope : TScope;
+      Const eSpellingIssueType : TBADISpellingIssueType;
+      Const iLine, iCol, iCommentLine, iCommentCol: Integer);
+    Destructor Destroy; Override; 
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    (**
+      This property returns the type of the spelling issue.
+      @precon  None.
+      @postcon Returns the type of the spelling issue.
+      @return  a TBADISpellingIssueType
+    **)
+    Property SpellingIssueType : TBADISpellingIssueType Read FSpellingIssueType;
   End;
 
 Implementation
@@ -89,22 +98,24 @@ End;
   @postcon Creates the element and a pseudo comment.
 
   @param   strWord            as a String as a constant
-  @param   strDocConflictDesc as a String as a constant
   @param   AScope             as a TScope as a constant
+  @param   eSpellingIssueType as a TBADISpellingIssueType as a constant
   @param   iLine              as an Integer as a constant
   @param   iCol               as an Integer as a constant
   @param   iCommentLine       as an Integer as a constant
   @param   iCommentCol        as an Integer as a constant
 
 **)
-Constructor TBADISpellingIssue.Create(Const strWord, strDocConflictDesc : String; Const AScope : TScope;
+Constructor TBADISpellingIssue.Create(Const strWord : String;
+  Const AScope : TScope; Const eSpellingIssueType : TBADISpellingIssueType;
   Const iLine, iCol, iCommentLine, iCommentCol: Integer);
 
 Begin
   Inherited Create(strWord, AScope, iLine, iCol, iiSpellingItem, Nil);
   FUniqueReference := iSpellingCounter;
+  FSpellingIssueType := eSpellingIssueType;
   Inc(iSpellingCounter);
-  Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol, 0);
+  Comment := TComment.Create('', iCommentLine, iCommentCol, 0);
 End;
 
 (**

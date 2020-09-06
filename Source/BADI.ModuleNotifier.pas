@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 6.755
-  @Date    09 Jul 2020
+  @Version 6.760
+  @Date    06 Sep 2020
 
   @license
 
@@ -221,7 +221,7 @@ End;
 
 (**
 
-  This method is called to see if an check should be done for overwriting readonly files.
+  This method is called to see if an check should be done for overwriting read only files.
 
   @precon  None.
   @postcon Returns true to ensure this is done.
@@ -241,7 +241,7 @@ End;
   A constructor for the TBADIMOduleNotifier class.
 
   @precon  None.
-  @postcon Stores the module filenamer and the module rename event.
+  @postcon Stores the module filename and the module rename event.
 
   @param   ModuleStatsList   as an IBADIModuleStatsList as a constant
   @param   strFileName       as a String as a constant
@@ -302,7 +302,7 @@ End;
 
 (**
 
-  This is a getter method for the OverwriteFileName property.
+  This is a getter method for the Overwrite FileName property.
 
   @precon  None.
   @postcon Not Used.
@@ -323,7 +323,7 @@ End;
 
 (**
 
-  This is a getter method for the OverwriteFilenameCount property.
+  This is a getter method for the Overwrite Filename Count property.
 
   @precon  None.
   @postcon Not Used.
@@ -340,7 +340,7 @@ End;
 
 (**
 
-  This method increments the determines the line anc column of the index position into the given text.
+  This method increments the determines the line and column of the index position into the given text.
 
   @precon  Line and Column are the position of the start of the given text.
   @postcon The Line and Column of the index into the string are returned through the var parameters.
@@ -415,7 +415,7 @@ End;
 
 (**
 
-  This method retreives the source code for the modules filename.
+  This method retrieves the source code for the modules filename.
 
   @precon  None.
   @postcon The modules source code is returned.
@@ -522,7 +522,7 @@ End;
 
 (**
 
-  This is a setter method for the SaveFileName property.
+  This is a setter method for the Save FileName property.
 
   @precon  None.
   @postcon Not Used.

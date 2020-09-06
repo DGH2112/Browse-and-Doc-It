@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 2.353
-  @Date    24 Aug 2020
+  @Version 2.477
+  @Date    05 Sep 2020
 
   @license
 
@@ -587,6 +587,7 @@ Const
     (FName: 'BADIRefactorConstant'; FCaption: strMenuRefactorConstant; FShortcut: 'CTRL+SHIFT+ALT+C';     FMaskColor: clLime),
     (FName: 'BADIMetrics';          FCaption: strMenuMetrics;          FShortcut: 'CTRL+SHIFT+ALT+S';     FMaskColor: clLime),
     (FName: 'BADIChecks';           FCaption: strMenuChecks;           FShortcut: 'CTRL+SHIFT+ALT+H';     FMaskColor: clFuchsia),
+    (FName: 'BADISpelling';         FCaption: strMenuSpelling;         FShortcut: 'CTRL+SHIFT+ALT+Z';     FMaskColor: clLime),
     (FName: 'BADISep3';             FCaption: strMenuSep;              FShortcut: '';                     FMaskColor: clLime),
     (FName: 'BADIOptions';          FCaption: strMenuOptions;          FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime)
   );
@@ -968,13 +969,34 @@ Const
 
   (** A constant array of strings for the names of the limit types. **)
   astrLimitType : Array[TLimitType] Of String = (
-    'Errors',
-    'Warnings',
-    'Hints',
-    'Conflicts',
-    'Checks',
-    'Metrics',
-    'Spellings'
+    strErrors,
+    strWarnings,
+    strHints,
+    strConflicts,
+    strChecks,
+    strMetrics,
+    strSpelling
+  );
+
+  (** A constant to define a light green colour for the columns if an item is under the limit. **)
+  iLightGreen = $80FF80;
+  (** A constant to define a light amber colour for the columns if an item is at the limit. **)
+  iLightRed = $8080FF;
+  (** A constant to define a light red colour for the columns if an item is over the limit. **)
+  iLightAmber = $80CCFF;
+  (** A constant to define a light aqua colour for the columns if an item is over the limit but which
+      have been overridden. **)
+  iLightAqua = $FFFF80;
+  (** A constant to define a light yellow colour. **)
+  iLightYellow = $80FFFF;
+
+  (** A constant array of string representing spelling issue types. **)
+  astrSpellingIssueType : Array[TBADISpellingIssueType] Of String = (
+    strComment,
+    strTag,
+    strResourceString,
+    strConstant,
+    strLiteral
   );
 
 Implementation

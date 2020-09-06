@@ -1,11 +1,11 @@
 (**
 
-  This module defines a class which reprepsents a form for selecting
-  DUnit Unit Tetsing Options.
+  This module defines a class which represents a form for selecting
+  DUnit Unit Testing Options.
 
-  @Version 1.042
+  @Version 1.047
   @Author  David Hoyle
-  @Date    28 Mar 2020
+  @Date    06 Sep 2020
 
   @license
 
@@ -52,7 +52,7 @@ uses
   ImgList,
   ExtCtrls,
   UITypes,
-  BADI.ElementContainer;
+  BADI.ElementContainer, System.ImageList;
 
 type
   (** A class to represent the form interface. **)
@@ -430,7 +430,7 @@ End;
 
 (**
 
-  This is an error event hanlder for errors raised in the DUnitCreator module.
+  This is an error event handler for errors raised in the DUnit Creator module.
 
   @precon  None.
   @postcon Displays an error in a dialogue box.
@@ -546,7 +546,7 @@ end;
 
 (**
 
-  This is an OnFormDestroy Event Hanlder for the TfrmDUnit class.
+  This is an On Form Destroy Event Handler for the TfrmDUnit class.
 
   @precon  None.
   @postcon Frees the memory used by the Root Element of the tree view.
@@ -938,7 +938,7 @@ End;
 
 (**
 
-  This is an OnGetImageIndex for the virtual tree view.
+  This is an On Get Image Index for the virtual tree view.
 
   @precon  None.
   @postcon Returns the adjusted image index for scope for the associated module
@@ -967,10 +967,10 @@ end;
 
 (**
 
-  This is an OnGetText event handler for the virtual tree view.
+  This is an On Get Text event handler for the virtual tree view.
 
   @precon  None.
-  @postcon Returns the AsString text of the associated module element.
+  @postcon Returns the As String text of the associated module element.
 
   @param   Sender   as a TBaseVirtualTree
   @param   Node     as a PVirtualNode

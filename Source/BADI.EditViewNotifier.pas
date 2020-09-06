@@ -3,8 +3,8 @@
   This module contains a class which implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 6.139
-  @Date    02 Aug 2020
+  @Version 6.384
+  @Date    29 Aug 2020
   
   @license
 
@@ -55,6 +55,7 @@ Type
       (** A class variable to determine whether the paint cycle is a full cycle or not. **)
       FFullRepaint : Boolean;
   Strict Private
+    FFileName            : String;
     FPlainTextFontInfo   : TTokenFontInfo;
     FCommentFontInfo     : TTokenFontInfo;
     FTokenFontInfo       : TTokenFontInfo;
@@ -91,7 +92,7 @@ Type
     Procedure RenderMsgs(Const recDocIssue: TBADIDocIssueInfo; Const Canvas: TCanvas;
       Const TextRect: TRect; Const CellSize: TSize; Var R: TRect);
   Public
-    Constructor Create;
+    Constructor Create(Const strFileName : String);
     Destructor Destroy; Override;
     Class Procedure ForceFullRepaint;
   End;
@@ -189,10 +190,13 @@ End;
   @postcon Creates 2 strings list for the icons and messages to render.
 
 **)
-Constructor TBADIEditViewNotifier.Create;
+Constructor TBADIEditViewNotifier.Create(Const strFileName : String);
 
 Begin
+  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{ $ENDIF}
   Inherited Create;
+  FFileName := strFileName;
+  CodeSite.Send(csmRed, 'TBADIEditViewNotifier.Create', FFilename);
   FIconsToRender := TStringList.Create;
   FIconsToRender.Sorted := True;
   FIconsToRender.Duplicates := dupIgnore;
@@ -213,8 +217,10 @@ End;
 Destructor TBADIEditViewNotifier.Destroy;
 
 Begin
+  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{ $ENDIF}
   FIconsToRender.Free;
   FMsgsToRender.Free;
+  CodeSite.Send(csmRed, 'TBADIEditViewNotifier.Destroy', FFilename);
   Inherited Destroy;
 End;
 
@@ -224,6 +230,8 @@ End;
 
   @precon  None.
   @postcon The comment tag is overwritten on the editor.
+
+  @refactor Can this be refactored with DrawMsgText().
 
   @param   Canvas       as a TCanvas as a constant
   @param   R            as a TRect as a reference
@@ -239,6 +247,7 @@ Var
   setFontStyles : TFontStyles;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DrawCommentTag', tmoTiming);{$ENDIF}
   strTextToRender := strText;
   setFontStyles := Canvas.Font.Style;
   Try
@@ -256,7 +265,7 @@ Begin
       PChar(strTextToRender),
       Length(strTextToRender),
       R,
-      DT_LEFT Or DT_VCENTER
+      DT_LEFT Or DT_BOTTOM
     );
   Finally
     Canvas.Font.Style := setFontStyles;
@@ -270,6 +279,8 @@ End;
   @precon  None.
   @postcon The message is printed on the editor to the right of the issue icon. The left edge of the R 
            rectangle is moved to the end position of the printed message.
+
+  @refactor Can this be refactored with DrawCommentTag().
 
   @param   Canvas       as a TCanvas as a constant
   @param   R            as a TRect as a reference
@@ -285,6 +296,7 @@ Var
   setFontStyles : TFontStyles;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DrawMsgText', tmoTiming);{$ENDIF}
   strTextToRender := strText;
   setFontStyles := Canvas.Font.Style;
   Canvas.Font.Style := FTokenFontInfo.FStyles;
@@ -297,7 +309,7 @@ Begin
     PChar(strTextToRender),
     Length(strTextToRender),
     R,
-    DT_LEFT Or DT_VCENTER
+    DT_LEFT Or DT_BOTTOM
   );
   Inc(R.Left, Canvas.TextWidth(strTextToRender));
   Canvas.Font.Style := setFontStyles;
@@ -368,6 +380,7 @@ Var
   Value: TValue;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FindHorizontalScrollPosition', tmoTiming);{$ENDIF}
   FHorizontalScroll := 0;
   If Not Assigned(View) Or Not Assigned(View.GetEditWindow) Then
     Exit;
@@ -397,6 +410,7 @@ End;
 Class Procedure TBADIEditViewNotifier.ForceFullRepaint;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TBADIEditViewNotifier.ForceFullRepaint', tmoTiming);{$ENDIF}
   FFullRepaint := True;
 End;
 
@@ -427,6 +441,7 @@ Var
   DocIssueInfo: TBADIDocIssueInfo;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'HighlightSpellingMistakes', tmoTiming);{$ENDIF}
   For i := 0 To LineDocIssues.SpellingMistakeCount - 1 Do
     Begin
       strText := UTF8ToString(LineText);
@@ -466,6 +481,7 @@ Procedure TBADIEditViewNotifier.IconsToRender(Const DocOps : TDocOptions; Const 
   Const eDocIssueType : TLimitType);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'IconsToRender', tmoTiming);{$ENDIF}
   If eDocOption In DocOps Then
     FIconsToRender.Add(astrLimitType[eDocIssueType]);
 End;
@@ -495,6 +511,7 @@ Var
   strText: String;
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MarkUpdateSpecialTags', tmoTiming);{$ENDIF}
   If strDocIssue[1] = '@' Then
     Begin
       strText := UTF8ToString(LineText);
@@ -531,6 +548,7 @@ Procedure TBADIEditViewNotifier.MsgsToRender(Const DocOps : TDocOptions; Const e
   Const eDocIssueType : TLimitType);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MsgsToRender', tmoTiming);{$ENDIF}
   If eDocOption In DocOps Then
     FMsgsToRender.Add(astrLimitType[eDocIssueType]);
 End;
@@ -570,6 +588,7 @@ Var
   
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PaintLine', tmoTiming);{$ENDIF}
+  //: @debug CodeSite.Send(csmViolet, UTF8ToString(LineText));
   LineDocIssues := TfrmDockableModuleExplorer.LineDocIssue(LineNumber);
   R := LineRect;
   If Assigned(LineDocIssues) Then
@@ -606,6 +625,7 @@ Var
   iIndex: Integer;
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RenderIcons', tmoTiming);{$ENDIF}
   If FIconsToRender.Find(recDocIssue.FName, iIndex) Or (recDocIssue.FImageIndex In [iiBadTag]) Then
     Begin
       TBADIOptions.BADIOptions.ScopeImageList.Draw(
@@ -642,6 +662,7 @@ Var
   iIndex: Integer; 
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RenderMsgs', tmoTiming);{$ENDIF}
   If FMsgsToRender.Find(recDocIssue.FName, iIndex) Then
     Begin
       If R.Left < TextRect.Right Then
@@ -654,3 +675,4 @@ End;
 {$ENDIF DXE100}
 
 End.
+

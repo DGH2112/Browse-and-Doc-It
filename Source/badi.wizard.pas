@@ -3,8 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.546
-  @Date    24 Aug 2020
+  @Version 1.740
+  @Date    05 Sep 2020
 
   @license
 
@@ -94,6 +94,7 @@ Uses
   BADI.Module.Metrics.SubView, 
   BADI.Module.Checks, 
   BADI.Module.Checks.SubView,
+  BADI.Module.Spelling, 
   BADI.SplashScreen, 
   BADI.AboutBox, 
   BADI.BNFHighlighter,
@@ -113,61 +114,28 @@ Uses
 **)
 Constructor TBrowseAndDocItWizard.Create;
 
-ResourceString
-  strCreatingModuleExplorer = 'Creating module explorer...';
-  strCreatingSplashScreenEntry = 'Creating Splash Screen Entry...';
-  strCreatingAboutBoxEntry = 'Creating About Box Entry...';
-  strCreatingModuleStatistics = 'Creating Module Statistics...';
-  strCreatingEditorNotifier = 'Creating Editor Notifier...';
-  strRegisteringEditorNotifier = 'Registering Editor Notifier...';
-  strCreatingIDEMenu = 'Creating IDE Menu...';
-  strSettingUpShortcuts = 'Setting up Shortcuts...';
-  strCreatingBNFHighlighter = 'Creating BNF Highlighter...';
-  strCreatingEidolonHighlighter = 'Creating Eidolon Highlighter...';
-  strRegisteringMetricsEditorView = 'Registering Metrics Editor View...';
-  strRegisteringChecksEditorView = 'Registering Checks Editor View...';
-  strRegisteringMetricsEditorSubView = 'Registering Metrics Editor Sub-View...';
-  strRegisteringChecksEditorSubView = 'Registering Checks Editor Sub-View...';
-  strCreatingIDENotifer = 'Creating IDE Notifier...';
-  strDone = 'Done!';
-
 Begin
   {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
-  InitialisingMsg(strCreatingModuleExplorer);
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange, IDEErrors);
-  InitialisingMsg(strCreatingSplashScreenEntry);
   AddSplashScreen;
-  InitialisingMsg(strCreatingAboutBoxEntry);
   AddAboutBoxEntry;
-  InitialisingMsg(strCreatingModuleStatistics);
   FModuleStatsList := TBADIModuleStatsList.Create;
-  InitialisingMsg(strCreatingEditorNotifier);
   FEditorNotifier := TEditorNotifier.Create(FModuleStatsList);
-  InitialisingMsg(strRegisteringEditorNotifier);
   FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(FEditorNotifier);
-  InitialisingMsg(strCreatingIDEMenu);
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
-  InitialisingMsg(strSettingUpShortcuts);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
-  InitialisingMsg(strCreatingBNFHighlighter);
   FBNFHighlighterIndex := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TBNFHighlighter.Create);
-  InitialisingMsg(strCreatingEidolonHighlighter);
   FEidolonHighlighterIndex := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TEidolonHighlighter.Create);
-  InitialisingMsg(strRegisteringMetricsEditorView);
   RegisterMetricsEditorView;
-  InitialisingMsg(strRegisteringChecksEditorView);
   RegisterChecksEditorView;
-  InitialisingMsg(strRegisteringMetricsEditorSubView);
+  RegisterSpellingEditorView;
   RegisterEditorMetricsSubView;
-  InitialisingMsg(strRegisteringChecksEditorSubView);
   RegisterEditorChecksSubView;
-  InitialisingMsg(strCreatingIDENotifer);
   TBADIIDENotifier.InstallIDENotifier(FModuleStatsList);
-  InitialisingMsg(strDone);
 End;
 
 (**

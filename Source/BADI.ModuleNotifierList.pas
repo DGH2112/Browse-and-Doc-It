@@ -3,8 +3,8 @@
   This module contains an interfaced class which manages module notifier indexes using their filenames.
 
   @Author  David Hoyle
-  @Version 1.293
-  @Date    09 Jul 2020
+  @Version 1.422
+  @Date    16 Aug 2020
 
   @license
 
@@ -66,13 +66,19 @@ Type
       End;
   Strict Private
     FModuleNotifierList : TList<TModuleNotifierRec>;
+    FName               : String;
   {$IFDEF D2010} Strict {$ENDIF} Protected
+    // IBADIMOduleNotifierList
     Procedure Add(Const strFileName : String; Const iIndex : Integer);
     Function  Remove(Const strFileName: String): Integer;
     Procedure Rename(Const strOldFileName: String; Const strNewFileName: String);
+    // General Methods
     Function  Find(Const strFileName : String; Var iIndex : Integer) : Boolean;
+    {$IFDEF DEBUG}
+    Procedure DumpToCodeSite;
+    {$ENDIF DEBUG}
   Public
-    Constructor Create;
+    Constructor Create(Const strName : String);
     Destructor Destroy; Override;
   End;
 
@@ -86,7 +92,7 @@ Uses
 
 (**
 
-  This is a constructor for the TModNotRec record which describes the attributes to be stored for each 
+  This is a constructor for the TModuleNotifierRec record which describes the attributes to be stored for each 
   module / project / form notifier registered.
 
   @precon  None.
@@ -125,22 +131,25 @@ End;
 
 (**
 
-  A constructor for the TDINMOduleNotifierList class.
+  A constructor for the TBADIModuleNotifierList class.
 
   @precon  None.
   @postcon Initialises the list.
 
+  @param   strName as a String as a constant
+
 **)
-Constructor TBADIModuleNotifierList.Create;
+Constructor TBADIModuleNotifierList.Create(Const strName : String);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   FModuleNotifierList := TList<TModuleNotifierRec>.Create;
+  FName := strName;
 End;
 
 (**
 
-  A destructor for the TDINModuleNotifierList class.
+  A destructor for the TBADIModuleNotifierList class.
 
   @precon  None.
   @postcon Removes the records from the collection and checks for orphans.
@@ -170,13 +179,35 @@ Begin
   Inherited Destroy;
 End;
 
+{$IFDEF DEBUG}
+(**
+
+  This is a debug only method to dump the notifier list to CodeSite for checking.
+
+  @precon  None.
+  @postcon The filenames and indexes are output to CodeSite.
+
+**)
+Procedure TBADIModuleNotifierList.DumpToCodeSite;
+
+Var
+  R : TModuleNotifierRec;
+  
+Begin
+  CodeSite.EnterMethod(FName);
+  For R In FModuleNotifierList Do
+    CodeSite.Send(csmCheckPoint, R.FileName, R.NotifierIndex);
+  CodeSite.ExitMethod(FName);
+End;
+{$ENDIF DEBUG}
+
 (**
 
   This method searches for the given filename in the collection and if found returns
   true with the index in iIndex else returns false.
 
   @precon  None.
-  @postcon Either trues the true with the index of the found item or returns false.
+  @postcon Either returns true with the index of the found item or returns false.
 
   @param   strFileName as a String as a constant
   @param   iIndex      as an Integer as a reference
@@ -224,6 +255,7 @@ Var
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Remove', tmoTiming);{$ENDIF}
+  //: @debug DumpToCodeSite;
   Result := -1;
   If Find(strFileName, iModuleIndex) Then
     Begin

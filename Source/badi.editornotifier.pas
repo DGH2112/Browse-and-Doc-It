@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 2.259
-  @Date    25 Jul 2020
+  @Version 2.291
+  @Date    29 Aug 2020
 
   @license
 
@@ -676,6 +676,7 @@ Var
   P: IOTAProject;
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateProjectDictionary', tmoTiming);{$ENDIF}
   If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
     Begin
       P := MS.GetActiveProject;
@@ -768,3 +769,4 @@ begin
 end;
 
 End.
+

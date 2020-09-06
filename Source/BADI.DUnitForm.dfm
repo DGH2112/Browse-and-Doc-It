@@ -147,6 +147,21 @@ object frmDUnit: TfrmDUnit
     Width = 441
     Height = 215
     Anchors = [akLeft, akTop, akRight, akBottom]
+    Colors.BorderColor = 15987699
+    Colors.DisabledColor = clGray
+    Colors.DropMarkColor = 15385233
+    Colors.DropTargetColor = 15385233
+    Colors.DropTargetBorderColor = 15385233
+    Colors.FocusedSelectionColor = 15385233
+    Colors.FocusedSelectionBorderColor = 15385233
+    Colors.GridLineColor = 15987699
+    Colors.HeaderHotColor = clBlack
+    Colors.HotColor = clBlack
+    Colors.SelectionRectangleBlendColor = 15385233
+    Colors.SelectionRectangleBorderColor = 15385233
+    Colors.SelectionTextColor = clBlack
+    Colors.TreeLineColor = 9471874
+    Colors.UnfocusedColor = 15987699
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
     Header.Height = 17
@@ -230,27 +245,23 @@ object frmDUnit: TfrmDUnit
     object lblClassName: TLabel
       Left = 0
       Top = 0
-      Width = 220
-      Height = 25
+      Width = 100
+      Height = 16
       Align = alClient
       Caption = '&Class Name Mask'
       FocusControl = edtClassName
-      ExplicitWidth = 100
-      ExplicitHeight = 16
     end
     object lblMethodName: TLabel
       AlignWithMargins = True
       Left = 223
       Top = 0
-      Width = 218
-      Height = 22
+      Width = 112
+      Height = 16
       Margins.Top = 0
       Margins.Right = 0
       Align = alClient
       Caption = 'Method Name &Mask'
       FocusControl = edtMethodName
-      ExplicitWidth = 112
-      ExplicitHeight = 16
     end
     object edtClassName: TEdit
       Left = 0

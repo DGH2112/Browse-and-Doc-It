@@ -4,7 +4,7 @@
   (metrics).
 
   @Author  David Hoyle
-  @Version 2.172
+  @Version 2.347
   @Date    06 Sep 2020
 
   @license
@@ -57,6 +57,9 @@ Type
       (** An enumerate to define the status panels to be shown with the metrics. **)
       TBADIMetricStatusPanel = (mspModules, mspMethods, mspLinesOfCode, mspUnderLimit, mspAtLimit,
         mspOverLimit);
+    Const
+      (** A set to define the document options related to metrics. **)
+      setMetricsOptions = [doShowMetrics..doShowMetricMsgsInEditor];
     Class Var
       (** A single class var reference to the editor view. **)
       FEditorViewRef : INTACustomEditorView;
@@ -69,10 +72,11 @@ Type
     FCount            : Integer;
     FSourceStrings    : TStringList;
     FSource           : String;
-    FFileName         : String;
     FModified         : Boolean;
     FFileDate         : TDateTime;
     FLastRenderedList : TBADIModuleMetrics;
+    FLastDocOptions   : TDocOptions;
+    FDocExclusions    : TStringList;
   Strict Protected
     // INTACustomEditorView
     Function  CloneEditorView: INTACustomEditorView;
@@ -96,15 +100,17 @@ Type
     Procedure DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; Const Rect: TRect);
     Function  GetStatusPanelCount: Integer;
     // General Methods
-    Procedure ParseAndRender;
+    Procedure ParseAndRender(Const strFileName : String);
     Procedure UpdateStatusPanels;
-    Procedure ExtractSourceFromModule(Const Module : IOTAModule; Const strFileName : String);
-    Procedure ExtractSourceFromFile;
+    Procedure ExtractSourceFromModule(Const Module : IOTAModule);
+    Procedure ExtractSourceFromFile(Const strFileName: String);
     Procedure LastModifiedDateFromModule(Const Module: IOTAModule);
-    Procedure LastModifiedDateFromFile(Const ModuleInfo: IOTAModuleInfo);
+    Procedure LastModifiedDateFromFile(Const strFileName: String);
     Function  CurrentEditWindow : String;
-    Procedure ProcesModule(Const ModuleInfo : IOTAModuleInfo; Const strFileName : String);
+    Procedure ProcessModule(Const strFileName: String);
     Function  RenderedList : TBADIModuleMetrics;
+    Function  CheckSettings: Boolean;
+    Procedure UpdateSettings;
   Public
     Class Function CreateEditorView: INTACustomEditorView;
     Constructor Create(Const strViewIdentifier : String);
@@ -128,7 +134,7 @@ Uses
   BADI.Module.Metrics.EditorView.Frame,
   BADI.ProgressForm, 
   BADI.Options,
-  BADI.Constants;
+  BADI.Constants, BADI.Interfaces;
 
 Const
   (** A unique name for the editor view. **)
@@ -189,6 +195,40 @@ Var
 Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
     EVS.UnregisterEditorView(strBADIMetricsEditorView);
+End;
+
+(**
+
+  This method checks whether any of the settings that affect spelling has changed.
+
+  @precon  None.
+  @postcon Returns true if any of the options have changed and the list needs to be completely rebuilt.
+
+  @return  a Boolean
+
+**)
+Function TBADIModuleMetricsEditorView.CheckSettings: Boolean;
+
+Var
+  Exclusions: IBADIExclusions;
+  i: Integer;
+  sl : TStringList;
+
+Begin
+  Result := FLastRenderedList <> RenderedList;
+  Result := Result Or (FLastDocOptions <> TBADIOptions.BADIOptions.Options * setMetricsOptions);
+  sl := TStringList.Create;
+  Try
+    sl.Duplicates := dupIgnore;
+    sl.Sorted := True;
+    Exclusions := TBADIOptions.BADIOptions.Exclusions;
+    For i := 0 To Exclusions.Count - 1 Do
+      If etSpelling In Exclusions[i].FExclusions Then
+        sl.Add(Exclusions[i].FExclusionPattern);
+    Result := Result Or (CompareText(sl.Text, FDocExclusions.Text) <> 0);
+  Finally
+    sl.Free;
+  End;
 End;
 
 (**
@@ -299,6 +339,9 @@ Begin
   FFrameManager := TBADIFrameManager.Create;
   FFileInfoMgr := TBADIFileInfoManager.Create;
   FSourceStrings := TStringList.Create;
+  FDocExclusions := TStringList.Create;
+  FDocExclusions.Duplicates := dupIgnore;
+  FDocExclusions.Sorted := True;
   FViewIdent := strViewIdentifier;
   FCount := 0;
   If Supports(BorlandIDEServices, INTAEditorViewServices, EVS) Then
@@ -394,6 +437,7 @@ End;
 Destructor TBADIModuleMetricsEditorView.Destroy;
 
 Begin
+  FDocExclusions.Free;
   FSourceStrings.Free;
   FFileInfoMgr.Free;
   FFrameManager.Free;
@@ -567,14 +611,16 @@ End;
   @precon  ModuleInfo must be a valid instance.
   @postcon The source code, filename and date information is retrieved from the disk file.
 
+  @param   strFileName as a String as a constant
+
 **)
-Procedure TBADIModuleMetricsEditorView.ExtractSourceFromFile;
+Procedure TBADIModuleMetricsEditorView.ExtractSourceFromFile(Const strFileName: String);
 
 Begin
   FSource := '';
-  If FileExists(FFileName) Then
+  If FileExists(strFileName) Then
     Begin
-      FSourceStrings.LoadFromFile(FFileName);
+      FSourceStrings.LoadFromFile(strFileName);
       FSource := FSourceStrings.Text;
       FSourceStrings.Clear;
     End;
@@ -587,12 +633,10 @@ End;
   @precon  Module and ModuleInfo must be a valid instance.
   @postcon The source code, filename and date information is retrieved from the in memory module.
 
-  @param   Module      as an IOTAModule as a constant
-  @param   strFileName as a String as a constant
+  @param   Module as an IOTAModule as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ExtractSourceFromModule(Const Module : IOTAModule;
-  Const strFileName : String);
+Procedure TBADIModuleMetricsEditorView.ExtractSourceFromModule(Const Module : IOTAModule);
 
 Var
   SE: IOTASourceEditor;
@@ -806,16 +850,15 @@ End;
   This method retrieves the last modified date of the module from disk.
 
   @precon  ModuleInfo must be a valid instance.
-  @postcon The FFileName, FFileDate and FModified fields are updated.
+  @postcon The FFileDate and FModified fields are updated.
 
-  @param   ModuleInfo as an IOTAModuleInfo as a constant
+  @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.LastModifiedDateFromFile(Const ModuleInfo: IOTAModuleInfo);
+Procedure TBADIModuleMetricsEditorView.LastModifiedDateFromFile(Const strFileName: String);
 
 Begin
-  FFileName := ModuleInfo.FileName;
-  FileAge(FFileName, FFileDate);
+  FileAge(strFileName, FFileDate);
   FModified := False;
 End;
 
@@ -824,7 +867,7 @@ End;
   This method retrieves the last modified date of the module from the IDE.
 
   @precon  Module must be a valid instance.
-  @postcon The FFileName, FFileDate and FModified fields are updated.
+  @postcon The FFileDate and FModified fields are updated.
 
   @param   Module as an IOTAModule as a constant
 
@@ -837,9 +880,8 @@ Var
 Begin
   SE := TBADIToolsAPIFunctions.SourceEditor(Module);
   FModified := SE.Modified;
-  FFileName := Module.FileName;
   If Not FModified Then
-    FileAge(FFileName, FFileDate)
+    FileAge(MOdule.FileName, FFileDate)
   Else
     FFileDate := Now();
 End;
@@ -851,18 +893,20 @@ End;
   @precon  None.
   @postcon The source code is parsed and rendered.
 
+  @param   strFileName as a String as a constant
+
 **)
-Procedure TBADIModuleMetricsEditorView.ParseAndRender;
+Procedure TBADIModuleMetricsEditorView.ParseAndRender(Const strFileName : String);
 
 Var
   Module : TBaseLanguageModule;
   AFrame: Tframe;
 
 Begin
-  FFileInfoMgr.Add(FFileName, FFileDate);
-  If (Length(FSource) > 0) And (Length(FFileName) > 0) Then
+  FFileInfoMgr.Add(strFileName, FFileDate);
+  If (Length(FSource) > 0) And (Length(strFileName) > 0) Then
     Begin
-      Module := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified, [moParse]);
+      Module := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, strFileName, FModified, [moParse]);
       Try
         AFrame := FFrameManager.Frame[CurrentEditWindow];
         If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
@@ -885,12 +929,10 @@ End;
   @postcon Process the module extracting the filename, date time and source code and the pass it for 
            parsing.
 
-  @param   ModuleInfo  as an IOTAModuleInfo as a constant
   @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ProcesModule(Const ModuleInfo : IOTAModuleInfo;
-  Const strFileName : String);
+Procedure TBADIModuleMetricsEditorView.ProcessModule(Const strFileName : String);
 
 Var
   Module: IOTAModule;
@@ -901,14 +943,14 @@ Begin
   If Assigned(Module) Then
     LastModifiedDateFromModule(Module)
   Else
-    LastModifiedDateFromFile(ModuleInfo);
+    LastModifiedDateFromFile(strFileName);
   If FFileInfoMgr.ShouldUpdate(strFileName, FFileDate) Then
     Begin
       If Assigned(Module) Then
-        ExtractSourceFromModule(Module, strFileName)
+        ExtractSourceFromModule(Module)
       Else
-        ExtractSourceFromFile;
-        ParseAndRender;
+        ExtractSourceFromFile(strFileName);
+        ParseAndRender(strFileName);
     End;
 End;
 
@@ -965,9 +1007,11 @@ Begin
   P := TBADIToolsAPIFunctions.ActiveProject;
   If Assigned(P) Then
     Begin
-      If FLastRenderedList <> RenderedList Then
-        FFileInfoMgr.Clear;
-      FLastRenderedList := RenderedList;
+      If CheckSettings Then
+        Begin
+          FFileInfoMgr.Clear;
+          UpdateSettings;
+        End;
       frmProgress := TfrmProgress.Create(Application.MainForm);
       Try
         frmProgress.Init(P.GetModuleCount, strParsingProjectModules, strPleaseWait);
@@ -975,11 +1019,13 @@ Begin
           Begin
             ModuleInfo := P.GetModule(iModule);
             If ModuleInfo.ModuleType In setModuleTypesToParse Then
-              Begin
-                ProcesModule(ModuleInfo, ModuleInfo.FileName);
-                frmProgress.UpdateProgress(Succ(iModule), Format(strParsing,
-                  [ExtractFileName(FFileName)]));
-              End
+              If ModuleInfo.FileName.Length > 0 Then
+                Begin
+                  ProcessModule(ModuleInfo.FileName);
+
+                  frmProgress.UpdateProgress(Succ(iModule), Format(strParsing,
+                    [ExtractFileName(ModuleInfo.FileName)]));
+                End
           End;
         AFrame := FFrameManager.Frame[CurrentEditWindow];
         If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
@@ -989,6 +1035,31 @@ Begin
       End;
       UpdateStatusPanels;
     End;
+End;
+
+(**
+
+  This method updates the internal copy of the settings that are used for rendering the editor view.
+
+  @precon  None.
+  @postcon The internal copy of the settings is updated so later renderings can check whether the
+           settings have changed.
+
+**)
+Procedure TBADIModuleMetricsEditorView.UpdateSettings;
+
+Var
+  Exclusions: IBADIExclusions;
+  i: Integer;
+
+Begin
+  FLastRenderedList := RenderedList;
+  FLastDocOptions := TBADIOptions.BADIOptions.Options * setMetricsOptions;
+  // Build a string list of spelling exclusions
+  Exclusions := TBADIOptions.BADIOptions.Exclusions;
+  For i := 0 To Exclusions.Count - 1 Do
+    If etSpelling In Exclusions[i].FExclusions Then
+      FDocExclusions.Add(Exclusions[i].FExclusionPattern);
 End;
 
 (**

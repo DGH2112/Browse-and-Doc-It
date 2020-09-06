@@ -1,10 +1,10 @@
 (**
   
-  This module contains cade to refactor a constant from Object Pascal code.
+  This module contains code to refactor a constant from Object Pascal code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    12 Jul 2019
+  @Version 1.001
+  @Date    06 Sep 2020
 
   @license
 
@@ -93,7 +93,7 @@ Const
     
 (**
 
-  This method attempts to breal a long token down into smaller bits.
+  This method attempts to break a long token down into smaller bits.
 
   @precon  None.
   @postcon If the token is too long a token broken down into bits is returned.
@@ -110,8 +110,8 @@ Const
 
   (**
 
-    This method searches backwards from the breapoint to find a more natural point in the text to break
-    it up into piece. If one is foudn that position is returned.
+    This method searches backwards from the break point to find a more natural point in the text to break
+    it up into piece. If one is found that position is returned.
 
     @precon  None.
     @postcon A new breakpoint position is returned.
@@ -168,7 +168,7 @@ End;
 (**
 
   This method checks the an existing constant or resource string that has been declared for the same
-  literal so that is canbe promoted and reused.
+  literal so that is can be promoted and reused.
   
   @precon  None.
   @postcon Returns true if an existing declarations is found and refactoring should not be done.
@@ -278,7 +278,7 @@ End;
   A constructor for the TBADIRefactorConstant class.
 
   @precon  None.
-  @postcon Gets the IDEs blockindent for the refactorings.
+  @postcon Gets the IDEs block indent for the refactorings.
 
 **)
 Constructor TBADIRefactorConstant.Create;
@@ -306,7 +306,7 @@ End;
   dialogue and then based on options chosen the refactoring proceeds.
 
   @precon  SE must be a valid instance.
-  @postcon The user is presented with a refactoring dialogue to chose th refactoring and is accepted
+  @postcon The user is presented with a refactoring dialogue to chose the refactoring and is accepted
            the refactoring proceeds.
 
   @param   SE      as an IOTASourceEditor as a constant

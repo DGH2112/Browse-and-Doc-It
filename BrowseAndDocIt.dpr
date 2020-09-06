@@ -3,7 +3,7 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.272
+  @Version 1.273
   @Author  David Hoyle
   @Date    06 Sep 2020
 
@@ -29,7 +29,7 @@
 
   @nocheck EmptyBEGINEND
 
-  @bug  Refactoring a const in the DPR module AVs.
+  @done Refactoring a const in the DPR module AVs.
   @done Update the Metrics Editor View to iterate only the implemented methods.
   @done Update the Checks Editor View to iterate only the implemented methods.
   @todo Add the ability to insert / surround tags or comments type.

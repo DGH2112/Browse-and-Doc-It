@@ -1,16 +1,16 @@
 ﻿(**
 
-  ObjectPascalModule : A unit to tokenize Pascal source code.
+  Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 2.085
-  @Date    12 Apr 2020
+  @Version 3.019
+  @Date    29 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
-    
+
     Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
@@ -298,6 +298,8 @@ Type
     Function  GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     Procedure CheckFunctionReturn(Const Func : TPascalMethod);
+    Procedure CheckResourceStringSpelling(Const Element : TElementContainer);
+    Procedure CheckConstantStringSpelling(Const Element : TElementContainer);
     (**
       This property returns the method on top of the method stack.
       @precon  None.
@@ -367,7 +369,7 @@ Uses
   BADI.Pascal.UsesList,
   BADI.Generic.Parameter,
   Generics.Collections,
-  System.Character;
+  System.Character, BADI.Generic.Tokenizer;
 
 Const
   (** Constant for the keyword ABSTRACT. **)
@@ -432,7 +434,7 @@ Const
   (** A lower case keyword end. **)
   strLCEnd = 'end';
   
-  (** A list of cyclo metric complexity oerators which increase the complexity. **)
+  (** A list of cyclometric complexity operators which increase the complexity. **)
   strCycloMetricComplexityOperators : Array[0..2] Of String = ('and', 'or', 'xor');
 
 (**
@@ -460,7 +462,7 @@ End;
 
   This method adds a pascal method is the given container. If Nil adds to the implemented methods.
 
-  @precon  Method must be a valid TPascalMethod.
+  @precon  Method must be a valid Pascal Method.
   @postcon Adds a pascal method is the given container. If Nil adds to the implemented methods.
 
   @nometrics
@@ -538,6 +540,7 @@ begin
             AddIssue(Format(strDuplicateIdentifierFound, [Method.Identifier,
               Method.Line, Method.Column]), scNone, tmpMethod.Line, tmpMethod.Column, etError, Self);
         End;
+      AddIdentifier(Method.Identifier);
     End;
 end;
 
@@ -803,10 +806,10 @@ End;
 
 (**
 
-  This function returns a string repreentation of the unit.
+  This function returns a string representation of the unit.
 
   @precon  None .
-  @postcon Returns a string repreentation of the unit.
+  @postcon Returns a string representation of the unit.
 
   @nohints
 
@@ -828,7 +831,7 @@ end;
   This method parses a single RTTI Attribute declaration at the current token position.
 
   @precon  None.
-  @postcon The current RTTI Attribute at the current token postiion is parsed else an error is raised.
+  @postcon The current RTTI Attribute at the current token position is parsed else an error is raised.
 
 **)
 Procedure TPascalModule.AttributeDeclaration;
@@ -864,7 +867,7 @@ End;
   grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon Parses a block section from the current token position
@@ -998,7 +1001,7 @@ End;
 
   This method checks the alias (if one exists) of the procedure / function.
 
-  @precon  Method must be a valid TPascalMethod instance.
+  @precon  Method must be a valid Pascal Method instance.
   @postcon Checks the alias (if one exists) of the procedure / function.
 
   @param   Method as a TPascalMethod as a constant
@@ -1027,6 +1030,33 @@ Begin
             End;
         End Else
           ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+    End;
+End;
+
+(**
+
+  This method iterates the given element and all its child elements recursively checking the spelling of
+  constant string declarations.
+
+  @precon  Element must be a valid instance.
+  @postcon All spelling mistakes in the string constants in the element hierarchy are output.
+
+  @param   Element as a TElementContainer as a constant
+
+**)
+Procedure TPascalModule.CheckConstantStringSpelling(Const Element: TElementContainer);
+
+Var
+  iElement: Integer;
+  E: TElementContainer;
+
+Begin
+  For iElement := 1 To Element.ElementCount Do
+    Begin
+      E := Element.Elements[iElement];
+      If (E Is TConstant) And Not (E Is TResourceString) Then
+        ProcessLiteralsForSpelling(E, sitConstant);
+      CheckConstantStringSpelling(Element.Elements[iElement]);
     End;
 End;
 
@@ -1084,9 +1114,36 @@ End;
 
 (**
 
+  This method iterates the given element and all its child elements recursively checking the spelling of
+  resource string declarations.
+
+  @precon  Element must be a valid instance.
+  @postcon All spelling mistakes in the resource strings in the element hierarchy are output.
+
+  @param   Element as a TElementContainer as a constant
+
+**)
+Procedure TPascalModule.CheckResourceStringSpelling(Const Element : TElementContainer);
+
+Var
+  iElement: Integer;
+  E: TElementContainer;
+
+Begin
+  For iElement := 1 To Element.ElementCount Do
+    Begin
+      E := Element.Elements[iElement];
+      If E Is TResourceString Then
+        ProcessLiteralsForSpelling(E, sitResourceString);
+      CheckResourceStringSpelling(Element.Elements[iElement]);
+    End;
+End;
+
+(**
+
   This method checks the returns value of the function.
 
-  @precon  Method must be a valid TPascalMethod instance .
+  @precon  Method must be a valid Generic Method instance .
   @postcon Checks the returns value of the function .
 
   @param   Method as a TGenericFunction as a constant
@@ -1107,11 +1164,11 @@ End;
 
 (**
 
-  This method cross reference the methods in class, exported and implemented and marsk the as resolved 
+  This method cross reference the methods in class, exported and implemented and marks the as resolved 
   and output error messages for those that are still unresolved.
 
   @precon  None.
-  @postcon Cross reference the methods in class, exported and implemented and marsk the as resolved and 
+  @postcon Cross reference the methods in class, exported and implemented and marks the as resolved and 
            output error messages for those that are still unresolved.
 
 **)
@@ -1142,7 +1199,7 @@ end;
   following object pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -1259,7 +1316,7 @@ End;
 
 (**
 
-  This method parses a class property list frmo the current token position using the following object 
+  This method parses a class property list from the current token position using the following object 
   pascal grammar.
 
   @precon  Cls is a valid class declaration to get method for and Scope is the current scope of the 
@@ -1331,7 +1388,7 @@ End;
 
 (**
 
-  This method parse a class declaration from the current token position deligating field, property and 
+  This method parse a class declaration from the current token position delegating field, property and 
   method declarations using the following object pascal grammar.
 
   @precon  None.
@@ -1602,7 +1659,7 @@ End;
   pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -1824,7 +1881,7 @@ end;
   object pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -1874,11 +1931,11 @@ End;
 
 (**
 
-  This method parses a contains clause fro the cutrrent token position using the following object pascal 
+  This method parses a contains clause fro the current token position using the following object pascal 
   grammar.
 
   @precon  None.
-  @postcon Parses a contains clause fro the cutrrent token position
+  @postcon Parses a contains clause fro the current token position
 
 **)
 Procedure TPascalModule.ContainsClause;
@@ -1903,14 +1960,12 @@ End;
 
 (**
 
-  This is the constructor method for the TPascalDocModule class.
+  This is the constructor method for the Pascal Module class.
 
   @precon  Source is a valid TStream descendant containing as stream of text, that is the contents of a 
            source code module and Filename is the file name of the module being parsed and IsModified 
            determines if the source code module has been modified since the last save to disk.
   @postcon Creates an instance of the module parser.
-
-  @nometricHardString
 
   @param   Source        as a String as a constant
   @param   strFileName   as a String as a constant
@@ -1921,13 +1976,15 @@ End;
 Constructor TPascalModule.CreateParser(Const Source, strFileName : String;
   Const IsModified : Boolean; Const ModuleOptions : TModuleOptions);
 
-Const
+ResourceString
   strStart = 'Start';
-  strTokenize = 'Tokenize';
+  strTokenize = 'Tokenise';
   strParse = 'Parse';
   strResolve = 'Resolve';
   strRefs = 'Refs';
-  strChecks = 'Check';
+  strChecks = 'Checks';
+  strMetrics = 'Metrics';
+  strSpelling = 'Spelling';
   
 Var
   boolCascade: Boolean;
@@ -1977,6 +2034,17 @@ Begin
       AddTickCount(strChecks);
       TidyUpEmptyElements;
       MetricsUnsortedMethods;
+      AddTickCount(strMetrics);
+      If doShowSpelling In BADIOptions.Options Then
+        Begin
+          CheckCommentSpelling;
+          If doSpellCheckResourceStrings In TBADIOptions.BADIOptions.Options Then
+            CheckResourceStringSpelling(Self);
+          If doSpellCheckConstants In TBADIOptions.BADIOptions.Options Then
+            CheckConstantStringSpelling(Self);
+          CheckStringSpelling;
+          AddTickCount(strSpelling);
+        End;
     End;
 End;
 
@@ -1986,7 +2054,7 @@ End;
   pascal grammar.
 
   @precon  On entry to this method , Scope defines the current scope of the block i . e . private in in 
-           the implemenation section or public if in the interface section and The Method parameter is
+           the implementation section or public if in the interface section and The Method parameter is
            nil for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method .
   @postcon Parses a declaration section from the current token position .
@@ -2212,7 +2280,7 @@ End;
   This is a destructor for the TPascalModule class.
 
   @precon  None.
-  @postcon Fress the memory fo this instance.
+  @postcon Frees the memory for this instance.
 
 
 **)
@@ -2304,11 +2372,11 @@ end;
 
 (**
 
-  This method retrives the method directives after the method declaration from the current token position
-  using the followong object pascal grammar.
+  This method retrieves the method directives after the method declaration from the current token position
+  using the following object pascal grammar.
 
   @precon  M is a valid method declaration to add directives too.
-  @postcon Retrives the method directives after the method declaration from the current token position
+  @postcon Retrieves the method directives after the method declaration from the current token position
 
   @param   M              as a TPascalMethod as a constant
   @param   boolGrammarFix as a Boolean as a constant
@@ -2681,8 +2749,6 @@ End;
   @precon  None.
   @postcon Attempts to parse the next series of tokens as an expression.
 
-  @grammer Expression -> SimpleExpression [RelOp SimpleExpression]
-
   @param   C        as a TElementContainer as a constant
   @param   ExprType as a TPascalExprTypes as a reference
 
@@ -2935,7 +3001,7 @@ End;
   This method parses a classes / interfaces field list from the current token position using the 
   following object pascal grammar.
 
-  @precon  Cls is an ibject delcaration to add fields too and Scope is the current internal scope of the
+  @precon  Cls is an object declaration to add fields too and Scope is the current internal scope of the
            object.
   @postcon Returns true is a field was parsed.
 
@@ -3195,10 +3261,10 @@ procedure TPascalModule.FindUnresolvedRecordObjectAndClassMethods(Const TypeLabe
 
   (**
 
-    This function walks backwards through the heirarchy to find all the qualifying objects and classes.
+    This function walks backwards through the hierarchy to find all the qualifying objects and classes.
 
     @precon  None.
-    @postcon Walks backwards through the heirarchy to find all the qualifying objects and classes.
+    @postcon Walks backwards through the hierarchy to find all the qualifying objects and classes.
 
     @param   RecObjOrCls as a TRecordDecl as a constant
     @return  a String
@@ -3224,7 +3290,7 @@ procedure TPascalModule.FindUnresolvedRecordObjectAndClassMethods(Const TypeLabe
 
     This method determines if the method should have an implementation.
 
-    @precon  Method must be a valid TPascalMethod instance.
+    @precon  Method must be a valid Pascal Method instance.
     @postcon Determines if the method should have an implementation.
 
     @param   Method as a TPascalMethod as a constant
@@ -3309,7 +3375,7 @@ End;
 (**
 
   This method parses a methods formal parameters from the current token position using the following 
-  object psacal grammar.
+  object pascal grammar.
 
   @precon  Method is a valid method to which the formal parameters are to be added.
   @postcon Parses a methods formal parameters from the current token position
@@ -3520,7 +3586,7 @@ End;
 
 (**
 
-  This is a getter methods for the VariablesLabel propertry.
+  This is a getter methods for the Variables Label property.
 
   @precon  None.
   @postcon Returns the modules variable label (creating it if required).
@@ -3681,6 +3747,8 @@ Begin
   Result := RestrictedType(AToken);
   If Result = Nil Then
     Result := OPType(AToken);
+  If Assigned(Result) And (Result.TokenCount = 1) Then
+    Self.ReferenceSymbol(Result.Tokens[0]);
   PortabilityDirective;
 End;
 
@@ -3688,11 +3756,11 @@ End;
 
   This method is the starting position for the parsing of an object pascal
   module. It finds the first non comment token and begins the grammar checking
-  from their by deligating to the program, library, unit and package methods.
+  from their by delegating to the program, library, unit and package methods.
 
   @precon  None.
   @postcon It finds the first non comment token and begins the grammar checking
-           from their by deligating to the program, library, unit and package
+           from their by delegating to the program, library, unit and package
            methods.
 
 **)
@@ -3738,10 +3806,10 @@ end;
 (**
 
   This method creates a identifier list starting at the current token and return the list to the calling 
-  function. If OwnList is true then the identlist is added to the classes owned items list for automatic 
-  disposal, else it the responsibliity of the calling function to disposal of the class.
+  function. If Own List is true then the identlist is added to the classes owned items list for automatic 
+  disposal, else it the responsibility of the calling function to disposal of the class.
 
-  @precon  OwnList determines if the identlist should be disposed of be the parser or be the caller . 
+  @precon  Own List determines if the identlist should be disposed of be the parser or be the caller . 
            SeekTokens is a sorted lowercase list of token to find if an error is found.
   @postcon Returns an ident list.
 
@@ -3771,6 +3839,7 @@ Begin
     Repeat
       If IsIdentifier(Token) Then
         Begin
+          AddIdentifier(Token.Token);
           C := GetComment;
           If C <> Nil then
             Begin
@@ -4057,10 +4126,10 @@ End;
 
 (**
 
-  This method checks for inline variable or constant declarations and if neither processes a statement.
+  This method checks for in-line variable or constant declarations and if neither processes a statement.
 
   @precon  None.
-  @postcon Processes an inline varaible or constant or if not found processes a statement.
+  @postcon Processes an in-line variable or constant or if not found processes a statement.
 
 **)
 Procedure TPascalModule.InLineStatement;
@@ -4087,7 +4156,7 @@ Function TPascalModule.InLineVarDecl: Boolean;
 
     this procedure creates a variable based on the given element and type.
 
-    @precon  Ident and T must be avalid instances.
+    @precon  Ident and T must be a valid instances.
     @postcon A variable of type T is created in the methods variables collection.
 
     @param   Ident as a TElementContainer as a constant
@@ -4219,7 +4288,7 @@ End;
 
 (**
 
-  This method parses the gramar for the method list of an interface.
+  This method parses the grammar for the method list of an interface.
 
   @precon  Cls must be a valid instance.
   @postcon The grammar element is parsed.
@@ -4239,7 +4308,7 @@ End;
 
 (**
 
-  This method parses the grammar for an interace property by delegating the process to the 
+  This method parses the grammar for an interface property by delegating the process to the 
   ClassPropertyList method.
 
   @precon  Cls must be a valid reference.
@@ -4400,7 +4469,7 @@ End;
 
 (**
 
-  This method parses a var declaration in a for statemwnt and returned true else returns false.
+  This method parses a var declaration in a for statement and returned true else returns false.
 
   @precon  None.
   @postcon A var statement in a form look is parsed and true is returned else false is returned.
@@ -4493,7 +4562,7 @@ End;
   object pascal grammar.
 
   @precon  None .
-  @postcon This method dicards the labels found and returns True if this method handles a label 
+  @postcon This method discards the labels found and returns True if this method handles a label 
            declaration section .
 
   @param   Container as a TElementContainer as a constant
@@ -4655,7 +4724,7 @@ end;
   This method parse a method list from the current token position using the following object pascal 
   grammar.
 
-  @precon  Cls is an object declaration to add methods too and Scopeis the current internal scope of the
+  @precon  Cls is an object declaration to add methods too and Scope is the current internal scope of the
            object.
   @postcon Returns true is a method declaration was parsed.
 
@@ -4675,7 +4744,7 @@ End;
 
 (**
 
-  This method parses the quantified record / object / class names that preceed an implemented method.
+  This method parses the quantified record / object / class names that precedes an implemented method.
 
   @precon  None.
   @postcon The method builds a list of the record / object / class hierarchy that qualifies the 
@@ -4749,11 +4818,11 @@ End;
 (**
 
   This method checks the given method for missing CONST key words for each parameter and outputs a
-  modue metric message if not found.
+  module metric message if not found.
 
   @precon  None.
   @postcon Checks the given method for missing CONST key words for each parameter and outputs a
-           modue metric message if not found.
+           module metric message if not found.
 
   @param   Method as a TGenericFunction as a constant
 
@@ -4789,11 +4858,11 @@ End;
 
 (**
 
-  This method checks the given metyhod cyclometric complexity and if found to be above the limit a module
+  This method checks the given method cyclometric complexity and if found to be above the limit a module
   metric message is output.
 
   @precon  None.
-  @postcon Checks the given metyhod cyclometric complexity and if found to be above the limit a module
+  @postcon Checks the given method cyclometric complexity and if found to be above the limit a module
            metric message is output.
 
   @param   Method as a TGenericFunction as a constant
@@ -4822,7 +4891,7 @@ End;
   This method outputs a metric message for a missing block.
 
   @precon  None.
-  @postcon A metric messsage is output for an empty block.
+  @postcon A metric message is output for an empty block.
 
   @param   eCheck as a TBADIModuleCheck as a constant
 
@@ -4848,10 +4917,10 @@ End;
 
 (**
 
-  This method outputs a module metric message for an On Exceptino clause thst will eat all exceptions.
+  This method outputs a module metric message for an On Exception clause that will eat all exceptions.
 
   @precon  Container must be a valid container.
-  @postcon Outputs a module metric message for an On Exceptino clause thst will eat all exceptions.
+  @postcon Outputs a module metric message for an On Exception clause that will eat all exceptions.
 
   @param   Container as a TElementContainer as a constant
 
@@ -4878,11 +4947,11 @@ End;
 
 (**
 
-  This method checks the current token for a hard coded number (Int or Dec) and adds a metric message of 
+  This method checks the current token for a hard coded number (INT or DEC) and adds a metric message of 
   a magic number is in use.
 
   @precon  Container must be a valid instance.
-  @postcon A metrci message is raised if the current token is a magic number.
+  @postcon A metric message is raised if the current token is a magic number.
 
   @param   Container as a TElementContainer as a constant
 
@@ -5041,12 +5110,12 @@ End;
 
 (**
 
-  This method checks the given method for a long parmaeter list and if found outputs a module metric
-  messge accordingly.
+  This method checks the given method for a long parameter list and if found outputs a module metric
+  message accordingly.
 
   @precon  Method must be a valid instance.
-  @postcon Checks the given method for a long parmaeter list and if found outputs a module metric
-           messge accordingly.
+  @postcon Checks the given method for a long parameter list and if found outputs a module metric
+           message accordingly.
 
   @param   Method as a TGenericFunction as a constant
 
@@ -5096,10 +5165,10 @@ End;
 
 (**
 
-  This method outputs the NestedIFDepth of a method if it exceeds a specific limit.
+  This method outputs the Nested IF Depth of a method if it exceeds a specific limit.
 
   @precon  None.
-  @postcon Outputs a NestedIFDepth message for the method if it exceeds a specific limit.
+  @postcon Outputs a Nested IF Depth message for the method if it exceeds a specific limit.
 
   @param   Method as a TGenericFunction as a constant
 
@@ -5127,7 +5196,7 @@ End;
   is not in the correct position.
 
   @precon  None.
-  @postcon A message is otput for each method that is not in the correct position.
+  @postcon A message is output for each method that is not in the correct position.
 
 **)
 Procedure TPascalModule.MetricsUnsortedMethods;
@@ -5138,7 +5207,7 @@ Procedure TPascalModule.MetricsUnsortedMethods;
     the method sort order is correct and if not outputs a message.
 
     @precon  Container must be a valid instance
-    @postcon Methods that are nnot in the correct sort order generate messages.
+    @postcon Methods that are not in the correct sort order generate messages.
 
     @param   Container as a TElementContainer as a constant
 
@@ -5250,7 +5319,7 @@ End;
   ClassClassVarSection.
 
   @precon  Cls must be a valid instance
-  @postcon Parses a class var section defined within an object delcaration.
+  @postcon Parses a class var section defined within an object declaration.
 
   @param   AScope as a TScope as a constant
   @param   Cls    as a TRecordDecl as a constant
@@ -5265,7 +5334,7 @@ End;
 
 (**
 
-  This method parses a constant section defined in an object delcaration by delegating this to the 
+  This method parses a constant section defined in an object declaration by delegating this to the 
   ConstSection method.
 
   @precon  None.
@@ -5285,7 +5354,7 @@ End;
 
 (**
 
-  This method parses an Object type declaration from the current token position using the followong 
+  This method parses an Object type declaration from the current token position using the following 
   object pascal grammar.
 
   @precon  None.
@@ -5407,7 +5476,7 @@ End;
   This method parses a list of methods defined in an object by delegating this to the MethodList method.
 
   @precon  Cls must be a valid instance
-  @postcon Method within the oject declarations are parsed.
+  @postcon Method within the object declarations are parsed.
 
   @param   Cls                as a TRecordDecl as a constant
   @param   AScope             as a TScope as a constant
@@ -5482,10 +5551,10 @@ End;
 
 (**
 
-  This method parses the visibility elements of an object definiton.
+  This method parses the visibility elements of an object definition.
 
   @precon  None.
-  @postcon Parses an visibility elements of the object definiton return the visibility in the var 
+  @postcon Parses an visibility elements of the object definition return the visibility in the var 
            parameter.
 
   @param   AScope as a TScope as a reference
@@ -5910,7 +5979,7 @@ End;
 
 (**
 
-  This method determines if the type is an ordinal type using the folowing object pascal grammar.
+  This method determines if the type is an ordinal type using the following object pascal grammar.
 
   @precon  None.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -5935,7 +6004,7 @@ End;
   object pascal grammar.
 
   @precon  Method is a valid method to add a parameter too and ParamMod is a parameter modifier for the 
-           parameter to signify a const, var or out paramemter.
+           parameter to signify a CONST, VAR or OUT parameter.
   @postcon Parses a parameter list for a method from the current token position
 
   @param   Method   as a TPascalMethod as a constant
@@ -6022,7 +6091,7 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
+           Errors while providing declaration elements for browsing.
 
 **)
 Procedure TPascalModule.ParseTokens;
@@ -6626,6 +6695,7 @@ begin
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         Begin
+          AddIdentifier(Token.Token);
           PropertiesLabel := Cls.FindElement(strPropertiesLabel) As TLabelContainer;
           If PropertiesLabel = Nil Then
             PropertiesLabel := Cls.Add(strPropertiesLabel, iiPropertiesLabel, scNone) As TLabelContainer;
@@ -6922,11 +6992,11 @@ End;
 
 (**
 
-  This method parses a class heriage ist from the current token position using the following object 
+  This method parses a class heritage list from the current token position using the following object 
   pascal grammar.
 
   @precon  Cls is a valid object declaration to get a heritage for.
-  @postcon Parses a class heriage ist from the current token position
+  @postcon Parses a class heritage list from the current token position
 
   @param   RecObjClsInt as a TRecordDecl as a constant
 
@@ -6950,7 +7020,7 @@ end;
   This method parses a class var section within a record definition.
 
   @precon  Cls must be a valid instance.
-  @postcon A class var sectino is parsed if found and true returned.
+  @postcon A class var section is parsed if found and true returned.
 
   @param   AScope as a TScope as a constant
   @param   Cls    as a TRecordDecl as a constant
@@ -7048,10 +7118,10 @@ End;
 
 (**
 
-  This method parses a const section within a record definition.
+  This method parses a CONST section within a record definition.
 
   @precon  Container must be a valid container.
-  @postcon Parses a const section of it exists and returns true.
+  @postcon Parses a CONST section of it exists and returns true.
 
   @param   AScope    as a TScope as a constant
   @param   Container as a TElementContainer as a constant
@@ -7106,7 +7176,7 @@ End;
   This method parses the field list element of the record definition.
 
   @precon  Rec must be a valid instance.
-  @postcon Parses a field list if at the current token and returnd true if so.
+  @postcon Parses a field list if at the current token and returns true if so.
 
   @param   Rec           as a TRecordDecl as a constant
   @param   InternalScope as a TScope as a constant
@@ -7314,7 +7384,7 @@ End;
 
   This method parses a record type declaration from the current token position.
 
-  @precon  boolPacked detmerines if the record is packed for not.
+  @precon  boolPacked determines if the record is packed for not.
   @postcon This method returns True if this method handles a constant declaration section.
 
   @nometrics
@@ -7585,11 +7655,11 @@ End;
 
 (**
 
-  This method parses a requires clause from the current token position usnig the following object pascal 
+  This method parses a requires clause from the current token position using the following object pascal 
   grammar.
 
   @precon  None.
-  @postcon Parses a requires clause from the current token position usnig
+  @postcon Parses a requires clause from the current token position using
 
 **)
 Procedure TPascalModule.RequiresClause;
@@ -7638,7 +7708,7 @@ end;
   This method resolved method and procedures that have been forward referenced.
 
   @precon  None.
-  @postcon The implementation of a forward referenced method is updates wih the refernece information
+  @postcon The implementation of a forward referenced method is updates with the reference information
            for the forward declaration.
 
   @nometrics
@@ -7708,11 +7778,11 @@ end;
 (**
 
   This method resolved the references between the exports methods and implemented methods marking each as
-  resovled where a match is found.
+  resolved where a match is found.
 
   @precon  None.
   @postcon Resolved the references between the exports methods and implemented methods marking each as 
-           resovled where a match is found.
+           resolved where a match is found.
 
 **)
 procedure TPascalModule.ResolveScopeOfImplementedExportsMethods;
@@ -7794,7 +7864,7 @@ end;
   This method parses a resource string declaration section from the current token position.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -7842,7 +7912,7 @@ End;
   This method parses a resource string declaration section from the current token position.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -8212,7 +8282,7 @@ End;
 
 (**
 
-  This method parses a sring type declaration from the current token position using the following object 
+  This method parses a string type declaration from the current token position using the following object 
   pascal grammar.
 
   @precon  None.
@@ -8472,13 +8542,11 @@ End;
 
 (**
 
-  This method parses a Thread var section declatation from the current token position.
+  This method parses a Thread var section declaration from the current token position.
 
   @precon  On entry to this method , Scope defines the current scope of the block i . e . private in in 
-           the implemenation section or public if in the interface section .
+           the implementation section or public if in the interface section .
   @postcon This method returns True if this method handles a constant declaration section .
-
-  @see     For object pascal grammar see {@link TPascalDocModule.VarSection} .
 
   @param   AScope    as a TScope as a constant
   @param   Container as a TElementContainer as a constant
@@ -8574,7 +8642,7 @@ Var
   iLine : Integer;
   (** Current column number **)
   iColumn : Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
+  (** Token stream position. Fast to increment this than read the stream position. **)
   iStreamPos : Integer;
   (** Token line **)
   iTokenLine : Integer;
@@ -8923,6 +8991,7 @@ Begin
       TypeParams(AToken.FIdentifier);
       If Token.Token = '=' Then
         Begin
+          AddIdentifier(AToken.FIdentifier);
           NextNonCommentToken;
           boolIsType := False;
           If Token.UToken = strTYPE Then
@@ -9052,7 +9121,7 @@ End;
 
 (**
 
-  This method parses the TypeParam element of the grammar.
+  This method parses the Type Parameter element of the grammar.
 
   @precon  None.
   @postcon The updated identifier is returned if it contains a generic definition.
@@ -9082,7 +9151,7 @@ End;
   grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -9349,7 +9418,7 @@ end;
   following object pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.

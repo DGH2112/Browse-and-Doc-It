@@ -1,18 +1,18 @@
 ﻿(**
 
   This module contains a frame which holds all the functionality of the
-  module browser so that it can be independant of the application specifics.
+  module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 3.006
-  @Date    24 May 2020
+  @Version 5.798
+  @Date    25 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-  @nometric UnsortedModule
 
 **)
 Unit BADI.ModuleExplorerFrame;
@@ -60,12 +58,15 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types, System.Actions, System.ImageList;
+  BADI.Types, System.Actions, System.ImageList, Vcl.Menus;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
       current module. **)
   TSelectionChange = Procedure(Const iIdentLine, iIdentCol, iCommentLine : Integer) Of Object;
+
+  (** This is a method signature for getting IDE errors for the module explorer to display. **)
+  TBADIIDEErrors = Procedure(Const slErrors : TStringList) Of Object;
 
   (** This is a frame class to contain all the functionality of the module
       explorer so that it can be placed inside any container required and
@@ -116,6 +117,17 @@ Type
     actMetrics: TAction;
     tbtnMetrics: TToolButton;
     tmFilter: TTimer;
+    pmExplorerContext: TPopupMenu;
+    actAddToLocalDictionary: TAction;
+    actIgnoreSpellingMistake: TAction;
+    AddtoDictionary1: TMenuItem;
+    IgnoreSpellingMistake1: TMenuItem;
+    actAddToProjectDictionary: TAction;
+    AddtoProjectDictionary1: TMenuItem;
+    procedure actAddToLocalDictionaryExecute(Sender: TObject);
+    procedure actAddToProjectDictionaryExecute(Sender: TObject);
+    procedure actSpellingUpdate(Sender: TObject);
+    procedure actIgnoreSpellingMistakeExecute(Sender: TObject);
     Procedure actLocalUpdate(Sender: TObject);
     Procedure actLocalExecute(Sender: TObject);
     Procedure FilterChange;
@@ -185,6 +197,9 @@ Type
     FLastFilterUpdate  : Int64;
     FLineDocIssues     : TDictionary<Integer,IBADILineDocIssues>;
     FDocIssueTotals    : IBADIDocIssueTotals;
+    FIDEErrors         : TBADIIDEErrors;
+  private
+    procedure DoRefresh(Sender: TObject);
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -252,6 +267,8 @@ Type
     Function  GetLineDocIssue(Const iLine : Integer) : IBADILineDocIssues;
     Function  GetDocIssueTotals : IBADIDocIssueTotals;
     Procedure LogDocIssueConflict(Const Element : TElementContainer);
+    Function  ExtractSpellingWord : String;
+    Procedure CheckForIDEErrors(Const Container : TElementContainer);
     (**
       This property gets and set the filter text for the explorer view.
       @precon  None.
@@ -286,9 +303,16 @@ Type
     **)
     Property OnRefresh : TNotifyEvent Read FRefresh Write FRefresh;
     (**
-      This property exposes the virtual tree view to ouside sources.
+      This is an event handler for the IDE Errors.
       @precon  None.
-      @postcon Exposes the virtual tree view to ouside sources.
+      @postcon Implement a event handler for add errors to the module explorer.
+      @return  a TBADIIDEErrors
+    **)
+    Property OnIDEErrors : TBADIIDEErrors Read FIDEErrors Write FIDEErrors;
+    (**
+      This property exposes the virtual tree view to outside sources.
+      @precon  None.
+      @postcon Exposes the virtual tree view to outside sources.
       @return  a TBADIVirtualStringTree
     **)
     Property Explorer : TBADIVirtualStringTree Read FExplorer;
@@ -330,7 +354,8 @@ Uses
   BADI.ModuleExplorer.TreeNodeInfo,
   BADI.DocIssue,
   BADI.LineDocIssue,
-  BADI.DocIssueTotals;
+  BADI.DocIssueTotals,
+  BADI.SpellingIssue;
 
 Resourcestring
   (** A format pattern for the bytes statusbar text. **)
@@ -361,6 +386,57 @@ Const
   iDivisor = 2;
 
 {$R *.dfm}
+
+(**
+
+  This is an on execute event handler for the Add to Dictionary action.
+
+  @precon  None.
+  @postcon Adds the selected word to the local dictionary.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actAddToLocalDictionaryExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.LocalDictionary.Add(ExtractSpellingWord);
+  DoRefresh(Sender);
+End;
+
+(**
+
+  This is an on execute event handler for the Add To Project Dictionary action.
+
+  @precon  None.
+  @postcon The selected spelling mistake is added to the project dictionary.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actAddToProjectDictionaryExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.ProjectDictionary.Add(ExtractSpellingWord);
+  DoRefresh(Sender);
+End;
+
+(**
+
+  This is an on execute event handler for the Ignore Spelling Mistake action.
+
+  @precon  None.
+  @postcon Adds the selected word to the ignore dictionary.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actIgnoreSpellingMistakeExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.IgnoreDictionary.Add(ExtractSpellingWord);
+  DoRefresh(Sender);
+End;
 
 (**
 
@@ -455,13 +531,12 @@ begin
       UpdateOptions(doShowUndocumentedClasses);
       UpdateOptions(doShowUndocumentedInterfaces);
     End;
-  If Assigned(FRefresh) Then
-    FRefresh(Sender);
+  DoRefresh(Sender);
 end;
 
 (**
 
-  This is an on update event handler for the sceop actions.
+  This is an on update event handler for the scope actions.
 
   @precon  None.
   @postcon Checks the action depending on the scopes in ScopesToRender.
@@ -509,6 +584,38 @@ begin
   Else If Sender = actTypes Then
     (Sender As TAction).Checked := doShowUndocumentedTypes In TBADIOptions.BADIOptions.Options
 end;
+
+(**
+
+  This is an on update event handler for the Spelling actions.
+
+  @precon  None.
+  @postcon Enables the context menus for spelling actions.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actSpellingUpdate(Sender: TObject);
+
+Var
+  A: TAction;
+  boolEnabled : Boolean;
+  NodeData : PBADITreeData;
+
+Begin
+  If Sender Is TAction Then
+    Begin
+      A := Sender As TAction;
+      boolEnabled := A.Enabled;
+      If Assigned(FExplorer.FocusedNode) Then
+        Begin
+          NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
+          boolEnabled := (NodeData.FNodeType = ntSpellingIssue)
+        End;
+      If boolEnabled <> A.Enabled Then
+        A.Enabled := boolEnabled;
+    End;
+End;
 
 (**
 
@@ -574,6 +681,8 @@ begin
     NodeData.FNodeType := ntDocConflict
   Else If Element Is TDocIssue Then
     NodeData.FNodeType := ntDocIssue
+  Else If Element Is TBADISpellingIssue Then
+    NodeData.FNodeType := ntSpellingIssue
   Else
     NodeData.FNodeType := ntElement;
   N := TBADITreeNodeInfo.Create(Element, iLevel);
@@ -619,6 +728,62 @@ Begin
   FNodeInfo.Add(N);
   NodeData.FNode := N;
   FExplorer.InvalidateNode(Result); //: @note Used to recalc node height due to bug in VTV
+End;
+
+(**
+
+  This method checks the if the IDE has any error messages for the current module and adds them to the
+  list of errors.
+
+  @precon  Container must be a valid instance.
+  @postcon Any IDE errors are added to the module.
+
+  @param   Container as a TElementContainer as a constant
+
+**)
+Procedure TframeModuleExplorer.CheckForIDEErrors(Const Container: TElementContainer);
+
+Type
+  //: @nohints
+  TBADIErrorFields = (efFilename, efMessage, efLine, efColumn);
+
+ResourceString
+  strMsg = '%s found at line %d column %d.';
+  
+Var
+  Errors: TElementContainer;
+  sl: TStringList;
+  strError: String;
+  astrError: TArray<String>;
+
+Begin
+  Errors := Container.FindElement(strErrors);
+  If Not Assigned(Errors) And (doShowIDEErrors In TBADIOptions.BADIOPtions.Options) Then
+    If Assigned(FIDEErrors) Then
+      Begin
+        sl := TStringList.Create;
+        Try
+          FIDEErrors(sl);
+          For strError In sl Do
+            Begin
+              astrError := strError.Split(['|']);
+              Container.AddIssue(
+                Format(strMsg, [
+                  astrError[Integer(efMessage)], 
+                  astrError[Integer(efLine)].ToInteger,
+                  astrError[Integer(efColumn)].ToInteger + 1
+                ]),
+                scGlobal,
+                astrError[Integer(efLine)].ToInteger,
+                astrError[Integer(efColumn)].ToInteger + 1,
+                etError,
+                Container
+              );
+            End;
+        Finally
+          sl.Free;
+        End;
+      End;
 End;
 
 (**
@@ -678,6 +843,7 @@ begin
   FExplorer.Images := TBADIOptions.BADIOptions.ScopeImageList;
   FExplorer.TabOrder := iTabOrder;
   FExplorer.TreeOptions.MiscOptions := FExplorer.TreeOptions.MiscOptions + [toVariableNodeHeight];
+  FExplorer.TreeOptions.SelectionOptions := FExplorer.TreeOptions.SelectionOptions + [toRightClickSelect];
   FExplorer.EmptyListMessage := strBrowseAndDocItCannotParse;
   FExplorer.OnAfterCellPaint := tvExplorerAfterCellPaint;
   FExplorer.OnBeforeItemPaint := tvExplorerBeforeItemPaint;
@@ -689,6 +855,7 @@ begin
   FExplorer.OnExpanded := tvExplorerNodeExpanded;
   FExplorer.OnCollapsed := tvExplorerNodeExpanded;
   FExplorer.OnChange := tvExplorerChange;
+  FExplorer.PopupMenu := pmExplorerContext;
   FMouseEnter := False;
   FFiltering := False;
   FExplorer.NodeDataSize := SizeOf(TBADITreeData);
@@ -705,10 +872,10 @@ end;
 
 (**
 
-  This method create both the todo folder node and the document conflict folders in the treeview.
+  This method create the special tags folder nodes and the document conflict folders in the treeview.
 
   @precon  None.
-  @postcon Creates the special tag noNode.
+  @postcon Creates the special tag nodes.
 
 **)
 Procedure TframeModuleExplorer.CreateSpecialTagNodes();
@@ -761,6 +928,23 @@ end;
 
 (**
 
+  This method refreshes the module explorer by asking for the module to be re-parsed.
+
+  @precon  None.
+  @postcon The module is re-parsed.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.DoRefresh(Sender: TObject);
+
+Begin
+  If Assigned(FRefresh) Then
+    FRefresh(Sender);
+End;
+
+(**
+
   This method highlights the selected item in the treeview.
 
   @precon  None.
@@ -782,7 +966,7 @@ End;
 
   This method draws the icon for the current tree node.
 
-  @precon  NodeData must be the TTreeData for the current node.
+  @precon  None.
   @postcon The nodes icon is drawn.
 
   @param   R            as a TRect as a reference
@@ -803,7 +987,7 @@ End;
 
 (**
 
-  This method draws the treenode button containing the + or - signs for expanding and collapsing .
+  This method draws the tree node button containing the + or - signs for expanding and collapsing .
 
   @precon  None.
   @postcon The button is drawn.
@@ -847,8 +1031,7 @@ End;
 
   This method renders a selection rectangle around the selected note.
 
-  @precon  NodeData must be a valid pointer to a TTreeData node fo the node being rendered and sl
-           must contain the string tokens to be rendered.
+  @precon  sl must contain the string tokens to be rendered.
   @postcon The selection rectangle is rendered (accounting for extra width due to font
            preferences).
 
@@ -1013,7 +1196,7 @@ End;
   This procedure draws the text on the explorer tree view.
 
   @precon  NodeData and sl must be valid instance.
-  @postcon The treenode text is drawn.
+  @postcon The tree node text is drawn.
 
   @param   sl as a TStringList as a constant
   @param   R  as a TRect as a reference
@@ -1205,7 +1388,7 @@ procedure TframeModuleExplorer.ExpandNodes;
     children).
 
     @precon  None.
-    @postcon Returns true if the node text matches the requried text.
+    @postcon Returns true if the node text matches the required text.
 
     @param   strNodeText  as a String as a constant
     @param   strMatchText as a String as a constant
@@ -1305,10 +1488,27 @@ end;
 
 (**
 
+  This method extracts the spelling mistake word from the current tree node text.
+
+  @precon  The focused node is a spelling mistake.
+  @postcon The spelling mistake word is returned.
+
+  @return  a String
+
+**)
+Function TframeModuleExplorer.ExtractSpellingWord: String;
+
+Begin
+  Result := FExplorer.Text[FExplorer.FocusedNode, 0];
+  Result := Copy(Result, 1, Pos('(', Result) - 1).Trim;
+End;
+
+(**
+
   This method updates the filtering of the treeview.
 
   @precon  None.
-  @postcon The treeview filter is updated onyl showing node that match the filter text.
+  @postcon The treeview filter is updated only showing node that match the filter text.
 
 **)
 Procedure TframeModuleExplorer.FilterChange;
@@ -1424,7 +1624,7 @@ End;
   This method attempts to focus the FFollowNode in the treeview.
 
   @precon  None.
-  @postcon If the FFollowNode is not visible the ifrst visible parent node is focused.
+  @postcon If the FFollowNode is not visible the first visible parent node is focused.
 
 **)
 Procedure TframeModuleExplorer.FocusFollowedNode;
@@ -1452,7 +1652,7 @@ End;
   This method attempts to focus the node (element) which contains the cursor line provided.
 
   @precon  None.
-  @postcon If found the elements or its first visibel parent is focused.
+  @postcon If found the elements or its first visible parent is focused.
 
   @param   iLine as an Integer as a constant
 
@@ -1552,7 +1752,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     This procedure adds a doc issue to the module based on a line and tag record.
 
     @precon  None.
-    @postcon A doc issue is aded tot he module.
+    @postcon A doc issue is added to the module.
 
     @param   iLine as an Integer as a constant
     @param   Tag   as a TSpecialTagNode as a constant
@@ -1581,7 +1781,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     This procedure adds a doc issue to the module based on a line and tag name.
 
     @precon  None.
-    @postcon A doc issue is aded tot he module.
+    @postcon A doc issue is added to the module.
 
     @param   iLine      as an Integer as a constant
     @param   strTagName as a String as a constant
@@ -1614,6 +1814,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
 
     @param   Tag   as a TSpecialTagNode as a constant
     @param   iLine as an Integer as a constant
+    @param   iCol  as an Integer as a constant
 
   **)
   Procedure AddTotalInfo(Const Tag : TSpecialTagNode; Const iLine, iCol : Integer); Overload;
@@ -1640,6 +1841,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
 
     @param   strTagName as a String as a constant
     @param   iLine      as an Integer as a constant
+    @param   iCol       as an Integer as a constant
 
   **)
   Procedure AddTotalInfo(Const strTagName : String; Const iLine, iCol : Integer); Overload;
@@ -1663,14 +1865,16 @@ ResourceString
 Const
   iTreeLevel = 2;
   astrTagsToIgnore : TArray<String> = [
-    'nocheck',
-    'nochecks',
-    'nodocumentation',
-    'nohint',
-    'nohints',
-    'nometric',
-    'nometrics',
-    'stopdocumentation'
+    strnocheck,
+    strnochecks,
+    strnodocumentation,
+    strnohint,
+    strnohints,
+    strnometric,
+    strnometrics,
+    strnospelling,
+    strnospellings,
+    strstopdocumentation
   ];
   
 Var
@@ -1739,7 +1943,7 @@ End;
   This method gets the tree nodes that are currently expanded and stores them in a string list.
 
   @precon  Node is the tree node to be tested for expansion.
-  @postcon Adds, update or deletes nodes from the expanded node list depending whether thhey are
+  @postcon Adds, update or deletes nodes from the expanded node list depending whether they are
            now expanded.
 
   @param   StartNode as a PVirtualNode as a constant
@@ -1775,7 +1979,7 @@ End;
 
 (**
 
-  This is a getter method for the DocIssueConflicts property.
+  This is a getter method for the Line Doc Issue conflicts property.
 
   @precon  None.
   @postcon Returns a set of limit types for the given line number to indicate issues on that line.
@@ -1794,7 +1998,7 @@ End;
 
   This method returns the path of the specified tree node.
 
-  @precon  Node is the tree node to be pathed.
+  @precon  Node is the tree node to be calculate the path to.
   @postcon Returns a string representation of the tree nodes path excluding the root item.
 
   @param   Node as a PVirtualNode as a constant
@@ -1825,7 +2029,7 @@ End;
 
 (**
 
-  This method initalises a TMatchResult record as we cannot define constructors for annoymous
+  This method initialises a TMatchResult record as we cannot define constructors for anonymous
   records.
 
   @precon  None.
@@ -1939,6 +2143,7 @@ Procedure TframeModuleExplorer.LogDocIssueConflict(Const Element: TElementContai
       ctDocumentation: Result := ltConflicts;
       ctMetric:        Result := ltMetrics;
       ctCheck:         Result := ltChecks;
+      ctSpelling:      Result := ltSpelling;
     Else
       Result := ltErrors;
     End;
@@ -1951,7 +2156,8 @@ Const
     iiHint,
     iiDocConflictItem,
     iiCheckItem,
-    iiMetricItem
+    iiMetricItem,
+    iiSpellingItem
   );
 
 Var
@@ -1961,6 +2167,7 @@ Var
   DC: TDocumentConflict;
   recTotalInfo : TBADITotalInfo;
   recDocIssueInfo : TBADIDocIssueInfo;
+  SI: TBADISpellingIssue;
 
 Begin
   If Element Is TDocIssue Then
@@ -1996,14 +2203,38 @@ Begin
       If FLineDocIssues.TryGetValue(DC.Line, LineDocIssues) Then
         LineDocIssues.AddIssue(astrLimitType[eLimitType], recDocIssueInfo)
       Else
-        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType],
-          recDocIssueInfo));
+        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo));
       recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
       recTotalInfo.FForeColour := clNone;
       recTotalInfo.FBackColour := clNone;
       recTotalInfo.FFontStyles := [];
       recTotalInfo.FFirstLine := DC.Line;
       recTotalInfo.FFirstCol := DC.Column;
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);    
+    End
+  Else If Element Is TBADISpellingIssue Then
+    Begin
+      SI := Element As TBADISpellingIssue;
+      eLimitType := ConflictTypeToLimitType(ctSpelling);
+      recDocIssueInfo.FName := astrLimitType[eLimitType];
+      recDocIssueInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recDocIssueInfo.FForeColour := clNone;
+      recDocIssueInfo.FBackColour := clNone;
+      recDocIssueInfo.FMessage := '';
+      If FLineDocIssues.TryGetValue(SI.Line, LineDocIssues) Then
+        LineDocIssues.AddSpellingMistake(SI.Identifier, SI.Column)
+      Else
+        Begin
+         LineDocIssues := TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo);
+         LineDocissues.AddSpellingMistake(SI.Identifier, SI.Column);
+         FLineDocIssues.Add(SI.Line, LineDocIssues);
+        End;
+      recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recTotalInfo.FForeColour := clNone;
+      recTotalInfo.FBackColour := clNone;
+      recTotalInfo.FFontStyles := [];
+      recTotalInfo.FFirstLine := SI.Line;
+      recTotalInfo.FFirstCol := SI.Column;
       FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);    
     End;
 End;
@@ -2059,13 +2290,16 @@ Begin
         ctDocumentation: Result := TBADIOptions.BADIOptions.IssueLimits[ltConflicts];
         ctMetric:        Result := TBADIOptions.BADIOptions.IssueLimits[ltMetrics];
         ctCheck:         Result := TBADIOptions.BADIOptions.IssueLimits[ltChecks];
+        ctSpelling:      Result := TBADIOptions.BADIOptions.IssueLimits[ltSpelling];
       End
     Else If Container.Elements[1] Is TDocIssue Then
       Case TDocIssue(Container.Elements[1]).ErrorType Of
         etHint:    Result := TBADIOptions.BADIOptions.IssueLimits[ltHints];
         etWarning: Result := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];
         etError:   Result := TBADIOptions.BADIOptions.IssueLimits[ltErrors];  
-      End;
+      End
+    Else If Container.Elements[1] Is TBADISpellingIssue Then
+      Result := TBADIOptions.BADIOptions.IssueLimits[ltSpelling];
 End;
 
 (**
@@ -2081,8 +2315,15 @@ End;
 procedure TframeModuleExplorer.OutputModuleInfo(Const Container : TElementContainer);
 
 Const
-  strPromotedLabels : Array[1..6] Of String = (strMetrics, strChecks, strDocumentationConflicts,
-    strHints, strWarnings, strErrors);
+  strPromotedLabels : Array[1..7] Of String = (
+    strSpelling,
+    strMetrics,
+    strChecks,
+    strDocumentationConflicts,
+    strHints,
+    strWarnings,
+    strErrors    
+  );
 
 Var
   i: Integer;
@@ -2152,8 +2393,7 @@ End;
 
   This method displays the specified module in the treeview.
 
-  @precon  M is a valid instance of a TBaseLanguageModule that has been parsed and strStatus is a
-           text string to be displayed in the forms status bar.
+  @precon  Module is a valid instance of a TBaseLanguageModule that has been parsed.
   @postcon Renders the module information for the given module.
 
   @param   Module as a TBaseLanguageModule as a constant
@@ -2206,18 +2446,9 @@ Begin
       Module.AddTickCount(strClear);
       SetLength(FSpecialTagNodes, TBADIOptions.BADIOptions.SpecialTags.Count);
       // Create Root Tree Node
-      FModule := AddNode(
-        Nil,
-        Module, //.AsString(True, False),
-        //Module.Name,
-        0 //,
-        //Module.ImageIndexAdjustedForScope,
-        //Module.ModuleNameLine,
-        //Module.ModuleNameCol,
-        //False,
-        //Module.Comment
-      );
+      FModule := AddNode(Nil, Module, 0);
       CreateSpecialTagNodes();
+      CheckForIDEErrors(Module);
       OutputModuleInfo(Module);
       Module.AddTickCount(strBuild);
       SetExpandedNodes(FModule);
@@ -2250,10 +2481,10 @@ End;
 
 (**
 
-  This method expands the tree view nodes if they are foudn in the list.
+  This method expands the tree view nodes if they are found in the list.
 
   @precon  Node is the tree node to be expanded.
-  @postcon Sets the node as expanded if it was in the edpanded node list.
+  @postcon Sets the node as expanded if it was in the expanded node list.
 
   @param   StartNode as a PVirtualNode as a constant
 
@@ -2285,7 +2516,7 @@ End;
   This is a setter method for the ExplorerFilter property.
 
   @precon  None.
-  @postcon Sets the FExplorerFilter field and determiens whether a simple panel is to be displayed for
+  @postcon Sets the FExplorerFilter field and determines whether a simple panel is to be displayed for
            the filter text information.
 
   @param   strValue as a String as a constant
@@ -2334,7 +2565,7 @@ End;
 
 (**
 
-  This is an on timer event handelr for the filter text.
+  This is an on timer event handler for the filter text.
 
   @precon  None.
   @postcon Attempts to filter the text in the treeview.
@@ -2383,7 +2614,7 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     This local method highlights the text matches passed in the given colour.
 
     @precon  None.
-    @postcon If there are matches these are highlighed.
+    @postcon If there are matches these are highlighted.
 
     @param   MC      as a TMatchCollection as a constant
     @param   strText as a String as a constant
@@ -2494,7 +2725,7 @@ End;
   This is an on click event handler for the explorer tree view.
 
   @precon  None.
-  @postcon Fires a SelectionChange event for the specifically selected item.
+  @postcon Fires a Selection Change event for the specifically selected item.
 
   @param   Sender as a TObject
 
@@ -2509,12 +2740,12 @@ Begin
     Exit;
   FSelectionChanging := True;
   Try
-    If FExplorer.FocusedNode <> Nil Then
+    If Assigned(FExplorer.FocusedNode) Then
       If Assigned(FSelectionChange) And Not FRendering Then
         Begin
           NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
-          If NodeData.FNode <> Nil Then
-            If NodeData.FNode.Comment = Nil Then
+          If Assigned(NodeData.FNode) Then
+            If Not Assigned(NodeData.FNode.Comment) Then
               FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line)
             Else
               FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);
@@ -2742,7 +2973,7 @@ end;
   This is an on node expanded / collapsed event handler for the explorer view.
 
   @precon  None.
-  @postcon Attempts tto re-focus the followed node when nodes are expanded or collapsed.
+  @postcon Attempts to re-focus the followed node when nodes are expanded or collapsed.
 
   @param   Sender as a TBaseVirtualTree
   @param   Node   as a PVirtualNode

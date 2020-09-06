@@ -3,8 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.402
-  @Date    18 Apr 2020
+  @Version 1.740
+  @Date    05 Sep 2020
 
   @license
 
@@ -75,6 +75,7 @@ Type
     Procedure OptionsChange(Sender: TObject);
     Procedure UpdateMenuShortcuts(Sender : TObject);
     Procedure InitialisingMsg(Const strMsg : String);
+    Procedure IDEErrors(Const slIDEErrors : TStringList);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -93,6 +94,7 @@ Uses
   BADI.Module.Metrics.SubView, 
   BADI.Module.Checks, 
   BADI.Module.Checks.SubView,
+  BADI.Module.Spelling, 
   BADI.SplashScreen, 
   BADI.AboutBox, 
   BADI.BNFHighlighter,
@@ -102,7 +104,7 @@ Uses
 
 (**
 
-  This is the constructor method for the TPascalDocWizard class. This constructor create
+  This is the constructor method for the TBrowseAndDocItWizard class. This constructor create
   the explorer form and menus.
 
   @precon  None.
@@ -112,61 +114,28 @@ Uses
 **)
 Constructor TBrowseAndDocItWizard.Create;
 
-ResourceString
-  strCreatingModuleExplorer = 'Creating module explorer...';
-  strCreatingSplashScreenEntry = 'Creating Splash Screen Entry...';
-  strCreatingAboutBoxEntry = 'Creating About Box Entry...';
-  strCreatingModuleStatistics = 'Creating Module Statistics...';
-  strCreatingEditorNotifier = 'Creating Editor Notifier...';
-  strRegisteringEditorNotifier = 'Registering Editor Notifier...';
-  strCreatingIDEMenu = 'Creating IDE Menu...';
-  strSettingUpShortcuts = 'Setting up Shortcuts...';
-  strCreatingBNFHighlighter = 'Creating BNF Highlighter...';
-  strCreatingEidolonHighlighter = 'Creating Eidolon Highlighter...';
-  strRegisteringMetricsEditorView = 'Registering Metrics Editor View...';
-  strRegisteringChecksEditorView = 'Registering Checks Editor View...';
-  strRegisteringMetricsEditorSubView = 'Registering Metrics Editor Sub-View...';
-  strRegisteringChecksEditorSubView = 'Registering Checks Editor Sub-View...';
-  strCreatingIDENotifer = 'Creating IDE Notifer...';
-  strDone = 'Done!';
-
 Begin
   {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
-  InitialisingMsg(strCreatingModuleExplorer);
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
-  InitialisingMsg(strCreatingSplashScreenEntry);
+  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange, IDEErrors);
   AddSplashScreen;
-  InitialisingMsg(strCreatingAboutBoxEntry);
   AddAboutBoxEntry;
-  InitialisingMsg(strCreatingModuleStatistics);
   FModuleStatsList := TBADIModuleStatsList.Create;
-  InitialisingMsg(strCreatingEditorNotifier);
   FEditorNotifier := TEditorNotifier.Create(FModuleStatsList);
-  InitialisingMsg(strRegisteringEditorNotifier);
   FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(FEditorNotifier);
-  InitialisingMsg(strCreatingIDEMenu);
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
-  InitialisingMsg(strSettingUpShortcuts);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
-  InitialisingMsg(strCreatingBNFHighlighter);
   FBNFHighlighterIndex := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TBNFHighlighter.Create);
-  InitialisingMsg(strCreatingEidolonHighlighter);
   FEidolonHighlighterIndex := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TEidolonHighlighter.Create);
-  InitialisingMsg(strRegisteringMetricsEditorView);
   RegisterMetricsEditorView;
-  InitialisingMsg(strRegisteringChecksEditorView);
   RegisterChecksEditorView;
-  InitialisingMsg(strRegisteringMetricsEditorSubView);
+  RegisterSpellingEditorView;
   RegisterEditorMetricsSubView;
-  InitialisingMsg(strRegisteringChecksEditorSubView);
   RegisterEditorChecksSubView;
-  InitialisingMsg(strCreatingIDENotifer);
   TBADIIDENotifier.InstallIDENotifier(FModuleStatsList);
-  InitialisingMsg(strDone);
 End;
 
 (**
@@ -201,7 +170,7 @@ End;
 
 (**
 
-  This is an exceute method for the wizard. Since this wizard is not implemented
+  This is an execute method for the wizard. Since this wizard is not implemented
   as a menu wizard this method has no code but is required for the interface.
 
   @nocheck EmptyMethod
@@ -258,7 +227,7 @@ End;
   This is a getter method for the MenuText property.
 
   @precon  None.
-  @postcon Reutns the Menu text for the wizard.
+  @postcon Returns the Menu text for the wizard.
 
   @return  a string
 
@@ -305,6 +274,47 @@ Function TBrowseAndDocItWizard.GetState: TWizardState;
 
 Begin
   Result := [wsEnabled];
+End;
+
+(**
+
+  This is an event handler to extract IDE Error messages to be displayed in the module explorer.
+
+  @precon  slIDEErrors must be a valid instance passed to the event handler.
+  @postcon IDE Errors are added to the string list.
+
+  @param   slIDEErrors as a TStringList as a constant
+
+**)
+Procedure TBrowseAndDocItWizard.IDEErrors(Const slIDEErrors: TStringList);
+
+Const
+  strErrorRecord = '%s|%s|%d|%d';
+
+Var
+  MS : IOTAModuleServices;
+  Module : IOTAModule;
+  ModuleErrors : IOTAModuleErrors;
+  Errors: TOTAErrors;
+  iError: Integer;
+
+Begin
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      Module := MS.CurrentModule;
+      If Assigned(Module) Then
+        If Supports(Module, IOTAModuleErrors, ModuleErrors) Then
+          Begin
+            Errors := ModuleErrors.GetErrors;
+            For iError := Low(Errors) To High(Errors) Do
+              slIDEErrors.Add(Format(strErrorRecord, [
+                Module.FileName,
+                Errors[iError].Text,
+                Errors[iError].Start.Line,
+                Errors[iError].Start.CharIndex
+              ]));
+          End;
+    End;
 End;
 
 (**

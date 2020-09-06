@@ -1,11 +1,11 @@
 (**
 
-  This module contains an editor notifier that monitors the coed for changes
+  This module contains an editor notifier that monitors the code for changes
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 2.120
-  @Date    09 Jul 2020
+  @Version 2.291
+  @Date    29 Aug 2020
 
   @license
 
@@ -77,6 +77,7 @@ Type
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+    procedure UpdateProjectDictionary;
   Public
     Constructor Create(Const ModuleStatsList : IBADIModuleStatsList);
     Destructor Destroy; Override;
@@ -152,6 +153,7 @@ Begin
               mrNo: Exit;
               mrCancel: Abort;
             End;
+          UpdateProjectDictionary;
           FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
       End;
     End;
@@ -267,7 +269,7 @@ End;
 
 (**
 
-  This an impementation of the DockFormRefresh method for the Editor Notifier
+  This an implementation of the DockFormRefresh method for the Editor Notifier
   interface.
 
   @precon  None.
@@ -287,7 +289,7 @@ end;
 
 (**
 
-  This an impementation of the DockFormUpdate method for the Editor Notifier
+  This an implementation of the DockFormUpdated method for the Editor Notifier
   interface.
 
   @precon  None.
@@ -312,7 +314,7 @@ End;
 
 (**
 
-  This an impementation of the DockFormVisibleChange method for the Editor Notifier
+  This an implementation of the DockFormVisibleChanged method for the Editor Notifier
   interface.
 
   @precon  None.
@@ -334,11 +336,11 @@ end;
 (**
 
   This method extracts the filename, modified status and the editor stream of
-  code for the BrowseAndDocItThread.
+  code for the Browse And Doc It thread.
 
   @precon  None.
   @postcon Extracts the filename, modified status and the editor stream of
-           code for the BrowseAndDocItThread.
+           code for the Browse And Doc It thread.
 
   @param   strFileName  as a String as a reference
   @param   boolModified as a Boolean as a reference
@@ -431,7 +433,7 @@ Const
 
   (**
 
-    This procedure adds the standard compiler defintions to the definiton list for parsing files.
+    This procedure adds the standard compiler definitions to the definition list for parsing files.
 
     @precon  Project must be a valid instance.
     @postcon The standard compiler definitions are added the definitions list for parsing.
@@ -495,11 +497,11 @@ end;
 
 (**
 
-  This an impementation of the EditorViewActivate method for the Editor Notifier
+  This an implementation of the EditorViewActivated method for the Editor Notifier
   interface.
 
   @precon  None.
-  @postcon Refreshes the module explorer IF the last parser was sucessful.
+  @postcon Refreshes the module explorer IF the last parser was successful.
 
   @nohint  EditWindow EditView
 
@@ -520,7 +522,7 @@ End;
 
 (**
 
-  This an impementation of the EditorViewModified method for the Editor Notifier
+  This an implementation of the EditorViewModified method for the Editor Notifier
   interface.
 
   @precon  None.
@@ -541,10 +543,10 @@ end;
 
 (**
 
-  This method reenabled the timer and returns whether the parse failed or not.
+  This method re-enables the timer and returns whether the parse failed or not.
 
   @precon  None.
-  @postcon Reenabled the timer and returns whether the parse failed or not.
+  @postcon Re-enables the timer and returns whether the parse failed or not.
 
   @param   boolSuccessfulParse as a Boolean as a constant
 
@@ -626,7 +628,7 @@ end;
 
 (**
 
-  This is a TTimer on Timer event handler.
+  This is an on Timer event handler.
 
   @precon  None.
   @postcon Checks to see if the last time the editor was changes is beyond the
@@ -658,7 +660,34 @@ end;
 
 (**
 
-  This an impementation of the WindowActivated method for the Editor Notifier
+  This method updates the project dictionary filename.
+
+  @precon  None.
+  @postcon The project dictionary filename is updated.
+
+**)
+Procedure TEditorNotifier.UpdateProjectDictionary;
+
+Const
+  strDctExt = '.dct';
+
+Var
+  MS: IOTAModuleServices;
+  P: IOTAProject;
+  
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateProjectDictionary', tmoTiming);{$ENDIF}
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      P := MS.GetActiveProject;
+      If Assigned(P) Then
+        TBADIOptions.BADIOptions.ProjectDictionaryFile := ChangeFileExt(P.FileName, strDctExt);
+    End;
+End;
+
+(**
+
+  This an implementation of the WindowActivated method for the Editor Notifier
   interface.
 
   @nohint  EditWindow
@@ -677,7 +706,7 @@ end;
 
 (**
 
-  This an impementation of the WindowCommand method for the Editor Notifier
+  This an implementation of the WindowCommand method for the Editor Notifier
   interface.
 
   @precon  None.

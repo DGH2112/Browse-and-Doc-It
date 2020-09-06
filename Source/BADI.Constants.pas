@@ -3,15 +3,15 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.899
-  @Date    10 May 2020
+  @Version 2.477
+  @Date    05 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ Const
   (** A default list of symbols which should have spaces after them. **)
   strSpaceAfterSymbols = ['=', ':', '+', '-', '*', '\', ','];
 
-  (** A set of characters for whitespace **)
+  (** A set of characters for white space **)
   strWhiteSpace : Set Of AnsiChar = [#32, #9];
   (** A set of characters for line feed and carriage return **)
   strLineEnd : Set of AnsiChar = [#10, #13];
@@ -70,6 +70,7 @@ Const
     strOptionGroupConflicts,
     strOptionGroupChecks,
     strOptionGroupMetrics,
+    strOptionGroupSpelling,
     strOptionGroupDoNotFollow,
     strOptionGroupTypes,
     strOptionGroupModule,
@@ -94,6 +95,7 @@ Const
     (FDescription : strSyntaxHighlightErrors;                 FEnabled : False; FGroup: dogErrors),
     (FDescription : strShowErrorIconsInEditor;                FEnabled :  True; FGroup: dogErrors),
     (FDescription : strShowErrorMsgsInEditor;                 FEnabled : False; FGroup: dogErrors),
+    (FDescription : strShowIDEErrors;                         FEnabled : False; FGroup: dogErrors),
 
     (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogWarnings),
     (FDescription : strExpandWarnings;                        FEnabled:   True; FGroup: dogWarnings),
@@ -127,12 +129,26 @@ Const
     (FDescription : strShowMetricIconsInEditor;               FEnabled :  True; FGroup: dogMetrics),
     (FDescription : strShowMetricMsgsInEditor;                FEnabled : False; FGroup: dogMetrics),
 
+    (FDescription : strShowModuleSpelling;                    FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strExpandSpelling;                        FEnabled:   True; FGroup: dogSpelling),
+    (FDescription : strSyntaxHighlightSpelling;               FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strAutoHideSpellingWithNoIssues;          FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strShowSpellingIconsInEditor;             FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strShowSpellingMsgsInEditor;              FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckComments;                    FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckTags;                        FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckResourceStrings;             FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckConstants;                   FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckLiterals;                    FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckDFMLiterals;                 FEnabled :  True; FGroup: dogSpelling),
+
     (FDescription : strDoNotFollowEditorIfErrors;             FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfWarnings;           FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfHints;              FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfConflicts;          FEnabled : False; FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfChecks;             FEnabled : True;  FGroup: dogDoNotFollow),
     (FDescription : strDoNotFollowEditorIfMetrics;            FEnabled : False; FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfSpelling;           FEnabled : False; FGroup: dogDoNotFollow),
 
     (FDescription : strShowUndocumentedTypes;                 FEnabled : False; FGroup: dogTypes),
     (FDescription : strShowUndocumentedRecords;               FEnabled : False; FGroup: dogTypes),
@@ -215,7 +231,7 @@ Const
     (FForeColour : clFuchsia;    FStyles : [];                     FBackColour: clNone)
   );
 
-  (** This is a list of image resource masks to be placed of the below images to create vesions
+  (** This is a list of image resource masks to be placed of the below images to create versions
       for different scopes. **)
   BADIScopeList : Array[Low(TScope)..High(TScope)] Of TImageIndexInfo = (
     (FResourceName : 'NoneMask';                      FMaskColour: clLime),
@@ -228,7 +244,7 @@ Const
     (FResourceName : 'FriendMask';                    FMaskColour: clLime)
   );
 
-  (** This is a list of Image Resource name to be loaded fom the executable. **)
+  (** This is a list of Image Resource name to be loaded from the executable. **)
   BADIImageList : Array[TBADIImageIndex] Of TImageIndexInfo = (
     (FResourceName : 'Module';                        FMaskColour: clLime),
 
@@ -328,6 +344,9 @@ Const
     (FResourceName : 'GreenToDoCross';                FMaskColour: clFuchsia),
     (FResourceName : 'BlueToDoCross';                 FMaskColour: clFuchsia),
 
+    (FResourceName : 'SpellingFolder';                FMaskColour: clLime),
+    (FResourceName : 'SpellingItem';                  FMaskColour: clLime),
+    
     (FResourceName : 'BadTag';                        FMaskColour: clLime),
     
     (FResourceName : 'UsesLabel';                     FMaskColour: clLime),
@@ -568,6 +587,7 @@ Const
     (FName: 'BADIRefactorConstant'; FCaption: strMenuRefactorConstant; FShortcut: 'CTRL+SHIFT+ALT+C';     FMaskColor: clLime),
     (FName: 'BADIMetrics';          FCaption: strMenuMetrics;          FShortcut: 'CTRL+SHIFT+ALT+S';     FMaskColor: clLime),
     (FName: 'BADIChecks';           FCaption: strMenuChecks;           FShortcut: 'CTRL+SHIFT+ALT+H';     FMaskColor: clFuchsia),
+    (FName: 'BADISpelling';         FCaption: strMenuSpelling;         FShortcut: 'CTRL+SHIFT+ALT+Z';     FMaskColor: clLime),
     (FName: 'BADISep3';             FCaption: strMenuSep;              FShortcut: '';                     FMaskColor: clLime),
     (FName: 'BADIOptions';          FCaption: strMenuOptions;          FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime)
   );
@@ -603,7 +623,7 @@ Const
   strHCNumIgmoreZeroNoMetric = 'HCNumIgmoreZero';
   (** A constant name for the Hard Coded Strings metric so it can be disabled. **)
   strHardCodedStringNoMetric = 'HardCodedString';
-  (** A constant name for the Hard Coded Strings Igmore Empty metric so it can be disabled. **)
+  (** A constant name for the Hard Coded Strings Ignore Empty metric so it can be disabled. **)
   strHCStrIgnoreEmptyNoMetric = 'HCStrIgnoreEmpty';
   (** A constant name for the Hard Coded String Ignore Single metric so it can be disabled. **)
   strHCStrIgnoreSingleNoMetric = 'HCStrIgnoreSingle';
@@ -613,11 +633,11 @@ Const
   strWithStatementNoMetric = 'WithStatement';
   (** A constant name for the Goto Statement metric so it can be disabled. **)
   strGotoStatementNoMetric = 'GotoStatement';
-  (** A constant name for the NestedIFDepth metric so it can be disabled. **)
+  (** A constant name for the Nested IF Depth metric so it can be disabled. **)
   strNestedIFDepthNoMetric = 'NestedIFDepth';
   (** A constant name for the Cyclometric Complexity metric so it can be disabled. **)
   strCyclometricComplexityNoMetric = 'CyclometricComplexity';
-  (** A constant name for the Cyclometric Complexity Igmore Expressions metric so it can be disabled. **)
+  (** A constant name for the Cyclometric Complexity Ignore Expressions metric so it can be disabled. **)
   strCCIncludeExpressionNoMetric = 'CCIncludeExpression';
   (** A constant name for the Toxicity metric so it can be disabled. **)
   strToxicityNoMetric = 'Toxicity';
@@ -649,9 +669,34 @@ Const
   strEmptyMethodNoMetric = 'EmptyMethod';
   (** A constant name for the Missing CONST in Parameters metric so it can be disabled. **)
   strMissingCONSTInParamNoMetric = 'MissingCONSTInParam';
-  (** A constant name for the Missign Const in Parameters Ignore Event handlers metric so it can be
+  (** A constant name for the Missing Constant in Parameters Ignore Event handlers metric so it can be
       disabled. **)
   strMCParmListIgnoreEventsNoMetric = 'MCParmListIgnoreEvents';
+  (** A resource for disabling all errors on an element and its sub elements. **)
+  strNoError = 'noerror';
+  (** A resource for disabling all warnings on an element and its sub elements. **)
+  strNoWarning = 'nowarning';
+  (** A resource for disabling all hints on an element and its sub elements. **)
+  strNoHint = 'nohint';
+  (** A resource for disabling all hints on an element and its sub elements. **)
+  strNoHints = 'nohints';
+  (** A resource for disabling all metrics on an element and its sub elements. **)
+  strNoMetrics = 'nometrics';
+  (** A resource for disabling all checks on an element and its sub elements. **)
+  strNoChecks = 'nochecks';
+  (** A resource for disabling all spellings on an element and its sub elements. **)
+  strNoSpellings = 'nospellings';
+  (** A resource for disabling a metric on an element and its sub elements. **)
+  strNoMetric = 'nometric';
+  (** A resource for disabling a check on an element and its sub elements. **)
+  strNoCheck = 'nocheck';
+  (** A resource for disabling a spelling on an element and its sub elements. **)
+  strNoSpelling = 'nospelling';
+  (** A resource for disabling documentation on an element and its sub elements. **)
+  strStopDocumentation = 'stopdocumentation';
+  (** A resource for disabling documentation on an element and its sub elements. **)
+  strNoDocumentation = 'nodocumentation';
+
 
   (** A constant array of default options for the Module Metrics. **)
   ModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord = (
@@ -711,7 +756,7 @@ Const
       FLimitType: ltFloat)
   );
 
-  (** A constant array of information for the mnetric sub-options. **)
+  (** A constant array of information for the metric sub-options. **)
   ModuleMetricSubOps : Array[Low(TBADIModuleMetricSubOp)..High(TBADIModuleMetricSubOp)] Of
     TBADIMetricSubOpRecord = (
     (FName: 'MethodCCIncIF';         FDescription: strMethodCCIncIF;         FParentMetric: mmCyclometricComplexity),
@@ -924,14 +969,36 @@ Const
 
   (** A constant array of strings for the names of the limit types. **)
   astrLimitType : Array[TLimitType] Of String = (
-    'Errors',
-    'Warnings',
-    'Hints',
-    'Conflicts',
-    'Checks',
-    'Metrics'
+    strErrors,
+    strWarnings,
+    strHints,
+    strConflicts,
+    strChecks,
+    strMetrics,
+    strSpelling
   );
-  
+
+  (** A constant to define a light green colour for the columns if an item is under the limit. **)
+  iLightGreen = $80FF80;
+  (** A constant to define a light amber colour for the columns if an item is at the limit. **)
+  iLightRed = $8080FF;
+  (** A constant to define a light red colour for the columns if an item is over the limit. **)
+  iLightAmber = $80CCFF;
+  (** A constant to define a light aqua colour for the columns if an item is over the limit but which
+      have been overridden. **)
+  iLightAqua = $FFFF80;
+  (** A constant to define a light yellow colour. **)
+  iLightYellow = $80FFFF;
+
+  (** A constant array of string representing spelling issue types. **)
+  astrSpellingIssueType : Array[TBADISpellingIssueType] Of String = (
+    strComment,
+    strTag,
+    strResourceString,
+    strConstant,
+    strLiteral
+  );
+
 Implementation
 
 End.

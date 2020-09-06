@@ -3,15 +3,15 @@
   This module contains a base class for all documentation modules.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.136
+  @Date    27 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ Interface
 Uses
   SysUtils,
   Classes,
-  ProgressForm;
+  BADI.ProgressForm;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -52,8 +52,8 @@ Type
     Destructor Destroy; Override;
     Procedure Add(Const strFileName : String);
     Procedure OutputDocumentation; Virtual; Abstract;
-    Procedure Initialise(iMax : Integer; Const strTitle, strMsg : String); Virtual;
-    Procedure Update(iPosition : Integer; Const strMsg : String); Virtual;
+    Procedure Initialise(Const iMax : Integer; Const strTitle, strMsg : String); Virtual;
+    Procedure Update(Const iPosition : Integer; Const strMsg : String); Virtual;
     Procedure Finalise; Virtual;
     (**
       This property returns the initial document which should be displayed by
@@ -160,41 +160,37 @@ end;
 
 (**
 
-
-  This method initialises the progress dialogue with a maximum, a title and an
-  initial message.
+  This method initialises the progress dialogue with a maximum, a title and an initial message.
 
   @precon  None.
-  @postcon Initialises the progress dialogue with a maximum, a title and an
-           initial message.
+  @postcon Initialises the progress dialogue with a maximum, a title and an initial message.
 
-
-  @param   iMax     as an Integer
-  @param   strTitle as a String as a Constant
-  @param   strMsg   as a String as a Constant
+  @param   iMax     as an Integer as a constant
+  @param   strTitle as a String as a constant
+  @param   strMsg   as a String as a constant
 
 **)
-procedure TBaseDocumentation.Initialise(iMax: Integer; Const strTitle, strMsg : String);
-begin
+Procedure TBaseDocumentation.Initialise(Const iMax: Integer; Const strTitle, strMsg: String);
+
+Begin
   FProgressForm.Init(iMax, strTitle, strMsg);
-end;
+End;
 
 (**
-
 
   This method update the progress dialogue with a position and a message.
 
   @precon  None.
   @postcon Update the progress dialogue with a position and a message.
 
-
-  @param   iPosition as an Integer
-  @param   strMsg    as a String as a Constant
+  @param   iPosition as an Integer as a constant
+  @param   strMsg    as a String as a constant
 
 **)
-procedure TBaseDocumentation.Update(iPosition: Integer; Const strMsg : String);
-begin
+Procedure TBaseDocumentation.Update(Const iPosition: Integer; Const strMsg: String);
+
+Begin
   FProgressForm.UpdateProgress(iPosition, strMsg);
-end;
+End;
 
 End.

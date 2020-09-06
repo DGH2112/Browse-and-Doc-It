@@ -3,9 +3,9 @@
   This module contains a class which represents a frame interface for excluded document
   files.
 
-  @Version 1.0
+  @Version 1.035
   @Author  David Hoyle
-  @Date    25 Jun 2019
+  @Date    18 Jul 2020
 
   @license
 
@@ -50,7 +50,7 @@ Uses
   Generics.Collections,
   BADI.Types,
   BADI.Exclusions,
-  BADI.CustomOptionsFrame;
+  BADI.CustomOptionsFrame, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -121,7 +121,7 @@ Type
   (** A pointer to the above node data structure. **)
   PBADIExclusionNode = ^TBADIExclusionNode;
   (** An enumerate to describe the fields in the treeview. **)
-  TBADIExclusionField = (efPattern, efDocConflicts, efMetrics, efChecks);
+  TBADIExclusionField = (efPattern, efDocConflicts, efMetrics, efChecks, efSpelling);
 
 ResourceString
   (** A string for the InputQuery dialogue title / caption. **)
@@ -315,7 +315,7 @@ End;
 
 (**
 
-  This method updates the exclusions treeview with the contents of the FExclusions colection.
+  This method updates the exclusions treeview with the contents of the FExclusions collection.
 
   @precon  None.
   @postcon The exclusions treeview is updated.
@@ -406,8 +406,9 @@ Begin
   recExclusion := FExclusions[NodeData.FIndex];
   Case TBADIExclusionField(Column) Of
     efDocConflicts: TargetCanvas.Brush.Color := Colour[etDocumentation In recExclusion.FExclusions];
-    efMetrics:      TargetCanvas.Brush.Color := Colour[etMetrics In recExclusion.FExclusions];
-    efChecks:       TargetCanvas.Brush.Color := Colour[etChecks  In recExclusion.FExclusions];
+    efMetrics:      TargetCanvas.Brush.Color := Colour[etMetrics       In recExclusion.FExclusions];
+    efChecks:       TargetCanvas.Brush.Color := Colour[etChecks        In recExclusion.FExclusions];
+    efSpelling:     TargetCanvas.Brush.Color := Colour[etSpelling      In recExclusion.FExclusions];
   Else
     TargetCanvas.Brush.Color := clWindow;
     {$IFDEF DXE102}
@@ -489,10 +490,11 @@ Var
 Begin
   NodeData := vstExclusions.GetNodeData(Node);
   Case TBADIExclusionField(Column) Of
-    efPattern: CellText := FExclusions[NodeData.FIndex].FExclusionPattern;
+    efPattern:      CellText := FExclusions[NodeData.FIndex].FExclusionPattern;
     efDocConflicts: CellText := strYesNo[etDocumentation in FExclusions[NodeData.FIndex].FExclusions];
-    efMetrics: CellText := strYesNo[etMetrics in FExclusions[NodeData.FIndex].FExclusions];
-    efChecks: CellText := strYesNo[etChecks in FExclusions[NodeData.FIndex].FExclusions];
+    efMetrics:      CellText := strYesNo[etMetrics in FExclusions[NodeData.FIndex].FExclusions];
+    efChecks:       CellText := strYesNo[etChecks in FExclusions[NodeData.FIndex].FExclusions];
+    efSpelling:     CellText := strYesNo[etSpelling in FExclusions[NodeData.FIndex].FExclusions];
   End;
 End;
 
@@ -549,6 +551,7 @@ Begin
         efDocConflicts: ToggleExclusion(recExclusion, etDocumentation);
         efMetrics:      ToggleExclusion(recExclusion, etMetrics);
         efChecks:       ToggleExclusion(recExclusion, etChecks);
+        efSpelling:     ToggleExclusion(recExclusion, etSpelling);
       End;
       FExclusions[NodeData.FIndex] := recExclusion;
       vstExclusions.Invalidate;
@@ -581,7 +584,7 @@ Begin
   recExclusion := FExclusions[NodeData.FIndex];;
   TargetCanvas.Font.Color := clWindowText;
   Case TBADIExclusionField(Column) Of
-    efDocConflicts .. efChecks: TargetCanvas.Font.Color := clBlack;
+    efDocConflicts..efSpelling: TargetCanvas.Font.Color := clBlack;
   Else
     {$IFDEF DXE102}
     If Assigned(FStyleServices) Then

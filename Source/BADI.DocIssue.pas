@@ -3,8 +3,8 @@
   This module contains class to represent document issues and conflicts.
 
   @Author  David Hoyle
-  @Version 1.106
-  @Date    25 May 2020
+  @Version 1.107
+  @Date    29 Aug 2020
 
   @license
 

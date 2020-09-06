@@ -1,17 +1,17 @@
 (**
 
-  This module contains a class which represent the abtract base container for ALL containers in
+  This module contains a class which represent the abstract base container for ALL containers in
   the Browse and Doc It system.
 
   @Author  David Hoyle
-  @Version 1.050
-  @Date    25 May 2020
+  @Version 1.075
+  @Date    15 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
-    
+
     Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ Uses
 
 Type
   (** This class defines an object that can contain tokens and has line and
-      column numbers. It is the anscester for TTag, TComment and
+      column numbers. It is the ancestor for TTag, TComment and
       TElementContainer. **)
   TBADIBaseContainer = Class Abstract
   Strict Private
@@ -62,8 +62,8 @@ Type
     Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
       iColumn : Integer); Virtual;
     Destructor Destroy; Override;
-    Procedure AddToken(Const strToken : String; Const ATokenType : TBADITokenType = ttUnknown);
-      Overload; Virtual;
+    Procedure AddToken(Const strToken : String; Const ATokenType : TBADITokenType = ttUnknown;
+      Const iLine : Integer = 0; Const iColumn : Integer = 0); Overload; Virtual;
     Procedure AddToken(Const AToken : TTokenInfo); Overload; Virtual;
     Procedure AppendToken(Const AToken : TTokenInfo); Virtual;
     Procedure InsertToken(Const strToken : String; Const iIndex : Integer;
@@ -152,13 +152,15 @@ Uses
 
   @param   strToken   as a String as a constant
   @param   ATokenType as a TBADITokenType as a constant
+  @param   iLine      as an Integer as a constant
+  @param   iColumn    as an Integer as a constant
 
 **)
 Procedure TBADIBaseContainer.AddToken(Const strToken: String;
-  Const ATokenType: TBADITokenType = ttUnknown);
+  Const ATokenType: TBADITokenType = ttUnknown; Const iLine : Integer = 0; Const iColumn : Integer = 0);
 
 Begin
-  AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), ATokenType));
+  AddToken(TTokenInfo.Create(strToken, 0, iLine, iColumn, Length(strToken), ATokenType));
 End;
 
 (**
@@ -167,7 +169,7 @@ End;
 
   @precon  AToken must be a valid token instance.
   @postcon Adds the given TTokenInfo object to the token collection. Note that the calling code must not
-           free this memeory - it will be freed by this container.
+           free this memory - it will be freed by this container.
 
   @param   AToken as a TTokenInfo as a constant
 
@@ -182,7 +184,7 @@ End;
 
   This method append a copy of the given token to the tokens collection.
 
-  @precon  AToken mustbe a valid instance of a TTokenInfo.
+  @precon  AToken must be a valid instance of a TTokenInfo.
   @postcon Append a copy of the given token to the tokens collection. Note, the calling code is
            responsible for freeing the AToken instance only.
 
@@ -198,11 +200,11 @@ End;
 
 (**
 
-  This method builds a string from the identifer and tokens and tries to present it with the style of
+  This method builds a string from the identifier and tokens and tries to present it with the style of
   code you would probably except.
 
   @precon  None.
-  @postcon Builds a string from the identifer and tokens and tries to present it with the style of code
+  @postcon Builds a string from the identifier and tokens and tries to present it with the style of code
            you would probably except.
 
   @nometric LongParameterList HardCodedInteger

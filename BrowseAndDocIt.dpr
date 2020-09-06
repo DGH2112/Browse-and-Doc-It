@@ -3,16 +3,16 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.074
+  @Version 1.272
   @Author  David Hoyle
-  @Date    09 Jul 2020
+  @Date    06 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   @nocheck EmptyBEGINEND
+
+  @bug  Refactoring a const in the DPR module AVs.
+  @done Update the Metrics Editor View to iterate only the implemented methods.
+  @done Update the Checks Editor View to iterate only the implemented methods.
+  @todo Add the ability to insert / surround tags or comments type.
 
 **)
 library BrowseAndDocIt;
@@ -216,7 +221,6 @@ uses
   BADI.IDEThemingNotifier in 'Source\BADI.IDEThemingNotifier.pas',
   BADI.Exclusions in 'Source\BADI.Exclusions.pas',
   BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas',
-  ProgressForm in 'Externals\ProgressForm.pas' {frmProgress},
   BADI.IDENotifier in 'Source\BADI.IDENotifier.pas',
   BADI.ModuleNotifierList in 'Source\BADI.ModuleNotifierList.pas',
   BADI.ModuleNotifier in 'Source\BADI.ModuleNotifier.pas',
@@ -227,19 +231,35 @@ uses
   BADI.LineDocIssue in 'Source\BADI.LineDocIssue.pas',
   BADI.DocIssueTotals in 'Source\BADI.DocIssueTotals.pas',
   BADI.DocIssuesHintWindow in 'Source\BADI.DocIssuesHintWindow.pas',
-  BADI.ProjectNotifier in 'Source\BADI.ProjectNotifier.pas';
+  BADI.ProjectNotifier in 'Source\BADI.ProjectNotifier.pas',
+  BADI.Module.Spelling.EditorView.Frame in 'Source\BADI.Module.Spelling.EditorView.Frame.pas' {frameBADIModuleSpellingEditorView: TFrame},
+  BADI.Spelling.OpsFrame in 'Source\BADI.Spelling.OpsFrame.pas' {frameBADISpellingOpions: TFrame},
+  BADI.SpellingIssue in 'Source\BADI.SpellingIssue.pas',
+  BADI.Spelling.DictionaryEditorForm in 'Source\BADI.Spelling.DictionaryEditorForm.pas' {frmDictionaryEditor},
+  BADI.Module.Spelling in 'Source\BADI.Module.Spelling.pas',
+  BADI.FileInfo.Manager in 'Source\BADI.FileInfo.Manager.pas',
+  BADI.Frame.Manager in 'Source\BADI.Frame.Manager.pas',
+  BADI.ProgressForm in 'Source\BADI.ProgressForm.pas' {frmProgress};
 
 {$R *.res}
+
+{$IFDEF DEBUG}
+Const
+  iBaseColour = $C0;
+  iAddColour = $3F;
+{$ENDIF DEBUG} 
 
 begin
   {$IFDEF DEBUG}
   ReportMemoryLeaksOnShutdown := True;
+  CodeSite.Category := 'BADI';
+  Randomize;
+  CodeSite.CategoryColor :=
+    $0000FF And ((iBaseColour + Random(iAddColour)) Shl 00)+
+    $00FF00 And ((iBaseColour + Random(iAddColour)) Shl 08) +
+    $FF0000 And ((iBaseColour + Random(iAddColour)) Shl 16);
+  CodeSite.SendColor(csmReminder, 'CategoryColor', CodeSite.CategoryColor);
   {$ENDIF DEBUG} 
-  {$IFDEF EUREKALOG}
-  SetEurekaLogState(True);
-  {$ENDIF EUREKALOG}
-  //CodeSite.Category := 'BADI';
-  //CodeSite.CategoryColor := $80FFFF;
 end.
 
 

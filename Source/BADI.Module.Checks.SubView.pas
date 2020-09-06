@@ -3,15 +3,15 @@
   A module to provide an custom editor sub view for displaying the Checks for a module.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.017
+  @Date    06 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ Uses
   Generics.Collections;
 
 Type
-  (** A class to implement the INTACustomEditorSubView interface for a subview for Checks. **)
+  (** A class to implement the INTACustomEditorSubView interface for a sub-view for Checks. **)
   TBADIModuleChecksSubView = Class(TInterfacedObject, IInterface, INTACustomEditorSubView)
   Strict Private
   Strict Protected
@@ -82,15 +82,15 @@ Uses
   BADI.Module.Checks.EditorView.Frame;
 
 Var
-  (** A private pointer to the regsitered subview so it can be removed. **)
+  (** A private pointer to the registered sub-view so it can be removed. **)
   ptrEditorChecksSubView : Pointer;
 
 (**
 
-  This method registers the custom editor subview with the IDE.
+  This method registers the custom editor sub-view with the IDE.
 
   @precon  None.
-  @postcon The sub-view is regsitered with the IDE.
+  @postcon The sub-view is registered with the IDE.
 
 **)
 Procedure RegisterEditorChecksSubView;
@@ -106,10 +106,10 @@ End;
 
 (**
 
-  This method unregisters the custom editor subview from the IDE.
+  This method un-registers the custom editor sub-view from the IDE.
 
   @precon  None.
-  @postcon The sub-view is unregsitered from the IDE.
+  @postcon The sub-view is un-registered from the IDE.
 
 **)
 Procedure UnregisterEditorChecksSubView;
@@ -121,8 +121,6 @@ Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
     EVS.UnregisterEditorSubView(ptrEditorChecksSubView);
 End;
-
-{ TBADIModuleChecksSubView }
 
 (**
 
@@ -141,10 +139,10 @@ End;
 
 (**
 
-  This is a class function to create the custom editor subview for displaying module metric information.
+  This is a class function to create the custom editor sub-view for displaying module metric information.
 
   @precon  None.
-  @postcon Returns a new instance of the subview.
+  @postcon Returns a new instance of the sub-view.
 
   @return  an INTACustomEditorSubView
 
@@ -171,10 +169,10 @@ End;
 
 (**
 
-  This method is called when a subview is displayed or hidden (AContext is nil).
+  This method is called when a sub-view is displayed or hidden (AContext is nil).
 
   @precon  None.
-  @postcon If the context is valid the modules editor text is parsed and passed to the subview for
+  @postcon If the context is valid the modules editor text is parsed and passed to the sub-view for
            rendering.
 
   @nocheck MissingCONSTInParam
@@ -202,8 +200,10 @@ Begin
           Module := TBADIDispatcher.BADIDispatcher.Dispatcher(strSource, SE.FileName, SE.Modified,
             [moParse]);
           Try
-            (AViewObject As TframeBADIModuleChecksSubView).RenderModule(Module, [croClear,
-              croAutoExpand]);
+            (AViewObject As TframeBADIModuleChecksSubView).RenderModule(
+              Module,
+              [roClear, roAutoExpand]
+            );
           Finally
             Module.Free;
           End;
@@ -212,10 +212,10 @@ End;
 
 (**
 
-  This method is called by the IDE to undertake an editor actions the subview supports.
+  This method is called by the IDE to undertake an editor actions the sub-view supports.
 
   @precon  None.
-  @postcon If copy is the action the subview asks the frame to copy the metric information to the
+  @postcon If copy is the action the sub-view asks the frame to copy the metric information to the
            clipboard.
 
   @nocheck MissingCONSTInParam
@@ -243,7 +243,7 @@ End;
 
 (**
 
-  This method is called byt he IDE when it creates the frame instance.
+  This method is called by the IDE when it creates the frame instance.
 
   @precon  None.
   @postcon Store a reference to the frame instance so it can be used later in Display.
@@ -264,7 +264,7 @@ End;
   This is a getter method for the CanCloseView property.
 
   @precon  None.
-  @postcon Called by the IDE to know wehther the view can be closed. We return false to let the IDE know
+  @postcon Called by the IDE to know whether the view can be closed. We return false to let the IDE know
            if cannot be cloned.
 
   @return  a Boolean
@@ -281,7 +281,7 @@ End;
   This is a getter method for the Caption property.
 
   @precon  None.
-  @postcon Called by the IDE to get the subview tab caption.
+  @postcon Called by the IDE to get the sub-view tab caption.
 
   @return  a String
 
@@ -297,11 +297,11 @@ End;
 
 (**
 
-  This is a getter method for the EditState property.
+  This is a getter method for the Edit State property.
 
   @precon  None.
-  @postcon Called by the IDE to find out which editor actions can be undertaken byt he subview. We return
-           a set with esCanCopy to signify that the subview can copy the mreic data to the clipboard.
+  @postcon Called by the IDE to find out which editor actions can be undertaken by the sub-view. We return
+           a set with esCanCopy to signify that the sub-view can copy the check data to the clipboard.
 
   @nocheck MissingCONSTInParam
   @nohint  AContext AViewObject
@@ -320,11 +320,11 @@ End;
 
 (**
 
-  This is a getter method for the FrameClass property.
+  This is a getter method for the Frame Class property.
 
   @precon  None.
   @postcon This method is called by the IDE to get the class of the frame to be created by the IDE for
-           the subview. We returns the class of our custom frame for viewing Checks.
+           the sub-view. We returns the class of our custom frame for viewing Checks.
 
   @return  a TCustomFrameClass
 
@@ -340,7 +340,7 @@ End;
   This is a getter method for the Priority property.
 
   @precon  None.
-  @postcon This method is called by the IDE to find out the priority of the subview caption tab. Our
+  @postcon This method is called by the IDE to find out the priority of the sub-view caption tab. Our
            Checks tab is low priority so that it is on the right of all other tabs.
 
   @return  an Integer
@@ -354,10 +354,10 @@ End;
 
 (**
 
-  This is a getter method for the ViewIdentifier property.
+  This is a getter method for the View Identifier property.
 
   @precon  None.
-  @postcon Returns a unique name fo the subview.
+  @postcon Returns a unique name for the sub-view.
 
   @return  a String
 
@@ -373,10 +373,10 @@ End;
 
 (**
 
-  This method is called by the IDE to understand which contexts are handled by the subview.
+  This method is called by the IDE to understand which contexts are handled by the sub-view.
 
   @precon  None.
-  @postcon We need to IOTAModule context for our subview so we return true for that context only.
+  @postcon We need to IOTAModule context for our sub-view so we return true for that context only.
 
   @param   AContext as an IInterface as a constant
   @return  a Boolean
@@ -397,7 +397,7 @@ End;
 
 (**
 
-  This method is called when a subview is hidden by another subview.
+  This method is called when a sub-view is hidden by another sub-view.
 
   @precon  None.
   @postcon Not used.
@@ -417,7 +417,7 @@ End;
 
 (**
 
-  This method is called then the IDE closes down and closes all the subviews all at once.
+  This method is called then the IDE closes down and closes all the sub-views all at once.
 
   @precon  None.
   @postcon Not used.

@@ -1,10 +1,10 @@
 (**
   
-  This module contains Open Tools API code to create an editor view to display the BADI Metrics
-  (metrics).
+  This module contains Open Tools API code to create an editor view to display the BADI Spelling
+  (Spelling).
 
   @Author  David Hoyle
-  @Version 2.347
+  @Version 8.906
   @Date    06 Sep 2020
 
   @license
@@ -28,38 +28,43 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
   
 **)
-Unit BADI.Module.Metrics;
+Unit BADI.Module.Spelling;
 
 Interface
 
 Uses
   ToolsAPI,
   DesignIntf,
-  Forms, 
-  ComCtrls,
-  Windows,
   Classes, 
-  Generics.Collections,
-  Themes, 
-  BADI.Types,
+  Forms,
+  ComCtrls,
+  Themes,
+  Windows,
   BADI.Base.Module,
+  BADI.Types,
   BADI.FileInfo.Manager,
   BADI.Frame.Manager;
    
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** A class to implement an editor view for displaying module metrics. @nometrics MissingCONSTInParam **)
-  TBADIModuleMetricsEditorView = Class(TInterfacedObject, IInterface, INTACustomEditorView,
+  (** A class to implement an editor view for displaying module spelling. **)
+  TBADIModuleSpellingEditorView = Class(TInterfacedObject, IInterface, INTACustomEditorView,
     INTACustomEditorView150, INTACustomEditorViewStatusPanel)
   Strict Private
     Type
-      (** An enumerate to define the status panels to be shown with the metrics. **)
-      TBADIMetricStatusPanel = (mspModules, mspMethods, mspLinesOfCode, mspUnderLimit, mspAtLimit,
-        mspOverLimit);
+      (** An enumerate to define the status panels to be shown with the spelling. **)
+      TBADISpellingStatusPanel = (
+        sspModules,
+        sspComment,
+        sspTags,
+        sspConstants,
+        sspResourceStrings,
+        sspLiterals
+      );
     Const
-      (** A set to define the document options related to metrics. **)
-      setMetricsOptions = [doShowMetrics..doShowMetricMsgsInEditor];
+      (** A set to contain the spelling options. **)
+      setSpellingOptions = [doShowSpelling..doSpellCheckDFMLiterals];
     Class Var
       (** A single class var reference to the editor view. **)
       FEditorViewRef : INTACustomEditorView;
@@ -68,13 +73,12 @@ Type
     FFileInfoMgr      : TBADIFileInfoManager;
     FImageIndex       : Integer;
     FViewIdent        : String;
-    FModulePanels     : Array[Low(TBADIMetricStatusPanel)..High(TBADIMetricStatusPanel)] Of TStatusPanel;
+    FModulePanels     : Array[TBADISpellingStatusPanel] Of TStatusPanel;
     FCount            : Integer;
     FSourceStrings    : TStringList;
     FSource           : String;
     FModified         : Boolean;
     FFileDate         : TDateTime;
-    FLastRenderedList : TBADIModuleMetrics;
     FLastDocOptions   : TDocOptions;
     FDocExclusions    : TStringList;
   Strict Protected
@@ -102,13 +106,12 @@ Type
     // General Methods
     Procedure ParseAndRender(Const strFileName : String);
     Procedure UpdateStatusPanels;
-    Procedure ExtractSourceFromModule(Const Module : IOTAModule);
+    Procedure ExtractSourceFromModule(Const Module : IOTAModule; Const strFileName : String);
     Procedure ExtractSourceFromFile(Const strFileName: String);
     Procedure LastModifiedDateFromModule(Const Module: IOTAModule);
     Procedure LastModifiedDateFromFile(Const strFileName: String);
     Function  CurrentEditWindow : String;
     Procedure ProcessModule(Const strFileName: String);
-    Function  RenderedList : TBADIModuleMetrics;
     Function  CheckSettings: Boolean;
     Procedure UpdateSettings;
   Public
@@ -117,8 +120,8 @@ Type
     Destructor Destroy; Override;
   End;
 
-  Procedure RegisterMetricsEditorView;
-  Procedure UnregisterMetricsEditorView;
+  Procedure RegisterSpellingEditorView;
+  Procedure UnregisterSpellingEditorView;
   
 Implementation
 
@@ -129,18 +132,19 @@ Uses
   SysUtils, 
   Controls, 
   Vcl.Graphics,
+  BADI.Interfaces,
+  BADI.ProgressForm, 
   BADI.Module.Dispatcher,
   BADI.ToolsAPIUtils,
-  BADI.Module.Metrics.EditorView.Frame,
-  BADI.ProgressForm, 
+  BADI.Module.Spelling.EditorView.Frame,
   BADI.Options,
-  BADI.Constants, BADI.Interfaces;
+  BADI.Constants;
 
 Const
   (** A unique name for the editor view. **)
-  strBADIMetricsEditorView = 'BADIMetricsEditorView';
+  strBADISpellingEditorView = 'BADISpellingEditorView';
   (** A caption for the editor view. **)
-  strBADIMetrics = 'BADI Metrics';
+  strBADISpelling = 'BADI Spelling';
   (** A default edit window name if one cannot be determined. **)
   strUnknown = 'Unknown';
 
@@ -158,7 +162,7 @@ Const
 Function RecreateBADIStatisticEditorView: INTACustomEditorView;
 
 Begin
-  Result := TBADIModuleMetricsEditorView.CreateEditorView;
+  Result := TBADIModuleSpellingEditorView.CreateEditorView;
 End;
 
 (**
@@ -169,14 +173,14 @@ End;
   @postcon The custom editor view is registered with the IDE.
 
 **)
-Procedure RegisterMetricsEditorView;
+Procedure RegisterSpellingEditorView;
 
 Var
   EVS : IOTAEditorViewServices;
   
 Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
-    EVS.RegisterEditorView(strBADIMetricsEditorView, RecreateBADIStatisticEditorView);
+    EVS.RegisterEditorView(strBADISpellingEditorView, RecreateBADIStatisticEditorView);
 End;
 
 (**
@@ -187,14 +191,14 @@ End;
   @postcon The custom editor view is unregistered from the IDE.
 
 **)
-Procedure UnregisterMetricsEditorView;
+Procedure UnregisterSpellingEditorView;
 
 Var
   EVS : IOTAEditorViewServices;
   
 Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
-    EVS.UnregisterEditorView(strBADIMetricsEditorView);
+    EVS.UnregisterEditorView(strBADISpellingEditorView);
 End;
 
 (**
@@ -207,7 +211,7 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleMetricsEditorView.CheckSettings: Boolean;
+Function TBADIModuleSpellingEditorView.CheckSettings: Boolean;
 
 Var
   Exclusions: IBADIExclusions;
@@ -215,8 +219,7 @@ Var
   sl : TStringList;
 
 Begin
-  Result := FLastRenderedList <> RenderedList;
-  Result := Result Or (FLastDocOptions <> TBADIOptions.BADIOptions.Options * setMetricsOptions);
+  Result := FLastDocOptions <> TBADIOptions.BADIOptions.Options * setSpellingOptions;
   sl := TStringList.Create;
   Try
     sl.Duplicates := dupIgnore;
@@ -242,7 +245,7 @@ End;
   @return  an INTACustomEditorView
 
 **)
-Function TBADIModuleMetricsEditorView.CloneEditorView: INTACustomEditorView;
+Function TBADIModuleSpellingEditorView.CloneEditorView: INTACustomEditorView;
 
 Var
   EVS : IOTAEditorViewServices;
@@ -264,7 +267,7 @@ End;
   @param   Allowed as a Boolean as a reference
 
 **)
-Procedure TBADIModuleMetricsEditorView.Close(Var Allowed: Boolean);
+Procedure TBADIModuleSpellingEditorView.Close(Var Allowed: Boolean);
 
 Begin
   Allowed := True;
@@ -281,7 +284,7 @@ End;
   @param   ShouldClose as a Boolean as a reference
 
 **)
-Procedure TBADIModuleMetricsEditorView.CloseAllCalled(Var ShouldClose: Boolean);
+Procedure TBADIModuleSpellingEditorView.CloseAllCalled(Var ShouldClose: Boolean);
 
 Begin
   ShouldClose := True;
@@ -301,22 +304,22 @@ End;
   @param   Panel     as a TStatusPanel
 
 **)
-Procedure TBADIModuleMetricsEditorView.ConfigurePanel(StatusBar: TStatusBar; Panel: TStatusPanel);
+Procedure TBADIModuleSpellingEditorView.ConfigurePanel(StatusBar: TStatusBar; Panel: TStatusPanel);
 
 Const
-  iPanelWidth = 100;
+  iPanelWidth = 125;
 
 Begin
-  FModulePanels[TBADIMetricStatusPanel(Panel.Index)] := Panel;
-  FModulePanels[TBADIMetricStatusPanel(Panel.Index)].Alignment := taCenter;
-  FModulePanels[TBADIMetricStatusPanel(Panel.Index)].Width := iPanelWidth;
+  FModulePanels[TBADISpellingStatusPanel(Panel.Index)] := Panel;
+  FModulePanels[TBADISpellingStatusPanel(Panel.Index)].Alignment := taCenter;
+  FModulePanels[TBADISpellingStatusPanel(Panel.Index)].Width := iPanelWidth;
   //: @note Problems with first panel if you do not explicitly set this
-  FModulePanels[TBADIMetricStatusPanel(Panel.Index)].Style := psOwnerDraw; // psText; 
+  FModulePanels[TBADISpellingStatusPanel(Panel.Index)].Style := psOwnerDraw; // psText; 
 End;
 
 (**
 
-  A constructor for the TBADIModuleMetricsEditorView class.
+  A constructor for the TBADIModuleSpellingEditorView class.
 
   @precon  None.
   @postcon Adds an image to the editor image list to be displayed against this editor view.
@@ -324,10 +327,10 @@ End;
   @param   strViewIdentifier as a String as a constant
 
 **)
-Constructor TBADIModuleMetricsEditorView.Create(Const strViewIdentifier : String);
+Constructor TBADIModuleSpellingEditorView.Create(Const strViewIdentifier : String);
 
 Const
-  strBADIMetricsImage = 'BADIMetricsImage';
+  strBADISpellingImage = 'BADISpellingImage';
 
 Var
   EVS : INTAEditorViewServices;
@@ -350,9 +353,9 @@ Begin
       Try
         BM := TBitMap.Create;
         Try
-          BM.LoadFromResourceName(HInstance, strBADIMetricsImage);
+          BM.LoadFromResourceName(HInstance, strBADISpellingImage);
           ImageList.AddMasked(BM, clLime);
-          FImageIndex := EVS.AddImages(ImageList, strBADIMetricsEditorView);
+          FImageIndex := EVS.AddImages(ImageList, strBADISpellingEditorView);
         Finally
           BM.Free;
         End;
@@ -373,7 +376,7 @@ End;
   @return  an INTACustomEditorView
 
 **)
-Class Function TBADIModuleMetricsEditorView.CreateEditorView : INTACustomEditorView;
+Class Function TBADIModuleSpellingEditorView.CreateEditorView : INTACustomEditorView;
 
 Var
   EVS : IOTAEditorViewServices;
@@ -383,7 +386,7 @@ Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
     Begin
       If Not Assigned(FEditorViewRef) Then
-        FEditorViewRef := TBADIModuleMetricsEditorView.Create('');
+        FEditorViewRef := TBADIModuleSpellingEditorView.Create('');
       Result := FEditorViewRef;
       EVS.ShowEditorView(Result);
     End;
@@ -399,7 +402,7 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleMetricsEditorView.CurrentEditWindow: String;
+Function TBADIModuleSpellingEditorView.CurrentEditWindow: String;
 
 Var
   ES : INTAEditorServices;
@@ -420,7 +423,7 @@ End;
   @postcon Does nothing.
 
 **)
-Procedure TBADIModuleMetricsEditorView.DeselectView;
+Procedure TBADIModuleSpellingEditorView.DeselectView;
 
 Begin
   // Does nothing
@@ -428,13 +431,13 @@ End;
 
 (**
 
-  A destructor for the TBADIModuleMetricsEditorView class.
+  A destructor for the TBADIModuleSpellingEditorView class.
 
   @precon  None.
   @postcon Frees the memory used by the module (if not nil).
 
 **)
-Destructor TBADIModuleMetricsEditorView.Destroy;
+Destructor TBADIModuleSpellingEditorView.Destroy;
 
 Begin
   FDocExclusions.Free;
@@ -458,7 +461,7 @@ End;
   @param   Rect      as a TRect as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; Const Rect: TRect);
+Procedure TBADIModuleSpellingEditorView.DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; Const Rect: TRect);
 
   (**
 
@@ -476,18 +479,15 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
     iColour : TColor;
 
   Begin
-    Case TBADIMetricStatusPanel(Panel.Index) Of
-      mspModules..mspLinesOfCode:  iColour := iLightYellow;
-      mspUnderLimit..mspOverLimit: iColour := iLightGreen;
+    Case TBADISpellingStatusPanel(Panel.Index) Of
+      sspModules: iColour := iLightYellow;
+      sspComment..sspLiterals: iColour := iLightGreen;
     Else
       iColour := StatusBar.Color;
     End;
     If strNum <> '' Then
-      Case TBADIMetricStatusPanel(Panel.Index) Of
-        mspAtLimit:
-          If StrToInt(strNum) > 0 Then
-            iColour := iLightAmber;
-        mspOverLimit:
+      Case TBADISpellingStatusPanel(Panel.Index) Of
+        sspComment..sspLiterals:
           If StrToInt(strNum) > 0 Then
             iColour := iLightRed;
       End;
@@ -586,7 +586,7 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleMetricsEditorView.EditAction(Action: TEditAction): Boolean;
+Function TBADIModuleSpellingEditorView.EditAction(Action: TEditAction): Boolean;
 
 Var
   AFrame: Tframe;
@@ -597,8 +597,8 @@ Begin
     eaCopy:
       Begin
         AFrame := FFrameManager.Frame[CurrentEditWindow];
-        If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
-          (AFrame As TframeBADIModuleMetricsEditorView).CopyToClipboard;
+        If Assigned(AFrame) And (AFrame Is TframeBADIModuleSpellingEditorView) Then
+          (AFrame As TframeBADIModuleSpellingEditorView).CopyToClipboard;
         Result := True;
       End;
   End;
@@ -614,7 +614,7 @@ End;
   @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ExtractSourceFromFile(Const strFileName: String);
+Procedure TBADIModuleSpellingEditorView.ExtractSourceFromFile(Const strFileName: String);
 
 Begin
   FSource := '';
@@ -633,17 +633,29 @@ End;
   @precon  Module and ModuleInfo must be a valid instance.
   @postcon The source code, filename and date information is retrieved from the in memory module.
 
-  @param   Module as an IOTAModule as a constant
+  @param   Module      as an IOTAModule as a constant
+  @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ExtractSourceFromModule(Const Module : IOTAModule);
+Procedure TBADIModuleSpellingEditorView.ExtractSourceFromModule(Const Module : IOTAModule;
+  Const strFileName : String);
+
+Const
+  strDFMExt = '.dfm';
 
 Var
+  strExt: String;
   SE: IOTASourceEditor;
 
 Begin
-  SE := TBADIToolsAPIFunctions.SourceEditor(Module);
-  FSource := TBADIToolsAPIFunctions.EditorAsString(SE);
+  strExt := LowerCase(ExtractFileExt(strFileName));
+  If strExt = strDFMExt Then
+    ExtractSourceFromFile(strFileName)
+  Else
+    Begin
+      SE := TBADIToolsAPIFunctions.SourceEditor(Module);
+      FSource := TBADIToolsAPIFunctions.EditorAsString(SE);
+    End;
 End;
 
 (**
@@ -651,14 +663,14 @@ End;
   This method is called when the frame is first created.
 
   @precon  None.
-  @postcon Stores a reference to the frame so that a modules metrics can be rendered
+  @postcon Stores a reference to the frame so that a modules Spelling can be rendered
 
   @nocheck MissingCONSTInParam
   
   @param   AFrame as a TCustomFrame
 
 **)
-Procedure TBADIModuleMetricsEditorView.FrameCreated(AFrame: TCustomFrame);
+Procedure TBADIModuleSpellingEditorView.FrameCreated(AFrame: TCustomFrame);
 
 Const
   strTEditWindow = 'TEditWindow';
@@ -683,7 +695,7 @@ Begin
             End;
           C := C.Parent;
         End;
-      FFrameManager.Add(strEditWindowName, AFrame As TframeBADIModuleMetricsEditorView);
+      FFrameManager.Add(strEditWindowName, AFrame As TframeBADIModuleSpellingEditorView);
     End;
 End;
 
@@ -697,7 +709,7 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleMetricsEditorView.GetCanCloneView: Boolean;
+Function TBADIModuleSpellingEditorView.GetCanCloneView: Boolean;
 
 Begin
   Result := False;
@@ -714,10 +726,10 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleMetricsEditorView.GetCaption: String;
+Function TBADIModuleSpellingEditorView.GetCaption: String;
 
 ResourceString
-  strMetrics = 'Metrics';
+  strSpelling = 'Spelling';
 
 Const
   iDivisor = 2;
@@ -725,9 +737,9 @@ Const
 Begin
   Inc(FCount);
   If FCount Mod iDivisor = 0 Then
-    Result := strMetrics
+    Result := strSpelling
   Else
-    Result := strBADIMetrics;
+    Result := strBADISpelling;
 End;
 
 (**
@@ -741,10 +753,10 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleMetricsEditorView.GetEditorWindowCaption: String;
+Function TBADIModuleSpellingEditorView.GetEditorWindowCaption: String;
 
 Begin
-  Result := strBADIMetrics;
+  Result := strBADISpelling;
 End;
 
 (**
@@ -758,7 +770,7 @@ End;
   @return  a TEditState
 
 **)
-Function TBADIModuleMetricsEditorView.GetEditState: TEditState;
+Function TBADIModuleSpellingEditorView.GetEditState: TEditState;
 
 Begin
   Result := [esCanCopy];
@@ -774,10 +786,10 @@ End;
   @return  a TCustomFrameClass
 
 **)
-Function TBADIModuleMetricsEditorView.GetFrameClass: TCustomFrameClass;
+Function TBADIModuleSpellingEditorView.GetFrameClass: TCustomFrameClass;
 
 Begin
-  Result := TframeBADIModuleMetricsEditorView;
+  Result := TframeBADIModuleSpellingEditorView;
 End;
 
 (**
@@ -790,7 +802,7 @@ End;
   @return  an Integer
 
 **)
-Function TBADIModuleMetricsEditorView.GetImageIndex: Integer;
+Function TBADIModuleSpellingEditorView.GetImageIndex: Integer;
 
 Begin
   Result := FImageIndex;
@@ -806,10 +818,10 @@ End;
   @return  an Integer
 
 **)
-Function TBADIModuleMetricsEditorView.GetStatusPanelCount: Integer;
+Function TBADIModuleSpellingEditorView.GetStatusPanelCount: Integer;
 
 Begin
-  Result := Ord(High(TBADIMetricStatusPanel)) - Ord(Low(TBADIMetricStatusPanel)) + 1;
+  Result := Ord(High(TBADISpellingStatusPanel)) - Ord(Low(TBADISpellingStatusPanel)) + 1;
 End;
 
 (**
@@ -822,10 +834,10 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleMetricsEditorView.GetTabHintText: String;
+Function TBADIModuleSpellingEditorView.GetTabHintText: String;
 
 Begin
-  Result := strBADIMetrics;
+  Result := strBADISpelling;
 End;
 
 (**
@@ -839,23 +851,23 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleMetricsEditorView.GetViewIdentifier: String;
+Function TBADIModuleSpellingEditorView.GetViewIdentifier: String;
 
 Begin
-  Result := Format('%s.%s', [strBADIMetricsEditorView, FViewIdent]);
+  Result := Format('%s.%s', [strBADISpellingEditorView, FViewIdent]);
 End;
 
 (**
 
   This method retrieves the last modified date of the module from disk.
 
-  @precon  ModuleInfo must be a valid instance.
+  @precon  strFileName must be a valid instance.
   @postcon The FFileDate and FModified fields are updated.
 
   @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.LastModifiedDateFromFile(Const strFileName: String);
+Procedure TBADIModuleSpellingEditorView.LastModifiedDateFromFile(Const strFileName: String);
 
 Begin
   FileAge(strFileName, FFileDate);
@@ -872,7 +884,7 @@ End;
   @param   Module as an IOTAModule as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.LastModifiedDateFromModule(Const Module: IOTAModule);
+Procedure TBADIModuleSpellingEditorView.LastModifiedDateFromModule(Const Module: IOTAModule);
 
 Var
   SE : IOTASourceEditor;
@@ -881,14 +893,14 @@ Begin
   SE := TBADIToolsAPIFunctions.SourceEditor(Module);
   FModified := SE.Modified;
   If Not FModified Then
-    FileAge(MOdule.FileName, FFileDate)
+    FileAge(Module.FileName, FFileDate)
   Else
     FFileDate := Now();
 End;
 
 (**
 
-  This method parses the source code and renders the module in the metrics frame.
+  This method parses the source code and renders the module in the Spelling frame.
 
   @precon  None.
   @postcon The source code is parsed and rendered.
@@ -896,7 +908,7 @@ End;
   @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ParseAndRender(Const strFileName : String);
+Procedure TBADIModuleSpellingEditorView.ParseAndRender(Const strFileName : String);
 
 Var
   Module : TBaseLanguageModule;
@@ -909,8 +921,8 @@ Begin
       Module := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, strFileName, FModified, [moParse]);
       Try
         AFrame := FFrameManager.Frame[CurrentEditWindow];
-        If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
-          (AFrame As TframeBADIModuleMetricsEditorView).RenderModule(
+        If Assigned(AFrame) And (AFrame Is TframeBADIModuleSpellingEditorView) Then
+          (AFrame As TframeBADIModuleSpellingEditorView).RenderModule(
             Module,
             [roAutoExpand, roAutoExpandOnError]
           );
@@ -925,14 +937,14 @@ End;
   This method process the module extracting the filename, date time and source code and the pass it for 
   parsing.
 
-  @precon  ModuleInfo must be a valid instance.
+  @precon  strFileName must be a valid instance.
   @postcon Process the module extracting the filename, date time and source code and the pass it for 
            parsing.
 
   @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ProcessModule(Const strFileName : String);
+Procedure TBADIModuleSpellingEditorView.ProcessModule(Const strFileName: String);
 
 Var
   Module: IOTAModule;
@@ -947,34 +959,11 @@ Begin
   If FFileInfoMgr.ShouldUpdate(strFileName, FFileDate) Then
     Begin
       If Assigned(Module) Then
-        ExtractSourceFromModule(Module)
+        ExtractSourceFromModule(Module, strFileName)
       Else
         ExtractSourceFromFile(strFileName);
-        ParseAndRender(strFileName);
+      ParseAndRender(strFileName);
     End;
-End;
-
-(**
-
-  This method extracts the current module metrics into a set so that we can see if the last render was
-  done with a different set of options and thus we need to force a complete re-parsing of the modules.
-
-  @precon  None.
-  @postcon The current metric options are returned.
-
-  @return  a TBADIModuleMetrics
-
-**)
-Function TBADIModuleMetricsEditorView.RenderedList: TBADIModuleMetrics;
-
-Var
-  eMetric: TBADIModuleMetric;
-
-Begin
-  Result := [];
-  For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
-    If TBADIOptions.BADIOptions.ModuleMetric[eMetric].FEnabled Then
-      Include(Result, eMetric);
 End;
 
 (**
@@ -983,10 +972,10 @@ End;
   focus.
 
   @precon  None.
-  @postcon Renders the modules metrics in the frame.
+  @postcon Renders the modules Spelling in the frame.
 
 **)
-Procedure TBADIModuleMetricsEditorView.SelectView;
+Procedure TBADIModuleSpellingEditorView.SelectView;
 
 ResourceString
   strParsingProjectModules = 'Parsing project modules';
@@ -995,6 +984,7 @@ ResourceString
 
 Const
   setModuleTypesToParse = [omtForm, omtDataModule, omtProjUnit, omtUnit];
+  strDFMExt = '.dfm';
   
 Var
   P: IOTAProject;
@@ -1022,14 +1012,15 @@ Begin
               If ModuleInfo.FileName.Length > 0 Then
                 Begin
                   ProcessModule(ModuleInfo.FileName);
-
+                  If ModuleInfo.ModuleType = omtForm Then
+                    ProcessModule(ChangeFileExt(ModuleInfo.FileName, strDFMExt));
                   frmProgress.UpdateProgress(Succ(iModule), Format(strParsing,
                     [ExtractFileName(ModuleInfo.FileName)]));
                 End
           End;
         AFrame := FFrameManager.Frame[CurrentEditWindow];
-        If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
-          (AFrame As TframeBADIModuleMetricsEditorView).FocusResults;
+        If Assigned(AFrame) And (AFrame Is TframeBADIModuleSpellingEditorView) Then
+          (AFrame As TframeBADIModuleSpellingEditorView).FocusResults;
       Finally
         frmProgress.Free;
       End;
@@ -1046,15 +1037,14 @@ End;
            settings have changed.
 
 **)
-Procedure TBADIModuleMetricsEditorView.UpdateSettings;
+Procedure TBADIModuleSpellingEditorView.UpdateSettings;
 
 Var
   Exclusions: IBADIExclusions;
   i: Integer;
 
 Begin
-  FLastRenderedList := RenderedList;
-  FLastDocOptions := TBADIOptions.BADIOptions.Options * setMetricsOptions;
+  FLastDocOptions := TBADIOptions.BADIOptions.Options * setSpellingOptions;
   // Build a string list of spelling exclusions
   Exclusions := TBADIOptions.BADIOptions.Exclusions;
   For i := 0 To Exclusions.Count - 1 Do
@@ -1070,31 +1060,31 @@ End;
   @postcon The status panels are updated.
 
 **)
-Procedure TBADIModuleMetricsEditorView.UpdateStatusPanels;
+Procedure TBADIModuleSpellingEditorView.UpdateStatusPanels;
 
 ResourceString
   strModules = '%d Modules';
-  strMethods = '%d Methods';
-  strLinesOfCode = '%d Lines';
-  strUnderLimit = '%d < Limit';
-  strAtLimit = '%d @ Limit';
-  strOverLimit = '%d > Limit';
+  strComment = '%d Comments';
+  strTag = '%d Tags';
+  strResString = '%d Resource String';
+  strConstant = '%d Constant';
+  strLiteral = '%d Literal';
 
 Var
   AFrame: Tframe;
-  F: TframeBADIModuleMetricsEditorView;
+  F: TframeBADIModuleSpellingEditorView;
   
 Begin
   AFrame := FFrameManager.Frame[CurrentEditWindow];
-  If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
+  If Assigned(AFrame) And (AFrame Is TframeBADIModuleSpellingEditorView) Then
     Begin
-      F := (AFrame As TframeBADIModuleMetricsEditorView);
-      FModulePanels[mspModules].Text :=     Format(strModules,     [F.ModuleCount]);
-      FModulePanels[mspMethods].Text :=     Format(strMethods,     [F.MethodCount]);
-      FModulePanels[mspLinesOfCode].Text := Format(strLinesOfCode, [F.LinesOfCode]);
-      FModulePanels[mspUnderLimit].Text :=  Format(strUnderLimit,  [F.UnderLimit]);
-      FModulePanels[mspAtLimit].Text :=     Format(strAtLimit,     [F.AtLimit]);
-      FModulePanels[mspOverLimit].Text :=   Format(strOverLimit,   [F.OverLimit]);
+      F := (AFrame As TframeBADIModuleSpellingEditorView);
+      FModulePanels[sspModules].Text :=         Format(strModules,   [F.ModuleCount]);
+      FModulePanels[sspComment].Text :=         Format(strComment,   [F.SpellingIssue[sitComment]]);
+      FModulePanels[sspTags].Text :=            Format(strTag,       [F.SpellingIssue[sitTag]]);
+      FModulePanels[sspConstants].Text :=       Format(strResString, [F.SpellingIssue[sitResourceString]]);
+      FModulePanels[sspResourceStrings].Text := Format(strConstant,  [F.SpellingIssue[sitConstant]]);
+      FModulePanels[sspLiterals].Text :=        Format(strLiteral,   [F.SpellingIssue[sitLiteral]]);
     End;
 End;
 

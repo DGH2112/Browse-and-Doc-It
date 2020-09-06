@@ -4,8 +4,8 @@
   about issues on a line.
 
   @Author  David Hoyle
-  @Version 1.540
-  @Date    13 Apr 2020
+  @Version 1.704
+  @Date    01 Aug 2020
   
   @license
 
@@ -42,10 +42,14 @@ Type
   TBADILineDocIssue = Class(TInterfacedObject, IBADILineDocIssues)
   Strict Private
     FDocIssues : TDictionary<String, TBADIDocIssueInfo>;
+    FSpellingMistakes : TList<TBADISpellingMistake>;
   Strict Protected
+    Function  GetLimitTypes: TArray<String>;
+    Function  GetSpellingMistakeCount : Integer;
+    Function  GetSpellingMistake(Const iIndex : Integer) : TBADISpellingMistake;
+    Function  GetMessage(Const strDocIssueType : String): TBADIDocIssueInfo;
     Procedure AddIssue(Const strDocIssueType : String; Const DocIssueInfo : TBADIDocIssueInfo);
-    Function GetLimitTypes: TArray<String>;
-    Function GetMessage(Const strDocIssueType : String): TBADIDocIssueInfo;
+    Procedure AddSpellingMistake(Const strWord : String; Const iColumn : Integer);
   Public
     Constructor Create(Const strDocIssueType : String; Const DocIssueInfo : TBADIDocIssueInfo);
     Destructor Destroy; Override;
@@ -74,7 +78,29 @@ End;
 
 (**
 
-  A constructor for the TBADILineDocIssues class.
+  This method adds a spelling mistake to the collection.
+
+  @precon  None.
+  @postcon The spelling mistake (word and column) are added to the collection.
+
+  @param   strWord as a String as a constant
+  @param   iColumn as an Integer as a constant
+
+**)
+Procedure TBADILineDocIssue.AddSpellingMistake(Const strWord: String; Const iColumn: Integer);
+
+Var
+  R : TBADISpellingMistake;
+  
+Begin
+  R.FWord := strWord;
+  R.FColumn := iColumn;
+  FSpellingMistakes.Add(R);
+End;
+
+(**
+
+  A constructor for the TBADILineDocIssue class.
 
   @precon  None.
   @postcon Initialises the class dictionary with the first issue type and message.
@@ -89,6 +115,7 @@ Constructor TBADILineDocIssue.Create(Const strDocIssueType : String;
 Begin
   FDocIssues := TDictionary<String, TBADIDocIssueInfo>.Create;
   FDocIssues.Add(strDocIssueType, DocIssueInfo);
+  FSpellingMistakes := TList<TBADISpellingMistake>.Create;
 End;
 
 (**
@@ -102,16 +129,17 @@ End;
 Destructor TBADILineDocIssue.Destroy;
 
 Begin
+  FSpellingMistakes.Free;
   FDocIssues.Free;
   Inherited Destroy;
 End;
 
 (**
 
-  This is a getter method for the LimitTypes property.
+  This is a getter method for the Limit Types property.
 
   @precon  None.
-  @postcon Returns a set of the doc iissue limit types for the line.
+  @postcon Returns a set of the doc issue limit types for the line.
 
   @return  a TArray<String>
 
@@ -147,6 +175,39 @@ Function TBADILineDocIssue.GetMessage(Const strDocIssueType : String): TBADIDocI
 
 Begin
   FDocIssues.TryGetValue(strDocIssueType, Result);
+End;
+
+(**
+
+  This is a getter method for the Spelling Mistake property.
+
+  @precon  iIndex must be between 0 and GetSpellingMistakeCount - 1.
+  @postcon Returns the indexed spelling mistake.
+
+  @param   iIndex as an Integer as a constant
+  @return  a TBADISpellingMistake
+
+**)
+Function TBADILineDocIssue.GetSpellingMistake(Const iIndex: Integer): TBADISpellingMistake;
+
+Begin
+  Result := FSpellingMistakes[iIndex];
+End;
+
+(**
+
+  This is a getter method for the Spelling Mistake Count property.
+
+  @precon  None.
+  @postcon Returns the number of spelling mistakes for the line.
+
+  @return  an Integer
+
+**)
+Function TBADILineDocIssue.GetSpellingMistakeCount: Integer;
+
+Begin
+  Result := FSpellingMistakes.Count;
 End;
 
 End.

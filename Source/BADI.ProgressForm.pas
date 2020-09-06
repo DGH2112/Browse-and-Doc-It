@@ -1,17 +1,17 @@
 (**
 
-  This is a generic progress dialogue for use in the ObjectPascalDocWizard.
+  This is a generic progress dialogue for use in the Browse and Doc It.
 
   @author     David Hoyle
-  @version    1.0
-  @Date    21 Jun 2019
+  @version    1.040
+  @Date    28 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 **)
-unit ProgressForm;
+unit BADI.ProgressForm;
 
 interface
 
@@ -48,6 +48,7 @@ type
     pnlInfo: TPanel;
     pnlButton: TPanel;
     btnCancel: TBitBtn;
+    pnlFrame: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
@@ -64,9 +65,11 @@ implementation
 
 {$R *.DFM}
 
+uses BADI.ToolsAPIUtils;
+
 (**
 
-  This is an OnFormCreate Event Hanlder for the TfrmProgress class.
+  This is an On Form Create Event Handler for the TfrmProgress class.
 
   @precon  None.
   @postcon Creates an ellipsis path control and aligns it to the client area.
@@ -94,28 +97,32 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmProgress.FormCreate(Sender: TObject);
-begin
-  FEllipsisLabel := TLabel.Create(Nil);
+Procedure TfrmProgress.FormCreate(Sender: TObject);
+
+Begin
+  FEllipsisLabel := TLabel.Create(Self);
   FEllipsisLabel.Parent := pnlInfo;
   FEllipsisLabel.Align := alClient;
   FEllipsisLabel.EllipsisPosition := epPathEllipsis;
-end;
+  TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmProgress, Self);
+End;
 
 (**
 
-  This is an OnFormDestroy Event Hanlder for the TfrmProgress class.
+  This is an On Form Destroy Event Handler for the TfrmProgress class.
 
   @precon  None.
   @postcon Frees the ellipsis path control.
 
+  @nocheck EmptyMethod
+
   @param   Sender as a TObject
 
 **)
-procedure TfrmProgress.FormDestroy(Sender: TObject);
-begin
-  FEllipsisLabel.Free;
-end;
+Procedure TfrmProgress.FormDestroy(Sender: TObject);
+
+Begin
+End;
 
 (**
 

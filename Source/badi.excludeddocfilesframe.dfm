@@ -27,6 +27,21 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
       Width = 409
       Height = 250
       Anchors = [akLeft, akTop, akRight, akBottom]
+      Colors.BorderColor = 15987699
+      Colors.DisabledColor = clGray
+      Colors.DropMarkColor = 15385233
+      Colors.DropTargetColor = 15385233
+      Colors.DropTargetBorderColor = 15385233
+      Colors.FocusedSelectionColor = 15385233
+      Colors.FocusedSelectionBorderColor = 15385233
+      Colors.GridLineColor = 15987699
+      Colors.HeaderHotColor = clBlack
+      Colors.HotColor = clBlack
+      Colors.SelectionRectangleBlendColor = 15385233
+      Colors.SelectionRectangleBorderColor = 15385233
+      Colors.SelectionTextColor = clBlack
+      Colors.TreeLineColor = 9471874
+      Colors.UnfocusedColor = 15987699
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoShowSortGlyphs, hoVisible]
       TabOrder = 0
@@ -42,7 +57,7 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
       Columns = <
         item
           Position = 0
-          Width = 180
+          Width = 105
           WideText = 'RegEx Pattern'
         end
         item
@@ -62,6 +77,12 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
           Position = 3
           Width = 75
           WideText = 'Checks'
+        end
+        item
+          Alignment = taCenter
+          Position = 4
+          Width = 75
+          WideText = 'Spelling'
         end>
     end
     object btnAdd: TButton

@@ -1,10 +1,10 @@
 (**
 
-  This module excapsulates the creation of menus in the IDE.
+  This module encapsulates the creation of menus in the IDE.
 
-  @Version 1.070
+  @Version 1.140
   @Author  David Hoyle
-  @Date    24 May 2020
+  @Date    05 Sep 2020
 
   @license
 
@@ -84,6 +84,7 @@ Type
     Procedure ModuleExplorerClick(Sender: TObject);
     Procedure MetricsClick(Sender : TObject);
     Procedure ChecksClick(Sender : TObject);
+    Procedure SpellingClick(Sender : TObject);
     Procedure CreateBADIMainMenu;
     Procedure RemoveActionsFromToolbars;
     Function  AddImagesToIDE : Integer;
@@ -117,7 +118,7 @@ Uses
   Controls,
   BADI.CommonIDEFunctions,
   BADI.DockableModuleExplorer,
-  ProgressForm,
+  BADI.ProgressForm,
   BADI.Module.Dispatcher,
   BADI.ElementContainer,
   BADI.Generic.FunctionDecl,
@@ -131,7 +132,8 @@ Uses
   BADI.Base.Documentation, 
   BADI.Refactor.Constant, 
   BADI.Module.Metrics, 
-  BADI.Module.Checks;
+  BADI.Module.Checks, 
+  BADI.Module.Spelling;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -188,7 +190,7 @@ end;
 
 (**
 
-  This method is a menu OnClick event for the insertion of a comment block at
+  This method is a menu On Click event for the insertion of a comment block at
   the cursor.
 
   This simple adds a comment block at the current cursor position in the active
@@ -276,6 +278,8 @@ Begin
   CreateMenuItem(FBADIMenu, bmBADIMetrics, MetricsClick, Nil, iImageIndex);
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmBADIChecks, ChecksClick, Nil, iImageIndex);
+  Inc(iImageIndex);
+  CreateMenuItem(FBADIMenu, bmBADISpelling, SpellingClick, Nil, iImageIndex);
   CreateMenuItem(FBADIMenu, bmSep3, Nil, Nil, 0);
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmOptions, OptionsClick, Nil, iImageIndex);
@@ -323,7 +327,7 @@ End;
   This method creates menu items using the passed information.
 
   @precon  mmiParent must be a valid parent menu item in the IDE .
-  @postcon A Sub menu ite is created under mmiParent .
+  @postcon A Sub menu item is created under mmiParent .
 
   @param   mmiParent   as a TMenuItem as a constant
   @param   eBADIMenu   as a TBADIMenu as a constant
@@ -633,8 +637,8 @@ End;
 
 (**
 
-  This method inserts either a Block, Line or InSitu comment at the position of the curerent cursor 
-  depending on the passed partameter.
+  This method inserts either a Block, Line or In-Situ comment at the position of the current cursor 
+  depending on the passed parameter.
 
   @precon  None.
   @postcon Inserts the specified comment.
@@ -761,10 +765,10 @@ End;
 (**
 
   This is an action for the Insert In Situ Comment event handler. It inserts an
-  in sity comment at the current cursor position.
+  in situ comment at the current cursor position.
 
   @precon  None.
-  @postcon Inserts an InSitu comment into the editor.
+  @postcon Inserts an In-Situ comment into the editor.
 
   @param   Sender as a TObject
 
@@ -832,13 +836,13 @@ End;
 
 (**
 
-  This is a menu OnClick event for the insertion of a method comment. This method
+  This is a menu On Click event for the insertion of a method comment. This method
   searches the IDE for the current module being edited and then creates a
   memory stream of the source and passes it to the Unit parser. It then finds
   the first method declaration prior to the cursor position, parses the
   declaration and output the information in as comment immediately above the
   method declaration. This comment block starts with '(**' to signify an
-  ObjectPascalDoc comment that can be used by the documentation system.
+  Browse and Doc It comment that can be used by the documentation system.
 
   @precon  Sender is the object initiating the event .
   @postcon Inserts a Method comment into the editor avoid the current method .
@@ -914,10 +918,10 @@ End;
 
 (**
 
-  This method displays the module statistics for the currentl visible module.
+  This method displays the module statistics for the currently visible module.
 
   @precon  None.
-  @postcon The modulel statistics are displays with the current modules information.
+  @postcon The module statistics are displays with the current modules information.
 
   @param   Sender as a TObject
 
@@ -930,7 +934,7 @@ End;
 
 (**
 
-  This is a TMenuItem on click event. If display the module explorer if its not
+  This is a on click event. If display the module explorer if its not
   visible else hide or focuses the explorer.
 
   @precon  Sender is the object initiating the event.
@@ -967,7 +971,7 @@ End;
 (**
 
   This is an event handler to be hooked the the Module Explorer Frames
-  OnOptionsChange event handler.
+  On Options Change event handler.
 
   @precon  None.
   @postcon Refreshes the current module view.
@@ -983,7 +987,7 @@ End;
 
 (**
 
-  This is a TMenuItem on click event. it invokes the Options dialogue.
+  This is a on click event. it invokes the Options dialogue.
 
   @precon  Sender is the object initiating the event.
   @postcon Displays the wizards Options dialogue.
@@ -1089,7 +1093,7 @@ End;
 
 (**
 
-  This is an on click event handler for the Porfiling menu item.
+  This is an on click event handler for the Profiling menu item.
 
   @precon  None.
   @postcon Invokes the profiling dialogue for selecting the methods to be
@@ -1166,15 +1170,15 @@ End;
 
 (**
 
-  This is a menu OnClick event for the insertion of a property comment. This
+  This is a menu On Click event for the insertion of a property comment. This
   method searches the IDE for the current module being edited and then
   creates a memory stream of the source and passes it to the Unit parser.
 
-  It then finds the first preperty declaration prior to the cursor position,
+  It then finds the first property declaration prior to the cursor position,
   parses the declaration and output the information in as comment immediately
   above the property declaration.
 
-  This comment block starts with '(**' to signify an ObjectPascalDoc comment
+  This comment block starts with '(**' to signify an Browse and Doc It comment
   that can be used by the documentation system.
 
   @precon  Sender is the object initiating the event.
@@ -1284,10 +1288,10 @@ End;
 
 (**
 
-  This method removes any BADI actions from any of the IDE toolbars to prevent AVs.
+  This method removes any BADI actions from any of the IDE tool bars to prevent AVs.
 
   @precon  None.
-  @postcon All BADI actions are removed from the IDE toolbars.
+  @postcon All BADI actions are removed from the IDE tool bars.
 
 **)
 Procedure TBADIIDEMenuInstaller.RemoveActionsFromToolbars;
@@ -1320,11 +1324,11 @@ Procedure TBADIIDEMenuInstaller.RemoveActionsFromToolbars;
 
   (**
 
-    This method iterates over the buttons on a toolbar and removed the button if its action corresponds 
+    This method iterates over the buttons on a tool bar and removed the button if its action corresponds 
     to an action from this expert.
 
     @precon  None.
-    @postcon Iterates over the buttons on a toolbar and removed the button if its action corresponds to 
+    @postcon Iterates over the buttons on a tool bar and removed the button if its action corresponds to 
              an action from this expert.
 
     @param   TB as a TToolbar as a constant
@@ -1472,10 +1476,10 @@ End;
 
 (**
 
-  This method returns the selected text in th active editor window and optionally deletes this text.
+  This method returns the selected text in the active editor window and optionally deletes this text.
 
   @precon  None.
-  @postcon Returns the selected text in th active editor window and optionally deletes this text.
+  @postcon Returns the selected text in the active editor window and optionally deletes this text.
 
   @param   boolDelete as a Boolean as a constant
   @return  a String
@@ -1546,8 +1550,8 @@ End;
 
 (**
 
-  This method move the active editors cursor to the supplied position and centres the cursor on th screen
-  .
+  This method move the active editors cursor to the supplied position and centres the cursor on the
+  screen.
 
   @precon  None.
   @postcon When a selection is made in the explorer the cursor is placed in the editor.
@@ -1566,10 +1570,27 @@ End;
 
 (**
 
-  This in an on click event handler for the Insert ToDo Comment menu item.
+  This method display the Spelling Checker Editor window showing the spelling mistakes in the active
+  project.
 
   @precon  None.
-  @postcon Inserts in the the menu at the cursor a todo line comment.
+  @postcon The spelling checker editor view is displayed.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBADIIDEMenuInstaller.SpellingClick(Sender: TObject);
+
+Begin
+  TBADIModuleSpellingEditorView.CreateEditorView; 
+End;
+
+(**
+
+  This in an on click event handler for the Insert To Do Comment menu item.
+
+  @precon  None.
+  @postcon Inserts in the the menu at the cursor a to do line comment.
 
   @param   Sender as a TObject
 
@@ -1646,5 +1667,3 @@ Begin
 End;
 
 End.
-
-

@@ -2,16 +2,16 @@
 
   This method contains functions that are used global through out the application.
 
-  @Version 1.081
+  @Version 1.084
   @Author  David Hoyle.
-  @Date    28 Mar 2020
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -704,7 +704,8 @@ Const
     'Hint',
     'DocConflict',
     'Check',
-    'Metric'
+    'Metric',
+    'Spelling'
   );
 
 Var

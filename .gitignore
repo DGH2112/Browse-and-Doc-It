@@ -79,3 +79,5 @@ Test/BrowseAndDocItTests_MemoryManager_EventLog.txt
 Test/dunit.ini
 *.gex
 Win32/Debug/dunitx-results.xml
+Dictionaries/
+*.dct

@@ -3,15 +3,15 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 1.694
-  @Date    09 Jul 2020
+  @Version 2.317
+  @Date    02 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ Type
     (**
       This property returns the number of items in the collection.
       @precon  None.
-      @postcon The number of items in the excluions collection is returned.
+      @postcon The number of items in the exclusions collection is returned.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
@@ -143,18 +143,32 @@ Type
     Procedure SetModuleDateFmt(Const strValue : String);
     Function  GetModuleVersionIncrement : Double;
     Procedure SetModuleVersionIncrement(Const dblValue : Double);
-    Function  GetDoNotFollowEditor : TArray<String>;
-    Procedure SetDoNotFollowEditor(Const astrDoNotFollowTypes : TArray<String>);
+    Function  GetDoNotFollowEditor : TLimitTypes;
+    Procedure SetDoNotFollowEditor(Const setDoNotFollowTypes : TLimitTypes);
     Function  GetScopeImageList : TImageList;
+    Function  GetLanguageDictionaryFile : String;
+    Procedure SetLanguageDictionaryFile(Const strValue : String);
+    Function  GetLanguageDictionary : TStringList;
+    Function  GetLocalDictionaryFile : String;
+    Procedure SetLocalDictionaryFile(Const strValue : String);
+    Function  GetLocalDictionary : TStringList;
+    Function  GetProjectDictionaryFile : String;
+    Procedure SetProjectDictionaryFile(Const strValue : String);
+    Function  GetProjectDictionary : TStringList;
+    Function  GetIgnoreDictionaryFile : String;
+    Procedure SetIgnoreDictionaryFile(Const strValue : String);
+    Function  GetIgnoreDictionary : TStringList;
+    Function  GetSpellingMistakeColour : TColor;
+    Procedure SetSpellingMistakeColour(Const iColour : TColor);
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure RequiresIDEEditorColoursUpdate;
     // Properties
     (**
-      This property contains the basic toggleable options for the application.
+      This property contains the basic boolean toggle options for the application.
       @precon  None.
-      @postcon Contains the basic toggleable options for the application.
+      @postcon Contains the basic boolean toggle options for the application.
       @return  a TDocOptions
     **)
     Property Options : TDocOptions Read GetOptions Write SetOptions;
@@ -180,7 +194,7 @@ Type
     **)
     Property ExpandedNodes : TStringList Read GetExpandedNodes;
     (**
-      This property determines the amount of time in milliseonds between the
+      This property determines the amount of time in milliseconds between the
       last editor update and the next refresh. Interval only, the application
       needs to implement the logic.
       @precon  None.
@@ -272,9 +286,9 @@ Type
     Property BGColour[Const boolUseIDEEditorColours : Boolean] : TColor Read GetModuleExplorerBGColour 
       Write SetModuleExplorerBGColour;
     (**
-      This property gets ans sets the token limit to the module explorer.
+      This property gets and sets the token limit to the module explorer.
       @precon  None.
-      @postcon Gets ans sets the token limit to the module explorer.
+      @postcon Gets and sets the token limit to the module explorer.
       @return  an Integer
     **)
     Property TokenLimit : Integer Read GetTokenLimit Write SetTokenLimit;
@@ -304,9 +318,9 @@ Type
     **)
     Property TreeColour : TColor Read GetTreeColour Write SetTreeColour;
     (**
-      This property returns the name of the inifile.
+      This property returns the name of the INI file.
       @precon  None.
-      @postcon Returns the name of the inifile.
+      @postcon Returns the name of the INI file.
       @return  a String
     **)
     Property INIFileName : String Read GetINIFileName;
@@ -357,7 +371,7 @@ Type
     Property ModuleMetricSubOptions : TBADIModuleMetricSubOps Read GetModuleMetricSubOps
       Write SetModuleMEtricSubOps;
     (**
-      This property defines the power of the y = x ^ z equiation used to combine the metrics for
+      This property defines the power of the y = x ^ z equation used to combine the metrics for
       toxicity.
       @precon  None.
       @postcon Gets ad sets the power of the toxicity summation.
@@ -407,7 +421,7 @@ Type
       A property to determine of a constant refactoring should have a new line between declaration
       sections.
       @precon  None.
-      @postcon Gets or set the boolena value.
+      @postcon Gets or set the boolean value.
       @return  a Boolean
     **)
     Property RefactorConstNewLine : Boolean Read GetRefactorConstNewLine Write SetRefactorConstNewLine;
@@ -439,9 +453,9 @@ Type
       selection from following the editor cursor.
       @precon  None.
       @postcon Gets and sets the limits to not follow.
-      @return  a TArray<String>
+      @return  a TLimitTypes
     **)
-    Property DoNotFollowEditor : TArray<String> Read GetDoNotFollowEditor Write SetDoNotFollowEditor;
+    Property DoNotFollowEditor : TLimitTypes Read GetDoNotFollowEditor Write SetDoNotFollowEditor;
     (**
       This property returns a single scope image list for use throughout the application.
       @precon  None.
@@ -449,6 +463,69 @@ Type
       @return  a TImageList
     **)
     Property ScopeImageList : TImageList Read GetScopeImageList;
+    (**
+      This property returns a sorted string list of language specific dictionary words.
+      @precon  None.
+      @postcon Returns a sorted string list of language specific dictionary words.
+      @return  a String
+    **)
+    Property LanguageDictionaryFile : String Read GetLanguageDictionaryFile Write SetLanguageDictionaryFile;
+    (**
+      This property gets and sets the filename for the language dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the language dictionary.
+      @return  a TStringList
+    **)
+    Property LanguageDictionary : TStringList Read GetLanguageDictionary;
+    (**
+      This property returns a sorted string list of local dictionary words.
+      @precon  None.
+      @postcon Returns a sorted string list of local dictionary words.
+      @return  a String
+    **)
+    Property LocalDictionaryFile : String Read GetLocalDictionaryFile Write SetLocalDictionaryFile;
+    (**
+      This property gets and sets the filename for the local dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the local dictionary.
+      @return  a TStringList
+    **)
+    Property LocalDictionary : TStringList Read GetLocalDictionary;
+    (**
+      This property returns a sorted string list of project dictionary words.
+      @precon  None.
+      @postcon Returns a sorted string list of project dictionary words.
+      @return  a String
+    **)
+    Property ProjectDictionaryFile : String Read GetProjectDictionaryFile Write SetProjectDictionaryFile;
+    (**
+      This property gets and sets the filename for the local dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the local dictionary.
+      @return  a TStringList
+    **)
+    Property ProjectDictionary : TStringList Read GetProjectDictionary;
+    (**
+      This property gets and sets the filename for the project dictionary.
+      @precon  None.
+      @postcon Gets and sets the filename for the project dictionary.
+      @return  a String
+    **)
+    Property IgnoreDictionaryFile : String Read GetIgnoreDictionaryFile Write SetIgnoreDictionaryFile;
+    (**
+      This property returns a sorted string list of dictionary words to ignore.
+      @precon  None.
+      @postcon Returns a sorted string list of dictionary words to ignore.
+      @return  a TStringList
+    **)
+    Property IgnoreDictionary : TStringList Read GetIgnoreDictionary;
+    (**
+      This property determines the colour of the highlighted text for spelling mistakes.
+      @precon  None.
+      @postcon Gets and sets the spelling mistake colours.
+      @return  a TColor
+    **)
+    Property SpellingMistakeColour : TColor Read GetSpellingMistakeColour Write SetSpellingMistakeColour;
   End;
 
   (** An interface to get the IDE Editor Colours from the Registry. **)
@@ -480,7 +557,7 @@ Type
     Procedure Rename(Const strFileName : String);
   End;
 
-  (** An interface to manage a dictionary of IBADT=IModuleStats. **)
+  (** An interface to manage a dictionary of IBADIModuleStats. **)
   IBADIModuleStatsList = Interface
   ['{C64AD7A8-8A15-4114-90DD-E689D8193CA5}']
     // Getter and Setters
@@ -490,9 +567,9 @@ Type
     Procedure Remove(Const strFileName : String);
     // Properties
     (**
-      This method returns an interfaces of the module stats for the given filename.
+      This method returns an interfaces of the module statistics for the given filename.
       @precon  None.
-      @postcon Returns an interfaces of the module stats for the given filename.
+      @postcon Returns an interfaces of the module statistics for the given filename.
       @param   strFileName as a String as a constant
       @return  an IBADIModuleStats
     **)
@@ -508,14 +585,23 @@ Type
     FMessage    : String;
   End;
 
+  (** A record for the spelling mistakes: The WORD and the Column position. **)
+  TBADISpellingMistake = Record
+    FWord   : String;
+    FColumn : Integer;
+  End;
+
   (** An interface for the Documentation Issues for a line of code. **)
   IBADILineDocIssues = Interface
   ['{6D94887A-69E7-4736-A1B1-6BB533DE9D9F}']
     // Getters and Setters
     Function  GetLimitTypes : TArray<String>;
     Function  GetMessage(Const strDocIssueType : String) : TBADIDocIssueInfo;
+    Function  GetSpellingMistakeCount : Integer;
+    Function  GetSpellingMistake(Const iIndex : Integer) : TBADISpellingMistake;
     // General Methods
     Procedure AddIssue(Const strDocIssueType : String; Const DocIssueInfo : TBADIDocIssueInfo);
+    Procedure AddSpellingMistake(Const strWord : String; Const iColumn : Integer);
     // Properties
     (**
       This property returns a set of enumerates which define the doc issues for the line.
@@ -532,6 +618,21 @@ Type
       @return  a TBADIDocIssueInfo
     **)
     Property Message[Const strDocIssueType : String] : TBADIDocIssueInfo Read GetMessage; Default;
+    (**
+      This property returns the number of spelling mistakes for the line.
+      @precon  None.
+      @postcon Returns the number of spelling mistakes for the line.
+      @return  an Integer
+    **)
+    Property SpellingMistakeCount : Integer Read GetSpellingMistakeCount;
+    (**
+      This property returns the spelling mistake information for the indexed item.
+      @precon  iiNdex must be between 0 and SpellingMistakeCount - 1.
+      @postcon Returns the spelling mistake information for the indexed item.
+      @param   iIndex as an Integer as a constant
+      @return  a TBADISpellingMistake
+    **)
+    Property SpellingMistake[Const iIndex : Integer] : TBADISpellingMistake Read GetSpellingMistake;
   End;
 
   (** A record to describe the information inside the Totals dictionary. **)
@@ -551,7 +652,7 @@ Type
   ['{FE2ACA7E-03A5-4C12-A872-A8A4F33AC809}']
     // Getters and Setters
     Function  GetTotals : TDictionary<String, TBADITotalInfo>;
-    Function  ContainsAny(Const astrValue : TArray<String>) : Boolean;
+    Function  ContainsAny(Const setDocIssues : TLimitTypes) : Boolean;
     // General Methods
     Procedure IncDocIssue(Const strDocIssueType : String; Const TotalInfo : TBADITotalInfo);
     Procedure Clear;

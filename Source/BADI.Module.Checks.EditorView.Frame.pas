@@ -1,17 +1,17 @@
 (**
   
-  This module contains a frame for dislpaying module methods and their checks.
+  This module contains a frame for displaying module methods and their checks.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    25 Jun 2019
+  @Version 1.210
+  @Date    06 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,28 +58,11 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes;
+  UITypes, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** An enumerate to define the type of information stored in each node - used for counting later. **)
-  TBADINodeType = (ntUnkown, ntModule, ntMethod);
-
-  (** An enumerate to define some options for when rendering the module metrics. **)
-  TBADICheckRenderOption = (
-    croClear,            // Clears the treeview before rendering
-    croAutoExpand,       // Auto expands the the treeview for the rendered module
-    croAutoExpandOnError // Auto expands the the treeview for the rendered module ONLY IF there are
-                         // issued
-  );
-  (** A set of the above enumerate options. **)
-  TBADICheckRenderOptions = Set Of TBADICheckRenderOption;
-
-  (** A custom virtual string tree to stop a Dark Themed IDE raising Access Violations due to some
-      sort of RTTI clash. **)
-  TBADIEditorViewVirtualStringTree = Class(TBADICustomVirtualStringTree);
-  
   (** A frame to display a modules methods and their metrics. **)
   TframeBADIModuleChecksEditorView = Class(TFrame)
     ilScopeImages: TImageList;
@@ -112,32 +95,35 @@ Type
     Procedure tmFocusTimerTimer(Sender: TObject);
     procedure actShowAllColumnsExecute(Sender: TObject);
   Strict Private
-  Type
+    Type
+      (** A custom virtual string tree to stop a Dark Themed IDE raising Access Violations due to some
+          sort of RTTI clash. **)
+      TBADIEditorViewVirtualStringTree = Class(TBADICustomVirtualStringTree);
       (** A record to describe the data to be held in a tree node. **)
-    TBADICheckRecord = Record
-      FNodeType        : TBADINodeType;
-      FFileName        : String;
-      FText            : String;
-      FImageIndex      : Integer;
-      FChecks          : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of Double;
-      FTotal           : Double;
-      FIssueCount      : Integer;
-      FCheckOverrides  : TBADIModuleChecks;
-      FIdentLine       : Integer;
-      FIdentColumn     : Integer;
-      FCommentLine     : Integer;
-      FCommentColumn   : Integer;
-    End;
-    (** A pointer to the above record. **)
-    PBADICheckRecord = ^TBADICheckRecord;
-    (** A record type to hold the return information from recursing nodes. **)
-    TNodeResultRecord = Record
-      FNode: PVirtualNode;
-      FChildCount: Integer;
-      FIssueCount: Integer;
-      Class Operator Add(Const R1, R2: TNodeResultRecord): TNodeResultRecord;
-      Constructor Create(Const Node: PVirtualNode);
-    End;
+      TBADICheckRecord = Record
+        FNodeType        : TBADINodeType;
+        FFileName        : String;
+        FText            : String;
+        FImageIndex      : Integer;
+        FChecks          : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of Double;
+        FTotal           : Double;
+        FIssueCount      : Integer;
+        FCheckOverrides  : TBADIModuleChecks;
+        FIdentLine       : Integer;
+        FIdentColumn     : Integer;
+        FCommentLine     : Integer;
+        FCommentColumn   : Integer;
+      End;
+      (** A pointer to the above record. **)
+      PBADICheckRecord = ^TBADICheckRecord;
+      (** A record type to hold the return information from recursing nodes. **)
+      TNodeResultRecord = Record
+        FNode: PVirtualNode;
+        FChildCount: Integer;
+        FIssueCount: Integer;
+        Class Operator Add(Const R1, R2: TNodeResultRecord): TNodeResultRecord;
+        Constructor Create(Const Node: PVirtualNode);
+      End;
   Strict Private
     FFileName      : String;
     FModuleCount   : Integer;
@@ -168,7 +154,7 @@ Type
       Const AFunction : TGenericFunction) : TNodeResultRecord;
     Procedure DeleteExistingModuleNode(Const Module : TBaseLanguageModule);
     Procedure SortAndExpand(Const NodeResult : TNodeResultRecord;
-      Const setRenderOptions : TBADICheckRenderOptions);
+      Const setRenderOptions : TBADIRenderOptions);
     Function  HasIssues(Const Node : PVirtualNode) : Boolean;
     Procedure ExtractMaxFromChildren(Const ParentNode : PVirtualNode);
     Procedure CreateVirtualStringTree;
@@ -176,12 +162,13 @@ Type
     Procedure ExpandIssues;
     Procedure HookThemingServices(Sender : TObject);
     Procedure vstChecksDblClick(Sender : TObject);
+    Function  CreateModule(Const Module: TBaseLanguageModule): TNodeResultRecord;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
     Destructor Destroy; Override;
     Procedure RenderModule(Const Module: TBaseLanguageModule;
-      Const setRenderOptions: TBADICheckRenderOptions);
+      Const setRenderOptions: TBADIRenderOptions);
     Procedure CopyToClipboard;
     Procedure FocusResults;
   Published
@@ -215,17 +202,6 @@ Type
     Property OverLimit: Integer Read FOverLimit;
   End;
 
-Const
-  (** A constant to define a light green colour for the columns if an item is under the limit. **)
-  iLightGreen = $80FF80;
-  (** A constant to define a light amber colour for the columns if an item is at the limit. **)
-  iLightRed = $8080FF;
-  (** A constant to define a light red colour for the columns if an item is over the limit. **)
-  iLightAmber = $80CCFF;
-  (** A constant to define a light aqua colour for the columns if an item is over the limit but which
-      have been overridden. **)
-  iLightAqua = $FFFF80;
-
 Implementation
 
 Uses
@@ -237,7 +213,8 @@ Uses
   BADI.Functions,
   ClipBrd, 
   BADI.IDEThemingNotifier,
-  BADI.ToolsAPIUtils;
+  BADI.ToolsAPIUtils,
+  BADI.Constants;
 
 {$R *.dfm}
 
@@ -278,7 +255,7 @@ Type
 
 Const
   (** A constant array of column information for rendering. **)
-  CheckColumns : Array[Low(TBADICheckColumn)..High(TBADICheckColumn)] Of TCheckColumnInfo = (
+  CheckColumns : Array[TBADICheckColumn] Of TCheckColumnInfo = (
     (FName: 'Method';   FWidth: 400; FMinWidth: 400; FAlignment: taLeftJustify; FCheck: mcHardCodedIntegers),
     (FName: 'Integer';  FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FCheck: mcHardCodedIntegers),
     (FName: 'Number';   FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FCheck: mcHardCodedNumbers),
@@ -303,11 +280,9 @@ Const
     (FName: 'Total';    FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FCheck: mcMissingCONSTInParemterList)
   );
 
-{ TNodeResultRecord }
-
 (**
 
-  This is an operator overload for the Add optioation.
+  This is an operator overload for the Add operation.
 
   @precon  None.
   @postcon Adds the numeric fields of the 2 record to a new result.
@@ -347,7 +322,7 @@ End;
 
 (**
 
-  This is an on execute event handler for the CollapseAll action.
+  This is an on execute event handler for the Collapse All action.
 
   @precon  None.
   @postcon Collapses all the treeview nodes.
@@ -379,7 +354,7 @@ End;
 
 (**
 
-  This is an on update event handler for the CollapseUpdate action.
+  This is an on update event handler for the Collapse Update action.
 
   @precon  None.
   @postcon Enables the Collapse action is there is a focused node, it has children and is currently
@@ -406,7 +381,7 @@ End;
 
 (**
 
-  This is an on execute event handler for the ExpandAll action.
+  This is an on execute event handler for the Expand All action.
 
   @precon  None.
   @postcon Expands all the nodes in the treeview.
@@ -597,7 +572,7 @@ End;
 
 (**
 
-  A constructor for the TframeBADIModuleStatistics class.
+  A constructor for the TframeBADIModuleChecksEditorView class.
 
   @precon  None.
   @postcon Initialises the treeview and the image list.
@@ -629,7 +604,47 @@ End;
 
 (**
 
-  This method creates the virtual string tree to display the metrics.
+  This method creates the module tree node for the spelling mistakes to sit under.
+
+  @precon  Module must be a valid instance.
+  @postcon The module node in the tree view is created.
+
+  @param   Module as a TBaseLanguageModule as a constant
+  @return  a TNodeResultRecord
+
+**)
+Function TframeBADIModuleChecksEditorView.CreateModule(Const Module:
+  TBaseLanguageModule): TNodeResultRecord;
+
+Var
+  NodeData : PBADICheckRecord;
+  eCheck : TBADIModuleCheck;
+    
+Begin
+  Result.Create(FVSTChecks.AddChild(Nil));
+  NodeData := FVSTChecks.GetNodeData(Result.FNode);
+  NodeData.FNodeType := ntModule;
+  NodeData.FFileName := Module.FileName;
+  NodeData.FText := Module.AsString(True, False);
+  NodeData.FImageIndex := BADIImageIndex(Module.ImageIndex, Module.Scope);
+  NodeData.FIdentLine := Module.Line;
+  NodeData.FIdentColumn := Module.Column;
+  NodeData.FCommentLine := 0;
+  NodeData.FCommentColumn := 0;
+  If Assigned(Module.Comment) Then
+    Begin
+      NodeData.FCommentLine := Module.Comment.Line;
+      NodeData.FCommentColumn := Module.Comment.Column;
+    End;
+  For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
+    NodeData.FChecks[eCheck] := 0;
+  NodeData.FTotal := 0;
+  NodeData.FIssueCount := 0;
+End;
+
+(**
+
+  This method creates the virtual string tree to display the checks.
 
   @precon  None.
   @postcon The virtual string tree is created.
@@ -705,7 +720,7 @@ End;
 
 (**
 
-  A destructor for the TframeBADIModuleMetricsEditorView class.
+  A destructor for the TframeBADIModuleChecksEditorView class.
 
   @precon  None.
   @postcon Does nothing.
@@ -760,7 +775,7 @@ End;
   child nodes.
 
   @precon  ParentNode must be a valid reference.
-  @postcon The parent node is updates with max values from the chlid nodes.
+  @postcon The parent node is updates with max values from the child nodes.
 
   @param   ParentNode as a PVirtualNode as a constant
 
@@ -831,7 +846,7 @@ End;
 
 (**
 
-  This method counts the numnber of issues in all the given nodes children and returns true if that
+  This method counts the number of issues in all the given nodes children and returns true if that
   number is not zero.
 
   @precon  Node must be a valid node reference.
@@ -901,7 +916,7 @@ End;
 
 (**
 
-  This method Hokos the IDEs Style Services if they are available and enabled.
+  This method Hooks the IDEs Style Services if they are available and enabled.
 
   @precon  None.
   @postcon The IDEs style services are hooked if available and enabled else its set to nil.
@@ -980,7 +995,7 @@ End;
 (**
 
   This method recursively walks the given container rendering its contents in the tree view. If the 
-  container is a generic function, metrics are extracted from the method and dislpayed. Any branches with
+  container is a generic function, metrics are extracted from the method and displayed. Any branches with
   out methods are pruned.
 
   @precon  Container must be a valid instance.
@@ -998,18 +1013,11 @@ Var
   NodeData: PBADICheckRecord;
   iElement: Integer;
   M: TGenericFunction;
-  Module: TBaseLanguageModule;
 
 Begin
   Result.Create(FVSTChecks.AddChild(Parent));
   NodeData := FVSTChecks.GetNodeData(Result.FNode);
   NodeData.FNodeType := ntUnkown;
-  If Container Is TBaseLanguageModule Then
-    Begin
-      Module := Container As TBaseLanguageModule;
-      NodeData.FNodeType := ntModule;
-      NodeData.FFileName := Module.FileName;
-    End;
   NodeData.FText := Container.AsString(True, False);
   NodeData.FImageIndex := BADIImageIndex(Container.ImageIndex, Container.Scope);
   NodeData.FIdentLine := Container.Line;
@@ -1044,14 +1052,15 @@ End;
   @postcon The modules methods and their metrics are rendered.
 
   @param   Module           as a TBaseLanguageModule as a constant
-  @param   setRenderOptions as a TBADICheckRenderOptions as a constant
+  @param   setRenderOptions as a TBADIRenderOptions as a constant
 
 **)
 Procedure TframeBADIModuleChecksEditorView.RenderModule(Const Module: TBaseLanguageModule;
-  Const setRenderOptions: TBADICheckRenderOptions);
+  Const setRenderOptions: TBADIRenderOptions);
 
 Var
   NodeResult: TNodeResultRecord;
+  ImplementedMethods: TElementContainer;
 
 Begin
   If Assigned(Module) And Assigned(FVSTChecks) Then
@@ -1059,11 +1068,14 @@ Begin
       FFileName := Module.FileName;
       FVSTChecks.BeginUpdate;
       Try
-        If croClear In setRenderOptions Then
+        If roClear In setRenderOptions Then
           FVSTChecks.Clear
         Else
           DeleteExistingModuleNode(Module);
-        NodeResult := RecurseContainer(Module, Nil);
+        NodeResult := CreateModule(Module);
+        ImplementedMethods := Module.FindElement(strImplementedMethodsLabel);
+        If Assigned(ImplementedMethods) Then
+          NodeResult := NodeResult + RecurseContainer(ImplementedMethods, NodeResult.FNode);
         SortAndExpand(NodeResult, setRenderOptions);
         UpdateStats;
       Finally
@@ -1081,18 +1093,18 @@ End;
   @postcon The rendered node (if valid) is sorted and expanded.
 
   @param   NodeResult       as a TNodeResultRecord as a constant
-  @param   setRenderOptions as a TBADICheckRenderOptions as a constant
+  @param   setRenderOptions as a TBADIRenderOptions as a constant
 
 **)
 Procedure TframeBADIModuleChecksEditorView.SortAndExpand(Const NodeResult : TNodeResultRecord;
-  Const setRenderOptions : TBADICheckRenderOptions);
+  Const setRenderOptions : TBADIRenderOptions);
 
 Begin
   If Assigned(NodeResult.FNode) Then
-    If croAutoExpand In setRenderOptions Then
+    If roAutoExpand In setRenderOptions Then
       Begin
-        If ((croAutoExpandOnError In setRenderOptions) And (NodeResult.FIssueCount > 0)) Or
-          Not (croAutoExpandOnError In setRenderOptions) Then
+        If ((roAutoExpandOnError In setRenderOptions) And (NodeResult.FIssueCount > 0)) Or
+          Not (roAutoExpandOnError In setRenderOptions) Then
         ExpandIssues;
       End;
 End;
@@ -1100,7 +1112,7 @@ End;
 (**
 
   This treeview needs to be focus to stop mouse scrolling message being directed to the editor (which
-  does not exists) so this timer waits for the treeview to be visisble and then gives it focus.
+  does not exists) so this timer waits for the treeview to be visible and then gives it focus.
 
   @precon  None.
   @postcon Focuses the treeview when it is visible.
@@ -1130,11 +1142,11 @@ Procedure TframeBADIModuleChecksEditorView.UpdateStats;
 
   (**
 
-    This procedure updates the FUnderLimit, FAtLimit or FOverLimit fields depending upon the value
+    This procedure updates the FUnderLimit or FOverLimit fields depending upon the value
     of the metric compared to the limit.
 
     @precon  None.
-    @postcon Updates the FUnderLimit, FAtLimit or FOverLimit fields depending upon the value
+    @postcon Updates the FUnderLimit or FOverLimit fields depending upon the value
              of the metric compared to the limit.
 
     @param   dblValue as a Double as a constant
@@ -1201,7 +1213,7 @@ Procedure TframeBADIModuleChecksEditorView.vstChecksBeforeCellPaint(Sender: TBas
 
     This function returns the colours to be used based on the value and the limit.
 
-    @precon  dblLimit cannot be zero.
+    @precon  dblValue cannot be zero.
     @postcon Returns the colours to be used based on the value and the limit.
 
     @param   dblValue as a Double as a constant
@@ -1309,7 +1321,7 @@ End;
 
 (**
 
-  This is an on FreeNdoe event handler for the treeview.
+  This is an on Free Node event handler for the treeview.
 
   @precon  None.
   @postcon Ensures that the managed types in the node are freed.

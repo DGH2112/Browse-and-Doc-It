@@ -1,11 +1,11 @@
 (**
   
-  This module contains a class whicih imnplements the IOTAEditorNotifier for detecting then views are
+  This module contains a class which implements the IOTAEditorNotifier for detecting then views are
   opened and closed.
 
   @Author  David Hoyle
-  @Version 1.872
-  @Date    09 Jul 2020
+  @Version 2.115
+  @Date    25 Aug 2020
   
   @license
 
@@ -43,11 +43,14 @@ Type
   (** This class implements an IOTAEditorNotifier to tracker when views are created and destroyed. **)
   TBADISourceEditorNotifier = Class(TNotifierObject, IInterface, IOTANotifier, IOTAEditorNotifier)
   Strict Private
+    FFileName              : String;
     {$IFDEF DXE100}
     FEditViewNotifierIndex : Integer;
     {$ENDIF DXE100}
     FView                  : IOTAEditView;
   Strict Protected
+    procedure InstallEditViewNotifier(const View: IOTAEditView);
+    procedure UninstallEditViewNotifier(const View: IOTAEditView);
     Procedure ViewActivated(Const View: IOTAEditView);
     Procedure ViewNotification(Const View: IOTAEditView; Operation: TOperation);
   Public
@@ -71,7 +74,7 @@ Uses
 
   @precon  None.
   @postcon Initialises the class and creates a view if a edit view is available. This is a workaround
-           for new modules created afrer the IDE has started.
+           for new modules created after the IDE has started.
 
   @param   SE as an IOTASourceEditor as a constant
 
@@ -79,7 +82,11 @@ Uses
 Constructor TBADISourceEditorNotifier.Create(Const SE : IOTASourceEditor);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
+  CodeSite.TraceMethod(Self, 'Create', tmoTiming);
+  {$IFDEF DEBUG}
+  FFileName := SE.FileName;
+  CodeSite.Send(csmOrange, 'TBADISourceEditorNotifier.Create', FFileName);
+  {$ENDIF}
   {$IFDEF DXE100}
   FEditViewNotifierIndex := -1;
   {$ENDIF DXE100}
@@ -100,9 +107,52 @@ End;
 Destructor TBADISourceEditorNotifier.Destroy;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
+  CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);
   ViewNotification(FView, opRemove);
+  CodeSite.Send(csmOrange, 'TBADISourceEditorNotifier.Destroy', FFileName);
   Inherited Destroy;
+End;
+
+(**
+
+  This method installs the Edit View Notifier.
+
+  @precon  View must be a valid instance.
+  @postcon The edit view notifier is created and installed.
+
+  @param   View as an IOTAEditView as a constant
+
+**)
+Procedure TBADISourceEditorNotifier.InstallEditViewNotifier(Const View: IOTAEditView);
+
+Begin
+  CodeSite.TraceMethod(Self, 'InstallEditViewNotifier', tmoTiming);
+  If FEditViewNotifierIndex = - 1 Then
+    Begin
+      FView := View;
+      FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create(FFileName));
+    End;
+End;
+
+(**
+
+  This method uninstalls the Edit View Notifier.
+
+  @precon  View must be a valid instance.
+  @postcon The edit view notifier is removed.
+
+  @param   View as an IOTAEditView as a constant
+
+**)
+Procedure TBADISourceEditorNotifier.UninstallEditViewNotifier(Const View: IOTAEditView);
+
+Begin
+  CodeSite.TraceMethod(Self, 'UninstallEditViewNotifier', tmoTiming);
+  If FEditViewNotifierIndex > - 1 Then
+    Begin
+      View.RemoveNotifier(FEditViewNotifierIndex);
+      FEditViewNotifierIndex := - 1;
+    End;
 End;
 
 (**
@@ -121,7 +171,10 @@ End;
 Procedure TBADISourceEditorNotifier.ViewActivated(Const View: IOTAEditView);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewActivated', tmoTiming);{$ENDIF}
+  CodeSite.TraceMethod(Self, 'ViewActivated', tmoTiming);
+  {: @debug CodeSite.Send(csmYellow, FFileName, Assigned(View));
+  If Assigned(View) Then
+    InstallEditViewNotifier(View);}
 End;
 
 (**
@@ -140,28 +193,19 @@ End;
 Procedure TBADISourceEditorNotifier.ViewNotification(Const View: IOTAEditView; Operation: TOperation);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);{$ENDIF}
+  CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);
   {$IFDEF DXE100}
   If Assigned(View) Then
     Begin
       Case Operation Of
-        // Only create a notifier if one has not already been created!
-        opInsert:
-          If FEditViewNotifierIndex = -1 Then 
-            Begin
-              FView := View;
-              FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create);
-            End;
-        // opRemove Never gets called!
-        opRemove:
-          If FEditViewNotifierIndex > -1 Then
-            Begin
-              View.RemoveNotifier(FEditViewNotifierIndex);
-              FEditViewNotifierIndex := -1;
-            End;
+        opInsert: InstallEditViewNotifier(View);
+        opRemove: UninstallEditViewNotifier(View);
       End;
     End;
   {$ENDIF DXE100}
 End;
 
 End.
+
+
+

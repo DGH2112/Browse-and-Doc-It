@@ -3,8 +3,8 @@
   This module contains a class which represents all comment in the Browse and Doc It system.
 
   @Author  David Hoyle
-  @Version
-  @Date    06 Jun 2020
+  @Version 1.465
+  @Date    15 Aug 2020
 
   @license
 
@@ -76,7 +76,8 @@ Type
       Reintroduce; Overload; Virtual;
     Destructor Destroy; Override;
     Class Function CreateComment(Const strComment: String; Const iLine, iCol : Integer): TComment; Virtual;
-    Procedure AddToken(Const strToken: String; Const iType: TBADITokenType = ttUnknown); Override;
+    Procedure AddToken(Const strToken: String; Const iType: TBADITokenType = ttUnknown;
+      Const iLine : Integer = 0; Const iColumn : Integer = 0); Override;
     Procedure Assign(Const srcComment: TComment); Overload;
     Procedure Assign(Const strComment: String); Overload;
     Function  AsString(Const iMaxWidth: Integer; Const boolShowHTML: Boolean): String;
@@ -85,7 +86,7 @@ Type
     Procedure TrimWhiteSpace;
     (**
       Returns the specifically indexed tag from the comments tag collection.
-      @precon  iTagIndex must eb a valid index between 0 and TagCount - 1.
+      @precon  iTagIndex must be a valid index between 0 and TagCount - 1.
       @postcon Returns the specifically indexed tag from the comments tag collection.
       @param   iTagIndex as an Integer as a Constant
       @return  a TTag
@@ -121,13 +122,16 @@ Uses
   @precon  strToken is a string to be added as a token and iType is the tokens type.
   @postcon Added a token and its type to the token list.
 
-  @nometric HardCodedInteger HardCodedString
+  @nohint iLine iColumn
 
   @param   strToken as a String as a constant
-  @param   iType    as a TBADITokenType as a Constant
+  @param   iType    as a TBADITokenType as a constant
+  @param   iLine    as an Integer as a constant
+  @param   iColumn  as an Integer as a constant
 
 **)
-Procedure TComment.AddToken(Const strToken: String; Const iType: TBADITokenType);
+Procedure TComment.AddToken(Const strToken: String; Const iType: TBADITokenType  = ttUnknown;
+  Const iLine : Integer = 0; Const iColumn : Integer = 0);
 
 Const
   strDoubleAt = '@@';
@@ -220,12 +224,12 @@ End;
 
 (**
 
-  This method assigns the str passed to the end of the token list. The string
+  This method assigns the string passed to the end of the token list. The string
   has a pre and post fix added so that the ParseComment() method will accept it
   as a valid comment.
 
   @precon  strComment is a string of text to be parsed as a comment.
-  @postcon Assigns the str passed to the end of the token list. The string
+  @postcon Assigns the string passed to the end of the token list. The string
            has a pre and post fix added so that the ParseComment() method will
            accept it as a valid comment.
 
@@ -287,9 +291,8 @@ End;
   This method returns a string representation of the comment tokens with the specified indent and broken
   into lines by the max width parameter.
 
-  @precon  iIndent is the indent in space required of the comment, iMaxWidth is the maximum width before
-           the comment is broken onto another line and ShowHTML determines if the routine outputs the
-           HTML Tags in the resulting string.
+  @precon  iMaxWidth is the maximum width before the comment is broken onto another line and
+           boolShowHTML determines if the routine outputs the HTML Tags in the resulting string.
   @postcon Returns a string representation of the comment indented and broken into lines.
 
   @param   iMaxWidth    as an Integer as a constant
@@ -305,10 +308,10 @@ End;
 
 (**
 
-  This is the TComment constructor. It create a token list and a tag list. Then it passes the comment to 
+  This is the TComment constructor. It create a token list and a tag list. Then it passes the comment to
   the comment parser.
 
-  @precon  strComment is a string of text to be parsed as a comment, iLine is the line number of the 
+  @precon  strComment is a string of text to be parsed as a comment, iLine is the line number of the
            comment and iCol is the column number of the comment.
   @postcon It create a token list and a tag list. Then it passes the comment to the comment parser.
 
@@ -350,12 +353,6 @@ Begin
   FTagMode := False;
   Assign(srcComment);
 End;
-
-//Constructor TComment.Create(Const strName: String; Const AScope: TScope; Const iLine, iColumn: Integer);
-//
-//Begin
-//  Inherited Create(strName, AScope, iLine, iColumn);
-//End;
 
 (**
 
@@ -503,7 +500,7 @@ End;
 
 (**
 
-  This method takes the given comment and parses it into tokens. It pulls out all the tags at the same 
+  This method takes the given comment and parses it into tokens. It pulls out all the tags at the same
   time. Tag should be at the end of the comment.
 
   @precon  strComment is a string of text to be parsed as a comment.
@@ -684,11 +681,11 @@ End;
 
 (**
 
-  This method trims starting whitespace from tags only if the line ends with a carriage return /
+  This method trims starting white space from tags only if the line ends with a carriage return /
   line feed.
 
   @precon  ATAg must be a valid instance.
-  @postcon The leading whitespace is removed from the tag if it ends with a CR / LF.
+  @postcon The leading white space is removed from the tag if it ends with a CR / LF.
 
   @param   ATag as a TTag as a constant
 
@@ -718,10 +715,10 @@ End;
 
 (**
 
-  This method removes trailing whitespace from the whole comment.
+  This method removes trailing white space from the whole comment.
 
   @precon  None.
-  @postcon Trailing whitespace is removed form the whole comment (including the last tag).
+  @postcon Trailing white space is removed form the whole comment (including the last tag).
 
 **)
 Procedure TComment.TrimTrailingWhitespace;
@@ -743,10 +740,10 @@ End;
 
 (**
 
-  This method removes both whitespave an line ends from the given Tag.
+  This method removes both white space an line ends from the given Tag.
 
   @precon  ATag must be a valid instance.
-  @postcon Whitespace and line ends are removed from the given tag.
+  @postcon White space and line ends are removed from the given tag.
 
   @param   ATag as a TTag as a constant
 
@@ -797,11 +794,11 @@ End;
 
 (**
 
-  This method removes common whitespace from all the lines of the tag so that the indentation
-  is maintained but the line with the least whitespace ends up with none.
+  This method removes common white space from all the lines of the tag so that the indentation
+  is maintained but the line with the least white space ends up with none.
 
   @precon  ATag must be a valid instance.
-  @postcon Common whitespace is removed from the tag comment.
+  @postcon Common white space is removed from the tag comment.
 
   @param   ATag as a TTag as a constant
 

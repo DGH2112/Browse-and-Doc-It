@@ -4,8 +4,8 @@
   project and unit source files.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    12 Jul 2019
+  @Version 1.052
+  @Date    06 Sep 2020
 
   @license
 
@@ -311,10 +311,10 @@ End;
 
 (**
 
-  This function returns true if the project file contains the unit TestFramework.
+  This function returns true if the project file contains the unit Test Framework.
 
   @precon  Project must be a valid instance of a project.
-  @postcon Returns true if the project file contains the unit TestFramework.
+  @postcon Returns true if the project file contains the unit Test Framework.
 
   @param   Project as an IOTAProject as a constant
   @return  a Boolean
@@ -340,8 +340,8 @@ Var
 
 Begin
   Result := False;
-  S := TBADIToolsAPIFunctions.SourceEditor(Project.CurrentEditor.Module);
   strFileName := Project.CurrentEditor.FileName;
+  S := TBADIToolsAPIFunctions.SourceEditor(Project.CurrentEditor.Module);
   M := TBADIDispatcher.BADIDispatcher.Dispatcher(TBADIToolsAPIFunctions.EditorAsString(S), strFileName,
     True, [moParse]);
   Try
@@ -805,7 +805,7 @@ End;
   This method adds new test cases to existing class at the end of the class. The assumption is that the 
   last section of the class is Published.
 
-  @precon  M and slTestCases must eb valid instances.
+  @precon  M and slTestCases must be valid instances.
   @postcon Adds new test cases to existing class at the end of the class.
 
   @param   M           as a TBaseLanguageModule as a constant
@@ -905,12 +905,12 @@ End;
 
 (**
 
-  This method adds new test suites to the initialisatio section assuming that the file has an 
-  initialisatin section.
+  This method adds new test suites to the initialization section assuming that the file has an 
+  initialization section.
 
   @precon  M must be a valid language module .
-  @postcon Adds new test suites to the initialisatio section assuming that the file has an initialisatin
-           section .
+  @postcon Adds new test suites to the initialization section assuming that the file has an
+           initialization section.
 
   @param   M                as a TBaseLanguageModule as a constant
   @param   slTestCases      as a TStrings as a constant
@@ -1146,10 +1146,10 @@ End;
 
 (**
 
-  This method checks if the given module is readonly. If so outputs a message and aborts.
+  This method checks if the given module is read only. If so outputs a message and aborts.
 
   @precon  Module must be a valid instance.
-  @postcon Checks if the given module is readonly. If so outputs a message and aborts.
+  @postcon Checks if the given module is read only. If so outputs a message and aborts.
 
   @param   Module            as an IOTAModule as a constant
   @param   strModuleReadOnly as a String as a constant
@@ -1356,10 +1356,10 @@ End;
 
 (**
 
-  This method returns true if the indexed project contains a nuit with the given name.
+  This method returns true if the indexed project contains a unit with the given name.
 
-  @precon  iProjecy must be a valid index into the project array.
-  @postcon Returns true if the indexed project contains a nuit with the given name.
+  @precon  iProject must be a valid index into the project array.
+  @postcon Returns true if the indexed project contains a unit with the given name.
 
   @param   iProject    as an Integer as a constant
   @param   strUnitName as a String as a constant
@@ -1864,7 +1864,7 @@ End;
 
 (**
 
-  This is a getter method for the AncestorName property.
+  This is a getter method for the Ancestor Name property.
 
   @precon  None.
   @postcon Not used in a unit.
@@ -1880,7 +1880,7 @@ End;
 
 (**
 
-  This is a getter method for the CreatorType property.
+  This is a getter method for the Creator Type property.
 
   @precon  None.
   @postcon Returns a type of Unit for a unit file (no form).
@@ -1899,7 +1899,7 @@ End;
   This is a getter method for the Existing property.
 
   @precon  None.
-  @postcon Returns false to indicate a new unUnit.
+  @postcon Returns false to indicate a new Unit.
   @return  a Boolean
 
 **)
@@ -1911,7 +1911,7 @@ End;
 
 (**
 
-  This is a getter method for the FileSystem property.
+  This is a getter method for the File System property.
 
   @precon  None.
   @postcon Returns an empty string to signify the default filing system.
@@ -1926,7 +1926,7 @@ End;
 
 (**
 
-  This is a getter method for the FormName property.
+  This is a getter method for the Form Name property.
 
   @precon  None.
   @postcon Not used in a unit file.
@@ -1941,7 +1941,7 @@ End;
 
 (**
 
-  This is a getter method for the ImplFileName property.
+  This is a getter method for the Implement FileName property.
 
   @precon  None.
   @postcon Returns the fully qualified filename for the unit.
@@ -1956,7 +1956,7 @@ End;
 
 (**
 
-  This is a getter method for the IntfFileName property.
+  This is a getter method for the Interface FileName property.
 
   @precon  None.
   @postcon Not used in Delphi.
@@ -1971,7 +1971,7 @@ End;
 
 (**
 
-  This is a getter method for the MainForm property.
+  This is a getter method for the Main Form property.
 
   @precon  None.
   @postcon Not used in a unit file.
@@ -2001,7 +2001,7 @@ End;
 
 (**
 
-  This is a getter method for the ShowForm property.
+  This is a getter method for the Show Form property.
 
   @precon  None.
   @postcon Not used in a unit file.
@@ -2016,7 +2016,7 @@ End;
 
 (**
 
-  This is a getter method for the ShowSource property.
+  This is a getter method for the Show Source property.
 
   @precon  None.
   @postcon Returns true to display the unit file source.
@@ -2152,8 +2152,10 @@ End;
 **)
 Function TProjectCreatorFile.GetSource: String;
 
-ResourceString
+Const
   strDUnitProjectTemplate = 'DUnitProjectSource';
+  
+ResourceString
   strTheDUnitProjectMsg = 'The DUnit Project Template ''%s'' was not found.';
 
 Var
@@ -2239,8 +2241,10 @@ End;
 **)
 Function TUnitCreatorFile.GetSource: String;
 
-ResourceString
+Const
   strDUnitUnitTemplate = 'DUnitUnitSource';
+
+ResourceString
   strTheDUnitUnitMsg = 'The DUnit Unit Template ''%s'' was not found.';
 
 Var

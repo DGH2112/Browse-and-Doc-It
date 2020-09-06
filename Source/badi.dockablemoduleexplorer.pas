@@ -3,8 +3,8 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Version 1.230
-  @Date    28 Mar 2020
+  @Version 1.360
+  @Date    24 Aug 2020
 
   @license
 
@@ -55,7 +55,7 @@ Type
       with the IDE **)
   TfrmDockableModuleExplorerClass = Class Of TfrmDockableModuleExplorer;
 
-  (** This class represents a dockable form that displays the heirarchical
+  (** This class represents a dockable form that displays the hierarchical
       representation of the modules contents. **)
   TfrmDockableModuleExplorer = Class(TDockableForm)
   Strict Private
@@ -81,8 +81,11 @@ Type
     Class Procedure CreateDockableModuleExplorer;
     Class Procedure RenderDocumentTree(Const BaseLanguageModule: TBaseLanguageModule);
     Class Procedure FollowEditorCursor(Const iLine : Integer);
-    Class Procedure HookEventHandlers(Const SelectionChangeProc: TSelectionChange;
-      Const Focus, ScopeChange: TNotifyEvent);
+    Class Procedure HookEventHandlers(
+                      Const SelectionChangeProc: TSelectionChange;
+                      Const Focus, ScopeChange: TNotifyEvent;
+                      Const IDEErrors : TBADIIDEErrors
+                    );
     Class Function  LineDocIssue(Const iLine : Integer) : IBADILineDocIssues;
     Class Function  DocIssueTotals : IBADIDocIssueTotals;
   End;
@@ -100,7 +103,7 @@ Uses
   BADI.ToolsAPIUtils;
 
 Var
-  (** This is a private varaible to hold the singleton instance of the
+  (** This is a private variable to hold the singleton instance of the
       dockable form. **)
   FormInstance: TfrmDockableModuleExplorer;
 
@@ -143,7 +146,7 @@ End;
 
   This procedure creates an instance of the dockable form.
 
-  @precon  FormVar is the instance reference and FormCass is the type of class
+  @precon  FormVar is the instance reference and FormClass is the type of class
            to be created..
   @postcon The form instance is created.
 
@@ -204,7 +207,7 @@ End;
   This method returns the doc issues totals.
 
   @precon  None.
-  @postcon An interfaced object is returned whcih contains the documentation issue totals.
+  @postcon An interfaced object is returned which contains the documentation issue totals.
 
   @return  an IBADIDocIssueTotals
 
@@ -220,11 +223,11 @@ End;
 (**
 
 
-  This method focuses the modukle explorers tree view the be focused IF
+  This method focuses the module explorers tree view the be focused IF
   available.
 
   @precon  None.
-  @postcon Focuses the modukle explorers tree view the be focused IF available.
+  @postcon Focuses the module explorers tree view the be focused IF available.
 
 
 **)
@@ -239,7 +242,7 @@ End;
 
 (**
 
-  This class method allowsd the caller to update the selection in the explorer module to align with
+  This class method allows the caller to update the selection in the explorer module to align with
   the given line number that is being followed in the editor.
 
   @precon  None.
@@ -277,19 +280,23 @@ End;
 
 (**
 
-  This is a class method which accepots even handler from the calling class to hand the dockable module 
-  explorer`s SelectionChange event handler.
+  This is a class method which accepts even handler from the calling class to hand the dockable module 
+  explorer`s Selection Change event handler.
 
   @precon  None.
-  @postcon Sets the SelectionChange event handler for the dockable form.
+  @postcon Sets the Selection Change event handler for the dockable form.
 
   @param   SelectionChangeProc as a TSelectionChange as a constant
   @param   Focus               as a TNotifyEvent as a constant
   @param   ScopeChange         as a TNotifyEvent as a constant
+  @param   IDEErrors           as a TBADIIDEErrors as a constant
 
 **)
-Class Procedure TfrmDockableModuleExplorer.HookEventHandlers(Const SelectionChangeProc: TSelectionChange;
-  Const Focus, ScopeChange: TNotifyEvent);
+Class Procedure TfrmDockableModuleExplorer.HookEventHandlers(
+                  Const SelectionChangeProc: TSelectionChange;
+                  Const Focus, ScopeChange: TNotifyEvent;
+                  Const IDEErrors : TBADIIDEErrors
+                );
 
 Begin
   If Assigned(FormInstance) Then
@@ -297,6 +304,7 @@ Begin
       FormInstance.FModuleExplorerFrame.OnSelectionChange := SelectionChangeProc;
       FormInstance.FModuleExplorerFrame.OnFocus := Focus;
       FormInstance.FModuleExplorerFrame.OnRefresh := ScopeChange;
+      FormInstance.FModuleExplorerFrame.OnIDEErrors := IDEErrors;
     End;
 End;
 
@@ -420,7 +428,7 @@ End;
 
 (**
 
-  This method themes the DockableModule Explorer form.
+  This method themes the Dockable Module Explorer form.
 
   @precon  None.
   @postcon The form is themed.
@@ -438,7 +446,7 @@ End;
 
 (**
 
-  This method unregisters the dockable form with the IDE.
+  This method un-registers the dockable form with the IDE.
 
   @precon  None.
   @postcon The dockable form is unregistered with the IDE.

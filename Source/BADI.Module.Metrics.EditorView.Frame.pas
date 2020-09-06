@@ -3,8 +3,8 @@
   This module contains a frame for displaying module methods and their metrics.
 
   @Author  David Hoyle
-  @Version 1.166
-  @Date    28 Aug 2020
+  @Version 1.313
+  @Date    06 Sep 2020
 
   @license
 
@@ -167,6 +167,7 @@ Type
     Procedure ExpandIssues;
     Procedure HookStyleServices(Sender : TObject);
     Procedure vstStatisticsDblClick(Sender : TObject);
+    Function  CreateModule(Const Module: TBaseLanguageModule): TNodeResultRecord;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -593,7 +594,46 @@ End;
 
 (**
 
-  This method creates the virtual string tree to display the metrics.
+  This method creates the module tree node for the spelling mistakes to sit under.
+
+  @precon  Module must be a valid instance.
+  @postcon The module node in the tree view is created.
+
+  @param   Module as a TBaseLanguageModule as a constant
+  @return  a TNodeResultRecord
+
+**)
+Function TframeBADIModuleMetricsEditorView.CreateModule(Const Module:
+  TBaseLanguageModule): TNodeResultRecord;
+
+Var
+  NodeData : PBADIMetricRecord;
+  eMetric : TBADIModuleMetric;
+    
+Begin
+  Result.Create(FVSTMetrics.AddChild(Nil));
+  NodeData := FVSTMetrics.GetNodeData(Result.FNode);
+  NodeData.FNodeType := ntModule;
+  NodeData.FFileName := Module.FileName;
+  NodeData.FText := Module.AsString(True, False);
+  NodeData.FImageIndex := BADIImageIndex(Module.ImageIndex, Module.Scope);
+  NodeData.FIdentLine := Module.Line;
+  NodeData.FIdentColumn := Module.Column;
+  NodeData.FCommentLine := 0;
+  NodeData.FCommentColumn := 0;
+  If Assigned(Module.Comment) Then
+    Begin
+      NodeData.FCommentLine := Module.Comment.Line;
+      NodeData.FCommentColumn := Module.Comment.Column;
+    End;
+  For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
+    NodeData.FMetrics[eMetric] := 0;
+  NodeData.FIssueCount := 0;
+End;
+
+(**
+
+  This method creates the virtual string tree to display the Metrics.
 
   @precon  None.
   @postcon The virtual string tree is created.
@@ -989,18 +1029,11 @@ Var
   NodeData: PBADIMetricRecord;
   iElement: Integer;
   M: TGenericFunction;
-  Module : TBaseLanguageModule;
 
 Begin
   Result.Create(FVSTMetrics.AddChild(Parent));
   NodeData := FVSTMetrics.GetNodeData(Result.FNode);
   NodeData.FNodeType := ntUnkown;
-  If Container Is TBaseLanguageModule Then
-    Begin
-      Module := Container As TBaseLanguageModule;
-      NodeData.FNodeType := ntModule;
-      NodeData.FFileName := Module.FileName;
-    End;
   NodeData.FText := Container.AsString(True, False);
   NodeData.FImageIndex := BADIImageIndex(Container.ImageIndex, Container.Scope);
   NodeData.FIdentLine := Container.Line;
@@ -1043,6 +1076,7 @@ Procedure TframeBADIModuleMetricsEditorView.RenderModule(Const Module: TBaseLang
 
 Var
   NodeResult: TNodeResultRecord;
+  ImplementedMethods: TElementContainer;
 
 Begin
   InitaliseRenderingOptions;
@@ -1055,7 +1089,10 @@ Begin
           FVSTMetrics.Clear
         Else
           DeleteExistingModuleNode(Module);
-        NodeResult := RecurseContainer(Module, Nil);
+        NodeResult := CreateModule(Module);
+        ImplementedMethods := Module.FindElement(strImplementedMethodsLabel);
+        If Assigned(ImplementedMethods) Then
+          NodeResult := NodeResult + RecurseContainer(ImplementedMethods, NodeResult.FNode);
         SortAndExpand(NodeResult, setRenderOptions);
         UpdateStats;
       Finally

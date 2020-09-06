@@ -3,8 +3,8 @@
   This module contains a frame for displaying module methods and their checks.
 
   @Author  David Hoyle
-  @Version 1.143
-  @Date    28 Aug 2020
+  @Version 1.210
+  @Date    06 Sep 2020
 
   @license
 
@@ -162,6 +162,7 @@ Type
     Procedure ExpandIssues;
     Procedure HookThemingServices(Sender : TObject);
     Procedure vstChecksDblClick(Sender : TObject);
+    Function  CreateModule(Const Module: TBaseLanguageModule): TNodeResultRecord;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -603,7 +604,47 @@ End;
 
 (**
 
-  This method creates the virtual string tree to display the metrics.
+  This method creates the module tree node for the spelling mistakes to sit under.
+
+  @precon  Module must be a valid instance.
+  @postcon The module node in the tree view is created.
+
+  @param   Module as a TBaseLanguageModule as a constant
+  @return  a TNodeResultRecord
+
+**)
+Function TframeBADIModuleChecksEditorView.CreateModule(Const Module:
+  TBaseLanguageModule): TNodeResultRecord;
+
+Var
+  NodeData : PBADICheckRecord;
+  eCheck : TBADIModuleCheck;
+    
+Begin
+  Result.Create(FVSTChecks.AddChild(Nil));
+  NodeData := FVSTChecks.GetNodeData(Result.FNode);
+  NodeData.FNodeType := ntModule;
+  NodeData.FFileName := Module.FileName;
+  NodeData.FText := Module.AsString(True, False);
+  NodeData.FImageIndex := BADIImageIndex(Module.ImageIndex, Module.Scope);
+  NodeData.FIdentLine := Module.Line;
+  NodeData.FIdentColumn := Module.Column;
+  NodeData.FCommentLine := 0;
+  NodeData.FCommentColumn := 0;
+  If Assigned(Module.Comment) Then
+    Begin
+      NodeData.FCommentLine := Module.Comment.Line;
+      NodeData.FCommentColumn := Module.Comment.Column;
+    End;
+  For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
+    NodeData.FChecks[eCheck] := 0;
+  NodeData.FTotal := 0;
+  NodeData.FIssueCount := 0;
+End;
+
+(**
+
+  This method creates the virtual string tree to display the checks.
 
   @precon  None.
   @postcon The virtual string tree is created.
@@ -972,18 +1013,11 @@ Var
   NodeData: PBADICheckRecord;
   iElement: Integer;
   M: TGenericFunction;
-  Module: TBaseLanguageModule;
 
 Begin
   Result.Create(FVSTChecks.AddChild(Parent));
   NodeData := FVSTChecks.GetNodeData(Result.FNode);
   NodeData.FNodeType := ntUnkown;
-  If Container Is TBaseLanguageModule Then
-    Begin
-      Module := Container As TBaseLanguageModule;
-      NodeData.FNodeType := ntModule;
-      NodeData.FFileName := Module.FileName;
-    End;
   NodeData.FText := Container.AsString(True, False);
   NodeData.FImageIndex := BADIImageIndex(Container.ImageIndex, Container.Scope);
   NodeData.FIdentLine := Container.Line;
@@ -1026,6 +1060,7 @@ Procedure TframeBADIModuleChecksEditorView.RenderModule(Const Module: TBaseLangu
 
 Var
   NodeResult: TNodeResultRecord;
+  ImplementedMethods: TElementContainer;
 
 Begin
   If Assigned(Module) And Assigned(FVSTChecks) Then
@@ -1037,7 +1072,10 @@ Begin
           FVSTChecks.Clear
         Else
           DeleteExistingModuleNode(Module);
-        NodeResult := RecurseContainer(Module, Nil);
+        NodeResult := CreateModule(Module);
+        ImplementedMethods := Module.FindElement(strImplementedMethodsLabel);
+        If Assigned(ImplementedMethods) Then
+          NodeResult := NodeResult + RecurseContainer(ImplementedMethods, NodeResult.FNode);
         SortAndExpand(NodeResult, setRenderOptions);
         UpdateStats;
       Finally

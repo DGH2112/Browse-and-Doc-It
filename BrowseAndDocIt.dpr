@@ -239,7 +239,8 @@ uses
   BADI.Module.Spelling in 'Source\BADI.Module.Spelling.pas',
   BADI.FileInfo.Manager in 'Source\BADI.FileInfo.Manager.pas',
   BADI.Frame.Manager in 'Source\BADI.Frame.Manager.pas',
-  BADI.ProgressForm in 'Source\BADI.ProgressForm.pas' {frmProgress};
+  BADI.ProgressForm in 'Source\BADI.ProgressForm.pas' {frmProgress},
+  BADI.CommentCodeForm in 'Source\BADI.CommentCodeForm.pas' {frmCommentCode};
 
 {$R *.res}
 

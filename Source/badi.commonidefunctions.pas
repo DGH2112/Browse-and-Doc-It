@@ -1,11 +1,11 @@
 (**
 
   This module contains common code that can be used within each of the IDE
-  imlpementations (Delphi and VB).
+  implementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Version 1.011
-  @Date    24 May 2020
+  @Version 1.120
+  @Date    06 Sep 2020
 
   @license
 
@@ -78,15 +78,6 @@ Type
       Const ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
   End;
 
-  (** A record to describe the start, end and markers for different comment
-      types. **)
-  TCommentTypeRec = Record
-    FStart: String;
-    FMiddle: String;
-    FBlockEnd: String;
-    FLineEnd: String;
-  End;
-
   Function FindFunction(Const iLine: Integer; Const Container: TElementContainer;
     Const ContainerClass: TGenericFunctionClass): TGenericFunction;
   Function Description(Const Func: TGenericFunction; Const iIndent: Integer; Const boolPadOut: Boolean;
@@ -109,7 +100,7 @@ Const
     ' as a constant', ' as an out parameter');
   (** A list of vowels. **)
   strVowels: Set Of AnsiChar = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
-  (** A constant array of outputs for the ArrayOf property. **)
+  (** A constant array of outputs for the Array Of property. **)
   strArrayOf: Array [False .. True] Of String = ('', 'Array Of ');
 
 ResourceString
@@ -163,22 +154,12 @@ Uses
   BADI.Options,
   BADI.Functions,
   BADI.Module.Dispatcher,
-  Dialogs;
+  Dialogs, BADI.Constants;
 
 Const
   (** A constant to define the with of the tag formatting in method / property
       comments. **)
   iTagWidth: Integer = 8;
-  (** A constant array to define the comment start, end and markers for the
-      different styles of source code. **)
-  strCmtTerminals: Array [Low(TCommentType) .. High(TCommentType)] Of TCommentTypeRec = (
-    (FStart: '';     FMiddle: '';    FBlockEnd: '';    FLineEnd: ''),
-    (FStart: '(**';  FMiddle: '';    FBlockEnd: '**)'; FLineEnd: '**)'),
-    (FStart: '{:';   FMiddle: '';    FBlockEnd: '}';   FLineEnd: '}'),
-    (FStart: '/**';  FMiddle: '';    FBlockEnd: '**/'; FLineEnd: '**/'),
-    (FStart: '//:';  FMiddle: '//:'; FBlockEnd: '';    FLineEnd: ''),
-    (FStart: ''':';  FMiddle: ''':'; FBlockEnd: ''':'; FLineEnd: ''),
-    (FStart: '<!--'; FMiddle: '';    FBlockEnd: '-->'; FLineEnd: '-->'));
   (** A pre-condition comment tag. **)
   strPreConTag = 'precon';
   (** A post-condition comment tag. **)
@@ -187,7 +168,7 @@ Const
   strParamTag = 'param';
   (** A return comment tag. **)
   strReturnTag = 'return';
-  (** A constant string for formating the type of a parameter **)
+  (** A constant string for formatting the type of a parameter **)
   strFormatAs = '   %-*s as ';
   (** A indentation padding for a comment. **)
   iCommentPadding = 2;
@@ -277,11 +258,11 @@ Begin
   If CommentType In [ctPascalBlock .. ctCPPBlock] Then
     AddToComment(strCommentText, StringOfChar(#32, iIndent));
   If CommentType In [ctPascalBlock, ctPascalBrace, ctCPPBlock] Then
-    AddToComment(strCommentText, strCmtTerminals[CommentType].FBlockEnd + #13#10)
+    AddToComment(strCommentText, astrCmtTerminals[CommentType].FBlockEnd + #13#10)
   Else
     Begin
       If CommentType In [ctCPPLine, ctVBLine] Then
-        strInsert := strCmtTerminals[CommentType].FMiddle
+        strInsert := astrCmtTerminals[CommentType].FMiddle
       Else
         strInsert := '';
       sl          := TStringList.Create;
@@ -305,7 +286,7 @@ End;
   This procedure outputs the comment header to the comment text.
 
   @precon  None.
-  @postcon The comment header is outptu to the comment text.
+  @postcon The comment header is output to the comment text.
 
   @param   strCommentText as a String as a reference
   @param   CommentType    as a TCommentType as a constant
@@ -320,7 +301,7 @@ Begin
   If CommentType In [ctPascalBlock .. ctCPPBlock] Then
     AddToComment(strCommentText, StringOfChar(#32, iIndent));
   If CommentType In [ctPascalBlock, ctPascalBrace, ctCPPBlock] Then
-    AddToComment(strCommentText, strCmtTerminals[CommentType].FStart + #13#10);
+    AddToComment(strCommentText, astrCmtTerminals[CommentType].FStart + #13#10);
   If boolPadOut Then
     AddToComment(strCommentText, #13#10);
 End;
@@ -393,10 +374,10 @@ Var
 
 Begin
   Result         := '';
-  strAllCmtStart := strCmtTerminals[CommentType].FStart;
-  strCmtMiddle   := strCmtTerminals[CommentType].FMiddle;
-  strBlockCmtEnd := strCmtTerminals[CommentType].FBlockEnd;
-  strLineCmtEnd  := strCmtTerminals[CommentType].FLineEnd;
+  strAllCmtStart := astrCmtTerminals[CommentType].FStart;
+  strCmtMiddle   := astrCmtTerminals[CommentType].FMiddle;
+  strBlockCmtEnd := astrCmtTerminals[CommentType].FBlockEnd;
+  strLineCmtEnd  := astrCmtTerminals[CommentType].FLineEnd;
   Case CommentStyle Of
     csBlock:
       Begin
@@ -425,7 +406,7 @@ End;
   This method returns a description for the method if it is a constructor, destructor, getter or setter
   method, else it returns an empty String.
 
-  @precon  Method is a valid instance of a method declatation to be described.
+  @precon  Method is a valid instance of a method declaration to be described.
   @postcon Returns a description of the method is applicable. CursorAdjust provide delta movements for
            the cursor from column 1 if the first line of the new comment.
 
@@ -454,11 +435,11 @@ End;
 
 (**
 
-  This method recursively works throug the hierarchy of elements looking for the method which is closest
+  This method recursively works through the hierarchy of elements looking for the method which is closest
   to be on or just above the current cursor line.
 
   @precon  Container must be a valid TElementContainer instance.
-  @postcon Recursively works throug the hierarchy of elements looking for the method which is closest to
+  @postcon Recursively works through the hierarchy of elements looking for the method which is closest to
            be on or just above the current cursor line.
 
   @param   iLine          as an Integer as a constant
@@ -701,7 +682,7 @@ End;
 
 (**
 
-  This method creates a new comment using the existing comment information and returns it int he comment
+  This method creates a new comment using the existing comment information and returns it in the comment
   text.
 
   @precon  Func must be a valid instance.
@@ -851,7 +832,7 @@ End;
   A constructor for the TBrowseAndDocItThreadManager class.
 
   @precon  None.
-  @postcon Intialises the thread variable to null.
+  @postcon Initialises the thread variable to null.
 
 **)
 Constructor TBrowseAndDocItThreadManager.Create;
@@ -986,7 +967,7 @@ End;
   This execute method parses the code of the active editor stored in the
   memory stream and render the information in the explorer module.
 
-  @precon  FMemoryStream must be a valid stream of chars to parse.
+  @precon  None.
   @postcon Parses the code of the active editor stored in the memory stream and
            render the information in the explorer module.
 
@@ -995,8 +976,10 @@ End;
 **)
 Procedure TBrowseAndDocItThread.Execute;
 
+{$IFDEF EUREKALOG}
 Const
   strBrowseAndDocItParsingThread = 'BrowseAndDocItParsingThread';
+{$ENDIF EUREKALOG}
 
 Begin
   Try
@@ -1025,11 +1008,11 @@ End;
 
 (**
 
-  This method synchronizes with the main IDE thread and renders the module
+  This method synchronises with the main IDE thread and renders the module
   explorer.
 
   @precon  FModule must be a valid TBaseLanguageModule instance.
-  @postcon Synchronizes with the main IDE thread and renders the module
+  @postcon Synchronises with the main IDE thread and renders the module
            explorer.
 
 **)

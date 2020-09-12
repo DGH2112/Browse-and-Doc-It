@@ -2,9 +2,9 @@
 
   This module encapsulates the creation of menus in the IDE.
 
-  @Version 1.140
+  @Version 1.287
   @Author  David Hoyle
-  @Date    05 Sep 2020
+  @Date    12 Sep 2020
 
   @license
 
@@ -103,7 +103,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,
@@ -133,7 +133,7 @@ Uses
   BADI.Refactor.Constant, 
   BADI.Module.Metrics, 
   BADI.Module.Checks, 
-  BADI.Module.Spelling;
+  BADI.Module.Spelling, BADI.CommentCodeForm;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -1597,33 +1597,28 @@ End;
 **)
 Procedure TBADIIDEMenuInstaller.ToDoCommentClick(Sender: TObject);
 
-Const
-  strAtToDo = '@todo ';
-  iTodoCommentInsPos = 10;
-
 Var
-  EditorSvcs     : IOTAEditorServices;
-  SE             : IOTASourceEditor;
-  Writer         : IOTAEditWriter;
-  EditPos        : TOTAEditPos;
-  CharPos        : TOTACharPos;
-  strSelectedText: String;
-  strComment     : String;
-  CommentType    : TCommentType;
-  iIndent        : Integer;
+  MS : IOTAModuleServices;
+  strExt : String;
+  strTagName : String;
+  eCommentType : TCommentType;
 
 Begin
-  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) And Assigned(MS.CurrentModule) Then
+    Begin
+      strExt := ExtractFileExt(MS.CurrentModule.FileName);
+      strTagName := TBADIOptions.BADIOptions.CommentTagName[strExt];
+      eCommentType := TBADIOptions.BADIOptions.CommentType[strExt];
+      If TfrmCommentCode.Execute(strTagName, eCommentType) Then
+        Begin
+          TBADIOptions.BADIOptions.CommentTagName[strExt] := strTagName;
+          TBADIOptions.BADIOptions.CommentType[strExt] := eCommentType;
+          CodeSite.SendEnum(csmNote, strTagName, TypeInfo(TCommentType), Ord(eCommentType));
+        End;
+    End;
+  (** @debug SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
   If Assigned(SE) Then
     Begin
-      If IsTextSelected(SE) Then
-        Case MessageDlg(strThereIsSelectedText, mtConfirmation, [mbYes, mbNo,
-          mbCancel], 0) Of
-          mrCancel: Exit;
-          mrNo:     strSelectedText := '';
-        Else
-          strSelectedText := SelectedText(True);
-        End;
       If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
         Begin
           EditPos := EditorSvcs.TopView.CursorPos;
@@ -1643,6 +1638,9 @@ Begin
           EditorSvcs.TopView.CursorPos := EditPos;
         End;
     End;
+    
+  **)
+  
 End;
 
 (**

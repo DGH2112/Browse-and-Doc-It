@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 2.477
-  @Date    05 Sep 2020
+  @Version 2.550
+  @Date    06 Sep 2020
 
   @license
 
@@ -999,6 +999,17 @@ Const
     strLiteral
   );
 
+  (** A constant array to define the comment start, end and markers for the
+      different styles of source code. **)
+  astrCmtTerminals: Array [Low(TCommentType) .. High(TCommentType)] Of TCommentTypeRec = (
+    (FStart: '';     FMiddle: '';    FBlockEnd: '';    FLineEnd: ''),
+    (FStart: '(**';  FMiddle: '';    FBlockEnd: '**)'; FLineEnd: '**)'),
+    (FStart: '{:';   FMiddle: '';    FBlockEnd: '}';   FLineEnd: '}'),
+    (FStart: '/**';  FMiddle: '';    FBlockEnd: '**/'; FLineEnd: '**/'),
+    (FStart: '//:';  FMiddle: '//:'; FBlockEnd: '';    FLineEnd: ''),
+    (FStart: ''':';  FMiddle: ''':'; FBlockEnd: ''':'; FLineEnd: ''),
+    (FStart: '<!--'; FMiddle: '';    FBlockEnd: '-->'; FLineEnd: '-->'));
+    
 Implementation
 
 End.

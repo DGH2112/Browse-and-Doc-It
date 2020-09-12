@@ -395,6 +395,10 @@
         <DCCReference Include="Source\BADI.ProgressForm.pas">
             <Form>frmProgress</Form>
         </DCCReference>
+        <DCCReference Include="Source\BADI.CommentCodeForm.pas">
+            <Form>frmCommentCode</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

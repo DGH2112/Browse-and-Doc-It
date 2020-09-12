@@ -3,8 +3,8 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.562
-  @Date    29 Aug 2020
+  @Version 1.593
+  @Date    06 Sep 2020
 
   @license
 
@@ -561,6 +561,9 @@ Type
       WriteComment. @nospellings **)
   TCommentType = (ctNone, ctPascalBlock, ctPascalBrace, ctCPPBlock, ctCPPLine, ctVBLine, ctXML);
 
+  (** A set of the above comment types. **)
+  TCommentTypes = Set Of TCommentType;
+
   (** A silent parser abort exception. **)
   EBADIParserAbort = Class(Exception);
   (** An exception or an error when parsing a file. **)
@@ -766,6 +769,15 @@ Type
   (** An enumerate to define the types of spelling issue. **)
   TBADISpellingIssueType = (sitComment, sitTag, sitResourceString, sitConstant, sitLiteral);
   
+  (** A record to describe the start, end and markers for different comment
+      types. **)
+  TCommentTypeRec = Record
+    FStart: String;
+    FMiddle: String;
+    FBlockEnd: String;
+    FLineEnd: String;
+  End;
+
 Implementation
 
 (**

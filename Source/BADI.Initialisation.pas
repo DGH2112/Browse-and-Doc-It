@@ -1,12 +1,12 @@
 (**
 
-  This module contains a singleton class which is automatically initialised at startup (and
-  therefore should not be manually created) to intialise and register a number of global objects
+  This module contains a singleton class which is automatically initialised at start-up (and
+  therefore should not be manually created) to initialise and register a number of global objects
   in the system.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jul 2019
+  @Version 1.041
+  @Date    06 Sep 2020
 
   @license
 
@@ -75,7 +75,7 @@ Type
   This is a constructor for the TBADI Initialisation class.
 
   @precon  None.
-  @postcon Initialises the 2 global objects ModuleDispatcher and BrowseAndDocItOptions in the
+  @postcon Initialises the 2 global objects Module Dispatcher and Browse And Doc It Options in the
            correct order.
 
 **)
@@ -83,23 +83,24 @@ Constructor TBADIInitialisation.Create;
 
 Type
   TBADIDispatcherRecord = Record
-    FModule    : TBaseLanguageModuleClass;
-    FExt       : String;
-    FCanDoc    : Boolean;
-    FBlockCmt  : TCommentType;
-    FLineCmt   : TCommentType;
-    FInSituCmt : TCommentType;
+    FModule       : TBaseLanguageModuleClass;
+    FExt          : String;
+    FCanDoc       : Boolean;
+    FBlockCmt     : TCommentType;
+    FLineCmt      : TCommentType;
+    FInSituCmt    : TCommentType;
+    FCommentTypes : TCommentTypes;
   End;
 
 Const
   Modules : Array[0..6] Of TBADIDispatcherRecord = (
-    (FModule: TBackusNaurModule;   FExt: '.bnf';                      FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
-    (FModule: TPascalModule;       FExt: '.dpk;.dpr;.pas';            FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
-    (FModule: TCPPModule;          FExt: '.cpp;.hpp;.c;.h';           FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
-    (FModule: TDFMModule;          FExt: '.dfm';                      FCanDoc: False; FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
-    (FModule: TINIModule;          FExt: '.ini;.tli';                 FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPBlock),
-    (FModule: TVBModule;           FExt: '.bas;.cls;.frm';            FCanDoc: True;  FBlockCmt: ctVBLine;      FLineCmt: ctVBLine;      FInSituCmt: ctVBLine),
-    (FModule: TXMLModule;          FExt: '.dtd;.htm;.html;.xml;.xsd'; FCanDoc: False; FBlockCmt: ctXML;         FLineCmt: ctXML;         FInSituCmt: ctXML)
+    (FModule: TBackusNaurModule;   FExt: '.bnf';                      FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock;    FCommentTypes: [ctCPPBlock, ctCPPLine]),
+    (FModule: TPascalModule;       FExt: '.dpk;.dpr;.pas';            FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock; FCommentTypes: [ctPascalBlock, ctPascalBrace, ctCPPLine]),
+    (FModule: TCPPModule;          FExt: '.cpp;.hpp;.c;.h';           FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock;    FCommentTypes: [ctCPPBlock, ctCPPLine]),
+    (FModule: TDFMModule;          FExt: '.dfm';                      FCanDoc: False; FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock; FCommentTypes: [ctPascalBlock, ctPascalBrace, ctCPPLine]),
+    (FModule: TINIModule;          FExt: '.ini;.tli';                 FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPBlock;    FCommentTypes: [ctCPPLine]),
+    (FModule: TVBModule;           FExt: '.bas;.cls;.frm';            FCanDoc: True;  FBlockCmt: ctVBLine;      FLineCmt: ctVBLine;      FInSituCmt: ctVBLine;      FCommentTypes: [ctVBLine]),
+    (FModule: TXMLModule;          FExt: '.dtd;.htm;.html;.xml;.xsd'; FCanDoc: False; FBlockCmt: ctXML;         FLineCmt: ctXML;         FInSituCmt: ctXML;         FCommentTypes: [ctXML])
   );
 
 Var
@@ -115,7 +116,9 @@ Begin
       Modules[iModule].FCanDoc,
       Modules[iModule].FBlockCmt,
       Modules[iModule].FLineCmt,
-      Modules[iModule].FInSituCmt);
+      Modules[iModule].FInSituCmt,
+      Modules[iModule].FCommentTypes
+    );
   TBADIOptions.BADIOptions.LoadSettings; // Will create the Options
 End;
 
@@ -141,7 +144,7 @@ End;
   information.
 
   @precon  None.
-  @postcon The initialisation class is freed and in doing so frees the module displatcher and
+  @postcon The initialisation class is freed and in doing so frees the module dispatcher and
            options class.
 
 **)
@@ -157,7 +160,7 @@ End;
   dispatcher (registering the modules) and the options.
 
   @precon  None.
-  @postcon The 2 global objects in BADI (Dispatcher and Options) are intialised correctly.
+  @postcon The 2 global objects in BADI (Dispatcher and Options) are initialised correctly.
 
 **)
 Class Procedure TBADIInitialisation.InitialiseBADI;
@@ -166,8 +169,8 @@ Begin
   FBADIInitialisationInstance := TBADIInitialisation.Create;
 End;
 
-(** This initialization section should be the ONLY intiialization section for the BADI code. It
-    initializes the 2 global singleton class and registers all the modules with the dispatcher. **)
+(** This initialization section should be the ONLY initialization section for the BADI code. It
+    initialises the 2 global singleton class and registers all the modules with the dispatcher. **)
 Initialization
   TBADIInitialisation.InitialiseBADI;
 (** This frees the initialisation class. **)

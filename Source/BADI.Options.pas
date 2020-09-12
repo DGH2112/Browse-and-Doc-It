@@ -3,8 +3,8 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 3.388
-  @Date    02 Aug 2020
+  @Version 20.836
+  @Date    12 Sep 2020
 
   @license
 
@@ -96,6 +96,8 @@ Type
     FIgnoreDictionaryFile             : String;
     FIgnoreDictionary                 : TStringList;
     FSpellingMistakeColour            : TColor;
+    FCommentTagNames                  : TStringList;
+    FCommentTypes                     : TStringList;
   Strict Protected
     // IBADIOptions
     Function  GetOptions : TDocOptions;
@@ -185,6 +187,8 @@ Type
     Procedure LoadMetrics(Const iniFile: TMemIniFile);
     Procedure LoadChecks(Const iniFile: TMemIniFile);
     Procedure LoadDictionaries(Const iniFile: TMemIniFile);
+    Procedure LoadCommentTags(Const iniFile: TMemIniFile);
+    Procedure LoadCommentTypes(Const iniFile: TMemIniFile);
     Procedure UpdateDoNotFollowEditor();
     Procedure SaveDocOptions(Const iniFile: TMemIniFile);
     Procedure SaveSpecialTags(Const iniFile: TMemIniFile);
@@ -199,6 +203,8 @@ Type
     Procedure SaveMetrics(Const iniFile: TMemIniFile);
     Procedure SaveChecks(Const iniFile: TMemIniFile);
     Procedure SaveDictionaries(Const iniFile: TMemIniFile);
+    Procedure SaveCommentTags(Const iniFile: TMemIniFile);
+    Procedure SaveCommentTypes(Const iniFile: TMemIniFile);
     Function  GetScopeImageList : TImageList;
     Function  GetLanguageDictionary : TStringList;
     Function  GetLanguageDictionaryFile : String;
@@ -214,6 +220,10 @@ Type
     Function  GetIgnoreDictionary : TStringList;
     Function  GetSpellingMistakeColour : TColor;
     Procedure SetSpellingMistakeColour(Const iColour : TColor);
+    Function  GetCommentTagName(Const strExt : String) : String;
+    Procedure SetCommentTagName(Const strExt, strValue : String);
+    Function  GetCommentType(Const strExt : String) : TCommentType;
+    Procedure SetCommentType(Const strExt : String; Const eValue : TCommentType);
   Public
     Constructor Create(Const IDEEditorColours : IBADIIDEEditorColours);
     Destructor Destroy; Override;
@@ -343,6 +353,10 @@ Const
   strIgnoreDictionaryINIKey = 'IgnoreDictionary';
   (** A constant for the Spelling Mistake Colour INI Key. **)
   strSpellingMistakeColourINIKey = 'Spelling Mistake Colour';
+  (** A constant for the Comment Tag Names INI Section **)
+  strCommentTagNamesINISection = 'CommentTagNames';
+  (** A constant for the Comment Types INI Section **)
+  strCommentTypesINISection = 'CommentTypes';
 
 Var
   (** This is a class variable to hide and hold the BADI Options instance reference. **)
@@ -440,6 +454,8 @@ Begin
   FignoreDictionary := TStringList.Create;
   FignoreDictionary.Sorted := True;
   FignoreDictionary.Duplicates := dupIgnore;
+  FCommentTagNames := TStringList.Create;
+  FCommentTypes := TStringList.Create;
   FINIFileName := BuildRootKey;
   FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
   FExclusions := TBADIExclusions.Create;
@@ -464,6 +480,8 @@ Destructor TBADIOptions.Destroy;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   SaveSettings;
+  FCommentTypes.Free;
+  FCommentTagNames.Free;
   FScopeImageList.Free;
   FProfilingCode.Free;
   FMethodDescriptions.Free;
@@ -491,6 +509,55 @@ Function TBADIOptions.GetBrowsePosition: TBrowsePosition;
 
 Begin
   Result := FBrowsePosition;
+End;
+
+(**
+
+  This is a getter method for the Comment Tag Name property.
+
+  @precon  None.
+  @postcon Returns the comment tag name for the given file extension.
+
+  @param   strExt as a String as a constant
+  @return  a String
+
+**)
+Function TBADIOptions.GetCommentTagName(Const strExt: String): String;
+
+Const
+  strToDoDefaultTagName = 'todo';
+
+Var
+  iIndex: Integer;
+
+Begin
+  Result := strToDoDefaultTagName;
+  iIndex := FCommentTagNames.IndexOfName(strExt);
+  If iIndex > -1 Then
+    Result := FCommentTagNames.ValueFromIndex[iIndex];
+End;
+
+(**
+
+  This is a getter method for the Comment Type property.
+
+  @precon  None.
+  @postcon Returns the comment type associated with the given file extension.
+
+  @param   strExt as a String as a constant
+  @return  a TCommentType
+
+**)
+Function TBADIOptions.GetCommentType(Const strExt: String): TCommentType;
+
+Var
+  iIndex: Integer;
+
+Begin
+  Result := TBADIDispatcher.BADIDispatcher.GetCommentType(strExt, csBlock);
+  iIndex := FCommentTypes.IndexOf(strExt);
+  If iIndex > -1 Then
+    Result := TCommentType(FCommentTypes.Objects[iIndex]);
 End;
 
 (**
@@ -1281,6 +1348,69 @@ End;
 
 (**
 
+  This method loads the comment tag names associated with the the file extensions in to the string list.
+
+  @precon  None.
+  @postcon The file extension = tag name pairs are loaded into the string list.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadCommentTags(Const iniFile: TMemIniFile);
+
+Const
+  strDefaultTagName = 'todo';
+
+Var
+  sl : TStringList;
+  strTagName: String;
+  
+Begin
+  sl := TstringList.Create;
+  Try
+    iniFile.ReadSection(strCommentTagNamesINISection, sl);
+    For strTagName In sl Do
+      FCommentTagNames.AddPair(
+        strTagName,
+        iniFile.ReadString(strCommentTagNamesINISection, strTagName, strDefaultTagName)
+      );
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This method loads the comment types associated with file extensions.
+
+  @precon  None.
+  @postcon The comment types associated with file extensions are loaded from the INI file.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadCommentTypes(Const iniFile: TMemIniFile);
+
+Var
+  sl: TStringList;
+  strTagName: String;
+
+Begin
+  sl := TstringList.Create;
+  Try
+    iniFile.ReadSection(strCommentTypesINISection, sl);
+    For strTagName In sl Do
+      FCommentTypes.AddObject(
+        strTagName,
+        TObject(iniFile.ReadInteger(strCommentTypesINISection, strTagName, Integer(ctNone)))
+      );
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
   This method loads the dictionary filenames from the INI File and loads the dictionaries into string
   lists.
 
@@ -1684,6 +1814,8 @@ Begin
     LoadMetrics(iniFile);
     LoadChecks(iniFile);
     LoadDictionaries(iniFile);
+    LoadCommentTags(iniFile);
+    LoadCommentTypes(iniFile);
     UpdateDoNotFollowEditor();
     FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
     FModuleDateFmt := iniFile.ReadString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey,
@@ -1822,6 +1954,54 @@ Begin
   For eCheckSubOp := Low(TBADIModuleCheckSubOp) To High(TBADIModuleCheckSubOp) Do
     iniFile.WriteBool(strModuleChecks, ModuleCheckSubOps[eCheckSubOp].FName + strEnabled,
       eCheckSubOp In FModuleCheckSubOps);
+End;
+
+(**
+
+  This method saves the comment tags associated with a file extension to the INI file.
+
+  @precon  None.
+  @postcon The comment tag associated with a file extension are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveCommentTags(Const iniFile: TMemIniFile);
+
+Var
+  iTag : Integer;
+  
+Begin
+  For iTag := 0 To FCommentTagNames.Count - 1 Do
+    iniFile.WriteString(
+      strCommentTagNamesINISection,
+      FCommentTagNames.Names[iTag],
+      FCommentTagNames.ValueFromIndex[iTag]
+    );  
+End;
+
+(**
+
+  This method saves the comment types associated with a file extension to the INI file.
+
+  @precon  None.
+  @postcon The comment types associated with a file extension are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveCommentTypes(Const iniFile: TMemIniFile);
+
+Var
+  iTag: Integer;
+
+Begin
+  For iTag := 0 To FCommentTypes.Count - 1 Do
+    iniFile.WriteInteger(
+      strCommentTypesINISection,
+      FCommentTypes[iTag],
+      Integer(FCommentTypes.Objects[iTag])
+    );  
 End;
 
 (**
@@ -2113,6 +2293,8 @@ Begin
     SaveMetrics(iniFile);
     SaveChecks(iniFile);
     SaveDictionaries(iniFile);
+    SaveCommentTags(iniFile);
+    SaveCommentTypes(iniFile);
     iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
     iniFile.WriteString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey, FModuleDateFmt);
     iniFile.WriteFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey, FModuleVersionIncrement);
@@ -2189,6 +2371,54 @@ Procedure TBADIOptions.SetBrowsePosition(Const eBrowsePosition: TBrowsePosition)
 
 Begin
   FBrowsePosition := eBrowsePosition;
+End;
+
+(**
+
+  This is a setter method for the Comment Tag Name property.
+
+  @precon  None.
+  @postcon Sets the tag name for the given file extension.
+
+  @param   strExt   as a String as a constant
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetCommentTagName(Const strExt, strValue: String);
+
+Var
+  iIndex: Integer;
+
+Begin
+  iIndex := FCommentTagNames.IndexOfName(strExt);
+  If iIndex > -1 Then
+    FCommentTagNames.Values[strExt] := strValue
+  Else
+    FCommentTagNames.AddPair(strExt, strValue);
+End;
+
+(**
+
+  This is a setter method for the Comment Types property.
+
+  @precon  None.
+  @postcon Sets the comments type associated with the given extension.
+
+  @param   strExt as a String as a constant
+  @param   eValue as a TCommentType as a constant
+
+**)
+Procedure TBADIOptions.SetCommentType(Const strExt: String; Const eValue: TCommentType);
+
+Var
+  iIndex: Integer;
+
+Begin
+  iIndex := FCommentTypes.IndexOf(strExt);
+  If iIndex > -1 Then
+    FCommentTypes.Objects[iIndex] := TObject(eValue)
+  Else
+    FCommentTypes.AddObject(strExt, TObject(eValue));
 End;
 
 (**
@@ -2813,20 +3043,12 @@ Const
 
 Var
   eDocIssue: TLimitType;
-  iIndex: Integer;
   
 Begin
   FDoNotFollowEditor := [];
-  iIndex := 0;
-  //SetLength(FDoNotFollowEditor, Integer(High(TLimitType)) - Integer(Low(TLimitType)) + 1);
   For eDocIssue := Low(TLimitType) To High(TLimitType) Do
     If aLimitOptions[eDocIssue] In FOptions Then
       Include(FDoNotFollowEditor, eDocIssue);
-  //    Begin
-  //      FDoNotFollowEditor[iIndex] := astrLimitType[eDocIssue];
-  //      Inc(iIndex);
-  //    End;
-  //SetLength(FDoNotFollowEditor, iIndex);
 End;
 
 End.

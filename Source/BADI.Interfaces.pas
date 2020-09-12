@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 2.317
-  @Date    02 Aug 2020
+  @Version 2.439
+  @Date    12 Sep 2020
 
   @license
 
@@ -160,6 +160,10 @@ Type
     Function  GetIgnoreDictionary : TStringList;
     Function  GetSpellingMistakeColour : TColor;
     Procedure SetSpellingMistakeColour(Const iColour : TColor);
+    Function  GetCommentTagName(Const strExt : String) : String;
+    Procedure SetCommentTagName(Const strExt, strValue : String);
+    Function  GetCommentType(Const strExt : String) : TCommentType;
+    Procedure SetCommentType(Const strExt : String; Const eValue : TCommentType);
     // General Methods
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -526,6 +530,24 @@ Type
       @return  a TColor
     **)
     Property SpellingMistakeColour : TColor Read GetSpellingMistakeColour Write SetSpellingMistakeColour;
+    (**
+      This property determines the comment tag to be used when inserting comments with tags for a given
+      file extension.
+      @precon  None.
+      @postcon Returns the comment tag to be used for the given module extension.
+      @param   strExt as a String as a constant
+      @return  a String
+    **)
+    Property CommentTagName[Const strExt : String] : String Read GetCommentTagName Write SetCommentTagName;
+    (**
+      This property determines the comment type to be used when inserting comments with tags for a given
+      file extension.
+      @precon  None.
+      @postcon Returns the comment type to be used for the given module extension.
+      @param   strExt as a String as a constant
+      @return  a TCommentType
+    **)
+    Property CommentType[Const strExt : String] : TCommentType Read GetCommentType Write SetCommentType;
   End;
 
   (** An interface to get the IDE Editor Colours from the Registry. **)

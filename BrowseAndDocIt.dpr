@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.273
+  @Version 1.314
   @Author  David Hoyle
-  @Date    06 Sep 2020
+  @Date    12 Sep 2020
 
   @license
 
@@ -32,7 +32,7 @@
   @done Refactoring a const in the DPR module AVs.
   @done Update the Metrics Editor View to iterate only the implemented methods.
   @done Update the Checks Editor View to iterate only the implemented methods.
-  @todo Add the ability to insert / surround tags or comments type.
+  @done Add the ability to insert / surround tags or comments type.
 
 **)
 library BrowseAndDocIt;
@@ -239,26 +239,30 @@ uses
   BADI.Module.Spelling in 'Source\BADI.Module.Spelling.pas',
   BADI.FileInfo.Manager in 'Source\BADI.FileInfo.Manager.pas',
   BADI.Frame.Manager in 'Source\BADI.Frame.Manager.pas',
-  BADI.ProgressForm in 'Source\BADI.ProgressForm.pas' {frmProgress};
+  BADI.ProgressForm in 'Source\BADI.ProgressForm.pas' {frmProgress},
+  BADI.CommentCodeForm in 'Source\BADI.CommentCodeForm.pas' {frmCommentCode};
 
 {$R *.res}
 
 {$IFDEF DEBUG}
 Const
+  (** A category label for the CodeSite messages during debugging. **)
+  strBADICodeSiteCategory = 'BADI';
+  (** This is the lowest colour level to randomise from. **)
   iBaseColour = $C0;
-  iAddColour = $3F;
+  (** This is the remaining level to randomise over. **)
+  iAddColour = $FF - iBaseColour;
 {$ENDIF DEBUG} 
 
 begin
   {$IFDEF DEBUG}
   ReportMemoryLeaksOnShutdown := True;
-  CodeSite.Category := 'BADI';
+  CodeSite.Category := strBADICodeSiteCategory;
   Randomize;
   CodeSite.CategoryColor :=
-    $0000FF And ((iBaseColour + Random(iAddColour)) Shl 00)+
-    $00FF00 And ((iBaseColour + Random(iAddColour)) Shl 08) +
-    $FF0000 And ((iBaseColour + Random(iAddColour)) Shl 16);
-  CodeSite.SendColor(csmReminder, 'CategoryColor', CodeSite.CategoryColor);
+    (iBaseColour + Random(iAddColour)) Shl 00+
+    (iBaseColour + Random(iAddColour)) Shl 08 +
+    (iBaseColour + Random(iAddColour)) Shl 16;
   {$ENDIF DEBUG} 
 end.
 

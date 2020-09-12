@@ -2,7 +2,7 @@
 
   This module encapsulates the creation of menus in the IDE.
 
-  @Version 1.287
+  @Version 23.666
   @Author  David Hoyle
   @Date    12 Sep 2020
 
@@ -76,7 +76,7 @@ Type
     Procedure BlockCommentClick(Sender: TObject);
     Procedure LineCommentClick(Sender: TObject);
     Procedure InSituCommentClick(Sender: TObject);
-    Procedure ToDoCommentClick(Sender: TObject);
+    Procedure TaggedCommentClick(Sender: TObject);
     Procedure DocumentationClick(Sender: TObject);
     Procedure DUnitClick(Sender: TObject);
     Procedure ProfilingClick(Sender: TObject);
@@ -88,8 +88,13 @@ Type
     Procedure CreateBADIMainMenu;
     Procedure RemoveActionsFromToolbars;
     Function  AddImagesToIDE : Integer;
+    function  BlockStartCursorPos(const ES: IOTAEditorServices): TOTAEditPos;
     Procedure NilActions;
     Procedure FreeActions;
+    Function  InsertLineComments(Const strComment: String; Const iCol : Integer;
+      Const strCmtText : String) : String;
+    Procedure InsertTaggedComment(Const strTagName: String; Const eCommentType: TCommentType);
+    Procedure MoveCursorToBlockStart(Const ES: IOTAEditorServices; Const Writer: IOTAEditWriter);
     Procedure RefactorConstantClick(Sender : TObject);
   Public
     Constructor Create(Const EditorNotifier : TEditorNotifier);
@@ -107,6 +112,7 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,
+  StrUtils,
   BADI.Documentation.Dispatcher,
   BADI.ToolsAPIUtils,
   BADI.DocumentationOptionsForm,
@@ -215,6 +221,28 @@ End;
 
 (**
 
+  This method returns the block start editor position.
+
+  @precon  None.
+  @postcon Returns the block start editor position.
+
+  @param   ES as an IOTAEditorServices as a constant
+  @return  a TOTAEditPos
+
+**)
+Function TBADIIDEMenuInstaller.BlockStartCursorPos(Const ES: IOTAEditorServices): TOTAEditPos;
+
+Begin
+  If ES.TopBuffer.BlockVisible Then
+    Begin
+      Result.Col := ES.TopBuffer.BlockStart.CharIndex + 1;
+      Result.Line := ES.TopBuffer.BlockStart.Line;
+    End Else
+      Result := ES.TopView.CursorPos;
+End;
+
+(**
+
   This is an on action event handler for the BADI Checks project editor view.
 
   @precon  None.
@@ -270,7 +298,7 @@ Begin
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmInSituComment, InSituCommentClick, Nil, iImageIndex);
   Inc(iImageIndex);
-  CreateMenuItem(FBADIMenu, bmToDoComment, ToDoCommentClick, Nil, iImageIndex);
+  CreateMenuItem(FBADIMenu, bmToDoComment, TaggedCommentClick, Nil, iImageIndex);
   CreateMenuItem(FBADIMenu, bmSep2, Nil, Nil, 0);
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmRefactorConstant, RefactorConstantClick, Nil, iImageIndex);
@@ -716,6 +744,46 @@ End;
 
 (**
 
+  This method inserts the line comment start for all lines in the given comment except the first.
+
+  @precon  None.
+  @postcon The comment text provided is returned with comment starts inserted at the given indent.
+
+  @param   strComment as a String as a constant
+  @param   iCol       as an Integer as a constant
+  @param   strCmtText as a String as a constant
+  @return  a String
+
+**)
+Function TBADIIDEMenuInstaller.InsertLineComments(Const strComment: String; Const iCol : Integer;
+  Const strCmtText : String) : String;
+
+Var
+  sl : TStringList;
+  iIndent : Integer;
+  iLine: Integer;
+  strLine: String;
+  
+Begin
+  sl := TStringList.Create;
+  Try
+    sl.TrailingLineBreak := False;
+    iIndent := iCol - 1;
+    sl.text := strComment;
+    For iLine := 1 To sl.Count - 1 Do //: @note Starting at 1 is deliberate
+      Begin
+        strLine := sl[iLine];
+        strLine.Insert(iIndent, strCmtText + #32);
+        sl[iLine] := strLine;
+      End;
+    Result := sl.Text;
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
   This method inserts profiling code into the editor.
 
   @precon  SE and ProfileJob must be valid instances.
@@ -760,6 +828,67 @@ Begin
         Writer := Nil;
       End;
     End;
+End;
+
+(**
+
+  This method inserts a tagged comment with optional selected text into the edit at the cursor position.
+
+  @precon  None.
+  @postcon The tagged comment is inserted.
+
+  @param   strTagName   as a String as a constant
+  @param   eCommentType as a TCommentType as a constant
+
+**)
+Procedure TBADIIDEMenuInstaller.InsertTaggedComment(Const strTagName: String;
+  Const eCommentType: TCommentType);
+
+Var
+  SE: IOTASourceEditor;
+  ES: IOTAEditorServices;
+  EditPos: TOTAEditPos;
+  Writer: IOTAEditWriter;
+  strComment : String;
+  
+Begin
+  SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
+  If Assigned(SE) Then
+    If Supports(BorlandIDEServices, IOTAEditorServices, ES) Then
+      Begin
+        EditPos := BlockStartCursorPos(ES);
+        Writer := SE.CreateUndoableWriter;
+        Try
+          MoveCursorToBlockStart(ES, Writer);
+          strComment := SelectedText(True);
+          Case eCommentType Of
+            ctPascalBlock, ctPascalBrace, ctCPPBlock, ctXML:
+              strComment := Format('%s %s %s %s', [
+                  astrCmtTerminals[eCommentType].FStart,
+                  IfThen(strTagName.Length > 0, '@' + strTagName, ''),
+                  strComment,
+                  astrCmtTerminals[eCommentType].FBlockEnd
+                ]);
+            ctCPPLine, ctVBLine:
+              Begin
+                strComment := InsertLineComments(strComment, EditPos.Col,
+                  astrCmtTerminals[eCommentType].FStart);
+                strComment := Format('%s %s %s', [
+                    astrCmtTerminals[eCommentType].FStart,
+                    IfThen(strTagName.Length > 0, '@' + strTagName, ''),
+                    strComment
+                  ]);
+              End;
+          End;
+          TBADIToolsAPIFunctions.OutputText(Writer, strComment);
+          EditPos.Col := EditPos.Col + Format('%s %s ', [
+            astrCmtTerminals[eCommentType].FStart,
+            IfThen(strTagName.Length > 0, '@' + strTagName, '')]).Length;
+        Finally
+          Writer := Nil;
+        End;
+        ES.TopView.CursorPos := EditPos;
+      End;
 End;
 
 (**
@@ -947,6 +1076,34 @@ Procedure TBADIIDEMenuInstaller.ModuleExplorerClick(Sender: TObject);
 
 Begin
   TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
+End;
+
+(**
+
+  This method moves the writer insertion position to the start of the selected block.
+
+  @precon  ES and Writer must be valid instances.
+  @postcon The cursor position is moved.
+
+  @param   ES     as an IOTAEditorServices as a constant
+  @param   Writer as an IOTAEditWriter as a constant
+
+**)
+Procedure TBADIIDEMenuInstaller.MoveCursorToBlockStart(Const ES: IOTAEditorServices;
+  Const Writer: IOTAEditWriter);
+
+Var
+  CharPos: TOTACharPos;
+
+Begin
+  If ES.TopBuffer.BlockVisible Then
+    CharPos := ES.TopBuffer.BlockStart
+  Else
+    Begin
+      CharPos.Line := ES.TopView.CursorPos.Line;
+      CharPos.CharIndex := ES.TopView.CursorPos.Col - 1;
+    End;
+  Writer.CopyTo(ES.TopView.CharPosToPos(CharPos));
 End;
 
 (**
@@ -1595,7 +1752,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TBADIIDEMenuInstaller.ToDoCommentClick(Sender: TObject);
+Procedure TBADIIDEMenuInstaller.TaggedCommentClick(Sender: TObject);
 
 Var
   MS : IOTAModuleServices;
@@ -1613,34 +1770,10 @@ Begin
         Begin
           TBADIOptions.BADIOptions.CommentTagName[strExt] := strTagName;
           TBADIOptions.BADIOptions.CommentType[strExt] := eCommentType;
-          CodeSite.SendEnum(csmNote, strTagName, TypeInfo(TCommentType), Ord(eCommentType));
+          InsertTaggedComment(strTagName, eCommentType);
         End;
     End;
-  (** @debug SE := TBADIToolsAPIFunctions.ActiveSourceEditor;
-  If Assigned(SE) Then
-    Begin
-      If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
-        Begin
-          EditPos := EditorSvcs.TopView.CursorPos;
-          Writer  := SE.CreateUndoableWriter;
-          Try
-            CharPos.Line      := EditPos.Line;
-            CharPos.CharIndex := EditPos.Col;
-            Writer.CopyTo(EditorSvcs.TopView.CharPosToPos(CharPos) - 1);
-            CommentType := TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csLine);
-            iIndent     := EditPos.Col;
-            strComment  := BuildBlockComment(CommentType, csLine, iIndent, strAtToDo + strSelectedText);
-            TBADIToolsAPIFunctions.OutputText(Writer, strComment);
-            EditPos.Col := EditPos.Col + iTodoCommentInsPos;
-          Finally
-            Writer := Nil;
-          End;
-          EditorSvcs.TopView.CursorPos := EditPos;
-        End;
-    End;
-    
-  **)
-  
+
 End;
 
 (**

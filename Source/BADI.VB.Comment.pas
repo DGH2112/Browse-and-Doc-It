@@ -3,15 +3,15 @@
   This module contains a class to represent a VB comment.
 
   @Author  David Hoyle
-  @Version 1.003
-  @Date    24 May 2020
+  @Version 1.004
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ Uses
   BADI.Comment;
 
 Type
-  (** An imlpementation for visual basic comments. **)
+  (** An implementation for visual basic comments. **)
   TVBComment = Class(TComment)
   Public
     Class Function CreateComment(Const strComment: String; Const iLine, iCol: Integer): TComment;

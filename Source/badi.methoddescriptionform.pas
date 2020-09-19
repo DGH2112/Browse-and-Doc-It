@@ -3,15 +3,15 @@
   This module contains a class to add and edit method descriptions.
 
   @Author  David Hoyle
-  @Version 1.030
-  @Date    28 Mar 2020
+  @Version 1.033
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ Uses
   Dialogs,
   StdCtrls,
   Buttons,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, System.ImageList, Vcl.ImgList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -82,7 +82,7 @@ Uses
 
   @precon  None.
   @postcon If the dialogue is confirmed then the pattern and description are
-           returned in the var parameters and the function retuen true.
+           returned in the var parameters and the function return true.
 
 
   @param   strPattern     as a String as a reference

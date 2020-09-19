@@ -3,16 +3,16 @@
   This module contains a class which represents a frame interface for excluded document
   files.
 
-  @Version 1.035
+  @Version 1.036
   @Author  David Hoyle
-  @Date    18 Jul 2020
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ Type
   TBADIExclusionField = (efPattern, efDocConflicts, efMetrics, efChecks, efSpelling);
 
 ResourceString
-  (** A string for the InputQuery dialogue title / caption. **)
+  (** A string for the Input Query dialogue title / caption. **)
   strExclusions = 'Exclusions';
   (**  string for the input query regular expression prompt. **)
   strValidReEx = 'Regular Expression for the exclusion';
@@ -217,7 +217,7 @@ End;
   A constructor for the TfmBADIExcludedDocFilesFrame class.
 
   @precon  None.
-  @postcon Creates a collection for the excclusions to be displayed.
+  @postcon Creates a collection for the exclusions to be displayed.
 
   @nocheck MissingCONSTInParam
 
@@ -520,7 +520,7 @@ Procedure TfmBADIExcludedDocFilesFrame.vstExclusionsMouseDown(Sender: TObject; B
     This procedure toggles the inclusion / exclusion of the given enumerate in the exclusion property.
 
     @precon  None.
-    @postcon The property is togged with the opposite of the given enumerate.
+    @postcon The property is toggled with the opposite of the given enumerate.
 
     @param   recExclusion      as a TBADIExclusionRec as a reference
     @param   BADIExclusionType as a TBADIExclusionType as a constant

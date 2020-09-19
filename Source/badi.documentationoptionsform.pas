@@ -3,16 +3,16 @@
   This module contains a class which represent a form for defining the option
   for Documentation.
 
-  @Version 1.035
+  @Version 1.038
   @Author  David Hoyle
-  @Date    28 Mar 2020
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ uses
   StdCtrls,
   Buttons,
   ExtCtrls,
-  BADI.Documentation.Dispatcher;
+  BADI.Documentation.Dispatcher, System.ImageList, Vcl.ImgList;
 
 type
   (** A class to represent the form interface. **)
@@ -80,7 +80,7 @@ Uses
 
 (**
 
-  This is the forms main interface method for invokking the dialogue.
+  This is the forms main interface method for invoking the dialogue.
 
   @precon  None.
   @postcon Returns the documentation type require in the var parameter if the dialogue is accepted while

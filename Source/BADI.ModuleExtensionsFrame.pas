@@ -3,15 +3,15 @@
   This module contains a frame for display the module explorer file extensions for editing.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ Uses
   A constructor for the TfmBADIModuleExtensionsFrame class.
 
   @precon  None.
-  @postcon Themes the ValueListEditor.
+  @postcon Themes the Value List Editor.
 
   @nocheck MissingCONSTInParam
 
@@ -116,7 +116,7 @@ End;
   This method loads the frame with the file extensions in the module dispatcher.
 
   @precon  None.
-  @postcon The frame is loaded with the file exteniosn for each module.
+  @postcon The frame is loaded with the file extensions for each module.
 
 **)
 Procedure TfmBADIModuleExtensionsFrame.LoadSettings;
@@ -137,7 +137,7 @@ End;
 
 (**
 
-  This method saves the changes inthe file exnteiosn associate with the modules back to the
+  This method saves the changes in the file extensions associate with the modules back to the
   module dispatcher.
 
   @precon  None.

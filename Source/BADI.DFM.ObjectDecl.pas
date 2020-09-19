@@ -3,15 +3,15 @@
   This module contains a class to represent a n object in a DFM file.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,9 +50,9 @@ Type
       iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
-      This property sets and gets the whether the Object, Inherited or Inline.
+      This property sets and gets the whether the Object, Inherited or In-line.
       @precon  None.
-      @postcon Sets and gets the whether the Object, Inherited or Inline.
+      @postcon Sets and gets the whether the Object, Inherited or In-line.
       @return  a TObjectType
     **)
     Property ObjectType : TObjectType Read FObjectType Write FObjectType;
@@ -65,10 +65,10 @@ Uses
 
 (**
 
-  This method returns a string represetation of the DFM object.
+  This method returns a string representation of the DFM object.
 
   @precon  None.
-  @postcon Returns a string represetation of the DFM object.
+  @postcon Returns a string representation of the DFM object.
 
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant

@@ -3,15 +3,15 @@
   This module contains a class to represent module information stored in the Modules Dispatcher.
 
   @Author  David Hoyle
-  @Version 1.262
-  @Date    06 Sep 2020
+  @Version 1.263
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

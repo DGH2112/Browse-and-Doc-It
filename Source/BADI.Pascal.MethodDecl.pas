@@ -3,15 +3,15 @@
   This module contains a class which implements an Object Pascal method declaration.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.004
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,9 +75,9 @@ Type
     **)
     Property Directives : TStringList Read FDirectives;
     (**
-      This property returns whether the method is resovled forward or not.
+      This property returns whether the method is resolved forward or not.
       @precon  None.
-      @postcon Returns whether the method is resovled forward or not.
+      @postcon Returns whether the method is resolved forward or not.
       @return  a Boolean
     **)
     Property Resolved : Boolean Read FResolved Write FResolved;
@@ -204,8 +204,6 @@ end;
   @precon  None.
   @postcon Initialises the class and creates a string list for the directives.
 
-  @nometricMissingCONSTInParam
-
   @param   MethodType as a TMethodType as a constant
   @param   strName    as a String as a constant
   @param   AScope     as a TScope as a constant
@@ -244,7 +242,7 @@ end;
 
 (**
 
-  This is a getter method for the ConstantLabel property.
+  This is a getter method for the Constant Label property.
 
   @precon  None.
   @postcon Creates a label if it does not already exist and returns the reference.
@@ -328,7 +326,7 @@ end;
 
 (**
 
-  This is a getter method for the QualifiedName property.
+  This is a getter method for the Qualified Name property.
 
   @precon  None.
   @postcon For anonymous methods, the parent qualified name is pre-pended.
@@ -353,7 +351,7 @@ End;
 
 (**
 
-  This is a getter method for the ResourceStringLabel property.
+  This is a getter method for the Resource String Label property.
 
   @precon  None.
   @postcon Creates a label if it does not already exist and returns the reference.
@@ -375,7 +373,7 @@ End;
 
 (**
 
-  This is a getter method for the TypeLabel property.
+  This is a getter method for the Type Label property.
 
   @precon  None.
   @postcon Creates a label if it does not already exist and returns the reference.

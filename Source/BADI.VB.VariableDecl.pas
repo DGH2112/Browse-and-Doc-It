@@ -3,15 +3,15 @@
   This module contains a class to represent a VB variable declaration.
 
   @Author  Daivd Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,10 +77,10 @@ Uses
 
 (**
 
-  This method adds an array dimension to the varaiable declaration.
+  This method adds an array dimension to the variable declaration.
 
   @precon  None .
-  @postcon Adds an array dimension to the varaiable declaration .
+  @postcon Adds an array dimension to the variable declaration .
 
   @param   strLow  as a String as a Constant
   @param   strHigh as a String as a Constant

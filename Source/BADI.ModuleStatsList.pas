@@ -4,15 +4,15 @@
   their size and size deltas.
 
   @Author  David Hoyle
-  @Version 1.025
-  @Date    08 May 2020
+  @Version 1.026
+  @Date    19 Sep 2020
   
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ Uses
 
 
 Type
-  (** A class whicih implements the IBADIModuleStatsList interface. **)
+  (** A class which implements the IBADIModuleStatsList interface. **)
   TBADIModuleStatsList = Class(TInterfacedObject, IBADIModuleStatsList)
   Strict Private
     FModuleList : TDictionary<String,IBADIModuleStats>;
@@ -94,7 +94,7 @@ End;
 
 (**
 
-  This is a getter method for the ModuleStats property.
+  This is a getter method for the Module Stats property.
 
   @precon  None.
   @postcon Returns the statistics for the given filename. If the file name does not exist a new

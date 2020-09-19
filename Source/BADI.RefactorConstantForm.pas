@@ -4,15 +4,15 @@
   refactoring.
 
   @Author  David Hoyle
-  @Version 1.032
-  @Date    28 Mar 2020
+  @Version 1.035
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ Uses
   StdCtrls,
   Buttons,
   ExtCtrls,
-  BADI.Refactoring.Functions;
+  BADI.Refactoring.Functions, System.ImageList, Vcl.ImgList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -217,10 +217,10 @@ End;
 
 (**
 
-  This method intialises the dialogue with available scopes and types.
+  This method initialises the dialogue with available scopes and types.
 
   @precon  None.
-  @postcon The form is intialised.
+  @postcon The form is initialised.
 
   @param   setScopes   as a TBADIRefactoringScopes as a constant
   @param   setTypes    as a TBADIRefactoringTypes as a constant

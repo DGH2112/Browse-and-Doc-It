@@ -3,15 +3,15 @@
   This module contains a class that represents a generic method declaration.
 
   @Author  David Hoyle
-  @Version 1.003
-  @Date    24 May 2020
+  @Version 1.005
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ Uses
 
   @precon  Method is the method declaration that requires checking for document
            conflicts.
-  @postcon The passed method is systematicaly check for errors.
+  @postcon The passed method is systematically check for errors.
 
   @param   boolCascade as a Boolean as a reference
 
@@ -160,7 +160,7 @@ End;
   missing or no description.
 
   @precon  Method is valid method declaration to be checked for documentation.
-  @postcon Checks the passed method for docuemntation errors.
+  @postcon Checks the passed method for documentation errors.
 
 **)
 Procedure TGenericMethodDecl.CheckMethodDocumentation;
@@ -375,11 +375,11 @@ End;
 
 (**
 
-  This is the constructor for the TMethodDecl class. It initialises the method type, scope and line and 
-  col information. If also creates a colection to store the parameter objects and a string list for the 
+  This is the constructor for the TGenericMethodDecl class. It initialises the method type, scope and line and 
+  col information. If also creates a collection to store the parameter objects and a string list for the 
   method directives.
 
-  @precon  MethodType is an enumerate indocating the type of the method, Scope is the scope of the 
+  @precon  MethodType is an enumerate indicating the type of the method, Scope is the scope of the 
            method, iLine is the line number of the method, and iCol is the column number of the method
            .
   @postcon It initialises the method type, scope and line and col information.
@@ -423,7 +423,7 @@ End;
 
 (**
 
-  This is the destructor method for the TMethodDecl class. It frees the
+  This is the destructor method for the TGenericMethodDecl class. It frees the
   parameters collection, the parameter and the directives.
 
   @precon  None.
@@ -519,7 +519,7 @@ End;
   This is a setter method for the Ext property.
 
   @precon  Value is the new value to assign to the Ext property.
-  @postcon Setst the extension property for the method.
+  @postcon Sets the extension property for the method.
 
   @param   Value as a String as a constant
 

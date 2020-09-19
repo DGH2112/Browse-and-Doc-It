@@ -5,15 +5,15 @@
   @note       This unit ONLY tokenizes C++ at the moment - the parser HAS NOT BEEN WRITTEN!
 
   @Author  David Hoyle
-  @Version 1.003
-  @Date    24 May 2020
+  @Version 1.013
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -796,13 +796,13 @@ Uses
   BADI.Module.Dispatcher;
 
 Resourcestring
-  (** This is an error message for rendering a temporay container - SHOULDN'T do this **)
+  (** This is an error message for rendering a temporary container - SHOULDN`T do this **)
   strTriedToRenderTmpCntr = 'Tried to Render a Temporary Container!';
   (** This is an error message for duplicate identifiers. **)
   strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
 
 Const
-  (** A set of characters for alpha characaters **)
+  (** A set of characters for alpha characters **)
   strTokenChars : Set Of AnsiChar = ['_', 'a'..'z', 'A'..'Z'];
   (** A set of numbers **)
   strNumbers : Set Of AnsiChar = ['0'..'9'];
@@ -2083,7 +2083,7 @@ end;
 
 (**
 
-  This is the constructor method for the TPascalDocModule class.
+  This is the constructor method for the TCPPModule class.
 
   @precon  Source is a valid TStream descendant containing as stream of text, that is the contents of a 
            source code module and Filename is the file name of the module being parsed and IsModified 
@@ -2152,10 +2152,10 @@ End;
 (**
 
 
-  This is a destructor for the TPascalModule class.
+  This is a destructor for the TCPPModule class.
 
   @precon  None.
-  @postcon Fress the memory fo this instance.
+  @postcon Frees the memory for this instance.
 
 
 **)
@@ -2207,7 +2207,7 @@ Var
   iLine : Integer;
   (** Current column number **)
   iColumn : Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
+  (** Token stream position. Fast to increment this than read the stream position. **)
   iStreamPos : Integer;
   (** Token line **)
   iTokenLine : Integer;
@@ -2398,7 +2398,7 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
+           Errors while providing declaration elements for browsing.
 
 **)
 Procedure TCPPModule.ParseTokens;
@@ -2596,13 +2596,11 @@ end;
 
   This method is the starting position for the parsing of an object pascal
   module. It finds the first non comment token and begins the grammar checking
-  from their by deligating to the program, library, unit and package methods.
-
-  @grammar Goal -> ( Program | Package | Library | Unit )
+  from their by delegating to the program, library, unit and package methods.
 
   @precon  None.
   @postcon It finds the first non comment token and begins the grammar checking
-           from their by deligating to the program, library, unit and package
+           from their by delegating to the program, library, unit and package
            methods.
 
 **)
@@ -6759,10 +6757,10 @@ end;
 
 (**
 
-  This function returns a string repreentation of the unit.
+  This function returns a string representation of the unit.
 
   @precon  None .
-  @postcon Returns a string repreentation of the unit .
+  @postcon Returns a string representation of the unit .
 
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant
@@ -7313,12 +7311,12 @@ end;
 (**
 
   This method cross reference the methods in class, exported and implemented
-  and marsk the as resolved and output error messages for those that are still
+  and marks the as resolved and output error messages for those that are still
   unresolved.
 
   @precon  None.
   @postcon Cross reference the methods in class, exported and implemented
-           and marsk the as resolved and output error messages for those that
+           and marks the as resolved and output error messages for those that
            are still unresolved.
 
 **)

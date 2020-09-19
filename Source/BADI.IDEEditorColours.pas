@@ -4,15 +4,15 @@
   the token colours from the IDE.
 
   @Author  David Hoyle
-  @Version 1.016
-  @Date    07 Feb 2020
+  @Version 1.017
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ End;
   and returns that alternate point instead of the standard BDS if found.
 
   @precon  None.
-  @postcon Returns the activty IDEs registration point.
+  @postcon Returns the active IDEs registration point.
 
   @return  a String
 
@@ -179,7 +179,7 @@ End;
 
 (**
 
-  This method reads an IDE Editor Token inforamtion from the given registry.
+  This method reads an IDE Editor Token information from the given registry.
 
   @precon  Reg must be a valid instance.
   @postcon The token is read from the registry.

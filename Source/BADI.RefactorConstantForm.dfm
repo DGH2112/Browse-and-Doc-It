@@ -25,8 +25,6 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 64
-    ExplicitTop = 8
     DesignSize = (
       437
       185)

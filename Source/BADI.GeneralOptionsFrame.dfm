@@ -19,7 +19,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = 192
     DesignSize = (
       525
       73)
@@ -73,7 +72,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     end
     object udUpdateInterval: TUpDown
       Left = 193
-      Top = 6
+      Top = 7
       Width = 16
       Height = 24
       Associate = edtUpdateInterval
@@ -125,6 +124,21 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     Width = 525
     Height = 218
     Align = alClient
+    Colors.BorderColor = 15987699
+    Colors.DisabledColor = clGray
+    Colors.DropMarkColor = 15385233
+    Colors.DropTargetColor = 15385233
+    Colors.DropTargetBorderColor = 15385233
+    Colors.FocusedSelectionColor = 15385233
+    Colors.FocusedSelectionBorderColor = 15385233
+    Colors.GridLineColor = 15987699
+    Colors.HeaderHotColor = clBlack
+    Colors.HotColor = clBlack
+    Colors.SelectionRectangleBlendColor = 15385233
+    Colors.SelectionRectangleBorderColor = 15385233
+    Colors.SelectionTextColor = clBlack
+    Colors.TreeLineColor = 9471874
+    Colors.UnfocusedColor = 15987699
     Header.AutoSizeIndex = 0
     Header.MainColumn = -1
     TabOrder = 1
@@ -135,7 +149,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     OnFreeNode = vstGeneralOptionsFreeNode
     OnGetText = vstGeneralOptionsGetText
     OnPaintText = vstGeneralOptionsPaintText
-    ExplicitHeight = 249
     Columns = <>
   end
 end

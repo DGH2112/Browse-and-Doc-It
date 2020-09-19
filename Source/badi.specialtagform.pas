@@ -4,15 +4,15 @@
   through a single method.
 
   @Author  David Hoyle
-  @Version 1.461
-  @Date    12 Apr 2020
+  @Version 1.496
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -134,10 +134,7 @@ End;
   This method accepts a name and description string and displays them for editing in the form. If the 
   user presses OK the form returns true.
 
-  @precon  strName is the tags name, strDescription is the tags description, boolShow is a boolean value
-           it indicate whether to show the tag in the browser, boolExpand is a boolean value it 
-           indicate whether to expand the tag in the browser and Returns true if the OK button was 
-           pressed.
+  @precon  BADIImages must be a valid instance.
   @postcon Displays the special tag form.
 
   @param   BADIImages as a TImageList as a constant
@@ -204,7 +201,7 @@ End;
 
 (**
 
-  This method intialises the fopm with the information in the special tag.
+  This method initialises the form with the information in the special tag.
 
   @precon  None.
   @postcon The information for the special tag is set in the form controls.

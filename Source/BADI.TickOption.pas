@@ -3,15 +3,15 @@
   This module contains a class to hold tick count information.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.044
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ Type
     FTickCount: Double;
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(const strName: String; dblTickCount: Double);
+    Constructor Create(Const strName: String; Const dblTickCount: Double);
     (**
       This property returns the name of the tick counter.
       @precon  None.
@@ -65,11 +65,11 @@ Implementation
   @precon  None.
   @postcon Initialises the tick counter.
 
-  @param   strName      as a String as a Constant
-  @param   dblTickCount as a Double
+  @param   strName      as a String as a constant
+  @param   dblTickCount as a Double as a constant
 
 **)
-Constructor TTickOption.Create(const strName: String; dblTickCount: Double);
+Constructor TTickOption.Create(Const strName: String; Const dblTickCount: Double);
 
 Begin
   FName := strName;

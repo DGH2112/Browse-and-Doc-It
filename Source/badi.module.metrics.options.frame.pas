@@ -1,18 +1,18 @@
 (**
 
-  This module contains a class which represents a frame fo the IDE options dialogue to allow the user
-  to select the metrics adn checks they wish to dispay.
+  This module contains a class which represents a frame for the IDE options dialogue to allow the user
+  to select the metrics and checks they wish to display.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.003
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ Uses
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** A custom treeview for this frame to stop AVs due to RTTI clashes with TVirtualStrinTree. **)
+  (** A custom treeview for this frame to stop AVs due to RTTI clashes with TVirtualStringTree. **)
   TBADIMetricsOptionsVirtualStringTree = Class(TBADICustomVirtualStringTree);
  
   (** A class to represent a frame for selecting the checks and metrics in the IDE options dialogue. **)
@@ -116,7 +116,7 @@ Uses
 {$R *.dfm}
 
 Type
-  (** A record to describe the information stored in the virtual treview. **)
+  (** A record to describe the information stored in the virtual tree view. **)
   TMetricNodeData = Record
     FNodeType          : (ntMainOption, ntSubOption);
     FModuleMetric      : TBADIModuleMetric;
@@ -124,7 +124,7 @@ Type
     FMetricLimit       : Double;
     FModuleMetricSubOp : TBADIModuleMetricSubOp;
   End;
-  (** A pointer to tbe above structure. **)
+  (** A pointer to the above structure. **)
   PMetricNodeData = ^TMetricNodeData;
 
 Const
@@ -137,7 +137,7 @@ Const
 
 (**
 
-  A constructor for the TframeBADIMetrics class.
+  A constructor for the TframeBADIModuleMetricsOptions class.
 
   @precon  AOwner must be a valid instance.
   @postcon Initialises the metrics frame for the IDE options dialogue.
@@ -252,7 +252,7 @@ End;
 
 (**
 
-  This method loads the settings from the global BADIOptions into the treeview.
+  This method loads the settings from the global BADI Options into the treeview.
 
   @precon  None.
   @postcon The treeview is updated with the current metrics and checks settings.
@@ -306,7 +306,7 @@ End;
   This method recurses the nodes in the treeview and updates the checked state to that given.
 
   @precon  vstTreeView and Node must be valid instances.
-  @postcon The checkded state of the treeview is updated.
+  @postcon The checked state of the treeview is updated.
 
   @param   vstTreeView as a TBaseVirtualTree as a constant
   @param   Node        as a PVirtualNode as a constant
@@ -339,7 +339,7 @@ End;
 
 (**
 
-  This method saves the settings to the global BADIOptions from the treeview.
+  This method saves the settings to the global BADI Options from the treeview.
 
   @precon  None.
   @postcon The treeview metrics and checks settings are saved to the options.
@@ -433,10 +433,10 @@ End;
 
 (**
 
-  This method updates the status of the header based on the number of nodee checked.
+  This method updates the status of the header based on the number of nodes checked.
 
   @precon  None.
-  @postcon Updates the status of the header based on the number of nodee checked.
+  @postcon Updates the status of the header based on the number of nodes checked.
 
   @param   Sender as a TBaseVirtualTree
   @param   Node   as a PVirtualNode
@@ -499,7 +499,7 @@ End;
   This method returns the description of the specified column.
 
   @precon  None.
-  @postcon The desceription for the specified column is returned.
+  @postcon The description for the specified column is returned.
 
   @param   Sender   as a TBaseVirtualTree
   @param   Node     as a PVirtualNode
@@ -575,7 +575,7 @@ End;
 
   This method sets the new limit for a check / metric after validating the value provided.
 
-  @precon  Noen.
+  @precon  None.
   @postcon Sets the new limit for a check / metric after validating the value provided.
 
   @param   Sender  as a TBaseVirtualTree
@@ -589,7 +589,7 @@ Procedure TframeBADIModuleMetricsOptions.vstMetricsNewText(Sender: TBaseVirtualT
 
 ResourceString
   strNotAValidInteger = '%s is not a valid integer!';
-  strNotAValidFloat = '%s is not a valid floting point number!';
+  strNotAValidFloat = '%s is not a valid floating point number!';
   strIntegerMustBeGreaterThanZero = 'The limit value (%s) must be greater than zero!';
   strFloatMustBeGreaterThanZero = 'The limit value (%s) must be greater than zero!';
 

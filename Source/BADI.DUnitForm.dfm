@@ -245,23 +245,27 @@ object frmDUnit: TfrmDUnit
     object lblClassName: TLabel
       Left = 0
       Top = 0
-      Width = 100
-      Height = 16
+      Width = 220
+      Height = 25
       Align = alClient
       Caption = '&Class Name Mask'
       FocusControl = edtClassName
+      ExplicitWidth = 100
+      ExplicitHeight = 16
     end
     object lblMethodName: TLabel
       AlignWithMargins = True
       Left = 223
       Top = 0
-      Width = 112
-      Height = 16
+      Width = 218
+      Height = 22
       Margins.Top = 0
       Margins.Right = 0
       Align = alClient
       Caption = 'Method Name &Mask'
       FocusControl = edtMethodName
+      ExplicitWidth = 112
+      ExplicitHeight = 16
     end
     object edtClassName: TEdit
       Left = 0

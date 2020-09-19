@@ -3,15 +3,15 @@
   This module contains a class to hold the tree node information for each module explorer node.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    15 Aug 2019
+  @Version 1.002
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ Type
     **)
     Property Title: Boolean Read FTitle;
     (**
-      This property deterines the tag properties of the tree node.
+      This property determines the tag properties of the tree node.
       @precon  None.
       @postcon Returns the tag properties of the tree node.
       @return  a TBADITagProperties
@@ -178,7 +178,7 @@ Uses
 
 (**
 
-  This is the constructor method for the TTreeNodeInfo class.
+  This is the constructor method for the TBADITreeNodeInfo class.
 
   @precon  This line number of the comment, This column number of the comment and This comment to
            be added to the node info object.
@@ -212,7 +212,7 @@ End;
 
 (**
 
-  This is the constructor method for the TTreeNodeInfo class.
+  This is the constructor method for the TBADITreeNodeInfo class.
 
   @precon  This line number of the comment, This column number of the comment and This comment to be 
            added to the node info object.
@@ -256,7 +256,7 @@ End;
 
 (**
 
-  This is the constructor method for the TTreeNodeInfo class.
+  This is the constructor method for the TBADITreeNodeInfo class.
 
   @precon  This line number of the comment, This column number of the comment and This comment to be 
            added to the node info object.
@@ -289,7 +289,7 @@ End;
 
 (**
 
-  This is the destructor method for the TTreeNodeInfo class.
+  This is the destructor method for the TBADITreeNodeInfo class.
 
   @precon  None.
   @postcon Destroys the instance of the Tree node info class.

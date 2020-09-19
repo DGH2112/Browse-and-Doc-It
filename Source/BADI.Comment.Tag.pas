@@ -3,15 +3,15 @@
   This module contains a class that represents a tag in a comment (@@name...).
 
   @Author  David Hoyle
-  @Version 1.189
-  @Date    25 May 2020
+  @Version 1.190
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ Uses
 
   This method returns all the tags tokens as a string with spaces in between.
 
-  @precon  ShowHTML determines of the routine output the HTML tags in the resulting string.
+  @precon  boolShowHTML determines of the routine output the HTML tags in the resulting string.
   @postcon Returns a string representation of the tag.
 
   @param   iMaxWidth    as an Integer as a constant
@@ -113,7 +113,7 @@ End;
 
 (**
 
-  This is the TTag class Destructor method. It disploses of the token list.
+  This is the TTag class Destructor method. It disposes of the token list.
 
   @precon  None.
   @postcon Frees the tags tokens.
@@ -130,7 +130,7 @@ End;
   This is a getter method for the TagName property.
 
   @precon  None.
-  @postcon Gets the tah name for the tag from the identifer property.
+  @postcon Gets the tag name for the tag from the identifier property.
 
   @return  a String
 

@@ -25,7 +25,6 @@ object frmMethodDescriptions: TfrmMethodDescriptions
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 96
     DesignSize = (
       624
       106)

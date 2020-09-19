@@ -1,18 +1,18 @@
 (**
 
-  This module contains a custom syntax highlighter for the Borland/Codegear
+  This module contains a custom syntax highlighter for the RAD Studio
   IDE to show Backus-Naur grammar.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.005
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -293,10 +293,10 @@ end;
 
 (**
 
-  This method returns the tex to be shown in the highlighter preview.
+  This method returns the text to be shown in the highlighter preview.
 
   @precon  None.
-  @postcon Returns the tex to be shown in the highlighter preview.
+  @postcon Returns the text to be shown in the highlighter preview.
 
   @return  a string
 
@@ -358,10 +358,10 @@ end;
 
 (**
 
-  This method returns the higlighter mark up codes for the given Line Buffer.
+  This method returns the highlighter mark up codes for the given Line Buffer.
 
   @precon  None.
-  @postcon Returns the higlighter mark up codes for the given Line Buffer.
+  @postcon Returns the highlighter mark up codes for the given Line Buffer.
 
   @param   StartClass     as a Byte
   @param   LineBuf        as a PAnsiChar
@@ -394,8 +394,7 @@ Var
     This procedure checks for the end of a block type.
 
     @precon  None.
-    @postcon Checks for the end of a block type and returns the block to btNone
-             if found.
+    @postcon Checks for the end of a block type and returns the block to None if found.
 
     @param   cChar          as an AnsiChar
     @param   CheckBlockType as a TBlockType

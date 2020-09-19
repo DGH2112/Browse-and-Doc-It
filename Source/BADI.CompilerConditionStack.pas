@@ -1,17 +1,17 @@
 (**
 
-  This module contains a class to handle compiler definiton information as a stack.
+  This module contains a class to handle compiler definition information as a stack.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ End;
 
 (**
 
-  A destructor for the TCompilerCondition class.
+  A destructor for the TCompilerConditionStack class.
 
   @precon  None.
   @postcon Frees the memory used by the class.
@@ -156,7 +156,7 @@ End;
 
   This method pushes the given compiler condition data on to the top of the stack.
 
-  @precon  CompilerConditionData must be a valdi instance.
+  @precon  CompilerConditionData must be a valid instance.
   @postcon The compiler condition data is placed on top of the stack.
 
   @param   CompilerConditionData as a TCompilerConditionData as a constant
@@ -171,10 +171,10 @@ End;
 
 (**
 
-  This method adds the given valud to the top of the stack.
+  This method adds the given value to the top of the stack.
 
   @precon  None.
-  @postcon Adds the given valud to the top of the stack.
+  @postcon Adds the given value to the top of the stack.
 
   @param   iCompilerDefType   as a TCompilerDefType as a constant
   @param   iCompilerCondition as a TCompilerCondition as a constant

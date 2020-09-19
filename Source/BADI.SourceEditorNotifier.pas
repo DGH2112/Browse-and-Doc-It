@@ -4,15 +4,15 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 2.115
-  @Date    25 Aug 2020
+  @Version 2.131
+  @Date    19 Sep 2020
   
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ Uses
 Constructor TBADISourceEditorNotifier.Create(Const SE : IOTASourceEditor);
 
 Begin
-  CodeSite.TraceMethod(Self, 'Create', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   {$IFDEF DEBUG}
   FFileName := SE.FileName;
   CodeSite.Send(csmOrange, 'TBADISourceEditorNotifier.Create', FFileName);
@@ -107,7 +107,7 @@ End;
 Destructor TBADISourceEditorNotifier.Destroy;
 
 Begin
-  CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   ViewNotification(FView, opRemove);
   CodeSite.Send(csmOrange, 'TBADISourceEditorNotifier.Destroy', FFileName);
   Inherited Destroy;
@@ -126,7 +126,7 @@ End;
 Procedure TBADISourceEditorNotifier.InstallEditViewNotifier(Const View: IOTAEditView);
 
 Begin
-  CodeSite.TraceMethod(Self, 'InstallEditViewNotifier', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InstallEditViewNotifier', tmoTiming);{$ENDIF}
   If FEditViewNotifierIndex = - 1 Then
     Begin
       FView := View;
@@ -147,7 +147,7 @@ End;
 Procedure TBADISourceEditorNotifier.UninstallEditViewNotifier(Const View: IOTAEditView);
 
 Begin
-  CodeSite.TraceMethod(Self, 'UninstallEditViewNotifier', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallEditViewNotifier', tmoTiming);{$ENDIF}
   If FEditViewNotifierIndex > - 1 Then
     Begin
       View.RemoveNotifier(FEditViewNotifierIndex);
@@ -171,7 +171,7 @@ End;
 Procedure TBADISourceEditorNotifier.ViewActivated(Const View: IOTAEditView);
 
 Begin
-  CodeSite.TraceMethod(Self, 'ViewActivated', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewActivated', tmoTiming);{$ENDIF}
   {: @debug CodeSite.Send(csmYellow, FFileName, Assigned(View));
   If Assigned(View) Then
     InstallEditViewNotifier(View);}
@@ -193,7 +193,7 @@ End;
 Procedure TBADISourceEditorNotifier.ViewNotification(Const View: IOTAEditView; Operation: TOperation);
 
 Begin
-  CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);{$ENDIF}
   {$IFDEF DXE100}
   If Assigned(View) Then
     Begin
@@ -206,6 +206,7 @@ Begin
 End;
 
 End.
+
 
 
 

@@ -139,7 +139,7 @@ object frmSpecialTag: TfrmSpecialTag
             Value = 24.999999999816510000
           end
           item
-            Value = 24.999999999911420000
+            Value = 24.999999999911430000
           end>
         ControlCollection = <
           item
@@ -182,7 +182,7 @@ object frmSpecialTag: TfrmSpecialTag
         end
         object chkItalic: TCheckBox
           AlignWithMargins = True
-          Left = 91
+          Left = 92
           Top = 4
           Width = 82
           Height = 17
@@ -192,7 +192,7 @@ object frmSpecialTag: TfrmSpecialTag
         end
         object chkUnderlined: TCheckBox
           AlignWithMargins = True
-          Left = 179
+          Left = 181
           Top = 4
           Width = 82
           Height = 17
@@ -202,9 +202,9 @@ object frmSpecialTag: TfrmSpecialTag
         end
         object chkStrikeout: TCheckBox
           AlignWithMargins = True
-          Left = 267
+          Left = 269
           Top = 4
-          Width = 85
+          Width = 83
           Height = 17
           Anchors = []
           Caption = '&Strikeout'

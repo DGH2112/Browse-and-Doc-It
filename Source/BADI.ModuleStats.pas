@@ -4,15 +4,15 @@
   change of a module.
 
   @Author  David Hoyle
-  @Version 2.164
-  @Date    09 Jul 2020
+  @Version 2.165
+  @Date    19 Sep 2020
   
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ End;
   This method updates the internal filename to that given.
 
   @precon  None.
-  @postcon The internal filenam eis updated to reflect strFileName.
+  @postcon The internal filename is updated to reflect strFileName.
 
   @param   strFileName as a String as a constant
 
@@ -112,7 +112,7 @@ End;
 
 (**
 
-  This method resets the sizwe delta to zero to signify no change.
+  This method resets the size delta to zero to signify no change.
 
   @precon  None.
   @postcon The size delta is reset to zero.

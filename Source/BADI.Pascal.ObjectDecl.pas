@@ -3,15 +3,15 @@
   This module contains a class which implements an Object Pascal specific Object Declaration.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ end;
 
   This method checks a record, object class or interface for documentation.
 
-  @precon  C is a valid gerneic container to be check for class like
+  @precon  C is a valid generic container to be check for class like
            documentation.
   @postcon Checks the passed class for documentation errors.
 

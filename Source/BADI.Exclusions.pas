@@ -3,15 +3,15 @@
   This module contains a class for handling the exclusion for documentation, metrics and checks.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.003
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ End;
   This method clears the exclusions and regular expression lists.
 
   @precon  None.
-  @postcon Both the rexclusions and reg ex list are empty.
+  @postcon Both the exclusions and regular expression list are empty.
 
 **)
 Procedure TBADIExclusions.Clear;
@@ -113,7 +113,7 @@ End;
 
 (**
 
-  This method deletes the indexed exclusion (and regex) from the collection.
+  This method deletes the indexed exclusion (and regular expression) from the collection.
 
   @precon  iIndex must be between 0 and GetCount -  1.
   @postcon The item is deleted from the collection.
@@ -181,8 +181,8 @@ End;
 
   This is a setter method for the Exclusion property.
 
-  @precon  iIndex must be a valud between 0 and GetCount - 1.
-  @postcon The exclusion is updated to the geiven exclusions record values.
+  @precon  iIndex must be a value between 0 and GetCount - 1.
+  @postcon The exclusion is updated to the given exclusions record values.
 
   @param   iIndex   as an Integer as a constant
   @param   recValue as a TBADIExclusionRec as a constant

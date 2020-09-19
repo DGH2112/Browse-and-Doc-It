@@ -5,15 +5,15 @@
   modules code to load and save their settings.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ Type
     Constructor Create(OptionsFrame: TFrameClass; Const strTitle : String); Overload;
   End;
 
-  (** This is a specialisation of the above class specifically for the shortcut frame so that
+  (** This is a specialization of the above class specifically for the shortcut frame so that
       a call back mechanism for checking whether shortcuts are in use can be setup. **)
   TBADIIDEShortcutOptionsHandler = Class(TBADIIDEOptionsHandler)
   Strict Private
@@ -258,7 +258,7 @@ End;
   A constructor for the TBADIIDEShortcutOptionsHandler class.
 
   @precon  None.
-  @postcon Initalises the class and saves references to a Notify event and a call back event.
+  @postcon Initialises the class and saves references to a Notify event and a call back event.
 
   @param   OptionsFrame as a TFrameClass
   @param   strTitle     as a String as a constant
@@ -280,7 +280,7 @@ End;
   This method is called when the Options frame is about to be closed.
 
   @precon  None.
-  @postcon If an event handlder is assigned to update the actions it is called.
+  @postcon If an event handler is assigned to update the actions it is called.
 
   @param   Accepted as a Boolean
 

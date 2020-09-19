@@ -3,15 +3,15 @@
   This module contains a custom hint window to display the module metric totals.
 
   @Author  David Hoyle
-  @Version 3.986
-  @Date    30 Aug 2020
+  @Version 3.987
+  @Date    19 Sep 2020
   
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ End;
   This method calculates the rectangle in which the Code Editor Totals should be displayed.
 
   @precon  None.
-  @postcon Calulcates the size and position of the hint window.
+  @postcon Calculates the size and position of the hint window.
 
   @param   Rect      as a TRect as a constant
   @param   ePosition as a TBADIHintPosition as a constant
@@ -354,7 +354,7 @@ End;
   This is a mouse down event for the hint window.
 
   @precon  None.
-  @postcon centrs the editor on the first occurrance of the clicked on document issue.
+  @postcon Centres the editor on the first occurrence of the clicked on document issue.
 
   @param   Sender as a TObject
   @param   Button as a TMouseButton
@@ -450,7 +450,7 @@ End;
   This method updates the canvas with the correct font information for rendering the hint.
 
   @precon  None.
-  @postcon Thre canvas is updated with thr correct font information.
+  @postcon The canvas is updated with the correct font information.
 
   @param   R as a TRect as a constant
 

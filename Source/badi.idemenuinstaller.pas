@@ -2,16 +2,16 @@
 
   This module encapsulates the creation of menus in the IDE.
 
-  @Version 23.666
+  @Version 23.667
   @Author  David Hoyle
-  @Date    12 Sep 2020
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.314
+  @Version 1.344
   @Author  David Hoyle
-  @Date    12 Sep 2020
+  @Date    19 Sep 2020
 
   @license
 
@@ -28,11 +28,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   @nocheck EmptyBEGINEND
-
-  @done Refactoring a const in the DPR module AVs.
-  @done Update the Metrics Editor View to iterate only the implemented methods.
-  @done Update the Checks Editor View to iterate only the implemented methods.
-  @done Add the ability to insert / surround tags or comments type.
 
 **)
 library BrowseAndDocIt;
@@ -260,8 +255,8 @@ begin
   CodeSite.Category := strBADICodeSiteCategory;
   Randomize;
   CodeSite.CategoryColor :=
-    (iBaseColour + Random(iAddColour)) Shl 00+
-    (iBaseColour + Random(iAddColour)) Shl 08 +
+    (iBaseColour + Random(iAddColour)) Shl 0 +
+    (iBaseColour + Random(iAddColour)) Shl 8 +
     (iBaseColour + Random(iAddColour)) Shl 16;
   {$ENDIF DEBUG} 
 end.

@@ -3,15 +3,15 @@
   This module contains a class to represent a DFM file item.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -99,10 +99,10 @@ End;
 
 (**
 
-  This is an overridden GetName to provide a unqiue name for the item.
+  This is an overridden GetName to provide a unique name for the item.
 
   @precon  None.
-  @postcon Returns a unqiue name for the item.
+  @postcon Returns a unique name for the item.
 
   @return  a String
 

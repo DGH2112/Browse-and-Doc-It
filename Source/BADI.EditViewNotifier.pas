@@ -3,8 +3,8 @@
   This module contains a class which implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 6.384
-  @Date    29 Aug 2020
+  @Version 6.385
+  @Date    12 Sep 2020
   
   @license
 
@@ -193,7 +193,7 @@ End;
 Constructor TBADIEditViewNotifier.Create(Const strFileName : String);
 
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
   FFileName := strFileName;
   CodeSite.Send(csmRed, 'TBADIEditViewNotifier.Create', FFilename);
@@ -217,7 +217,7 @@ End;
 Destructor TBADIEditViewNotifier.Destroy;
 
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   FIconsToRender.Free;
   FMsgsToRender.Free;
   CodeSite.Send(csmRed, 'TBADIEditViewNotifier.Destroy', FFilename);

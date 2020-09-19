@@ -3,15 +3,15 @@
   This module contains a custom virtual string tree class for the BADI module explorer.
 
   @Author  David Hoyle
-  @Version 1.008
-  @Date    19 Jul 2020
+  @Version 1.010
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,8 @@ Uses
   BADI.ModuleExplorer.TreeNodeInfo;
 
 Type
-  (** This is a descendant of the TVirtualStringTree in order to override the OnGetNodeWidth method. **)
+  (** This is a descendant of the TVirtualStringTree in order to override the On Get Node Width
+      method. **)
   TBADIVirtualStringTree = Class(TVirtualStringTree)
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function DoGetNodeWidth(Node: PVirtualNode; Column: TColumnIndex; Canvas: TCanvas = Nil) : Integer;

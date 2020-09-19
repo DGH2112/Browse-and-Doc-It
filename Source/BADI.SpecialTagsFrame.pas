@@ -2,16 +2,16 @@
 
   This module contains a frame for editing the BADI special tags.
 
-  @Version 1.286
+  @Version 1.291
   @Author  David Hoyle
-  @Date    27 May 2020
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ Uses
   BADI.CustomVirtualStringTree, System.ImageList, Vcl.ImgList;
 
 Type
-  (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)
+  (** A descendent class for the virtual string tree to prevent AVs in the 10.2.2. IDE during theming. **)
   TBADISpecialTagsOptionsVirtualStringTree = Class(TBADICustomVirtualStringTree);
 
   (** This is a class to represent the frame interface. **)
@@ -117,7 +117,7 @@ Uses
   BADI.Functions;
 
 Type
-  (** A record to describe the data to be stoed in the treeview. **)
+  (** A record to describe the data to be stored in the treeview. **)
   TSpecialTagsNodeData = Record
     FSpecialTagIndex : Integer;
   End;
@@ -137,7 +137,7 @@ Type
 
 (**
 
-  This is a TButton on click event. It allows the user to add a new tag.
+  This is a on click event. It allows the user to add a new tag.
 
   @precon  Sender is the control that invoked the event.
   @postcon Adds a tag to the list.
@@ -165,7 +165,7 @@ End;
 
 (**
 
-  This is a TButton on click event. It allows the user to delete a tag from
+  This is a on click event. It allows the user to delete a tag from
   the list.
 
   @precon  Sender is the control that invoked the event.
@@ -195,7 +195,7 @@ End;
 
 (**
 
-  This is a TButton on click event. It allows the user to edit a tag in the
+  This is a on click event. It allows the user to edit a tag in the
   list.
 
   @precon  Sender is the control that invoked the event.
@@ -225,7 +225,7 @@ End;
 
 (**
 
-  This is a TButton on click event. It allows the user to move the item down
+  This is a on click event. It allows the user to move the item down
   the list.
 
   @precon  Sender is the control that invoked the event.
@@ -254,7 +254,7 @@ End;
 
 (**
 
-  This is a TButton on click event. It allows the user to move the item up the
+  This is a on click event. It allows the user to move the item up the
   list.
 
   @precon  Sender is the control that invoked the event.
@@ -579,7 +579,7 @@ End;
 
 (**
 
-  This is an on double click event handler for the treview.
+  This is an on double click event handler for the tree view.
 
   @precon  None.
   @postcon Edits the double clicked item.
@@ -595,7 +595,7 @@ End;
 
 (**
 
-  This is an on GetImageIndex ebent handler for the treeview.
+  This is an on Get Image Index event handler for the treeview.
 
   @precon  None.
   @postcon Returns the image index for the current node.
@@ -687,7 +687,7 @@ Procedure TfmBADISpecialTagsFrame.vstSpecialTagsMouseDown(Sender: TObject; Butto
     properties.
 
     @precon  None.
-    @postcon The property is togged with the opposite of the given enumerate.
+    @postcon The property is toggled with the opposite of the given enumerate.
 
     @param   ST                 as a TBADISpecialTag as a reference
     @param   BADISpecialTagProp as a TBADITagProperty as a constant

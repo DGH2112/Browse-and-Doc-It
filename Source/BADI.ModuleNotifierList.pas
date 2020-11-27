@@ -3,8 +3,8 @@
   This module contains an interfaced class which manages module notifier indexes using their filenames.
 
   @Author  David Hoyle
-  @Version 1.423
-  @Date    19 Sep 2020
+  @Version 1.425
+  @Date    20 Sep 2020
 
   @license
 
@@ -169,7 +169,7 @@ Begin
     Begin
       {$IFDEF DEBUG}
       CodeSite.SendFmtMsg(csmError, strDestroyOrphanedModuleNotifier,
-        [FModuleNotifierList[iModule].FileName]);
+        [ExtractFileName(FModuleNotifierList[iModule].FileName)]);
       {$ENDIF}
       FModuleNotifierList.Delete(iModule);
       //: @note Cannot remove any left over notifiers here as the module

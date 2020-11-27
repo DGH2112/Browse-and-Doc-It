@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 6.761
-  @Date    19 Sep 2020
+  @Version 6.762
+  @Date    10 Oct 2020
 
   @license
 
@@ -256,7 +256,7 @@ Const strModuleHeaderRegEx = '^\s*[(/]\*\*.*?\*\*[)/]';
   strVersionRegEx = '\@version\s+(\d+.\d+)';
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
+  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{ $ENDIF}
   FModuleStatsList := ModuleStatsList;
   FFileName := strFileName;
   FModuleRenameEvent := ModuleRenameEvent;
@@ -279,7 +279,7 @@ End;
 Destructor TBADIModuleNotifier.Destroy;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
+  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{ $ENDIF}
   FModuleStatsList.Remove(FFileName);
   Inherited;
 End;

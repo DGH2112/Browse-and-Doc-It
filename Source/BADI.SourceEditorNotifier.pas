@@ -4,8 +4,8 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 2.131
-  @Date    19 Sep 2020
+  @Version 2.136
+  @Date    20 Sep 2020
   
   @license
 
@@ -85,7 +85,7 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   {$IFDEF DEBUG}
   FFileName := SE.FileName;
-  CodeSite.Send(csmOrange, 'TBADISourceEditorNotifier.Create', FFileName);
+  CodeSite.Send(csmGreen, 'TBADISourceEditorNotifier.Create', ExtractFileName(FFileName));
   {$ENDIF}
   {$IFDEF DXE100}
   FEditViewNotifierIndex := -1;
@@ -109,7 +109,7 @@ Destructor TBADISourceEditorNotifier.Destroy;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   ViewNotification(FView, opRemove);
-  CodeSite.Send(csmOrange, 'TBADISourceEditorNotifier.Destroy', FFileName);
+  CodeSite.Send(csmRed, 'TBADISourceEditorNotifier.Destroy', ExtractFileName(FFileName));
   Inherited Destroy;
 End;
 

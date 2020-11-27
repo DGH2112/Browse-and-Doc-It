@@ -4,8 +4,8 @@
   change of a module.
 
   @Author  David Hoyle
-  @Version 2.165
-  @Date    19 Sep 2020
+  @Version 2.178
+  @Date    27 Nov 2020
   
   @license
 
@@ -140,9 +140,9 @@ Function TBADIModuleStats.SizeChange: Int64;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SizeChange', tmoTiming);{$ENDIF}
   Result := FSizeDelta;
-  {$IFDEF DEBUG}
+  {$IFDEF COEDSITE}
   CodeSite.SendFmtMsg(csmNote, 'Filename: %s, Size: %1.0n', [ExtractFileName(FFilename), Int(Result)]);
-  {$ENDIF DEBUG}
+  {$ENDIF CODESITE}
 End;
 
 (**
@@ -171,10 +171,11 @@ Begin
       If (iDelta = 0) And (iModifiedCount > 0) Then
         Inc(FSizeDelta);
     End;
-  {$IFDEF DEBUG}
-  CodeSite.SendFmtMsg(csmNote, 'Filename: %s, Old Size: %1.0n, New Size: %1.0n, Delta: %1.0n', [
-    ExtractFileName(FFileName), Int(FSize), Int(iSize), Int(FSizeDelta)]);
-  {$ENDIF DEBUG}
+  {$IFDEF CODESITE}
+  If Int(FSizeDelta) > Int(iSize) * 0.10 Then
+    CodeSite.SendFmtMsg(csmWarning, 'Filename: %s, Old Size: %1.0n, New Size: %1.0n, Delta: %1.0n', [
+      ExtractFileName(FFileName), Int(FSize), Int(iSize), Int(FSizeDelta)]);
+  {$ENDIF CODESITE}
   FSize := iSize;
 End;
 

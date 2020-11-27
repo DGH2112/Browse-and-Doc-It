@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.344
+  @Version 1.345
   @Author  David Hoyle
-  @Date    19 Sep 2020
+  @Date    10 Oct 2020
 
   @license
 

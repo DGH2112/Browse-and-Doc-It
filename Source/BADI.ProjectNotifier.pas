@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 1.184
-  @Date    19 Sep 2020
+  @Version 1.196
+  @Date    27 Nov 2020
 
   @license
 
@@ -39,7 +39,8 @@ Uses
 
 Type
   (** This is an IOTAProjectNotifier which is derived from the TBADIModuleNotifier. **)
-  TBADIProjectNotifier = Class(TBADIModuleNotifier, IOTAProjectNotifier)
+  TBADIProjectNotifier = Class(TBADIModuleNotifier, IUnknown, IOTANotifier, IOTAModuleNotifier,
+    IOTAModuleNotifier80, IOTAModuleNotifier90, IOTAProjectNotifier)
   Strict Private
   Strict Protected
     // IOTAProjectNotifier
@@ -63,7 +64,7 @@ Uses
 
   A constructor for the TBADIProjectNotifier class.
 
-  @precon  ModuleStatsList and ModuleRenameEvents must be valid instances.
+  @precon  ModuleStatsList and ModuleRenameEvent must be valid instances.
   @postcon Calls the inherited method.
 
   @param   ModuleStatsList   as an IBADIModuleStatsList as a constant
@@ -75,13 +76,13 @@ Constructor TBADIProjectNotifier.Create(Const ModuleStatsList: IBADIModuleStatsL
   Const strFileName: String; Const ModuleRenameEvent: TBADIModuleRenameEvent);
   
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
+  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{ $ENDIF}
   Inherited Create(ModuleStatsList, strFileName, ModuleRenameEvent);
 End;
 
 (**
 
-  A destructor for the TBADIProjectNotfiier class.
+  A destructor for the TBADIProjectNotifier class.
 
   @precon  None.
   @postcon Used for CodeSite tracing only.
@@ -90,7 +91,7 @@ End;
 Destructor TBADIProjectNotifier.Destroy;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
+  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{ $ENDIF}
   Inherited Destroy;
 End;
 

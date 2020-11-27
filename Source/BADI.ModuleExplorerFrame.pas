@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 5.798
-  @Date    25 Aug 2020
+  @Version 5.806
+  @Date    27 Nov 2020
 
   @license
 
@@ -1541,7 +1541,7 @@ Begin
             FExplorer.IsVisible[N] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
             If FExplorer.IsVisible[N] Then
               Begin
-                If Not Assigned(FFollowNode) And FExplorer.FullyVisible[N] Then
+                If FExplorer.FullyVisible[N] Then // Override Follow Node
                   FFollowNode := N;
                 P := FExplorer.NodeParent[N];
                 While Assigned(P) Do

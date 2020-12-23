@@ -4,8 +4,8 @@
   module save events to see if there have been changes in the files.
 
   @Author  David Hoyle
-  @Version 2.423
-  @Date    27 Nov 2020
+  @Version 2.466
+  @Date    20 Dec 2020
   
   @license
 
@@ -256,12 +256,12 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FileNotification', tmoTiming);{$ENDIF}
   If Not Cancel And Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
     Begin
-      {$IFDEF DEBUG}
+      {$IFDEF CODESITE}
       Case NotifyCode Of
         ofnFileOpened, ofnFileClosing:
         CodeSite.SendEnum(csmReminder, ExtractFileName(FileName), TypeInfo(TOTAFileNotification), Ord(NotifyCode));
       End;
-      {$ENDIF DEBUG}
+      {$ENDIF CODESITE}
       Case NotifyCode Of
         ofnFileOpened:
           Begin
@@ -301,7 +301,9 @@ Begin
   For i := 0 To M.GetModuleFileCount - 1 Do
     Begin
       E := M.GetModuleFileEditor(i);
-      CodeSite.Send(csmGreen, 'InstallEditorSourceNotifier', ExtractFileName(E.FileName));
+      {$IFDEF CODESITE}
+      CodeSite.Send(csmGreen, 'InstallEditorSourceNotifier', ExtractFileName(E.FileName)); }
+      {$ENDIF CODESITE}
       If Supports(E, IOTASourceEditor, SE) Then
         Begin
           EN := TBADISourceEditorNotifier.Create(SE);
@@ -351,8 +353,10 @@ Var
   MN : IOTAModuleNotifier;
   
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InstallNotifiers', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InstallNotifiers', tmoTiming);{$ENDIF}
+  {$IFDEF CODESITE}
   CodeSite.Send(csmGreen, 'InstallNotifiers', ExtractFileName(strFileName));
+  {$ENDIF CODESITE}
   If Supports(M, IOTAProject, P) Then
     Begin
       PN := TBADIProjectNotifier.Create(FModuleStatsList, strFileName, ModuleRenameEvent);
@@ -381,10 +385,10 @@ Procedure TBADIIDENotifier.ModuleRenameEvent(Const strOldFileName, strNewFileNam
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleRenameEvent', tmoTiming);{$ENDIF}
-  {$IFDEF DEBUG}
+  { $IFDEF CODESITE}
   CodeSite.SendFmtMsg(csmReminder, 'Rename: %s => %s', [ExtractFileName(strOldFileName),
     ExtractFileName(strNewFileName)]);
-  {$ENDIF DEBUG}
+  { $ENDIF CODESITE}
   FModuleNotifiers.Rename(strOldFileName, strNewFileName);
   FProjectNotifiers.Rename(strOldFileName, strNewFileName);
   FModuleStatsList.Rename(strOldFileName, strNewFileName);
@@ -411,11 +415,13 @@ Var
   iIndex : Integer;
  
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallEditorSourceNotifier', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallEditorSourceNotifier', tmoTiming);{$ENDIF}
   For i := 0 To M.GetModuleFileCount - 1 Do
     Begin
       E := M.GetModuleFileEditor(i);
+      {$IFDEF CODESITE}
       CodeSite.Send(csmRed, 'UninstallEditorSourceNotifier', ExtractFileName(E.FileName));
+      {$ENDIF CODESITE}
       If Supports(E, IOTASourceEditor, SE) Then
         Begin
           iIndex := FEditorSourceNotifiers.Remove(strFileName);
@@ -462,8 +468,10 @@ Var
   iIndex: Integer;
 
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallNotifiers', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallNotifiers', tmoTiming);{$ENDIF}
+  {$IFDEF CODESITE}
   CodeSite.Send(csmRed, 'UninstallNotifiers', ExtractFileName(strFileName));
+  {$ENDIF CODESITE}
   UninstallEditorSourceNotifier(M, strFileName);
   If Supports(M, IOTAProject, P) Then
     Begin
@@ -479,6 +487,7 @@ Begin
 End;
 
 End.
+
 
 
 

@@ -4,8 +4,8 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 2.136
-  @Date    20 Sep 2020
+  @Version 2.175
+  @Date    19 Dec 2020
   
   @license
 
@@ -85,8 +85,10 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   {$IFDEF DEBUG}
   FFileName := SE.FileName;
-  CodeSite.Send(csmGreen, 'TBADISourceEditorNotifier.Create', ExtractFileName(FFileName));
-  {$ENDIF}
+  {$IFDEF CODESITE}
+  CodeSite.Send(csmGreen, 'TBADISourceEditorNotifier.Create', ExtractFileName(FFileName)); }
+  {$ENDIF CODESITE}
+  {$ENDIF DEBUG}
   {$IFDEF DXE100}
   FEditViewNotifierIndex := -1;
   {$ENDIF DXE100}
@@ -109,7 +111,9 @@ Destructor TBADISourceEditorNotifier.Destroy;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   ViewNotification(FView, opRemove);
+  {$IFDEF CODESITE}
   CodeSite.Send(csmRed, 'TBADISourceEditorNotifier.Destroy', ExtractFileName(FFileName));
+  {$ENDIF CODESITE}
   Inherited Destroy;
 End;
 
@@ -172,9 +176,6 @@ Procedure TBADISourceEditorNotifier.ViewActivated(Const View: IOTAEditView);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewActivated', tmoTiming);{$ENDIF}
-  {: @debug CodeSite.Send(csmYellow, FFileName, Assigned(View));
-  If Assigned(View) Then
-    InstallEditViewNotifier(View);}
 End;
 
 (**

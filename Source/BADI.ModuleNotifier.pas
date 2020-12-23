@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 6.762
-  @Date    10 Oct 2020
+  @Version 6.925
+  @Date    23 Dec 2020
 
   @license
 
@@ -128,6 +128,9 @@ Procedure TBADIModuleNotifier.AfterRename(Const OldFileName, NewFileName: String
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AfterRename', tmoTiming);{$ENDIF}
+  FFileName := NewFileName;
+  If Assigned(FModuleRenameEvent) Then
+    FModuleRenameEvent(OLDFileName, NewFileName);
 End;
 
 (**
@@ -256,7 +259,7 @@ Const strModuleHeaderRegEx = '^\s*[(/]\*\*.*?\*\*[)/]';
   strVersionRegEx = '\@version\s+(\d+.\d+)';
 
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   FModuleStatsList := ModuleStatsList;
   FFileName := strFileName;
   FModuleRenameEvent := ModuleRenameEvent;
@@ -279,7 +282,7 @@ End;
 Destructor TBADIModuleNotifier.Destroy;
 
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   FModuleStatsList.Remove(FFileName);
   Inherited;
 End;
@@ -402,6 +405,9 @@ End;
   @precon  None.
   @postcon Calls the Module Rename Event.
 
+  @nocheck EmptyMethod
+  @nohint  NewName
+
   @param   NewName as a String as a constant
 
 **)
@@ -409,8 +415,6 @@ Procedure TBADIModuleNotifier.ModuleRenamed(Const NewName: String);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleRenamed', tmoTiming);{$ENDIF}
-  FFileName := NewName;
-  FModuleStatsList.ModuleStats[NewName].Rename(NewName);
 End;
 
 (**
@@ -513,7 +517,7 @@ Begin
             Begin
               Writer := SE.CreateUndoableWriter;
               Writer.CopyTo(iOffset);
-              Writer.DeleteTo(iOffset + iLength); //: @bug IDE AVs here IF editor is closed while modified
+              Writer.DeleteTo(iOffset + iLength);
               Writer.Insert(PAnsiChar(UTF8Encode(strText)));
             End;
         End;
@@ -699,6 +703,8 @@ Begin
 End;
 
 End.
+
+
 
 
 

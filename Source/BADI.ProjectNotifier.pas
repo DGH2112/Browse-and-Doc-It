@@ -4,8 +4,8 @@
   and version number before the file is saved.
 
   @Author  David Hoyle
-  @Version 1.196
-  @Date    27 Nov 2020
+  @Version 1.214
+  @Date    20 Dec 2020
 
   @license
 
@@ -76,7 +76,7 @@ Constructor TBADIProjectNotifier.Create(Const ModuleStatsList: IBADIModuleStatsL
   Const strFileName: String; Const ModuleRenameEvent: TBADIModuleRenameEvent);
   
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(ModuleStatsList, strFileName, ModuleRenameEvent);
 End;
 
@@ -91,7 +91,7 @@ End;
 Destructor TBADIProjectNotifier.Destroy;
 
 Begin
-  { $IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{ $ENDIF}
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   Inherited Destroy;
 End;
 
@@ -148,12 +148,12 @@ Procedure TBADIProjectNotifier.ModuleRenamed(Const AOldFileName, ANewFileName: S
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleRenamed', tmoTiming);{$ENDIF}
-  If Assigned(ModuleRenameEvent) Then
-    ModuleRenameEvent(AOldFileName, ANewFileName);
   FileName := ANewFileName;
 End;
 
 End.
+
+
 
 
 

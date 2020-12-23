@@ -385,10 +385,10 @@ Procedure TBADIIDENotifier.ModuleRenameEvent(Const strOldFileName, strNewFileNam
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleRenameEvent', tmoTiming);{$ENDIF}
-  { $IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSite.SendFmtMsg(csmReminder, 'Rename: %s => %s', [ExtractFileName(strOldFileName),
     ExtractFileName(strNewFileName)]);
-  { $ENDIF CODESITE}
+  {$ENDIF DEBUG}
   FModuleNotifiers.Rename(strOldFileName, strNewFileName);
   FProjectNotifiers.Rename(strOldFileName, strNewFileName);
   FModuleStatsList.Rename(strOldFileName, strNewFileName);

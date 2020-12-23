@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 5.806
-  @Date    27 Nov 2020
+  @Version 5.807
+  @Date    19 Dec 2020
 
   @license
 
@@ -748,7 +748,7 @@ Type
   TBADIErrorFields = (efFilename, efMessage, efLine, efColumn);
 
 ResourceString
-  strMsg = '%s found at line %d column %d.';
+  strMsg = '[DCC32] %s found at line %d column %d.';
   
 Var
   Errors: TElementContainer;

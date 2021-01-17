@@ -3,8 +3,8 @@
   Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 3.020
-  @Date    19 Sep 2020
+  @Version 3.032
+  @Date    16 Jan 2021
 
   @license
 
@@ -1091,11 +1091,11 @@ end;
 (**
 
   This method checks the type of number in the expression to make sure Integers and Floating point number
-  aren`t mixed.
+  are not mixed.
 
   @precon  None.
   @postcon Checks the type of number in the expression to make sure Integers and Floating point number 
-           aren`t mixed.
+           are not mixed.
 
   @note    This may have problems with expression that allow integers and floats to be added, etc.
 
@@ -8925,6 +8925,9 @@ Begin
           End;
         If (Token.Token = ',') And Assigned(Container) Then
           Container.AddToken(Token.Token, Token.TokenType);
+        //: @todo Can we recurse here?
+        If Token.Token = '<' Then
+          TypeArgs(Container);
       Until Token.Token <> ',';
       If Token.Token = '>' Then
         Begin

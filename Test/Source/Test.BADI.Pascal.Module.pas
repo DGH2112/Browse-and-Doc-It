@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 57.992
+  @Date    16 Jan 2021
 
   @license
 
@@ -339,6 +339,8 @@ type
     Procedure TestCodeFailure45;
     Procedure TestCodeFailure46;
     Procedure TestCodeFailure47;
+    Procedure TestCodeFailure48;
+    Procedure TestCodeFailure49;
   Public
   End;
 
@@ -2514,6 +2516,57 @@ Begin
     '  (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone)'#13#10 +
     ');',
     [ttErrors],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure48;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Type'#13#10 +
+    '  TSimpleIndexComparer<T> = Class(TInterfacedObject, IComparer<TXTSimpleIndexRecord<T>>)'#13#10 +
+    '  Strict Private'#13#10 +
+    '  Strict Protected'#13#10 +
+    '  Public'#13#10 +
+    '    Function Compare(Const recLeft, recRight : TXTSimpleIndexRecord<T>) : Integer;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Function TSimpleIndexComparer<T>.Compare(Const recLeft, recRight : TXTSimpleIndexRecord<T>) : Integer;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure49;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Test;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  NodeData1 := Sender.GetNodeData(Node1);'#13#10 +
+    '  NodeData2 := Sender.GetNodeData(Node2);'#13#10 +
+    '  If NodeData1.FShiftLevel = NodeData2.FShiftLevel Then'#13#10 +
+    '    Begin'#13#10 +
+    '      Result := NodeData1.FDateIndex - NodeData2.FDateIndex;'#13#10 +
+    '      If Result = 0 Then'#13#10 +
+    '        Result := NodeData1.FShiftIndex - NodeData2.FShiftIndex;'#13#10 +
+    '    End'#13#10 +
+    '  Else If NodeData1.FShiftLevel < NodeData2.FShiftLevel Then'#13#10 +
+    '    Result := -1'#13#10 +
+    '  Else'#13#10 +
+    '    Result := 1;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
     []
   );
 End;

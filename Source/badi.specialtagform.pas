@@ -4,8 +4,8 @@
   through a single method.
 
   @Author  David Hoyle
-  @Version 1.496
-  @Date    19 Sep 2020
+  @Version 1.500
+  @Date    25 Apr 2021
 
   @license
 
@@ -89,12 +89,12 @@ Implementation
 Uses
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
+  BADI.ToolsAPIUtils,
   {$ENDIF}
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   System.TypInfo,
-  BADI.ToolsAPIUtils,
   BADI.Constants,
   BADI.Functions;
 
@@ -151,7 +151,9 @@ Begin
   Result := False;
   frm := TfrmSpecialTag.Create(Application.MainForm);
   Try
+    {$IFNDEF STANDALONEAPP}
     TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmSpecialTag, frm);
+    {$ENDIF}
     frm.InitialiseForm(BADIImages, SpecialTag);
     If frm.ShowModal = mrOK Then
       Begin

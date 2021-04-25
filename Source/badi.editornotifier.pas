@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 2.292
-  @Date    19 Sep 2020
+  @Version 2.489
+  @Date    27 Mar 2021
 
   @license
 
@@ -655,8 +655,10 @@ begin
   CheckForMovement(iUpdateInterval, CP);
   If Assigned(Application) And Assigned(Application.MainForm) And Application.MainForm.Visible Then
     If Not Application.Active Then
-      TBADIDocIssueHintWindow.Disappear;
-end;
+      TBADIDocIssueHintWindow.Disappear
+    Else
+      TBADIDocIssueHintWindow.Display(TfrmDockableModuleExplorer.DocIssueTotals);
+End;
 
 (**
 
@@ -766,6 +768,7 @@ procedure TEditorNotifier.WindowShow(const EditWindow: INTAEditWindow; Show,
   LoadedFromDesktop: Boolean);
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'WindowShow', tmoTiming);{$ENDIF}
+  TBADIDocIssueHintWindow.Display(TfrmDockableModuleExplorer.DocIssueTotals);
 end;
 
 End.

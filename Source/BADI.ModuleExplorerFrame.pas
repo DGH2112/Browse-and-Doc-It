@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 5.807
-  @Date    19 Dec 2020
+  @Version 7.185
+  @Date    28 Mar 2021
 
   @license
 
@@ -269,6 +269,7 @@ Type
     Procedure LogDocIssueConflict(Const Element : TElementContainer);
     Function  ExtractSpellingWord : String;
     Procedure CheckForIDEErrors(Const Container : TElementContainer);
+    Function FollowMethodNodeData(Const iLine : Integer) : PBADITreeData;
     (**
       This property gets and set the filter text for the explorer view.
       @precon  None.
@@ -1688,6 +1689,36 @@ Begin
   FocusFollowedNode;
 End;
 
+Function TframeModuleExplorer.FollowMethodNodeData(Const iLine : Integer) : PBADITreeData;
+
+Var
+  iFollowLine: Integer;
+  iNodeLine: Integer;
+  Node: PVirtualNode;
+  NodeData: PBADITreeData;
+
+Begin
+  Result := Nil;
+  iFollowLine := 0;
+  Node := Explorer.GetFirst();
+  While Assigned(Node) Do
+    Begin
+      NodeData := Explorer.GetNodeData(Node);
+      If NodeData.FNodeType = ntElement Then
+        Begin
+          iNodeLine := NodeData.FNode.Line;
+          If Assigned(NodeData.FNode.Comment) And (NodeData.FNode.Comment.Line > 0) Then
+            iNodeLine := NodeData.FNode.Comment.Line;
+          If (iLine >= iNodeLine) And (iNodeLine > iFollowLine) Then
+            Begin
+              Result := NodeData;
+              iFollowLine := iNodeLine;
+            End;
+        End;
+      Node := Explorer.GetNext(Node);
+    End;
+End;
+
 (**
 
   This method sets the explorer frame as the focus when the form is activated.
@@ -2733,7 +2764,7 @@ End;
 Procedure TframeModuleExplorer.tvExplorerClick(Sender: TObject);
 
 Var
-  NodeData: PBADITreeData;
+  NodeData, ND: PBADITreeData;
 
 Begin
   If FSelectionChanging Then
@@ -2746,9 +2777,22 @@ Begin
           NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
           If Assigned(NodeData.FNode) Then
             If Not Assigned(NodeData.FNode.Comment) Then
-              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line)
-            Else
-              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);
+              Begin
+                ND := FollowMethodNodeData(NodeData.FNode.Line);
+                //: @todo Check for method
+                If Assigned(NodeData) And Assigned(ND.FNode.Comment) Then
+                  FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, ND.FNode.Comment.Line)
+                Else
+                  FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line);
+              End Else
+              Begin
+                ND := FollowMethodNodeData(NodeData.FNode.Line);
+                //: @todo Check for method
+                If Assigned(NodeData) And Assigned(ND.FNode.Comment) Then
+                  FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, ND.FNode.Comment.Line)
+                Else
+                  FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);
+              End;
         End;
   Finally
     FSelectionChanging := False;

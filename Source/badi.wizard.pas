@@ -3,8 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.741
-  @Date    19 Sep 2020
+  @Version 1.898
+  @Date    20 Feb 2021
 
   @license
 
@@ -115,7 +115,7 @@ Uses
 Constructor TBrowseAndDocItWizard.Create;
 
 Begin
-  {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
+  CodeSite.TraceMethod(Self, 'Create', tmoTiming);
   Inherited Create;
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange, IDEErrors);
@@ -149,7 +149,7 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
-  {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
+  CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);
   TBADIIDENotifier.UninstallIDENotifier;
   UnregisterEditorChecksSubView;
   UnregisterEditorMetricsSubView;
@@ -182,7 +182,6 @@ End;
 Procedure TBrowseAndDocItWizard.Execute;
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Execute', tmoTiming);{$ENDIF}
   { Do nothing, this is not called }
 End;
 
@@ -199,7 +198,6 @@ End;
 Procedure TBrowseAndDocItWizard.Focus(Sender: TObject);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Focus', tmoTiming);{$ENDIF}
   If Assigned(FBADIIDEMenuInstaller) Then
     FBADIIDEMenuInstaller.Focus(Sender);
 End;
@@ -299,13 +297,16 @@ Var
   iError: Integer;
 
 Begin
+  CodeSite.TraceMethod(Self, 'IDEErrors', tmoTiming);
   If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
     Begin
       Module := MS.CurrentModule;
-      If Assigned(Module) Then
+      If Assigned(Module) Then BEGIN
         If Supports(Module, IOTAModuleErrors, ModuleErrors) Then
           Begin
-            Errors := ModuleErrors.GetErrors;
+            CodeSite.Send(csmCheckPoint, 'Errors := ModuleErrors.GetErrors;');
+            Errors := ModuleErrors.GetErrors; //: @bug Locks the IDE here under unknown circumstances.
+            CodeSite.Send(csmCheckPoint, 'For iError := Low(Errors) To High(Errors) Do');
             For iError := Low(Errors) To High(Errors) Do
               slIDEErrors.Add(Format(strErrorRecord, [
                 Module.FileName,
@@ -314,6 +315,7 @@ Begin
                 Errors[iError].Start.CharIndex
               ]));
           End;
+      END;
     End;
 End;
 
@@ -350,7 +352,6 @@ End;
 Procedure TBrowseAndDocItWizard.OptionsChange(Sender: TObject);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OptionsChange', tmoTiming);{$ENDIF}
   If Assigned(FBADIIDEMenuInstaller) Then
     FBADIIDEMenuInstaller.OptionsChange(Sender);
 End;
@@ -370,7 +371,6 @@ End;
 Procedure TBrowseAndDocItWizard.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SelectionChange', tmoTiming);{$ENDIF}
   If Assigned(FBADIIDEMenuInstaller) Then
     FBADIIDEMenuInstaller.SelectionChange(iIdentLine, iIdentCol, iCommentLine);
 End;
@@ -388,8 +388,8 @@ End;
 Procedure TBrowseAndDocItWizard.UpdateMenuShortcuts(Sender: TObject);
 
 Begin
-  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateMenuShortcuts', tmoTiming);{$ENDIF}
   FBADIIDEMenuInstaller.UpdateMenuShortcuts;
 End;
 
 End.
+

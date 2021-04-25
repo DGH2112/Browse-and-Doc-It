@@ -3,8 +3,8 @@
   This module contains a class to add and edit method descriptions.
 
   @Author  David Hoyle
-  @Version 1.033
-  @Date    19 Sep 2020
+  @Version 1.038
+  @Date    25 Apr 2021
 
   @license
 
@@ -68,11 +68,11 @@ Implementation
 
 {$R *.dfm}
 
+{$IFNDEF STANDALONEAPP}
 Uses
-  {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  {$ENDIF}
   BADI.ToolsAPIUtils;
+{$ENDIF}
 
 (**
 
@@ -99,7 +99,9 @@ Begin
   Result := False;
   F := TfrmMethodDescriptions.Create(Nil);
   Try
+    {$IFNDEF STANDALONEAPP}
     TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmMethodDescriptions, F);
+    {$ENDIF}
     F.edtPattern.Text := strPattern;
     F.edtDescription.Text := strDescription;
     If F.ShowModal = mrOK Then

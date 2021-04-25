@@ -4,8 +4,8 @@
   module save events to see if there have been changes in the files.
 
   @Author  David Hoyle
-  @Version 2.466
-  @Date    20 Dec 2020
+  @Version 2.643
+  @Date    28 Mar 2021
   
   @license
 
@@ -105,6 +105,14 @@ Procedure TBADIIDENotifier.AfterCompile(Succeeded: Boolean);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AfterCompile', tmoTiming);{$ENDIF}
+  {$IFDEF CODESITE}
+  CodeSite.SendFmtMsg(
+    csmCheckPoint,
+    'AfterCompile = Succeeded: %s', [
+      BoolToStr(Succeeded, True)
+    ]
+  );
+  {$ENDIF CODESITE}
 End;
 
 (**
@@ -125,6 +133,15 @@ Procedure TBADIIDENotifier.AfterCompile(Succeeded, IsCodeInsight: Boolean);
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AfterCompile', tmoTiming);{$ENDIF}
+  {$IFDEF CODESITE}
+  CodeSite.SendFmtMsg(
+    csmCheckPoint,
+    'AfterCompile = Succeeded: %s, IsCodeInsight: %s', [
+      BoolToStr(Succeeded, True),
+      BoolToStr(IsCodeInsight, True)
+    ]
+  );
+  {$ENDIF CODESITE}
 End;
 
 (**
@@ -146,6 +163,16 @@ Procedure TBADIIDENotifier.AfterCompile(Const Project: IOTAProject; Succeeded, I
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AfterCompile', tmoTiming);{$ENDIF}
+  {$IFDEF CODESITE}
+  CodeSite.SendFmtMsg(
+    csmCheckPoint,
+    'AfterCompile = Project: %s, Succeeded: %s, IsCodeInsight: %s', [
+      ExtractFileName(Project.FileName),
+      BoolToStr(Succeeded, True),
+      BoolToStr(IsCodeInsight, True)
+    ]
+  );
+  {$ENDIF CODESITE}
 End;
 
 (**
@@ -168,6 +195,16 @@ Procedure TBADIIDENotifier.BeforeCompile(Const Project: IOTAProject; IsCodeInsig
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeforeCompile', tmoTiming);{$ENDIF}
+  {$IFDEF CODESITE}
+  CodeSite.SendFmtMsg(
+    csmCheckPoint,
+    'BeforeCompile = Project: %s, IsCodeInsight: %s, Cancelled: %s', [
+      ExtractFileName(Project.FileName),
+      BoolToStr(IsCodeInsight, True),
+      BoolToStr(Cancel, True)
+    ]
+  );
+  {$ENDIF CODESITE}
 End;
 
 (**
@@ -188,6 +225,15 @@ Procedure TBADIIDENotifier.BeforeCompile(Const Project: IOTAProject; Var Cancel:
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'BeforeCompile', tmoTiming);{$ENDIF}
+  {$IFDEF CODESITE}
+  CodeSite.SendFmtMsg(
+    csmCheckPoint,
+    'BeforeCompile = Project: %s, Cancelled: %s', [
+      ExtractFileName(Project.FileName),
+      BoolToStr(Cancel, True)
+    ]
+  );
+  {$ENDIF CODESITE}
 End;
 
 (**
@@ -385,10 +431,10 @@ Procedure TBADIIDENotifier.ModuleRenameEvent(Const strOldFileName, strNewFileNam
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ModuleRenameEvent', tmoTiming);{$ENDIF}
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSite.SendFmtMsg(csmReminder, 'Rename: %s => %s', [ExtractFileName(strOldFileName),
     ExtractFileName(strNewFileName)]);
-  {$ENDIF DEBUG}
+  {$ENDIF CODESITE}
   FModuleNotifiers.Rename(strOldFileName, strNewFileName);
   FProjectNotifiers.Rename(strOldFileName, strNewFileName);
   FModuleStatsList.Rename(strOldFileName, strNewFileName);

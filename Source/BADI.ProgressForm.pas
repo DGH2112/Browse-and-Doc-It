@@ -3,8 +3,8 @@
   This is a generic progress dialogue for use in the Browse and Doc It.
 
   @author     David Hoyle
-  @version    1.040
-  @Date    28 Aug 2020
+  @version    1.048
+  @Date    02 May 2021
 
   @license
 
@@ -65,7 +65,10 @@ implementation
 
 {$R *.DFM}
 
-uses BADI.ToolsAPIUtils;
+{$IFNDEF STANDALONEAPP}
+Uses
+  BADI.ToolsAPIUtils;
+{$ENDIF}
 
 (**
 
@@ -104,7 +107,9 @@ Begin
   FEllipsisLabel.Parent := pnlInfo;
   FEllipsisLabel.Align := alClient;
   FEllipsisLabel.EllipsisPosition := epPathEllipsis;
+  {$IFNDEF STANDALONEAPP}
   TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmProgress, Self);
+  {$ENDIF}
 End;
 
 (**

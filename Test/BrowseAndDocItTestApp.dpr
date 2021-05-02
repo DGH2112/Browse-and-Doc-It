@@ -7,6 +7,11 @@ program BrowseAndDocItTestApp;
 
 uses
   Forms,
+  Vcl.Themes,
+  Vcl.Styles,
+  DDetours,
+  Vcl.Styles.Fixes,
+  Vcl.Styles.Hooks,
   BADI.Initialisation in '..\Source\BADI.Initialisation.pas',
   BADI.Options in '..\Source\BADI.Options.pas',
   BADI.Module.Dispatcher in '..\Source\BADI.Module.Dispatcher.pas',
@@ -135,14 +140,17 @@ uses
   BADI.ModuleExplorer.VirtualStringTree in '..\Source\BADI.ModuleExplorer.VirtualStringTree.pas',
   BADI.ModuleExplorer.TreeNodeInfo in '..\Source\BADI.ModuleExplorer.TreeNodeInfo.pas',
   BADI.ModuleExplorer.CustomHintWindow in '..\Source\BADI.ModuleExplorer.CustomHintWindow.pas',
-  ProgressForm in '..\Externals\ProgressForm.pas' {frmProgress},
   DGHSynEdit in '..\Externals\DGHSynEdit.pas',
   DGHCustomGraphicsControl in '..\Externals\DGHCustomGraphicsControl.pas',
   DGHMemoryMonitorControl in '..\Externals\DGHMemoryMonitorControl.pas',
   dghlibrary in '..\Externals\dghlibrary.pas',
   BADI.CustomVirtualStringTree in '..\Source\BADI.CustomVirtualStringTree.pas',
   UsefulSynEditFunctions in '..\Externals\UsefulSynEditFunctions.pas',
-  SynEditOptionsForm in '..\Externals\SynEditOptionsForm.pas' {frmEditorOptions};
+  SynEditOptionsForm in '..\Externals\SynEditOptionsForm.pas' {frmEditorOptions},
+  BADI.SpellingIssue in '..\Source\BADI.SpellingIssue.pas',
+  BADI.LineDocIssue in '..\Source\BADI.LineDocIssue.pas',
+  BADI.DocIssueTotals in '..\Source\BADI.DocIssueTotals.pas',
+  BADI.ProgressForm in '..\Source\BADI.ProgressForm.pas' {frmProgress};
 
 {$R *.res}
 

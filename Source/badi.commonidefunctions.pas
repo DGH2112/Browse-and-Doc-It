@@ -4,8 +4,8 @@
   implementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Version 1.121
-  @Date    19 Sep 2020
+  @Version 1.132
+  @Date    02 May 2021
 
   @license
 
@@ -61,9 +61,15 @@ Type
       the calling IDEs main thread. **)
   TThreadExceptionMsg = Procedure(Const strExceptionMsg: String) Of Object;
 
-  (** This is a class to manage thread used to parse code. Its main aim is
-      to ensure that only 1 thread is active at a time and provide a mechanism
-      to terminate a working thread. **)
+  (**
+
+    This is a class to manage thread used to parse code. Its main aim is
+    to ensure that only 1 thread is active at a time and provide a mechanism
+    to terminate a working thread.
+
+    @bug We need to be able to either wait for the thread to finish or terminate the thread!
+
+  **)
   TBrowseAndDocItThreadManager = Class
     {$IFDEF D2005} Strict {$ENDIF} Private
     FThread             : TThread;

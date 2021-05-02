@@ -61,7 +61,7 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Release>10</VerInfo_Release>
         <DCC_DependencyCheckOutputName>BrowseAndDocItTestAppXE2.exe</DCC_DependencyCheckOutputName>
-        <DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Library\SynEdit 2.1.0\Source;$(BDSPROJECTSDIR)\Library\Virtual Treeview 7.0.0\Source;$(BDSPROJECTSDIR)\Binaries\CS5\Lib\RX10.3\Win32;$(BDSPROJECTSDIR)\Binaries\ZipForge 6.0\Lib\Delphi 10.3 and C++ Builder 10.3 (Rio);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>DDetours\Source;VCL-Styles-Utils\Common;SynEdit\Source;VirtualTrees\Source;$(BDSPROJECTSDIR)\Binaries\CS5\Lib\RX10.4\Win32;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Platform>x86</DCC_Platform>
@@ -82,6 +82,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <Custom_Styles>&quot;Aqua Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate.vsf&quot;;Glow|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glow.vsf;&quot;Iceberg Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\IcebergClassico.vsf&quot;;&quot;Lavender Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\LavenderClassico.vsf&quot;;Sky|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky.vsf;&quot;Slate Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SlateClassico.vsf&quot;;&quot;Tablet Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletDark.vsf&quot;;&quot;Tablet Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletLight.vsf&quot;;Windows10|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10.vsf;&quot;Windows10 Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Blue.vsf&quot;;&quot;Windows10 Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Dark.vsf&quot;;&quot;Windows10 Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Green.vsf&quot;;&quot;Windows10 Purple|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Purple.vsf&quot;;&quot;Windows10 SlateGray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10SlateGray.vsf&quot;;Amakrits|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Amakrits.vsf;&quot;Amethyst Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaGraphite.vsf&quot;;Auric|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Auric.vsf;Carbon|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Carbon.vsf;&quot;Charcoal Dark Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CobaltXEMedia.vsf&quot;;&quot;Cyan Dusk|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\GoldenGraphite.vsf&quot;;Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Light.vsf;Luna|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Luna.vsf;&quot;Metropolis UI Black|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIBlack.vsf&quot;;&quot;Metropolis UI Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIBlue.vsf&quot;;&quot;Metropolis UI Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIDark.vsf&quot;;&quot;Metropolis UI Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIGreen.vsf&quot;;Obsidian|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Obsidian.vsf;&quot;Onyx Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\OnyxBlue.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SapphireKamri.vsf&quot;;Silver|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Silver.vsf;&quot;Smokey Quartz Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TurquoiseGray.vsf&quot;;Glossy|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glossy.vsf</Custom_Styles>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
@@ -155,7 +156,6 @@
         <DCCReference Include="..\Source\BADI.Base.Module.pas"/>
         <DCCReference Include="..\Source\BADI.CodeBrowsingFrame.pas">
             <Form>fmBADICodeBrowsingFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Comment.pas"/>
@@ -171,18 +171,15 @@
         <DCCReference Include="..\source\BADI.Documentation.Dispatcher.pas"/>
         <DCCReference Include="..\Source\BADI.DocumentationOptionsForm.pas">
             <Form>frmDocumentationOptions</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.ElementContainer.pas"/>
         <DCCReference Include="..\Source\BADI.ExcludedDocFilesFrame.pas">
             <Form>fmBADIExcludedDocFilesFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Functions.pas"/>
         <DCCReference Include="..\Source\BADI.GeneralOptionsFrame.pas">
             <Form>fmBADIGeneralOptions</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Generic.Constant.pas"/>
@@ -197,11 +194,9 @@
         <DCCReference Include="..\Source\BADI.INI.Module.pas"/>
         <DCCReference Include="..\Source\BADI.MethodDescriptionForm.pas">
             <Form>frmMethodDescriptions</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.MethodDescriptionsFrame.pas">
             <Form>fmBADIMethodDescriptionsFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.ModuleInfo.pas"/>
@@ -305,12 +300,10 @@
         <DCCReference Include="..\Source\BADI.XML.XMLPI.pas"/>
         <DCCReference Include="..\Source\BADI.ModuleExtensionsFrame.pas">
             <Form>fmBADIModuleExtensionsFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.MenuShortcutsFrame.pas">
             <Form>fmBADIMenuShortcuts</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Interfaces.pas"/>
@@ -319,10 +312,6 @@
         <DCCReference Include="..\Source\BADI.ModuleExplorer.VirtualStringTree.pas"/>
         <DCCReference Include="..\Source\BADI.ModuleExplorer.TreeNodeInfo.pas"/>
         <DCCReference Include="..\Source\BADI.ModuleExplorer.CustomHintWindow.pas"/>
-        <DCCReference Include="..\Externals\ProgressForm.pas">
-            <Form>frmProgress</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="..\Externals\DGHSynEdit.pas"/>
         <DCCReference Include="..\Externals\DGHCustomGraphicsControl.pas"/>
         <DCCReference Include="..\Externals\DGHMemoryMonitorControl.pas"/>
@@ -331,7 +320,12 @@
         <DCCReference Include="..\Externals\UsefulSynEditFunctions.pas"/>
         <DCCReference Include="..\Externals\SynEditOptionsForm.pas">
             <Form>frmEditorOptions</Form>
-            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Source\BADI.SpellingIssue.pas"/>
+        <DCCReference Include="..\Source\BADI.LineDocIssue.pas"/>
+        <DCCReference Include="..\Source\BADI.DocIssueTotals.pas"/>
+        <DCCReference Include="..\Source\BADI.ProgressForm.pas">
+            <Form>frmProgress</Form>
         </DCCReference>
         <RcCompile Include="..\Source\BADI.HTMLResources.RC">
             <Form>BADI.HTMLResources.res</Form>
@@ -394,10 +388,10 @@
                     <VersionInfoKeys Name="Comments">Test Application to Browse and Doc It.</VersionInfoKeys>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k260.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp260.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k270.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp270.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k270.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp270.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>

@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 7.185
-  @Date    28 Mar 2021
+  @Version 7.189
+  @Date    29 Apr 2021
 
   @license
 
@@ -2780,7 +2780,7 @@ Begin
               Begin
                 ND := FollowMethodNodeData(NodeData.FNode.Line);
                 //: @todo Check for method
-                If Assigned(NodeData) And Assigned(ND.FNode.Comment) Then
+                If Assigned(NodeData) And Assigned(ND) And Assigned(ND.FNode.Comment) Then
                   FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, ND.FNode.Comment.Line)
                 Else
                   FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line);
@@ -2788,7 +2788,7 @@ Begin
               Begin
                 ND := FollowMethodNodeData(NodeData.FNode.Line);
                 //: @todo Check for method
-                If Assigned(NodeData) And Assigned(ND.FNode.Comment) Then
+                If Assigned(NodeData) And Assigned(ND) And Assigned(ND.FNode.Comment) Then
                   FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, ND.FNode.Comment.Line)
                 Else
                   FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);

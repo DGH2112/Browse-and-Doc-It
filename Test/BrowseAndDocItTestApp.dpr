@@ -7,6 +7,11 @@ program BrowseAndDocItTestApp;
 
 uses
   Forms,
+  Vcl.Themes,
+  Vcl.Styles,
+  DDetours,
+  Vcl.Styles.Fixes,
+  Vcl.Styles.Hooks,
   BADI.Initialisation in '..\Source\BADI.Initialisation.pas',
   BADI.Options in '..\Source\BADI.Options.pas',
   BADI.Module.Dispatcher in '..\Source\BADI.Module.Dispatcher.pas',
@@ -145,9 +150,7 @@ uses
   BADI.SpellingIssue in '..\Source\BADI.SpellingIssue.pas',
   BADI.LineDocIssue in '..\Source\BADI.LineDocIssue.pas',
   BADI.DocIssueTotals in '..\Source\BADI.DocIssueTotals.pas',
-  BADI.ProgressForm in '..\Source\BADI.ProgressForm.pas' {frmProgress},
-  Vcl.Themes,
-  Vcl.Styles;
+  BADI.ProgressForm in '..\Source\BADI.ProgressForm.pas' {frmProgress};
 
 {$R *.res}
 

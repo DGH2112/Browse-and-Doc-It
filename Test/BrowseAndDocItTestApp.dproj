@@ -61,7 +61,7 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Release>10</VerInfo_Release>
         <DCC_DependencyCheckOutputName>BrowseAndDocItTestAppXE2.exe</DCC_DependencyCheckOutputName>
-        <DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Library\SynEdit 2.1.0\Source;$(BDSPROJECTSDIR)\Library\Virtual Treeview 7.0.0\Source;$(BDSPROJECTSDIR)\Binaries\CS5\Lib\RX10.4\Win32;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>DDetours\Source;VCL-Styles-Utils\Common;SynEdit\Source;VirtualTrees\Source;$(BDSPROJECTSDIR)\Binaries\CS5\Lib\RX10.4\Win32;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Platform>x86</DCC_Platform>
@@ -156,7 +156,6 @@
         <DCCReference Include="..\Source\BADI.Base.Module.pas"/>
         <DCCReference Include="..\Source\BADI.CodeBrowsingFrame.pas">
             <Form>fmBADICodeBrowsingFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Comment.pas"/>
@@ -172,18 +171,15 @@
         <DCCReference Include="..\source\BADI.Documentation.Dispatcher.pas"/>
         <DCCReference Include="..\Source\BADI.DocumentationOptionsForm.pas">
             <Form>frmDocumentationOptions</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.ElementContainer.pas"/>
         <DCCReference Include="..\Source\BADI.ExcludedDocFilesFrame.pas">
             <Form>fmBADIExcludedDocFilesFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Functions.pas"/>
         <DCCReference Include="..\Source\BADI.GeneralOptionsFrame.pas">
             <Form>fmBADIGeneralOptions</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Generic.Constant.pas"/>
@@ -198,11 +194,9 @@
         <DCCReference Include="..\Source\BADI.INI.Module.pas"/>
         <DCCReference Include="..\Source\BADI.MethodDescriptionForm.pas">
             <Form>frmMethodDescriptions</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.MethodDescriptionsFrame.pas">
             <Form>fmBADIMethodDescriptionsFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.ModuleInfo.pas"/>
@@ -306,12 +300,10 @@
         <DCCReference Include="..\Source\BADI.XML.XMLPI.pas"/>
         <DCCReference Include="..\Source\BADI.ModuleExtensionsFrame.pas">
             <Form>fmBADIModuleExtensionsFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.MenuShortcutsFrame.pas">
             <Form>fmBADIMenuShortcuts</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.Interfaces.pas"/>
@@ -328,14 +320,12 @@
         <DCCReference Include="..\Externals\UsefulSynEditFunctions.pas"/>
         <DCCReference Include="..\Externals\SynEditOptionsForm.pas">
             <Form>frmEditorOptions</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Source\BADI.SpellingIssue.pas"/>
         <DCCReference Include="..\Source\BADI.LineDocIssue.pas"/>
         <DCCReference Include="..\Source\BADI.DocIssueTotals.pas"/>
         <DCCReference Include="..\Source\BADI.ProgressForm.pas">
             <Form>frmProgress</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <RcCompile Include="..\Source\BADI.HTMLResources.RC">
             <Form>BADI.HTMLResources.res</Form>

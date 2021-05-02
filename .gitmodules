@@ -7,3 +7,9 @@
 [submodule "Test/VCL-Styles-Utils"]
 	path = Test/VCL-Styles-Utils
 	url = https://github.com/RRUZ/vcl-styles-utils.git
+[submodule "Test/SynEdit"]
+	path = Test/SynEdit
+	url = https://github.com/SynEdit/SynEdit.git
+[submodule "Test/VirtualTrees"]
+	path = Test/VirtualTrees
+	url = https://github.com/JAM-Software/Virtual-TreeView.git

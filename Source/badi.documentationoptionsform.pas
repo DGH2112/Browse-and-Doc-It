@@ -3,9 +3,9 @@
   This module contains a class which represent a form for defining the option
   for Documentation.
 
-  @Version 1.038
+  @Version 1.051
   @Author  David Hoyle
-  @Date    19 Sep 2020
+  @Date    02 May 2021
 
   @license
 
@@ -71,10 +71,12 @@ type
 implementation
 
 Uses
+  {$IFNDEF STANDALONEAPP}
+  BADI.ToolsAPIUtils,
+  {$ENDIF}
   BADI.Base.Module,
   BADI.Types,
-  BADI.Options,
-  BADI.ToolsAPIUtils;
+  BADI.Options;
 
 {$R *.dfm}
 
@@ -100,7 +102,9 @@ begin
   Result := False;
   F := TfrmDocumentationOptions.Create(Nil);
   Try
+    {$IFNDEF STANDALONEAPP}
     TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDocumentationOptions, F);
+    {$ENDIF}
     For i := Low(TDocType) to High(TDocType) Do
       F.rgpDocumentationOptions.Items.Add(strDocumentationTypes[i]);
     F.rgpDocumentationOptions.ItemIndex := Byte(ADocType);

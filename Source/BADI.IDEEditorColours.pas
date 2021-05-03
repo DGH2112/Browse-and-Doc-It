@@ -4,8 +4,8 @@
   the token colours from the IDE.
 
   @Author  David Hoyle
-  @Version 1.017
-  @Date    19 Sep 2020
+  @Version 1.022
+  @Date    02 May 2021
 
   @license
 
@@ -126,6 +126,9 @@ Begin
       Finally
         R.Free;
       End;
+    End Else
+    Begin
+      iBGColour := clNone;
     End;
 End;
 

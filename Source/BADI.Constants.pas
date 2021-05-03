@@ -3,8 +3,8 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 2.550
-  @Date    06 Sep 2020
+  @Version 2.650
+  @Date    03 May 2021
 
   @license
 
@@ -201,36 +201,35 @@ Const
 
   (** This is a default set of font information for the application. **)
   strTokenTypeInfo : TBADITokenFontInfoTokenSet = (
-    (FForeColour : clRed;        FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clMaroon;     FStyles : [fsBold];               FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clInfoText;   FStyles : [];                     FBackColour: clInfoBk),
-    (FForeColour : clWindowText; FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clNavy;       FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clPurple;     FStyles : [fsBold, fsUnderline];  FBackColour: clNone),
-    (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clNone;       FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clFuchsia;    FStyles : [];                     FBackColour: clNone)
-  );
-
+    (FForeColour : clRed;           FStyles : [];                     FBackColour: clNone),  // ttUnknown,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttWhiteSpace,
+    (FForeColour : clWindowText;    FStyles : [fsBold];               FBackColour: clNone),  // ttReservedWord,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttIdentifier,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttNumber,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttSymbol,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttLineEnd,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttSingleLiteral,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttDoubleLiteral,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttLineComment,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttBlockComment,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttHTMLStartTag,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttHTMLEndTag,
+    (FForeColour : clWindowText;    FStyles : [fsBold];               FBackColour: clNone),  // ttDirective,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttCompilerDirective,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttLinkTag,
+    (FForeColour : clWindowText;    FStyles : [fsBold];               FBackColour: clNone),  // ttTreeHeader,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttFileEnd,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttLineContinuation,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttCustomUserToken,
+    (FForeColour : clInfoText;      FStyles : [];                     FBackColour: clInfoBk),// ttExplorerHighlight,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttPlainText,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttCommentText,
+    (FForeColour : clWindowText;    FStyles : [fsBold, fsUnderline];  FBackColour: clNone),  // ttTagHeaderText,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttTagText,
+    (FForeColour : clHighlightText; FStyles : [];                     FBackColour: clHighlight), // ttSearchHighlight,
+    (FForeColour : clHighlightText; FStyles : [];                     FBackColour: clHighlight), // ttLineHighlight,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone)   // ttDocIssueEditorText
+  );                                                                                      
   (** This is a list of image resource masks to be placed of the below images to create versions
       for different scopes. **)
   BADIScopeList : Array[Low(TScope)..High(TScope)] Of TImageIndexInfo = (

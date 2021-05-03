@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 2.502
+  @Version 2.506
   @Date    03 May 2021
 
   @license
@@ -263,6 +263,7 @@ Begin
   FUpdateTimer.Enabled := False;
   FUpdateTimer.OnTimer := Nil;
   FUpdateTimer.Free;
+  FBADIThreadMgr.WaitForThreadToFinish;
   FBADIThreadMgr.Free;
   Inherited;
 End;

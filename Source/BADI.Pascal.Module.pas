@@ -3,8 +3,8 @@
   Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 3.032
-  @Date    16 Jan 2021
+  @Version 3.295
+  @Date    03 May 2021
 
   @license
 
@@ -5729,15 +5729,25 @@ begin
       Comment := GetComment;
       ModuleType := mtLibrary;
       NextNonCommentToken;
-      If Not IsIdentifier(Token) Then
-        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-      Else
+      If IsIdentifier(Token) Then
         Begin
           ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
           NextNonCommentToken;
-        End;
+          While Token.Token = '.' Do
+            Begin
+              ModuleName := ModuleName + '.';
+              NextNonCommentToken;
+              If IsIdentifier(Token) Then
+                Begin
+                  ModuleName := ModuleName + '.';
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
+            End;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self)
@@ -5776,15 +5786,25 @@ begin
       Comment := GetComment;
       ModuleType := mtPackage;
       NextNonCommentToken;
-      If Not IsIdentifier(Token) Then
-        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-      Else
+      If IsIdentifier(Token) Then
         Begin
           ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
           NextNonCommentToken;
-        End;
+          While Token.Token = '.' Do
+            Begin
+              ModuleName := ModuleName + '.';
+              NextNonCommentToken;
+              If IsIdentifier(Token) Then
+                Begin
+                  ModuleName := ModuleName + '.';
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+            End;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self)
@@ -5831,6 +5851,17 @@ begin
           Line := Token.Line;
           Column := Token.Column;
           NextNonCommentToken;
+          While Token.Token = '.' Do
+            Begin
+              ModuleName := ModuleName + '.';
+              NextNonCommentToken;
+              If IsIdentifier(Token) Then
+                Begin
+                  ModuleName := ModuleName + '.';
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
+            End;
           // In the Program module we need to check for '(' Ident List ')' but
           // discard
           If Token.Token = '(' Then
@@ -5911,26 +5942,25 @@ Begin
       Comment := GetComment;
       ModuleType := mtUnit;
       NextNonCommentToken;
-      If Not IsIdentifier(Token) Then
-        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-      Else
+      If IsIdentifier(Token) Then
         Begin;
           ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
           NextNonCommentToken;
-        End;
-      While Token.Token = '.' Do
-        Begin
-          ModuleName := ModuleName + '.';
-          NextNonCommentToken;
-          If IsIdentifier(Token) Then
+          While Token.Token = '.' Do
             Begin
               ModuleName := ModuleName + '.';
               NextNonCommentToken;
-            End Else
-              ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-        End;
+              If IsIdentifier(Token) Then
+                Begin
+                  ModuleName := ModuleName + '.';
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+            End;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       PortabilityDirective;
       // Check for ';'
       If Token.Token <> ';' Then

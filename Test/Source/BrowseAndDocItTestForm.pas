@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Author  David Hoyle
-  @Version 14.826
+  @Version 14.827
   @Date    03 May 2021
 
   @license
@@ -69,7 +69,9 @@ Uses
   System.Actions,
   System.ImageList,
   DGHCustomGraphicsControl,
-  DGHMemoryMonitorControl, System.Generics.Collections, System.Generics.Defaults;
+  DGHMemoryMonitorControl,
+  System.Generics.Collections,
+  System.Generics.Defaults;
 
 {$INCLUDE '..\..\Source\CompilerDefinitions.inc'}
 

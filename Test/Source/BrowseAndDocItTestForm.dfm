@@ -13,7 +13,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDefault
+  Position = poDesigned
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96

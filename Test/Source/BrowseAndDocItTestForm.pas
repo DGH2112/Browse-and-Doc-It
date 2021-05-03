@@ -4,8 +4,8 @@
   and how it can better handle errors.
 
   @Author  David Hoyle
-  @Version 14.657
-  @Date    02 May 2021
+  @Version 14.826
+  @Date    03 May 2021
 
   @license
 
@@ -367,6 +367,10 @@ Uses
 **)
 Procedure TfrmBrowseAndDocItTestForm.actFileExcludeFileExecute(Sender: TObject);
 
+ResourceString
+  strExcludeFileFromResult = 'Exclude File from Result';
+  strAreYouSure = 'Are you sure you want to exclude the below file from the results.';
+
 Var
   strFileName: String;
 
@@ -376,8 +380,8 @@ Begin
   strFileName := FileName;
   Delete(strFileName, 1, Length(PathRoot));
   strFileName := '*' + strFileName;
-  If InputQuery('Exclude File from Result',
-    'Are you sure you want to exclude the below file from the results.',
+  If InputQuery(strExcludeFileFromResult,
+    strAreYouSure,
     strFileName) Then
     Begin
       FFileExcludeList.Add(strFileName);
@@ -410,10 +414,13 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.actFileRecurseFoldersExecute(
-  Sender: TObject);
+Procedure TfrmBrowseAndDocItTestForm.actFileRecurseFoldersExecute(Sender: TObject);
+
+ResourceString
+  strWouldYouLikeToReScanCodeFiles = 'Would you like to re-scan the code files?';
+
 Begin
-  If MessageDlg('Would you like to re-scan the code files?', mtConfirmation,
+  If MessageDlg(strWouldYouLikeToReScanCodeFiles, mtConfirmation,
     [mbYes, mbNo, mbCancel], 0) = mrYes Then
     actFileScanExecute(Sender);
 End;
@@ -430,6 +437,11 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.actFileScanExecute(Sender: TObject);
 
+ResourceString
+  strPreparingToScan = 'Preparing to Scan';
+  strPleaseWait = 'Please wait...';
+  strScanningDirectories = 'Scanning Directories';
+
 Var
   i        : Integer;
   R        : TScanResults;
@@ -439,14 +451,14 @@ Begin
   Application.ProcessMessages;
   lvFileList.Items.Clear;
   FParseRecords.Clear;
-  FProgressForm.Init(-1, 'Preparing to Scan', 'Please wait...');
+  FProgressForm.Init(-1, strPreparingToScan, strPleaseWait);
   Try
     iPosition := 0;
     For i     := 0 To FFolders.Count - 1 Do
       If Integer(FFolders.Objects[i]) > 0 Then
         RecurseDirectories(FFolders.Names[i], FFolders.Names[i],
           iPosition, FFolders.ValueFromIndex[i]);
-    FProgressForm.Init(iPosition, 'Scanning Directories', 'Please wait...');
+    FProgressForm.Init(iPosition, strScanningDirectories, strPleaseWait);
     iPosition := 0;
     For i     := 0 To FFolders.Count - 1 Do
       If Integer(FFolders.Objects[i]) > 0 Then
@@ -612,6 +624,11 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.DocumentationClick(Sender: TObject);
 
+Const
+  strTESTDocumentationFolder = '\TEST Documentation\';
+  strTestDocumentationTitle = 'Test Documentation';
+  strOPENVerb = 'OPEN';
+
 Var
   i       : Integer;
   ADocType: TDocType;
@@ -620,13 +637,13 @@ Var
 Begin
   If TfrmDocumentationOptions.Execute(ADocType) Then
     Begin
-      D := DocumentDispatcher(ExtractFilePath(ParamStr(0)) + '\TEST Documentation\',
-        'Test Documentation', ADocType);
+      D := DocumentDispatcher(ExtractFilePath(ParamStr(0)) + strTESTDocumentationFolder,
+        strTestDocumentationTitle, ADocType);
       Try
         For i := 0 To lvFileList.Items.Count - 1 Do
           D.Add(lvFileList.Items[i].SubItems[4]);
         D.OutputDocumentation;
-        ShellExecute(hInstance, 'OPEN', PChar(D.MainDocument), '', PChar(GetCurrentDir), SW_NORMAL);
+        ShellExecute(hInstance, strOPENVerb, PChar(D.MainDocument), '', PChar(GetCurrentDir), SW_NORMAL);
       Finally
         Free;
       End;
@@ -680,8 +697,11 @@ End;
 procedure TfrmBrowseAndDocItTestForm.ExtractFile(Sender: TObject;
   var FileName: String; var FileAttr: LongWord; const Comment: AnsiString);
 
+ResourceString
+  strExtractFileFailure = 'Extract File Failure';
+
 begin
-  CodeSite.Send('Extract File Failure', FileName);
+  CodeSite.Send(strExtractFileFailure, FileName);
 end;
 
 (**
@@ -731,6 +751,14 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.FormCreate(Sender: TObject);
 
+Const
+  strWIN32 = 'WIN32';
+  {$IFDEF WIN32}
+  strMSWINDOWS = 'MSWINDOWS';
+  {$ELSE}
+  strLINUX = 'LINUX';
+  {$ENDIF}
+
 Begin
   FINIFileName            := BuildRootKey(Nil, Nil);
   FParseRecords           := TObjectList.Create(True);
@@ -749,10 +777,10 @@ Begin
   FSynDFMSyn := TSynDFMSyn.Create(Nil);
   FSynINISyn := TSynINISyn.Create(Nil);
   {$IFDEF WIN32}
-  TBADIOptions.BADIOptions.Defines.Add('WIN32');
-  TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
+  TBADIOptions.BADIOptions.Defines.Add(strWIN32);
+  TBADIOptions.BADIOptions.Defines.Add(strMSWINDOWS);
   {$ELSE}
-  TBADIOptions.BADIOptions.Defines.Add('LINUX');
+  TBADIOptions.BADIOptions.Defines.Add(strLINUX);
   {$ENDIF}
   FProgressForm                          := TfrmProgress.Create(Nil);
   FModuleExplorerFrame                   := TframeModuleExplorer.Create(Self);
@@ -922,6 +950,13 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.LoadResults;
 
+Const
+  strTxtExt = '.txt';
+
+ResourceString
+  strStartingUp = 'Starting Up...';
+  strLoadingScanResults = 'Loading Scan Results...';
+
 Var
   sl                                    : TStringList;
   iRecord                               : Integer;
@@ -933,9 +968,9 @@ Var
 Begin
   sl := TStringList.Create;
   Try
-    If FileExists(ChangeFileExt(FINIFileName, '.txt')) Then
-      sl.LoadFromFile(ChangeFileExt(FINIFileName, '.txt'));
-    FProgressForm.Init(sl.Count, 'Starting Up...', 'Loading Scan Results...');
+    If FileExists(ChangeFileExt(FINIFileName, strTxtExt)) Then
+      sl.LoadFromFile(ChangeFileExt(FINIFileName, strTxtExt));
+    FProgressForm.Init(sl.Count, strStartingUp, strLoadingScanResults);
     Try
       For iRecord := 0 To sl.Count - 1 Do
         Begin
@@ -1309,6 +1344,9 @@ Function TfrmBrowseAndDocItTestForm.RecurseDirectories(Const strRoot,
   strDirectory: String; Var iPosition: Integer; Const strExtensions: String;
   Const boolScan: Boolean = False): TScanResults;
 
+ResourceString
+  strScanning = 'Scanning %s %1.0n';
+
 Var
   recFile                   : TSearchRec;
   iResult                   : Integer;
@@ -1318,7 +1356,7 @@ Var
   R                         : TScanResults;
   slExts                    : TStringList;
   i                         : Integer;
-  boolResult                : Boolean;
+  {: @debug boolResult                : Boolean; }
   strSource                 : String;
 
 Begin
@@ -1357,7 +1395,7 @@ Begin
                     End
                   Else
                     FProgressForm.UpdateProgress(iPosition,
-                      Format('Scanning %s %1.0n', [strDirectory, Int(iPosition)]));
+                      Format(strScanning, [strDirectory, Int(iPosition)]));
                 End;
               iResult := FindNext(recFile);
             End;
@@ -1648,6 +1686,22 @@ Begin
   End;
 End;
 
+(**
+
+  This is an on mouse down event handler for the statusbar control.
+
+  @precon  None.
+  @postcon Displays a context menu for the VCL Themes that are available.
+
+  @nocheck HardCodedInteger
+
+  @param   Sender as a TObject
+  @param   Button as a TMouseButton
+  @param   Shift  as a TShiftState
+  @param   X      as an Integer
+  @param   Y      as an Integer
+
+**)
 Procedure TfrmBrowseAndDocItTestForm.sbrStatusBarMouseDown(Sender: TObject; Button: TMouseButton; Shift:
   TShiftState; X, Y: Integer);
 
@@ -1712,20 +1766,20 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.SetFileName(Const Value: String);
 
-Const
-  strMsg : String = 'The file "%s" has changed.'#13#10'Do you want to save the changes?';
+ResourceString
+  strMsg = 'The file "%s" has changed.'#13#10'Do you want to save the changes?';
+  
 Var
   strExt       : String;
-  strSource    : String;
+  {: @debug strSource    : String;
   strFileName  : String;
-  iPos         : Integer;
+  iPos         : Integer; }
 
 Begin
   If FSynEdit.Modified Then
     Case MessageDlg(Format(strMsg, [FFilename]), mtConfirmation, [mbYes, mbNo,
       mbCancel], 0) Of
       mrYes: FSynEdit.Lines.SaveToFile(FFileName);
-      mrNo: ;
       mrCancel: Abort;
     End;
   FFileName := Value;
@@ -1892,12 +1946,14 @@ End;
   @param   Changes as a TSynStatusChanges
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject;
-  Changes: TSynStatusChanges);
+Procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
+
+ResourceString
+  strLineColumn = 'Line %d, Column %d';
+
 Begin
   FLastEdit               := GetTickCount;
-  sbrStatusBar.Panels[4].Text := Format('Line %d, Column %d',
-    [FSynEdit.CaretY, FSynEdit.CaretX]);
+  sbrStatusBar.Panels[4].Text := Format(strLineColumn, [FSynEdit.CaretY, FSynEdit.CaretX]);
 End;
 
 (**
@@ -1964,6 +2020,18 @@ Begin
   sbrStatusBar.Panels[3].Text := Format('%1.0n Errors', [Int(iErrors)]);
 End;
 
+(**
+
+  This method applies the select VCL style from the context menu.
+
+  @precon  None.
+  @postcon The VCL style selected is applied.
+
+  @nocheck HardCodedInteger
+
+  @param   Sender as a TObject
+
+**)
 Procedure TfrmBrowseAndDocItTestForm.VCLThemeClick(Sender: TObject);
 
 Var

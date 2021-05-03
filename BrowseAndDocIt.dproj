@@ -411,6 +411,7 @@
             <Form>frmCommentCode</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Source\BADI.Thread.Manager.pas"/>
         <None Include="Source\DUnit Templates\DUnitProjectTemplate.txt"/>
         <None Include="Source\DUnit Templates\DUnitUnitTemplate.txt"/>
         <None Include="Source\CompilerDefinitions.inc"/>

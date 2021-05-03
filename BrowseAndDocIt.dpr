@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.346
+  @Version 1.352
   @Author  David Hoyle
-  @Date    21 Feb 2021
+  @Date    03 May 2021
 
   @license
 
@@ -235,7 +235,8 @@ uses
   BADI.FileInfo.Manager in 'Source\BADI.FileInfo.Manager.pas',
   BADI.Frame.Manager in 'Source\BADI.Frame.Manager.pas',
   BADI.ProgressForm in 'Source\BADI.ProgressForm.pas' {frmProgress},
-  BADI.CommentCodeForm in 'Source\BADI.CommentCodeForm.pas' {frmCommentCode};
+  BADI.CommentCodeForm in 'Source\BADI.CommentCodeForm.pas' {frmCommentCode},
+  BADI.Thread.Manager in 'Source\BADI.Thread.Manager.pas';
 
 {$R *.res}
 

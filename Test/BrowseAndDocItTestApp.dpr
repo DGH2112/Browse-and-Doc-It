@@ -150,7 +150,8 @@ uses
   BADI.SpellingIssue in '..\Source\BADI.SpellingIssue.pas',
   BADI.LineDocIssue in '..\Source\BADI.LineDocIssue.pas',
   BADI.DocIssueTotals in '..\Source\BADI.DocIssueTotals.pas',
-  BADI.ProgressForm in '..\Source\BADI.ProgressForm.pas' {frmProgress};
+  BADI.ProgressForm in '..\Source\BADI.ProgressForm.pas' {frmProgress},
+  BADI.Thread.Manager in '..\Source\BADI.Thread.Manager.pas';
 
 {$R *.res}
 

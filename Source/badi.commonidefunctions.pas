@@ -4,8 +4,8 @@
   implementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Version 1.132
-  @Date    02 May 2021
+  @Version 2.010
+  @Date    03 May 2021
 
   @license
 
@@ -36,9 +36,6 @@ Uses
   SysUtils,
   Windows,
   Classes,
-  {$IFDEF EUREKALOG}
-  EBase,
-  {$ENDIF EUREKALOG}
   BADI.Base.Module,
   BADI.ElementContainer,
   BADI.Generic.FunctionDecl,
@@ -46,43 +43,7 @@ Uses
   BADI.Types,
   BADI.Comment;
 
-Type
   {$INCLUDE 'CompilerDefinitions.inc'}
-(** This is a procedure to return the success of the parse in the thread. **)
-  TParserNotify = Procedure(Const boolSuccessfulParse: Boolean) Of Object;
-  (** This is a procedure to allow the thread to get information from the
-      calling IDE. **)
-  TEditorInformation = Function(Var strFileName: String; Var boolModified: Boolean)
-    : String Of Object;
-  (** This is a procedure to allow the thread to render the module in the
-      calling IDEs main thread. **)
-  TRenderDocumentTree = Procedure(Const Module: TBaseLanguageModule) Of Object;
-  (** This is a procedure to allow the thread to display an error message in
-      the calling IDEs main thread. **)
-  TThreadExceptionMsg = Procedure(Const strExceptionMsg: String) Of Object;
-
-  (**
-
-    This is a class to manage thread used to parse code. Its main aim is
-    to ensure that only 1 thread is active at a time and provide a mechanism
-    to terminate a working thread.
-
-    @bug We need to be able to either wait for the thread to finish or terminate the thread!
-
-  **)
-  TBrowseAndDocItThreadManager = Class
-    {$IFDEF D2005} Strict {$ENDIF} Private
-    FThread             : TThread;
-    FSuccessfulParseProc: TParserNotify;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure TerminateThread(Sender: TObject);
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    Function Parse(Const SuccessfulParseProc: TParserNotify; Const EditorInfo: TEditorInformation;
-      Const RenderDocumentTree: TRenderDocumentTree;
-      Const ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
-  End;
 
   Function FindFunction(Const iLine: Integer; Const Container: TElementContainer;
     Const ContainerClass: TGenericFunctionClass): TGenericFunction;
@@ -120,36 +81,6 @@ ResourceString
   (** This is a message to confirm you wish to update the current comment. **)
   strPropertyAlreadyExists = 'The property "%s" already has a comment. Do you' +
     ' want to continue?';
-
-Type
-  (** This class defines a thread in which the parsing of the code and
-      rendering of the module explorer is done. **)
-  TBrowseAndDocItThread = Class( {$IFDEF EUREKALOG} TThreadEx {$ELSE} TThread {$ENDIF EUREKALOG} )
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FModule            : TBaseLanguageModule;
-    FSource            : String;
-    FFileName          : String;
-    FModified          : Boolean;
-    FRenderDocumentTree: TRenderDocumentTree;
-    FThreadExceptionMsg: TThreadExceptionMsg;
-    FSuccessfulParse   : Boolean;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure Execute; Override;
-    Procedure RenderModuleExplorer;
-    Procedure ShowException;
-  Public
-    Constructor CreateBrowseAndDocItThread(Const EditorInfo: TEditorInformation;
-      Const RenderDocumentTree: TRenderDocumentTree; Const ThreadExceptionMsg: TThreadExceptionMsg;
-      Const TerminateThread: TNotifyEvent);
-    Destructor Destroy; Override;
-    (**
-      This property gets and sets the SuccessfulParse variable of the thread.
-      @precon  None.
-      @postcon Gets and sets the SuccessfulParse variable of the thread.
-      @return  a Boolean
-    **)
-    Property SuccessfulParse: Boolean Read FSuccessfulParse Write FSuccessfulParse;
-  End;
 
 Implementation
 
@@ -829,225 +760,6 @@ Begin
   FunctionReturn(Result, Func, boolExtraLine, iIndent);
   BlockFooter(Result, boolExtraLine, boolPadOut, CommentType, iIndent);
   UpdateCursor(CursorDelta, P, CommentType, boolPadOut);
-End;
-
-{ TBrowseAndDocItThreadManager }
-
-(**
-
-  A constructor for the TBrowseAndDocItThreadManager class.
-
-  @precon  None.
-  @postcon Initialises the thread variable to null.
-
-**)
-Constructor TBrowseAndDocItThreadManager.Create;
-
-Begin
-  FThread := Nil;
-End;
-
-(**
-
-  A destructor for the TBrowseAndDocItThreadManager class.
-
-  @precon  None.
-  @postcon Terminate any working thread.
-
-**)
-Destructor TBrowseAndDocItThreadManager.Destroy;
-
-Begin
-  If FThread <> Nil Then
-    FThread.Terminate;
-  Inherited Destroy;
-End;
-
-(**
-
-  This method parses the given code reference ONLY IF there is no current parsing thread.
-
-  @precon  None.
-  @postcon Parses the given code reference ONLY IF there is no current parsing thread.
-
-  @param   SuccessfulParseProc as a TParserNotify as a constant
-  @param   EditorInfo          as a TEditorInformation as a constant
-  @param   RenderDocumentTree  as a TRenderDocumentTree as a constant
-  @param   ThreadExceptionMsg  as a TThreadExceptionMsg as a constant
-  @return  a Boolean
-
-**)
-Function TBrowseAndDocItThreadManager.Parse(Const SuccessfulParseProc: TParserNotify;
-  Const EditorInfo: TEditorInformation; Const RenderDocumentTree: TRenderDocumentTree;
-  Const ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
-
-Begin
-  Result               := False;
-  FSuccessfulParseProc := SuccessfulParseProc;
-  If FThread = Nil Then
-    Begin
-      FThread := TBrowseAndDocItThread.CreateBrowseAndDocItThread(EditorInfo,
-        RenderDocumentTree, ThreadExceptionMsg, TerminateThread);
-      Result := True;
-    End;
-End;
-
-(**
-
-  This method is an on terminate event handler for threads.
-
-  @precon  None.
-  @postcon Called by the freeing thread which sets the thread variable to nil.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TBrowseAndDocItThreadManager.TerminateThread(Sender: TObject);
-
-Begin
-  If Assigned(FThread) Then
-    If Assigned(FThread.FatalException) Then
-      Begin
-        {$IFDEF EUREKALOG}
-        HandleException(FThread.FatalException);
-        {$ELSE}
-        If FThread.FatalException Is Exception Then
-          ShowException(FThread.FatalException, Nil);
-        {$ENDIF}
-      End;
-  FThread := Nil;
-  If Assigned(FSuccessfulParseProc) Then
-    If Sender Is TBrowseAndDocItThread Then
-      FSuccessfulParseProc((Sender As TBrowseAndDocItThread).SuccessfulParse);
-End;
-
-{ TBrowseAndDocItThread }
-
-(**
-
-  This is a constructor for the TBrowseAndDocItThread class.
-
-  @precon  None.
-  @postcon Creates a suspended thread and sets up a stream with the contents of the active editor and
-           then resumed the thread in order to parse the contents.
-
-  @param   EditorInfo         as a TEditorInformation as a constant
-  @param   RenderDocumentTree as a TRenderDocumentTree as a constant
-  @param   ThreadExceptionMsg as a TThreadExceptionMsg as a constant
-  @param   TerminateThread    as a TNotifyEvent as a constant
-
-**)
-Constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(Const EditorInfo: TEditorInformation;
-  Const RenderDocumentTree: TRenderDocumentTree; Const ThreadExceptionMsg: TThreadExceptionMsg;
-  Const TerminateThread: TNotifyEvent);
-
-Begin
-  FSuccessfulParse    := False;
-  FreeOnTerminate     := True; // Self Freeing...
-  FRenderDocumentTree := RenderDocumentTree;
-  FThreadExceptionMsg := ThreadExceptionMsg;
-  OnTerminate         := TerminateThread;
-  FSource             := '';
-  If Assigned(EditorInfo) Then
-    FSource := EditorInfo(FFileName, FModified);
-  Inherited Create(False);
-  //NameThreadForDebugging();
-End;
-
-(**
-
-  This is a destructor for the TBrowseAndDocItThread class.
-
-  @precon  None.
-  @postcon Frees the stream memory.
-
-**)
-Destructor TBrowseAndDocItThread.Destroy;
-
-Begin
-  Inherited Destroy;
-End;
-
-(**
-
-  This execute method parses the code of the active editor stored in the
-  memory stream and render the information in the explorer module.
-
-  @precon  None.
-  @postcon Parses the code of the active editor stored in the memory stream and
-           render the information in the explorer module.
-
-  @nometric ExceptionEating
-
-**)
-Procedure TBrowseAndDocItThread.Execute;
-
-{$IFDEF EUREKALOG}
-Const
-  strBrowseAndDocItParsingThread = 'BrowseAndDocItParsingThread';
-{$ENDIF EUREKALOG}
-
-Begin
-  Try
-    {$IFDEF EUREKALOG}
-    NameThread(strBrowseAndDocItParsingThread);
-    SetEurekaLogStateInThread(0, True);
-    {$ENDIF EUREKALOG}
-    If FFileName <> '' Then
-      FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified,
-        [moParse, moCheckForDocumentConflicts])
-    Else
-      FModule := Nil;
-    Try
-      If Terminated Then
-        Exit;
-      Synchronize(RenderModuleExplorer);
-      FSuccessfulParse := True;
-    Finally
-      FModule.Free;
-    End;
-  Except
-    On E: EBADIParserAbort Do
-      Exit;
-  End;
-End;
-
-(**
-
-  This method synchronises with the main IDE thread and renders the module
-  explorer.
-
-  @precon  FModule must be a valid TBaseLanguageModule instance.
-  @postcon Synchronises with the main IDE thread and renders the module
-           explorer.
-
-**)
-Procedure TBrowseAndDocItThread.RenderModuleExplorer;
-
-Begin
-  If Assigned(FRenderDocumentTree) Then
-    FRenderDocumentTree(FModule);
-End;
-
-(**
-
-  This method displays the raised exception message pass via the FFileName
-  field.
-
-  @precon  None.
-  @postcon Displays the raised exception message pass via the FFileName
-           field.
-
-**)
-Procedure TBrowseAndDocItThread.ShowException;
-
-Const
-  strMsg =
-    'Exception in TBrowseAndDocItThread:'#13#10 +
-    '  Exception: %s';
-Begin
-  If Assigned(FThreadExceptionMsg) Then
-    FThreadExceptionMsg(Format(strMsg, [FFileName]));
 End;
 
 End.

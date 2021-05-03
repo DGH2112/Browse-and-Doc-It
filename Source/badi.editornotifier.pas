@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 2.489
-  @Date    27 Mar 2021
+  @Version 2.502
+  @Date    03 May 2021
 
   @license
 
@@ -39,7 +39,7 @@ Uses
   BADi.Base.Module,
   DockForm,
   BADI.Interfaces,
-  BADI.CommonIDEFunctions;
+  BADI.Thread.Manager;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -54,7 +54,7 @@ Type
     FLastParserResult    : Boolean;
     FLastUpdateTickCount : Cardinal;
     FLastMoveTickCount   : Cardinal;
-    FBADIThreadMgr       : TBrowseAndDocItThreadManager;
+    FBADIThreadMgr       : TBADIThreadManager;
     FModuleStatsList     : IBADIModuleStatsList;
     FSource              : String;
   Strict Protected
@@ -154,7 +154,7 @@ Begin
               mrCancel: Abort;
             End;
           UpdateProjectDictionary;
-          FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
+          FBADIThreadMgr.Parse(EditorInfo);
       End;
     End;
 End;
@@ -238,7 +238,7 @@ begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create;
   FModuleStatsList := ModuleStatsList;
-  FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
+  FBADIThreadMgr := TBADIThreadManager.Create(EnableTimer, RenderDocument, ExceptionMsg);
   FUpdateTimer := TTimer.Create(Nil);
   FUpdateTimer.Interval := iUpdateInterval;
   FUpdateTimer.OnTimer := TimerEventHandler;

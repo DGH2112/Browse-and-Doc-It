@@ -4,8 +4,8 @@
   creating the thread.
 
   @Author  David Hoyle
-  @Version 1.179
-  @Date    03 May 2021
+  @Version 1.217
+  @Date    04 May 2021
 
   @license
 
@@ -116,6 +116,7 @@ Implementation
 
 uses
   System.SysUtils,
+  Vcl.Forms,
   BADI.Module.Dispatcher;
 
 (**
@@ -226,8 +227,11 @@ End;
 Procedure TBADIThreadManager.WaitForThreadToFinish;
 
 Begin
-  If Assigned(FThread) Then
-    FThread.WaitFor;
+  While Assigned(FThread) Do
+    Begin
+      Sleep(100);
+      Application.ProcessMessages;
+    End;
 End;
 
 (**
@@ -261,7 +265,6 @@ Begin
   If Assigned(EditorInfo) Then
     FSource := EditorInfo(FFileName, FModified);
   Inherited Create(False);
-  //NameThreadForDebugging();
 End;
 
 (**

@@ -5,8 +5,8 @@
   implemented.
 
   @Author  David Hoyle
-  @Version 1.001
-  @Date    19 Sep 2020
+  @Version 1.010
+  @Date    06 May 2021
 
   @license
 
@@ -146,7 +146,7 @@ Type
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
-    Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure CheckDocumentation(Var boolCascade : Boolean); Override;
@@ -2441,10 +2441,8 @@ end;
   @precon  None.
   @postcon Does nothings as conditional compilations is not supported.
 
-  @param   iSkip as an Integer as a reference
-
 **)
-Procedure TXMLModule.ProcessCompilerDirective(var iSkip : Integer);
+Procedure TXMLModule.ProcessCompilerDirective;
 
 Begin
   // Do nothing, i.e. Conditional Compilation is NOT supported.

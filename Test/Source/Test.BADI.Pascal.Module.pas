@@ -3,7 +3,7 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 58.171
+  @Version 59.099
   @Date    06 May 2021
 
   @nocheck HardCodedString HardCodedInteger HardCodedNumber
@@ -6415,6 +6415,75 @@ End;
 Procedure TestTPascalModule.TestProcessCompilerDirective;
 
 Begin
+  TestGrammarForErrors( // Test IFDEF ENDIF
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ENDIF'
+  );
+  TestGrammarForErrors( // Test IFDEF ELSE ENDIF 1
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 0|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ELSE $ENDIF 1'
+  );
+  TestGrammarForErrors( // Test IFDEF ELSE ENDIF 2
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH1}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ELSE $ENDIF 1'
+  );
+  TestGrammarForErrors( // Test IFNDEF ELSE ENDIF 1
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 0|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFNDEF $ELSE $ENDIF 0'
+  );
+  TestGrammarForErrors( // Test IFNDEF ELSE ENDIF 2
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH1}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFNDEF $ELSE $ENDIF 0'
+  );
+  //---------------------------------------------------------------------------------------------
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -6431,15 +6500,47 @@ Begin
     'Var iMyVar : Integer;'#13#10 +
     '{$ENDIF}'#13#10 +
     ''#13#10 +
-    '{$IFOPT R=}'#13#10 +
+    'Procedure Test();'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  {$IFOPT R=}'#13#10 +
     '  WriteLn(''Hello!'');'#13#10 +
-    '{$ENDIF}'#13#10 +
+    '  {$ENDIF}'#13#10 +
+    'End;'#13#10 +
     ''#13#10 +
     '{$EXTERNALSYM MySymbol}',
     [ttErrors, ttWarnings],
     [
       'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
-    ]
+    ], 0, 0, 0, 0, 0, 0, 'Complex 1'
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Uses'#13#10 +
+    '  Classes,'#13#10 +
+    '  {$IFNDEF CONSOLE}'#13#10 +
+    '  Forms,'#13#10 +
+    '  {$ENDIF}'#13#10 +
+    '  SysUtils;'#13#10 +
+    ''#13#10 +
+    '{$IFDEF PROFILECODE}'#13#10 +
+    'Type'#13#10 +
+    '  TProfiler = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '    FStackTop : Integer;'#13#10 +
+    '    {$IFNDEF CONSOLE}'#13#10 +
+    '    FLabel : TLabel;'#13#10 +
+    '    {$ENDIF}'#13#10 +
+    '  Strict Protected'#13#10 +
+    '  Public'#13#10 +
+    '  End;'#13#10 +
+    '{$ENDIF}'#13#10 +
+    '',
+    '{$IFDEF PROFILECODE}'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [], 0, 0, 0, 0, 0, 0, 'Complex 2'
   );
 End;
 

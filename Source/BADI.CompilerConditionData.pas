@@ -3,7 +3,7 @@
   This module contains a class to represent each compiler definition to be placed on the stack.
 
   @Author  David Hoyle
-  @Version 1.203
+  @Version 1.298
   @Date    06 May 2021
 
   @license

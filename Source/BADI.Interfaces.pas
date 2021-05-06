@@ -3,7 +3,7 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 2.764
+  @Version 2.799
   @Date    06 May 2021
 
   @license
@@ -723,12 +723,16 @@ Type
   (** An interface for managing the compiler definition stacks. **)
   IBADICompilerConditionStack = Interface
   ['{59643720-0B60-4D30-9763-D4A89A094B63}']
-    Procedure Push(Const iCompilerDefType : TCompilerDefType;
-      Const iCompilerCondition: TCompilerCondition; Const iTokenIndex: TTokenIndex); Overload;
+    Procedure Push(
+                Const iCompilerDefType : TCompilerDefType;
+                Const iCompilerCondition: TCompilerCondition;
+                Const iTokenIndex: TTokenIndex
+              ); Overload;
     Procedure Push(Const CompilerConditionData: IBADICompilerConditionData); Overload;
-    Procedure Pop();
-    Function Peek: IBADICompilerConditionData;
-    Function CanPop: Boolean;
+    Function  Pop() : IBADICompilerConditionData;
+    Function  Peek() : IBADICompilerConditionData;
+    Function  CanPop() : Boolean;
+    Function  CanParse() : Boolean;
   End;
 
 

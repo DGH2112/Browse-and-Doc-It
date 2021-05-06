@@ -4,7 +4,7 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 2.652
+  @Version 2.688
   @Date    06 May 2021
 
   @license
@@ -94,7 +94,7 @@ Type
     Procedure SetTokenIndex(Const iIndex : TTokenIndex);
     procedure AppendToLastToken(Const strToken : String);
     Procedure CheckTagSpelling(Const Comment : TComment; Const strTagName : String);
-    procedure ProcessCompilerDirective(Var iSkip : Integer); Virtual; Abstract;
+    procedure ProcessCompilerDirective(); Virtual; Abstract;
     Function  GetModuleName : String; Virtual;
     function  GetBytes: Int64;
     function  GetLines: Integer;
@@ -243,7 +243,7 @@ Type
     Property Modified : Boolean Read FModified;
     (**
       This property defines a compiler condition stack for use in the
-      ProcessCompilerDefintions method.
+      ProcessCompilerDirective method.
       @precon  None.
       @postcon Provides access to the compiler condition stack.
       @return  a IBADICompilerConditionStack
@@ -252,7 +252,7 @@ Type
       Read FCompilerConditionStack;
     (**
       This property defines a compiler condition undo stack for use in the
-      ProcessCompilerDefintions method.
+      ProcessCompilerDirective method.
       @precon  None.
       @postcon Provides access to the compiler condition undo stack.
       @return  a IBADICompilerConditionStack
@@ -451,7 +451,7 @@ End;
   This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Override and default GetAsString method and returns the name of the module.
+  @postcon Override and default AsString method and returns the name of the module.
 
   @nohint boolShowIdentifier boolForDocumentation
   
@@ -1229,45 +1229,38 @@ procedure TBaseLanguageModule.NextNonCommentToken;
 
 Var
   boolContinue : Boolean;
-  iSkip : Integer;
 
 begin
-  iSkip := 0;
   FShouldUndoCompilerStack := False;
   // Catch first token as directive
   If Token.TokenType = ttCompilerDirective Then
     Begin
-      ProcessCompilerDirective(iSkip);
+      ProcessCompilerDirective;
       FShouldUndoCompilerStack := True;
     End;
   Repeat
     ProcessBodyComments;
     If Not (Tokens[FTokenIndex].TokenType In [ttLineComment, ttBlockComment,
-      ttCompilerDirective]) And (iSkip = 0) Then
+      ttCompilerDirective]) And CompilerConditionStack.CanParse Then
       FPreviousTokenIndex := FTokenIndex;
     NextToken;
     If Token.TokenType = ttCompilerDirective Then
       Begin
-        ProcessCompilerDirective(iSkip);
+        ProcessCompilerDirective;
         FShouldUndoCompilerStack := True;
       End;
     boolContinue := (
-      (
-        Token.TokenType In [ttLineComment, ttBlockComment, ttCompilerDirective]
-      ) And
-      Not EndOfTokens
-    ) Or (iSkip > 0)
+      (Token.TokenType In [ttLineComment, ttBlockComment, ttCompilerDirective]) And Not EndOfTokens
+    ) Or Not CompilerConditionStack.CanParse;
   Until Not boolContinue;
 end;
 
 (**
 
-  This method moves the token to the next token in the token list or raises an
-  EDocException.
+  This method moves the token to the next token in the token list.
 
   @precon  None.
-  @postcon Moves the token to the next token in the token list or raises an
-           EDocException.
+  @postcon Moves the token to the next token in the token list.
 
 **)
 Procedure TBaseLanguageModule.NextToken;
@@ -1305,18 +1298,17 @@ End;
 
 (**
 
-  This method moves the token to the previous token in the token list or raises
-  an EDocException.
+  This method moves the token to the previous token in the token list.
 
   @precon  None.
-  @postcon Moves the token to the previous token in the token list or raises an
-           EDocException.
+  @postcon Moves the token to the previous token in the token list.
 
 **)
-procedure TBaseLanguageModule.PreviousToken;
-begin
+Procedure TBaseLanguageModule.PreviousToken;
+
+Begin
   Dec(FTokenIndex);
-end;
+End;
 
 (**
 

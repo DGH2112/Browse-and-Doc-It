@@ -3,8 +3,8 @@
   DFMModule : A unit to tokenise DFM code.
 
   @Author  David Hoyle
-  @Version 1.871
-  @Date    19 Sep 2020
+  @Version 1.880
+  @Date    06 May 2021
 
   @license
 
@@ -84,7 +84,7 @@ Type
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
-    Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
@@ -695,10 +695,8 @@ End;
   @nohints
   @nocheck EmptyMethod
 
-  @param   iSkip as an Integer as a reference
-
 **)
-procedure TDFMModule.ProcessCompilerDirective(Var iSkip: Integer);
+procedure TDFMModule.ProcessCompilerDirective;
 
 Begin
 End;

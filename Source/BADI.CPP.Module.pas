@@ -5,8 +5,8 @@
   @note       This unit ONLY tokenizes C++ at the moment - the parser HAS NOT BEEN WRITTEN!
 
   @Author  David Hoyle
-  @Version 1.013
-  @Date    19 Sep 2020
+  @Version 1.022
+  @Date    06 May 2021
 
   @license
 
@@ -780,7 +780,7 @@ Type
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
-    Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Class Function DefaultProfilingTemplate : String; Override;
@@ -9235,10 +9235,8 @@ end;
   @precon  None.
   @postcon Processes a compiler directive looking for conditional statements.
 
-  @param   iSkip as an Integer as a reference
-
 **)
-procedure TCPPModule.ProcessCompilerDirective(var iSkip : Integer);
+procedure TCPPModule.ProcessCompilerDirective;
 
   (**
 

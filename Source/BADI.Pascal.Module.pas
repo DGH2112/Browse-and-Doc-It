@@ -3,7 +3,7 @@
   Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 3.344
+  @Version 3.548
   @Date    06 May 2021
 
   @license
@@ -321,7 +321,7 @@ Type
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
-    Procedure ProcessCompilerDirective(Var iSkip : Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Class Function DefaultProfilingTemplate : String; Override;
@@ -343,7 +343,7 @@ Uses
   {$IFDEF PROFILECODE}
   Profiler,
   {$ENDIF}
-  Systrem.Generics.Collections,
+  System.Generics.Collections,
   System.Character,
   BADI.Functions,
   BADI.Options,
@@ -6407,12 +6407,8 @@ end;
   @precon  None.
   @postcon Processes a compiler directive looking for conditional statements.
 
-  @nometrics
-
-  @param   iSkip as an Integer as a reference
-
 **)
-procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
+procedure TPascalModule.ProcessCompilerDirective;
 
   (**
 
@@ -6458,26 +6454,6 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
 
   (**
 
-    This method adds the number to the stack and increments the iSkip variable by the value passed.
-
-    @precon  None.
-    @postcon Adds the number to the stack and increments the iSkip variable by the value passed.
-
-    @param   iCompilerDefType   as a TCompilerDefType as a constant
-    @param   iCompilerCondition as a TCompilerCondition as a constant
-
-  **)
-  Procedure IncSkip(Const iCompilerDefType : TCompilerDefType;
-    Const iCompilerCondition : TCompilerCondition);
-
-  Begin
-    CompilerConditionStack.Push(iCompilerDefType, iCompilerCondition, TokenIndex);
-    If iCompilerCondition = ccIncludeCode Then
-      Inc(iSkip);
-  End;
-
-  (**
-
     This function removes the number from the stack and decrements the iSkip variable by 1. Note this 
     also added the removed value to the UNDO stack.
 
@@ -6498,8 +6474,6 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
       Begin
         CompilerCondition := CompilerConditionStack.Peek;
         CompilerConditionUndoStack.Push(CompilerCondition);
-        If CompilerCondition.CompilerCondition = ccIncludeCode Then
-          Dec(iSkip);
         CompilerConditionStack.Pop;
       End Else
         Result := True;
@@ -6518,12 +6492,11 @@ Const
   strCDEXTERNALSYM = '{$EXTERNALSYM';
 
 Var
-  CompilerCondition : IBADICompilerConditionData;
+  CompilerConditionData : IBADICompilerConditionData;
 
 begin
-  CodeSite.SendFmtMsg(csmNote, '%s: %d, %s', [
-    StringOfChar(#32, iSkip * 2) + Token.Token,
-    iSkip,
+  CodeSite.SendFmtMsg(csmNote, '%s: %s', [
+    Token.Token,
     BoolToStr(CompilerConditionStack.CanPop And (CompilerConditionStack.Peek.CompilerCondition = ccIncludeCode), True)]
   );
   If Like(Token.Token, strCDDEFINE) Then
@@ -6532,41 +6505,36 @@ begin
     DeleteDef(GetDef)
   Else If Like(Token.Token, strCDIFDEF) Then
     Begin
-      If Not IfDef(GetDef) Then
-        IncSkip(cdtIFDEF, ccIncludeCode)
+      If IfDef(GetDef) Then
+        CompilerConditionStack.Push(cdtIFDEF, ccIncludeCode, TokenIndex)
       Else
-        IncSkip(cdtIFDEF, ccExcludeCode);
+        CompilerConditionStack.Push(cdtIFDEF, ccExcludeCode, TokenIndex);
     End
   Else If Like(Token.Token, strCDIFOPT) Then
     Begin
       If Not IfDef(GetDef) Then
-        IncSkip(cdtIFDEF, ccIncludeCode)
+        CompilerConditionStack.Push(cdtIFDEF, ccIncludeCode, TokenIndex)
       Else
-        IncSkip(cdtIFDEF, ccExcludeCode);
+        CompilerConditionStack.Push(cdtIFDEF, ccExcludeCode, TokenIndex);
     End
   Else If Like(Token.Token, strCDIF) Then
-    IncSkip(cdtIFDEF, ccExcludeCode) // FAKE $IF by defaulting to TRUE
+    CompilerConditionStack.Push(cdtIFDEF, ccExcludeCode, TokenIndex) // FAKE $IF by defaulting to TRUE
   Else If Like(Token.Token, strCDIFNDEF) Then
     Begin
-      If Not IfNotDef(GetDef) Then
-        IncSkip(cdtIFNDEF, ccIncludeCode)
+      If IfNotDef(GetDef) Then
+        CompilerConditionStack.Push(cdtIFNDEF, ccExcludeCode, TokenIndex)
       Else
-        IncSkip(cdtIFNDEF, ccExcludeCode);
+        CompilerConditionStack.Push(cdtIFNDEF, ccIncludeCode, TokenIndex);
     End
   Else If Like(Token.Token, strCDELSE) Then
     Begin
       If CompilerConditionStack.CanPop Then
         Begin
-          CompilerCondition := CompilerConditionStack.Peek;
-          If CompilerCondition.CompilerCondition = ccIncludeCode Then
-            Begin
-              CompilerConditionStack.Push(cdtELSE, ccExcludeCode, CompilerCondition.TokenIndex);
-              Dec(iSkip);
-            End Else
-            Begin
-              CompilerConditionStack.Push(cdtELSE, ccIncludeCode, CompilerCondition.TokenIndex);
-              Inc(iSkip);
-            End;
+          CompilerConditionData := CompilerConditionStack.Pop;
+          If CompilerConditionData.CompilerCondition = ccIncludeCode Then
+            CompilerConditionStack.Push(cdtELSE, ccExcludeCode, CompilerConditionData.TokenIndex)
+          Else
+            CompilerConditionStack.Push(cdtELSE, ccIncludeCode, CompilerConditionData.TokenIndex);
         End Else
           AddIssue(Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
               scGlobal, Token.Line, Token.Column, etError, Self);
@@ -6574,13 +6542,11 @@ begin
   Else If Like(Token.Token, strCDENDIF) Then
     Begin
       If TokenStackTop > 0 Then
-        Begin
-          CompilerConditionStack.Pop(); //: @debug Push(cdtENDIF, ccIncludeCode, TokenIndex);
-          Dec(iSkip);
-        End Else
-          If DecSkip Then
-            AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
-              scGlobal, Token.Line, Token.Column, etError, Self);
+        CompilerConditionStack.Pop()
+      Else
+        If DecSkip Then
+          AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
+            scGlobal, Token.Line, Token.Column, etError, Self);
 
     End
   Else If Like(Token.Token, strCDIFEND) Then
@@ -6593,8 +6559,6 @@ begin
     ProcessIncludeDirective(Token.Token)
   Else If Like(Token.Token, strCDEXTERNALSYM) Then
     FExternalSyms.Add(GetDef);
-  If iSkip < 0 Then
-    iSkip := 0;
 end;
 
 (**

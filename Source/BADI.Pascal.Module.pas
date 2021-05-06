@@ -3,8 +3,8 @@
   Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 3.295
-  @Date    03 May 2021
+  @Version 3.344
+  @Date    06 May 2021
 
   @license
 
@@ -343,6 +343,8 @@ Uses
   {$IFDEF PROFILECODE}
   Profiler,
   {$ENDIF}
+  Systrem.Generics.Collections,
+  System.Character,
   BADI.Functions,
   BADI.Options,
   BADI.Constants,
@@ -368,8 +370,8 @@ Uses
   BADI.Pascal.ThreadVariableDecl,
   BADI.Pascal.UsesList,
   BADI.Generic.Parameter,
-  Generics.Collections,
-  System.Character, BADI.Generic.Tokenizer;
+  BADI.Generic.Tokenizer,
+  BADI.Interfaces;
 
 Const
   (** Constant for the keyword ABSTRACT. **)
@@ -6488,7 +6490,7 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
   Function DecSkip : Boolean;
 
   Var
-    CompilerCondition: TCompilerConditionData;
+    CompilerCondition: IBADICompilerConditionData;
 
   Begin
     Result := False;
@@ -6516,9 +6518,14 @@ Const
   strCDEXTERNALSYM = '{$EXTERNALSYM';
 
 Var
-  CompilerCondition : TCompilerConditionData;
+  CompilerCondition : IBADICompilerConditionData;
 
 begin
+  CodeSite.SendFmtMsg(csmNote, '%s: %d, %s', [
+    StringOfChar(#32, iSkip * 2) + Token.Token,
+    iSkip,
+    BoolToStr(CompilerConditionStack.CanPop And (CompilerConditionStack.Peek.CompilerCondition = ccIncludeCode), True)]
+  );
   If Like(Token.Token, strCDDEFINE) Then
     AddDef(GetDef)
   Else If Like(Token.Token, strCDUNDEF) Then
@@ -6568,7 +6575,7 @@ begin
     Begin
       If TokenStackTop > 0 Then
         Begin
-          CompilerConditionStack.Push(cdtENDIF, ccIncludeCode, TokenIndex);
+          CompilerConditionStack.Pop(); //: @debug Push(cdtENDIF, ccIncludeCode, TokenIndex);
           Dec(iSkip);
         End Else
           If DecSkip Then

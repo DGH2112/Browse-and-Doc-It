@@ -3,8 +3,8 @@
   This module contains interfaces for use throughout Browse and Doc It.
 
   @Author  David Hoyle
-  @Version 2.439
-  @Date    12 Sep 2020
+  @Version 2.764
+  @Date    06 May 2021
 
   @license
 
@@ -687,6 +687,50 @@ Type
     **)
     Property Totals : TDictionary<String, TBADITotalInfo> Read GetTotals;
   End;
+
+  (** An interface for managing the compiler condition data. **)
+  IBADICompilerConditionData = Interface
+  ['{3AAB0526-620B-4A40-8634-37B6B4E706D4}']
+    // Getters and Setters
+    Function  GetCompilerDefType : TCompilerDefType;
+    Function  GetCompilerCondition : TCompilerCondition;
+    Function  GetTokenIndex : TTokenIndex;
+    // General Methods
+    // Property
+    (**
+      This property provide access to the compiler definition type of the class.
+      @precon  None.
+      @postcon Returns the compiler definition type of the stack item.
+      @return  a TCompilerDefType
+    **)
+    Property CompilerDefType : TCompilerDefType Read GetCompilerDefType;
+    (**
+      This property gets and sets the compiler condition (include code or exclude code).
+      @precon  None.
+      @postcon Gets and sets the compiler condition (include code or exclude code).
+      @return  a TCompilerCondition
+    **)
+    Property CompilerCondition: TCompilerCondition Read GetCompilerCondition;
+    (**
+      This property gets or sets the token index of the compiler condition.
+      @precon  None.
+      @postcon Gets or sets the token index of the compiler condition.
+      @return  a TTokenIndex
+    **)
+    Property TokenIndex: TTokenIndex Read GetTokenIndex;
+  End;
+
+  (** An interface for managing the compiler definition stacks. **)
+  IBADICompilerConditionStack = Interface
+  ['{59643720-0B60-4D30-9763-D4A89A094B63}']
+    Procedure Push(Const iCompilerDefType : TCompilerDefType;
+      Const iCompilerCondition: TCompilerCondition; Const iTokenIndex: TTokenIndex); Overload;
+    Procedure Push(Const CompilerConditionData: IBADICompilerConditionData); Overload;
+    Procedure Pop();
+    Function Peek: IBADICompilerConditionData;
+    Function CanPop: Boolean;
+  End;
+
 
 Implementation
 

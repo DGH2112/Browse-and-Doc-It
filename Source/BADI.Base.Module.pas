@@ -4,8 +4,8 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 2.631
-  @Date    29 Aug 2020
+  @Version 2.652
+  @Date    06 May 2021
 
   @license
 
@@ -32,7 +32,7 @@ Unit BADI.Base.Module;
 
 Interface
 
-Uses
+uses
   System.Classes,
   System.Contnrs,
   System.RegularExpressions,
@@ -41,7 +41,8 @@ Uses
   BADI.TokenInfo,
   BADI.Comment,
   BADI.ElementContainer,
-  BADI.CompilerConditionStack;
+  BADI.CompilerConditionStack,
+  BADI.Interfaces;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -60,8 +61,8 @@ Type
     FModified                   : Boolean;
     FCompilerDefs               : TStringList;
     FPreviousTokenIndex         : TTokenIndex;
-    FCompilerConditionStack     : TCompilerConditionStack;
-    FCompilerConditionUndoStack : TCompilerConditionStack;
+    FCompilerConditionStack     : IBADICompilerConditionStack;
+    FCompilerConditionUndoStack : IBADICompilerConditionStack;
     FLastComment                : TTokenInfo;
     FCommentClass               : TCommentClass;
     FShouldUndoCompilerStack    : Boolean;
@@ -245,18 +246,18 @@ Type
       ProcessCompilerDefintions method.
       @precon  None.
       @postcon Provides access to the compiler condition stack.
-      @return  a TCompilerConditionStack
+      @return  a IBADICompilerConditionStack
     **)
-    Property CompilerConditionStack : TCompilerConditionStack
+    Property CompilerConditionStack : IBADICompilerConditionStack
       Read FCompilerConditionStack;
     (**
       This property defines a compiler condition undo stack for use in the
       ProcessCompilerDefintions method.
       @precon  None.
       @postcon Provides access to the compiler condition undo stack.
-      @return  a TCompilerConditionStack
+      @return  a IBADICompilerConditionStack
     **)
-    Property CompilerConditionUndoStack : TCompilerConditionStack
+    Property CompilerConditionUndoStack : IBADICompilerConditionStack
       Read FCompilerConditionUndoStack;
     (**
       This property returns the number of bytes in the file.
@@ -845,8 +846,6 @@ end;
 **)
 destructor TBaseLanguageModule.Destroy;
 begin
-  FCompilerConditionUndoStack.Free;
-  FCompilerConditionStack.Free;
   FIdentifierList.Free;
   FCompilerDefs.Free;
   FBodyComment.Free;

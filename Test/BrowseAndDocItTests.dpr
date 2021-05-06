@@ -4,9 +4,13 @@ Program BrowseAndDocItTests;
 {$R 'BADIVerInfo.res' '..\BADIVerInfo.RC'}
 {$R 'LayeredExplorerImages.res' '..\LayeredExplorerImages.RC'}
 
+//: @debug {$APPTYPE CONSOLE}
+
 uses
   FastMM4,
   TestInsight.DUnit,
+  //: @debug GUITestRunner,
+  //: @debug TextTestRunner,
   SysUtils,
   Forms,
   Windows,

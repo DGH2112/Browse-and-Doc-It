@@ -3,15 +3,15 @@
   This module contains a class to handle compiler definition information as a stack.
 
   @Author  David Hoyle
-  @Version 1.001
-  @Date    19 Sep 2020
+  @Version 1.477
+  @Date    06 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2021  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,33 +31,58 @@ Unit BADI.CompilerConditionStack;
 
 Interface
 
-Uses
-  Classes,
-  Contnrs,
+uses
+  System.Classes,
+  System.Contnrs,
   BADI.Types,
-  BADI.CompilerConditionData;
+  BADI.CompilerConditionData,
+  BADI.Interfaces;
 
 Type
   (** A type to handle the stack of compiler condition visibilities. **)
-  TCompilerConditionStack = Class
-    {$IFDEF D2005} Strict {$ENDIF} Private
-    FStack: TObjectList;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
+  TCompilerConditionStack = Class(TInterfacedObject, IBADICompilerConditionStack)
+  Strict Private
+    FStack: TInterfaceList;
+  Strict Protected
+    Procedure Push(Const iCompilerDefType : TCompilerDefType;
+      Const iCompilerCondition: TCompilerCondition; Const iTokenIndex: TTokenIndex); Overload;
+    Procedure Push(Const CompilerConditionData: IBADICompilerConditionData); Overload;
+    Function  Pop() : IBADICompilerConditionData;
+    Function  Peek() : IBADICompilerConditionData;
+    Function  CanPop() : Boolean;
+    Function  CanParse() : Boolean;
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure Push(Const iCompilerDefType : TCompilerDefType;
-      Const iCompilerCondition: TCompilerCondition; Const iTokenIndex: TTokenIndex); Overload;
-    Procedure Push(Const CompilerConditionData: TCompilerConditionData); Overload;
-    Procedure Pop();
-    Function Peek: TCompilerConditionData;
-    Function CanPop: Boolean;
   End;
 
 Implementation
 
 uses
-  BADI.ResourceStrings;
+  System.TypInfo,
+  BADI.ResourceStrings,
+  CodeSiteLogging;
+
+(**
+
+  This method returns true if the top of the compiler definition stack has a define that allows parsing.
+
+  @precon  None.
+  @postcon Returns true if the top of the compiler definition stack has a define that allows parsing.
+
+  @return  a Boolean
+
+**)
+Function TCompilerConditionStack.CanParse: Boolean;
+
+Var
+  iDef: Integer;
+
+Begin
+  Result := True;
+  For iDef := FStack.Count - 1 DownTo 0 Do
+    Result := Result And ((FStack[iDef] As IBADICompilerConditionData).CompilerCondition = ccIncludeCode);
+End;
 
 (**
 
@@ -86,7 +111,7 @@ End;
 Constructor TCompilerConditionStack.Create;
 
 Begin
-  FStack := TObjectList.Create(True);
+  FStack := TInterfaceList.Create();
 End;
 
 (**
@@ -111,10 +136,10 @@ End;
   @precon  None.
   @postcon Returns the value on the top of the stack.
 
-  @return  a TCompilerConditionData
+  @return  a IBADICompilerConditionData
 
 **)
-Function TCompilerConditionStack.Peek: TCompilerConditionData;
+Function TCompilerConditionStack.Peek: IBADICompilerConditionData;
 
 Begin
   If FStack.Count > 0 Then
@@ -130,24 +155,16 @@ End;
   @precon  None.
   @postcon The value on the top of the stack is removed.
 
-**)
-Procedure TCompilerConditionStack.Pop;
+  @return  an IBADICompilerConditionData
 
-Var
-  CDT: TCompilerDefType;
+**)
+Function TCompilerConditionStack.Pop() : IBADICompilerConditionData;
 
 Begin
   If FStack.Count > 0 Then
     Begin
-      CDT := Peek.CompilerDefType;
+      Result := Peek;
       FStack.Delete(Pred(FStack.Count));
-      If CDT = cdtELSE Then
-        Begin
-          CDT := Peek.CompilerDefType;
-          If Not (CDT In [cdtIFDEF, cdtIFNDEF]) Then
-            Raise EBADIParserError.Create(strCannotPopCompilerCondition);
-          FStack.Delete(Pred(FStack.Count));
-        End;
     End Else
       Raise EBADIParserError.Create(strCannotPopCompilerCondition);
 End;
@@ -159,10 +176,10 @@ End;
   @precon  CompilerConditionData must be a valid instance.
   @postcon The compiler condition data is placed on top of the stack.
 
-  @param   CompilerConditionData as a TCompilerConditionData as a constant
+  @param   CompilerConditionData as a iBADICompilerConditionData as a constant
 
 **)
-Procedure TCompilerConditionStack.Push(Const CompilerConditionData: TCompilerConditionData);
+Procedure TCompilerConditionStack.Push(Const CompilerConditionData: IBADICompilerConditionData);
 
 Begin
   Push(CompilerConditionData.CompilerDefType, CompilerConditionData.CompilerCondition,

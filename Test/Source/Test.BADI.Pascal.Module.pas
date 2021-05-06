@@ -3,8 +3,10 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 57.992
-  @Date    16 Jan 2021
+  @Version 59.099
+  @Date    06 May 2021
+
+  @nocheck HardCodedString HardCodedInteger HardCodedNumber
 
   @license
 
@@ -5906,6 +5908,18 @@ Begin
     [ttErrors, ttWarnings],
     []
   );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Library MyLibrary.Namespace;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
 End;
 
 Procedure TestTPascalModule.TestOPPackage;
@@ -5930,6 +5944,25 @@ Begin
       'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone'
     ]
   );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Package MyPackage.Namespace;'#13#10 +
+    ''#13#10 +
+    'Requires'#13#10 +
+    '  VCL50;'#13#10 +
+    ''#13#10 +
+    'Contains'#13#10 +
+    '  DGHLibrary In ''DGHLibrary.pas'';'#13#10 +
+    ''#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Requires\VCL50|VCL50|scNone',
+      'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestOPProgram;
@@ -5939,6 +5972,18 @@ Begin
     TPascalModule,
     strNone,
     'Program MyProgram;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Program MyProgram.Namespace;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  WriteLn(''Hello'');'#13#10 +
@@ -5989,6 +6034,39 @@ Begin
     TPascalModule,
     strNone,
     'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Windows;'#13#10 +
+    ''#13#10 +
+    '  Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  i = 10;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\Interface\Windows|Windows|scPublic',
+      'Exported Headings\Hello|Procedure Hello|scPublic',
+      'Constants\i|i = 10|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPublic'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Unit MyUnit.Namespace;'#13#10 +
     ''#13#10 +
     'Interface'#13#10 +
     ''#13#10 +
@@ -6337,6 +6415,75 @@ End;
 Procedure TestTPascalModule.TestProcessCompilerDirective;
 
 Begin
+  TestGrammarForErrors( // Test IFDEF ENDIF
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ENDIF'
+  );
+  TestGrammarForErrors( // Test IFDEF ELSE ENDIF 1
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 0|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ELSE $ENDIF 1'
+  );
+  TestGrammarForErrors( // Test IFDEF ELSE ENDIF 2
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH1}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ELSE $ENDIF 1'
+  );
+  TestGrammarForErrors( // Test IFNDEF ELSE ENDIF 1
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 0|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFNDEF $ELSE $ENDIF 0'
+  );
+  TestGrammarForErrors( // Test IFNDEF ELSE ENDIF 2
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH1}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFNDEF $ELSE $ENDIF 0'
+  );
+  //---------------------------------------------------------------------------------------------
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -6353,15 +6500,47 @@ Begin
     'Var iMyVar : Integer;'#13#10 +
     '{$ENDIF}'#13#10 +
     ''#13#10 +
-    '{$IFOPT R=}'#13#10 +
+    'Procedure Test();'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  {$IFOPT R=}'#13#10 +
     '  WriteLn(''Hello!'');'#13#10 +
-    '{$ENDIF}'#13#10 +
+    '  {$ENDIF}'#13#10 +
+    'End;'#13#10 +
     ''#13#10 +
     '{$EXTERNALSYM MySymbol}',
     [ttErrors, ttWarnings],
     [
       'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
-    ]
+    ], 0, 0, 0, 0, 0, 0, 'Complex 1'
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Uses'#13#10 +
+    '  Classes,'#13#10 +
+    '  {$IFNDEF CONSOLE}'#13#10 +
+    '  Forms,'#13#10 +
+    '  {$ENDIF}'#13#10 +
+    '  SysUtils;'#13#10 +
+    ''#13#10 +
+    '{$IFDEF PROFILECODE}'#13#10 +
+    'Type'#13#10 +
+    '  TProfiler = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '    FStackTop : Integer;'#13#10 +
+    '    {$IFNDEF CONSOLE}'#13#10 +
+    '    FLabel : TLabel;'#13#10 +
+    '    {$ENDIF}'#13#10 +
+    '  Strict Protected'#13#10 +
+    '  Public'#13#10 +
+    '  End;'#13#10 +
+    '{$ENDIF}'#13#10 +
+    '',
+    '{$IFDEF PROFILECODE}'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [], 0, 0, 0, 0, 0, 0, 'Complex 2'
   );
 End;
 

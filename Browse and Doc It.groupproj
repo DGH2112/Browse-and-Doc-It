@@ -92,7 +92,7 @@
             <ProjectGuid>{97DFE465-856D-4033-BA9E-7585FED8E445}</ProjectGuid>
             <Configurations>Debug</Configurations>
             <Platforms>Win32</Platforms>
-            <Enabled>True</Enabled>
+            <Enabled>False</Enabled>
         </BuildGroupProject>
     </ItemGroup>
 </Project>

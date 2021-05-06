@@ -4,8 +4,8 @@
   to parser VB.NET code later).
 
   @Author     David Hoyle
-  @Version    1.001
-  @Date    19 Sep 2020
+  @Version    1.010
+  @Date    06 May 2021
 
   @license
 
@@ -116,7 +116,7 @@ Type
     Function QualifiedIdentifier(Container : TElementContainer;
       TokenTypes : TBADITokenTypes) : String;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     procedure TidyUpEmptyElements;
     Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
@@ -314,10 +314,8 @@ end;
   @precon  None.
   @postcon Not implemented.
 
-  @param   iSkip as an Integer as a reference
-
 **)
-procedure TVBModule.ProcessCompilerDirective(var iSkip: Integer);
+procedure TVBModule.ProcessCompilerDirective;
 begin
   {Do nothing}
 end;

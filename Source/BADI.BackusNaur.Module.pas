@@ -2,9 +2,9 @@
 
   BADI Backus Naur Module : A unit to tokenize Backus-Naur Grammar.
 
-  @Version    1.001
+  @Version    1.010
   @Author     David Hoyle
-  @Date       19 Sep 2020
+  @Date       06 May 2021
 
   @license
 
@@ -88,7 +88,7 @@ Type
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
-    Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
@@ -849,10 +849,8 @@ end;
   @precon  None.
   @postcon Does nothings as conditional compilations is not supported.
 
-  @param   iSkip as an Integer as a reference
-
 **)
-Procedure TBackusNaurModule.ProcessCompilerDirective(var iSkip : Integer);
+Procedure TBackusNaurModule.ProcessCompilerDirective;
 
 Begin
   // Do nothing, i.e. Conditional Compilation is NOT supported.

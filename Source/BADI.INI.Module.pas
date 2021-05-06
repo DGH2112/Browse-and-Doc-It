@@ -4,8 +4,8 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Author  David Hoyle
-  @Version 1.003
-  @Date    19 Sep 2020
+  @Version 1.012
+  @Date    06 May 2021
 
   @license
 
@@ -76,7 +76,7 @@ Type
     Destructor Destroy; Override;
     Function  ReservedWords: TKeyWords; Override;
     Function  Directives: TKeyWords; Override;
-    Procedure ProcessCompilerDirective(Var iSkip: Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     Function  ReferenceSymbol(Const AToken: TTokenInfo): Boolean; Override;
     Function  AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
       Override;
@@ -504,10 +504,8 @@ End;
   @nocheck EmptyMethod
   @nohint iSkip
 
-  @param   iSkip as an Integer as a reference
-
 **)
-Procedure TINIModule.ProcessCompilerDirective(Var iSkip: Integer);
+Procedure TINIModule.ProcessCompilerDirective;
 
 Begin
   // Do nothing, i.e. Conditional Compilation is NOT supported.

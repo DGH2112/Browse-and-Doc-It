@@ -3,8 +3,10 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 57.992
-  @Date    16 Jan 2021
+  @Version 58.171
+  @Date    06 May 2021
+
+  @nocheck HardCodedString HardCodedInteger HardCodedNumber
 
   @license
 
@@ -5906,6 +5908,18 @@ Begin
     [ttErrors, ttWarnings],
     []
   );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Library MyLibrary.Namespace;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
 End;
 
 Procedure TestTPascalModule.TestOPPackage;
@@ -5930,6 +5944,25 @@ Begin
       'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone'
     ]
   );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Package MyPackage.Namespace;'#13#10 +
+    ''#13#10 +
+    'Requires'#13#10 +
+    '  VCL50;'#13#10 +
+    ''#13#10 +
+    'Contains'#13#10 +
+    '  DGHLibrary In ''DGHLibrary.pas'';'#13#10 +
+    ''#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Requires\VCL50|VCL50|scNone',
+      'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestOPProgram;
@@ -5939,6 +5972,18 @@ Begin
     TPascalModule,
     strNone,
     'Program MyProgram;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Program MyProgram.Namespace;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  WriteLn(''Hello'');'#13#10 +
@@ -5989,6 +6034,39 @@ Begin
     TPascalModule,
     strNone,
     'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Windows;'#13#10 +
+    ''#13#10 +
+    '  Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  i = 10;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\Interface\Windows|Windows|scPublic',
+      'Exported Headings\Hello|Procedure Hello|scPublic',
+      'Constants\i|i = 10|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPublic'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Unit MyUnit.Namespace;'#13#10 +
     ''#13#10 +
     'Interface'#13#10 +
     ''#13#10 +

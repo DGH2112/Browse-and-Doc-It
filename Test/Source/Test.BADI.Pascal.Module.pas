@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 59.099
-  @Date    06 May 2021
+  @Version 59.370
+  @Date    08 May 2021
 
   @nocheck HardCodedString HardCodedInteger HardCodedNumber
 
@@ -6483,6 +6483,19 @@ Begin
       'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
     ], 0, 0, 0, 0, 0, 0, '$IFNDEF $ELSE $ENDIF 0'
   );
+  TestGrammarForErrors( // Test IF IFEND
+    TPascalModule,
+    strUnit,
+    '',
+    'type'#13#10 +
+    '  TMyclass = class'#13#10 +
+    '    property qwerty;'#13#10 +
+    '    //{$if CompilerVersion >= 34}property Hello;{$ifend}'#13#10 +
+    '    property Goodbye;'#1#10 +
+    '  end;',
+    [ttErrors, ttWarnings],
+    [], 0, 0, 0, 0, 0, 0, '$IF $IFEND'
+  );
   //---------------------------------------------------------------------------------------------
   TestGrammarForErrors(
     TPascalModule,
@@ -6813,6 +6826,24 @@ Begin
     [ttErrors, ttWarnings],
     [
       'Types\TRecordHelper|TRecordHelper = Record Helper For Integer|scPublic',
+      'Types\TRecordHelper\Methods\AsString|Function AsString(i : Integer) : String|scPublic',
+      'Implemented Methods\TRecordHelper\AsString|Function AsString(i : Integer) : String|scPublic'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TRecordHelper = Record Helper For System.Integer'#13#10 +
+    '    Function AsString(i : Integer) : String;'#13#10 +
+    '  End;',
+    'Function TRecordHelper.AsString(i : Integer) : String;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TRecordHelper|TRecordHelper = Record Helper For System.Integer|scPublic',
       'Types\TRecordHelper\Methods\AsString|Function AsString(i : Integer) : String|scPublic',
       'Implemented Methods\TRecordHelper\AsString|Function AsString(i : Integer) : String|scPublic'
     ]

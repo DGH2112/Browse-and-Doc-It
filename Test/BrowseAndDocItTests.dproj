@@ -60,7 +60,7 @@
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
         <DCC_RangeChecking>true</DCC_RangeChecking>
-        <DCC_Define>TESTINSIGHT;STANDALONEAPP;USE_JEDI_JCL;$(DCC_Define)</DCC_Define>
+        <DCC_Define>TESTINSIGHT;USE_JCLDEBUG;STANDALONEAPP;USE_JEDI_JCL_DISABLED;$(DCC_Define)</DCC_Define>
         <DCC_Optimize>false</DCC_Optimize>
         <DCC_F>false</DCC_F>
         <DCC_E>false</DCC_E>
@@ -72,7 +72,7 @@
         <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
         <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
         <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
-        <DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Library (LIVE)\FastMM;$(BDSPROJECTSDIR)\Binaries\TestInsight\Source;C:\Program Files (x86)\Embarcadero\Studio\21.0\source\DUnit\src;$(BDSPROJECTSDIR)\Library (LIVE)\JCL\jcl\Source;$(BDSPROJECTSDIR)\Library (LIVE)\JCL\jcl\Source\common;$(BDSPROJECTSDIR)\Library (LIVE)\JCL\jcl\Source\windows;$(BDSPROJECTSDIR)\Library (LIVE)\JCL\jcl\Source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Library (LIVE)\FastMM;$(BDSPROJECTSDIR)\Binaries\TestInsight\Source;C:\Program Files (x86)\Embarcadero\Studio\21.0\source\DUnit\src\DISABLED;$(BDSPROJECTSDIR)\Library (LIVE)\JCL\jcl\Source;$(BDSPROJECTSDIR)\Library (LIVE)\JCL\jcl\Source\common;$(BDSPROJECTSDIR)\Library (LIVE)\JCL\jcl\Source\windows;$(BDSPROJECTSDIR)\Library (LIVE)\JCL\jcl\Source\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_Warnings>error</DCC_Warnings>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>

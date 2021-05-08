@@ -3,8 +3,8 @@
   Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 3.548
-  @Date    06 May 2021
+  @Version 4.230
+  @Date    08 May 2021
 
   @license
 
@@ -29,9 +29,6 @@
   @todo       Implement an expression parser for the above compiler defines.
               Needs to be able to evaluate constants in the code and use the
               two functions Defined() and Declared().
-  @todo       There are some metrics and checks whihc are overridden.
-  @todo       Make the Interface and Implementation uses sections go to those areas of the code on click
-  @nometric   UnsortedModule Toxicity
 
 **)
 Unit BADI.Pascal.Module;
@@ -280,7 +277,7 @@ Type
     procedure FindUnresolvedImplementedClassMethods(Const StartLabel : TLabelContainer);
     Function  FindRecObjClsInt(Const slClassNames : TStringList) : TRecordDecl;
     Function  IsIdentifier(Const AToken : TTokenInfo) : Boolean;
-    Procedure ProcessIncludeDirective(Const strToken : String);
+    Procedure ProcessIncludeDirective(Const strToken, strIncludeType: String);
     Procedure MetricsUnsortedMethods;
     Procedure MetricsHardCodedStrings(Const Container : TElementContainer);
     Procedure MetricsHardCodedNumbers(Const Container : TElementContainer);
@@ -300,6 +297,7 @@ Type
     Procedure CheckFunctionReturn(Const Func : TPascalMethod);
     Procedure CheckResourceStringSpelling(Const Element : TElementContainer);
     Procedure CheckConstantStringSpelling(Const Element : TElementContainer);
+    Function  QualifiedIdentifier : String;
     (**
       This property returns the method on top of the method stack.
       @precon  None.
@@ -429,7 +427,9 @@ Const
   (** Constant for the keyword TYPE. **)
   strVAR = 'VAR';
   (** Constant for the keyword VAR. **)
-  strCDINCLUDE = '{$INCLUDE';
+  strCDINCLUDELong = '{$INCLUDE';
+  (** Constant for the keyword VAR. **)
+  strCDINCLUDEShort = '{$I';
   
   (** A lower case keyword else. **)
   strLCElse = 'else';
@@ -1450,11 +1450,7 @@ begin
               Begin
                 NextNonCommentToken;
                 If IsIdentifier(Token) Then
-                  Begin
-                    Result.HelperClassName := Token.Token;
-                    NextNonCommentToken;
-                  End Else
-                    ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+                  Result.HelperClassName := QualifiedIdentifier;
               End Else
                 ErrorAndSeekToken(strReservedWordExpected, strFOR, strSeekableOnErrorTokens, stActual, Self);
           // If this class has no body then return
@@ -5733,21 +5729,9 @@ begin
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         Begin
-          ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
-          NextNonCommentToken;
-          While Token.Token = '.' Do
-            Begin
-              ModuleName := ModuleName + '.';
-              NextNonCommentToken;
-              If IsIdentifier(Token) Then
-                Begin
-                  ModuleName := ModuleName + '.';
-                  NextNonCommentToken;
-                End Else
-                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-            End;
+          ModuleName := QualifiedIdentifier;
         End Else
           ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       // Check for ';'
@@ -5790,21 +5774,9 @@ begin
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         Begin
-          ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
-          NextNonCommentToken;
-          While Token.Token = '.' Do
-            Begin
-              ModuleName := ModuleName + '.';
-              NextNonCommentToken;
-              If IsIdentifier(Token) Then
-                Begin
-                  ModuleName := ModuleName + '.';
-                  NextNonCommentToken;
-                End Else
-                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
-            End;
+          ModuleName := QualifiedIdentifier;
         End Else
           ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       // Check for ';'
@@ -5849,21 +5821,9 @@ begin
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         Begin
-          ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
-          NextNonCommentToken;
-          While Token.Token = '.' Do
-            Begin
-              ModuleName := ModuleName + '.';
-              NextNonCommentToken;
-              If IsIdentifier(Token) Then
-                Begin
-                  ModuleName := ModuleName + '.';
-                  NextNonCommentToken;
-                End Else
-                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-            End;
+          ModuleName := QualifiedIdentifier;
           // In the Program module we need to check for '(' Ident List ')' but
           // discard
           If Token.Token = '(' Then
@@ -5946,21 +5906,9 @@ Begin
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         Begin;
-          ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
-          NextNonCommentToken;
-          While Token.Token = '.' Do
-            Begin
-              ModuleName := ModuleName + '.';
-              NextNonCommentToken;
-              If IsIdentifier(Token) Then
-                Begin
-                  ModuleName := ModuleName + '.';
-                  NextNonCommentToken;
-                End Else
-                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
-            End;
+          ModuleName := QualifiedIdentifier;;
         End Else
           ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       PortabilityDirective;
@@ -6454,11 +6402,11 @@ procedure TPascalModule.ProcessCompilerDirective;
 
   (**
 
-    This function removes the number from the stack and decrements the iSkip variable by 1. Note this 
-    also added the removed value to the UNDO stack.
+    This function removes the number from the stack. Note this also added the removed value to the UNDO
+    stack.
 
     @precon  None.
-    @postcon Removes the number from the stack and decrements the iSkip variable by 1.
+    @postcon Removes the number from the stack.
 
     @return  a Boolean
 
@@ -6495,14 +6443,16 @@ Var
   CompilerConditionData : IBADICompilerConditionData;
 
 begin
-  CodeSite.SendFmtMsg(csmNote, '%s: %s', [
-    Token.Token,
-    BoolToStr(CompilerConditionStack.CanPop And (CompilerConditionStack.Peek.CompilerCondition = ccIncludeCode), True)]
-  );
   If Like(Token.Token, strCDDEFINE) Then
-    AddDef(GetDef)
+    Begin
+      If CompilerConditionStack.CanParse Then
+        AddDef(GetDef);
+    End
   Else If Like(Token.Token, strCDUNDEF) Then
-    DeleteDef(GetDef)
+    Begin
+      If CompilerConditionStack.CanParse Then
+        DeleteDef(GetDef);
+    End
   Else If Like(Token.Token, strCDIFDEF) Then
     Begin
       If IfDef(GetDef) Then
@@ -6522,9 +6472,9 @@ begin
   Else If Like(Token.Token, strCDIFNDEF) Then
     Begin
       If IfNotDef(GetDef) Then
-        CompilerConditionStack.Push(cdtIFNDEF, ccExcludeCode, TokenIndex)
+        CompilerConditionStack.Push(cdtIFNDEF, ccIncludeCode, TokenIndex)
       Else
-        CompilerConditionStack.Push(cdtIFNDEF, ccIncludeCode, TokenIndex);
+        CompilerConditionStack.Push(cdtIFNDEF, ccExcludeCode, TokenIndex);
     End
   Else If Like(Token.Token, strCDELSE) Then
     Begin
@@ -6555,10 +6505,16 @@ begin
         AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
             scGlobal, Token.Line, Token.Column, etError, Self);
     End
-  Else If Like(Token.Token, strCDINCLUDE) Then
-    ProcessIncludeDirective(Token.Token)
+  Else If Like(Token.Token, strCDINCLUDELong) Then
+    ProcessIncludeDirective(Token.Token, strCDINCLUDELong)
+  Else If Like(Token.Token, strCDINCLUDEShort) Then
+    ProcessIncludeDirective(Token.Token, strCDINCLUDEShort)
   Else If Like(Token.Token, strCDEXTERNALSYM) Then
     FExternalSyms.Add(GetDef);
+  {: @debug CodeSite.SendFmtMsg(csmNote, '%s: %s', [
+    Token.Token,
+    BoolToStr(CompilerConditionStack.CanParse, True)]
+  );}
 end;
 
 (**
@@ -6569,10 +6525,11 @@ end;
   @precon  None.
   @postcon The parser tokens from the include file are inserted after the current token.
 
-  @param   strToken as a String as a constant
+  @param   strToken       as a String as a constant
+  @param   strIncludeType as a String as a constant
 
 **)
-Procedure TPascalModule.ProcessIncludeDirective(Const strToken: String);
+Procedure TPascalModule.ProcessIncludeDirective(Const strToken, strIncludeType: String);
 
 ResourceString
   strINCLUDEFileDoesNotExist = 'The INCLUDE file "%s" does not exist!';
@@ -6589,7 +6546,11 @@ Var
 
 Begin
   strFileName := strToken;
-  Delete(strFileName, 1, Length(strCDINCLUDE));
+  If strFileName.Length <= strIncludeType.Length Then
+    Exit;
+  If Not CharInSet(strFileName[strIncludeType.Length + 1], [#9, #32]) Then
+    Exit;
+  Delete(strFileName, 1, strIncludeType.Length);
   strFileName := Trim(strFileName);
   If (Length(strFileName) > 0) And (strFileName[Length(strFileName)] = '}') Then
     strFileName := Copy(strFileName, 1, Length(strFileName) - 1);
@@ -6599,7 +6560,7 @@ Begin
     strFileName := ExpandFileName(ExtractFilePath(FileName) + strFileName);
   If Not FileExists(strFileName) Then
     AddIssue(Format(strINCLUDEFileDoesNotExist, [strFileName]), scNone,
-      Token.Line, Token.Column, etError, Self)
+      Token.Line, Token.Column, etWarning, Self)
   Else
     Begin
       sl := TStringList.Create;
@@ -6923,8 +6884,38 @@ begin
           NextNonCommentToken;
         End Else
           PopTokenPosition;
+          //: @debug RollBackToken;
     End;
 end;
+
+(**
+
+  This method returns a string representing a fully qualified identifier.
+
+  @precon  None.
+  @postcon The fully qualified identifier is returned and the token position in the parsing is moved to
+           the first token after the identified.
+
+  @return  a String
+
+**)
+Function TPascalModule.QualifiedIdentifier: String;
+
+Begin
+  Result := Token.Token;
+  NextNonCommentToken;
+  While Token.Token = '.' Do
+    Begin
+      Result := Result + '.';
+      NextNonCommentToken;
+      If IsIdentifier(Token) Then
+        Begin
+          Result := Result + Token.Token;
+          NextNonCommentToken;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
+    End;
+End;
 
 (**
 
@@ -7434,12 +7425,7 @@ begin
           Begin
             NextNonCommentToken;
             If IsIdentifier(Token) Then
-              Begin
-                Result.HelperClassName := Token.Token;
-                NextNonCommentToken;
-              End Else
-                ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual,
-                  Self);
+              Result.HelperClassName := QualifiedIdentifier;
           End Else
             ErrorAndSeekToken(strReservedWordExpected, strFOR, strSeekableOnErrorTokens, stActual, Self);
 
@@ -8629,7 +8615,7 @@ Const
   (** Growth size of the token buffer. **)
   iTokenCapacity = 100;
   strSingleSymbols : Set Of AnsiChar = ['(', ')', ';', ',', '[', ']', '^',
-    '-', '+', '/', '*', '<', '>'];
+    '-', '+', '/', '*', '<', '>', '@'];
   iCommentPadding = 2;
   iDirectiveSignPos = 2;
 
@@ -8892,10 +8878,10 @@ End;
 
 (**
 
-  This method parses the TypeArgs element of the grammar for handling generics on type arguments.
+  This method parses the TypeArgs element of the grammar for handling generic on type arguments.
 
   @precon  None.
-  @postcon Parses the TypeArgs element of the grammar for handling generics on type arguments.
+  @postcon Parses the TypeArgs element of the grammar for handling generic on type arguments.
 
   @param   Container as a TElementContainer as a constant
   @return  a Boolean
@@ -8926,7 +8912,6 @@ Begin
           End;
         If (Token.Token = ',') And Assigned(Container) Then
           Container.AddToken(Token.Token, Token.TokenType);
-        //: @todo Can we recurse here?
         If Token.Token = '<' Then
           TypeArgs(Container);
       Until Token.Token <> ',';
@@ -9069,7 +9054,7 @@ End;
   This method parses the TypeParamDeclList element of the grammar.
 
   @precon  None.
-  @postcon The type param declaration list is parses and the identifier modified.
+  @postcon The type parameter declaration list is parses and the identifier modified.
 
   @param   strIdentifier as a String as a reference
 
@@ -9087,7 +9072,7 @@ End;
 
 (**
 
-  This method parses the TypeParamList element of the generics grammar.
+  This method parses the TypeParamList element of the generic grammar.
 
   @precon  None.
   @postcon the updated identifier is returned.

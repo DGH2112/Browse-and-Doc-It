@@ -55,8 +55,8 @@ object frmTokenForm: TfrmTokenForm
       end>
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Courier New'
+    Font.Height = -15
+    Font.Name = 'Consolas'
     Font.Style = []
     HideSelection = False
     RowSelect = True

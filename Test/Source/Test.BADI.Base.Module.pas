@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.047
-  @Date    06 May 2021
+  @Version 1.053
+  @Date    08 May 2021
 
   @nochecks
 

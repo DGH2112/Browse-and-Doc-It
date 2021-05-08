@@ -5,7 +5,7 @@
   implemented.
 
   @Author  David Hoyle
-  @Version 1.010
+  @Version 1.239
   @Date    06 May 2021
 
   @license
@@ -54,88 +54,88 @@ Type
 
   (** This is the main class for dealing with backus-naur grammar files. **)
   TXMLModule = Class(TBaseLanguageModule)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FSource : String;
     FModuleType : TModuleType;
     { Grammar Parsers }
-    Procedure Goal;                                                    //  1
-    Procedure Document;                                                //  2
-    Procedure Prolog(xmlParent : TElementContainer; var iElements : Integer);                   //  3
-    Function  Element(xmlParent : TElementContainer) : Boolean;        //  4
-    Function  Misc(xmlParent : TElementContainer; var iElements : Integer) : Boolean; //  5
-    Procedure XMLDecl(xmlParent : TElementContainer);                  //  6
-    Function  DocTypeDecl(xmlParent : TElementContainer) : Boolean;    //  7
-    Function  STag(xmlParent : TElementContainer) : TXMLElement;       //  8
-    Function  XMLName : String;                                        //  9
-    Procedure Content(xmlParent : TXMLElement);                        // 10
-    Procedure ETag(xmlParent : TElementContainer);                     // 11
-    Function  XMLComment : Boolean;                                    // 12
-    Function  XMLPI(xmlParent : TElementContainer) : Boolean;          // 13
-    Function  Whitespace(E : TXMLElement) : Boolean;                   // 14
-    Function  VersionInfo(xmlParent : TElementContainer) : Boolean;    // 15
-    Procedure EncodingDecl(xmlParent : TElementContainer);             // 16
-    Procedure SDDecl(xmlParent : TElementContainer);                   // 17
-    Function  ExternalID(xmlParent : TElementContainer) : Boolean;     // 18
-    Procedure IntSubSet(xmlParent : TElementContainer);                // 19
-    Function  Attribute(xmlElement : TXMLElement) : Boolean;           // 20
-    Procedure Eq(xmlParent : TElementContainer);                       // 21
-    Procedure VersionNum(xmlParent : TElementContainer);               // 22
-    Procedure EncName(xmlParent : TElementContainer);                  // 23
-    Function  PITarget(xmlParent : TElementContainer) : TXMLPI;        // 24
-    Function  EntityValue(xmlParent : TElementContainer) : Boolean;    // 25
-    Procedure NDataDecl(xmlParent : TElementContainer);                // 26
-    Procedure SystemLiteral(xmlParent : TElementContainer);            // 27
-    Procedure PubIDLiteral(xmlParent : TElementContainer);             // 28
-    Function  MarkupDecl(xmlParent : TElementContainer) : Boolean;     // 29
-    Function  DeclSep(xmlParent : TElementContainer) : Boolean;        // 30
-    Function  ElementDecl(xmlParent : TElementContainer) : Boolean;    // 31
-    Function  AttListDecl(xmlParent : TElementContainer) : Boolean;    // 32
-    Function  EntityDecl(xmlParent : TElementContainer) : Boolean;     // 33
-    Function  NotationDecl(xmlParent : TElementContainer) : Boolean;   // 34
-    Procedure ContentSpec(xmlParent : TElementContainer);              // 35
-    Function  Mixed(xmlParent : TElementContainer) : Boolean;          // 36
-    Function  Children(xmlParent : TElementContainer) : Boolean;       // 37
-    Function  ChoiceSeq(xmlParent : TElementContainer) : Boolean;      // 38
-    Function  CharData(E : TXMLElement) : Boolean;               // 40
-    Function  Reference(xmlParent: TElementContainer) : Boolean;       // 41
-    Function  CDSect : Boolean;                                        // 42
-    Procedure AttValue(xmlParent : TElementContainer);                 // 43
-    Function  PEReference(xmlParent : TElementContainer) : Boolean;    // 44
-    Function  AttDef(xmlParent : TElementContainer) : Boolean;         // 45
-    Function  GEDecl(xmlParent : TElementContainer) : Boolean;         // 46
-    Function  PEDecl(xmlParent : TElementContainer) : Boolean;         // 47
-    Procedure PublicID(xmlParent : TElementContainer);                 // 48
-    Function  EntityRef(xmlParent : TElementContainer) : Boolean;      // 50
-    Function  CharRef(xmlParent : TElementContainer) : Boolean;        // 51
-    Function  CDStart : Boolean;                                       // 52
-    Procedure CDData;                                                  // 53
-    Procedure CDEnd;                                                   // 54
-    Procedure AttType(xmlParent : TElementContainer);                  // 55
-    Procedure DefaultDecl(xmlParent : TElementContainer);              // 56
-    Procedure EntityDef(xmlParent : TElementContainer);                // 57
-    Function  StringType(xmlParent : TElementContainer) : Boolean;     // 58
-    Function  TokenizedType(xmlParent : TElementContainer) : Boolean;  // 59
-    Procedure EnumerateType(xmlParent : TElementContainer);            // 60
-    Procedure Enumeration(xmlParent : TElementContainer);              // 61
-    Function  NmToken(xmlParent : TElementContainer) : Boolean;        // 62
-    Function  NameChar(xmlParent : TElementContainer) : Boolean;       // 63
-    Function  CombiningChar : Boolean;                                 // 64
-    Function  Extender : Boolean;                                      // 65
-    Function  NotationType(xmlParent : TElementContainer) : Boolean;   // 66
-    Function  ExtSubSet(xmlParent : TElementContainer) : Boolean;
-    Function  TextDecl(xmlParent : TElementContainer) : Boolean;
-    Function  ExtSubSetDecl(xmlParent : TElementContainer) : Boolean;
-    Function  ConditionalSect(xmlParent : TElementContainer) : Boolean;
-    Function  IncludeSect(xmlParent : TElementContainer) : Boolean;
-    Function  IgnoreSect(xmlParent : TElementContainer) : Boolean;
+    Procedure Goal;                                                          //  1
+    Procedure Document;                                                      //  2
+    Procedure Prolog(Const xmlParent : TElementContainer; var iElements : Integer);                   //  3
+    Function  Element(Const xmlParent : TElementContainer) : Boolean;        //  4
+    Function  Misc(Const xmlParent : TElementContainer; var iElements : Integer) : Boolean; //  5
+    Procedure XMLDecl(Const xmlParent : TElementContainer);                  //  6
+    Function  DocTypeDecl(Const xmlParent : TElementContainer) : Boolean;    //  7
+    Function  STag(Const xmlParent : TElementContainer) : TXMLElement;       //  8
+    Function  XMLName : String;                                              //  9
+    Procedure Content(Const xmlParent : TXMLElement);                        // 10
+    Procedure ETag(Const xmlParent : TElementContainer);                     // 11
+    Function  XMLComment : Boolean;                                          // 12
+    Function  XMLPI(Const xmlParent : TElementContainer) : Boolean;          // 13
+    Function  Whitespace(Const E : TXMLElement) : Boolean;                   // 14
+    Function  VersionInfo(Const xmlParent : TElementContainer) : Boolean;    // 15
+    Procedure EncodingDecl(Const xmlParent : TElementContainer);             // 16
+    Procedure SDDecl(Const xmlParent : TElementContainer);                   // 17
+    Function  ExternalID(Const xmlParent : TElementContainer) : Boolean;     // 18
+    Procedure IntSubSet(Const xmlParent : TElementContainer);                // 19
+    Function  Attribute(Const xmlElement : TXMLElement) : Boolean;           // 20
+    Procedure Eq(Const xmlParent : TElementContainer);                       // 21
+    Procedure VersionNum(Const xmlParent : TElementContainer);               // 22
+    Procedure EncName(Const xmlParent : TElementContainer);                  // 23
+    Function  PITarget(Const xmlParent : TElementContainer) : TXMLPI;        // 24
+    Function  EntityValue(Const xmlParent : TElementContainer) : Boolean;    // 25
+    Procedure NDataDecl(Const xmlParent : TElementContainer);                // 26
+    Procedure SystemLiteral(Const xmlParent : TElementContainer);            // 27
+    Procedure PubIDLiteral(Const xmlParent : TElementContainer);             // 28
+    Function  MarkupDecl(Const xmlParent : TElementContainer) : Boolean;     // 29
+    Function  DeclSep(Const xmlParent : TElementContainer) : Boolean;        // 30
+    Function  ElementDecl(Const xmlParent : TElementContainer) : Boolean;    // 31
+    Function  AttListDecl(Const xmlParent : TElementContainer) : Boolean;    // 32
+    Function  EntityDecl(Const xmlParent : TElementContainer) : Boolean;     // 33
+    Function  NotationDecl(Const xmlParent : TElementContainer) : Boolean;   // 34
+    Procedure ContentSpec(Const xmlParent : TElementContainer);              // 35
+    Function  Mixed(Const xmlParent : TElementContainer) : Boolean;          // 36
+    Function  Children(Const xmlParent : TElementContainer) : Boolean;       // 37
+    Function  ChoiceSeq(Const xmlParent : TElementContainer) : Boolean;      // 38
+    Function  CharData(Const E : TXMLElement) : Boolean;                     // 40
+    Function  Reference(Const xmlParent: TElementContainer) : Boolean;       // 41
+    Function  CDSect : Boolean;                                              // 42
+    Procedure AttValue(Const xmlParent : TElementContainer);                 // 43
+    Function  PEReference(Const xmlParent : TElementContainer) : Boolean;    // 44
+    Function  AttDef(Const xmlParent : TElementContainer) : Boolean;         // 45
+    Function  GEDecl(Const xmlParent : TElementContainer) : Boolean;         // 46
+    Function  PEDecl(Const xmlParent : TElementContainer) : Boolean;         // 47
+    Procedure PublicID(Const xmlParent : TElementContainer);                 // 48
+    Function  EntityRef(Const xmlParent : TElementContainer) : Boolean;      // 50
+    Function  CharRef(Const xmlParent : TElementContainer) : Boolean;        // 51
+    Function  CDStart : Boolean;                                             // 52
+    Procedure CDData;                                                        // 53
+    Procedure CDEnd;                                                         // 54
+    Procedure AttType(Const xmlParent : TElementContainer);                  // 55
+    Procedure DefaultDecl(Const xmlParent : TElementContainer);              // 56
+    Procedure EntityDef(Const xmlParent : TElementContainer);                // 57
+    Function  StringType(Const xmlParent : TElementContainer) : Boolean;     // 58
+    Function  TokenizedType(Const xmlParent : TElementContainer) : Boolean;  // 59
+    Procedure EnumerateType(Const xmlParent : TElementContainer);            // 60
+    Procedure Enumeration(Const xmlParent : TElementContainer);              // 61
+    Function  NmToken(Const xmlParent : TElementContainer) : Boolean;        // 62
+    Function  NameChar(Const xmlParent : TElementContainer) : Boolean;       // 63
+    Function  CombiningChar : Boolean;                                       // 64
+    Function  Extender : Boolean;                                            // 65
+    Function  NotationType(Const xmlParent : TElementContainer) : Boolean;   // 66
+    Function  ExtSubSet(Const xmlParent : TElementContainer) : Boolean;
+    Function  TextDecl(Const xmlParent : TElementContainer) : Boolean;
+    Function  ExtSubSetDecl(Const xmlParent : TElementContainer) : Boolean;
+    Function  ConditionalSect(Const xmlParent : TElementContainer) : Boolean;
+    Function  IncludeSect(Const xmlParent : TElementContainer) : Boolean;
+    Function  IgnoreSect(Const xmlParent : TElementContainer) : Boolean;
     Procedure IgnoreSectContents;
     Procedure Ignore;
     // ----------------------------------------------------------------
-    Function  EatCharData(E : TXMLElement) : Boolean;
+    Function  EatCharData(Const E : TXMLElement) : Boolean;
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
     Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     procedure TidyUpEmptyElements;
@@ -192,11 +192,11 @@ Const
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the AttDef element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.AttDef(xmlParent: TElementContainer) : Boolean;
+Function TXMLModule.AttDef(Const xmlParent: TElementContainer) : Boolean;
 
 var
   strName: String;
@@ -228,11 +228,13 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the AttListDecl element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @nocheck EmptyRepeat EmptyWhile
+
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.AttListDecl(xmlParent : TElementContainer): Boolean;
+function TXMLModule.AttListDecl(Const xmlParent : TElementContainer): Boolean;
 var
   strName: String;
   A: TXMLElemDecl;
@@ -270,11 +272,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Attribute element of the grammar.
 
-  @param   xmlElement as a TXMLElement
+  @param   xmlElement as a TXMLElement as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.Attribute(xmlElement : TXMLElement): Boolean;
+function TXMLModule.Attribute(Const xmlElement : TXMLElement): Boolean;
 
 Var
   strName : String;
@@ -302,10 +304,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the AttType element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.AttType(xmlParent: TElementContainer);
+procedure TXMLModule.AttType(Const xmlParent: TElementContainer);
 begin
   If Not StringType(xmlParent) Then
     If Not TokenizedType(xmlParent) Then
@@ -314,15 +316,15 @@ end;
 
 (**
 
-  This method parses the AttVakue element of the grammar.
+  This method parses the AttValue element of the grammar.
 
   @precon  xmlParent must be a valid instance of a container.
-  @postcon Parses the AttVakue element of the grammar.
+  @postcon Parses the AttValue element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.AttValue(xmlParent: TElementContainer);
+procedure TXMLModule.AttValue(Const xmlParent: TElementContainer);
 begin
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     AddToExpression(xmlParent)
@@ -422,11 +424,11 @@ end;
   @precon  None.
   @postcon Eats up white space and token which do not start with an "<".
 
-  @param   E as a TXMLElement
+  @param   E as a TXMLElement as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.CharData(E : TXMLElement): Boolean;
+function TXMLModule.CharData(Const E : TXMLElement): Boolean;
 
 begin
   Result := Whitespace(E) Or EatCharData(E);
@@ -439,11 +441,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the CharRef element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.CharRef(xmlParent: TElementContainer) : Boolean;
+Function TXMLModule.CharRef(Const xmlParent: TElementContainer) : Boolean;
 begin
   Result := False;
   If IsKeyWord(Token.Token, ['&#', '&#x']) Then
@@ -469,6 +471,8 @@ end;
   @postcon Adds and documentation conflict IF either of these elements
            is not found.
 
+  @nohint boolCascade
+
   @param   boolCascade as a Boolean as a reference
 
 **)
@@ -481,11 +485,11 @@ procedure TXMLModule.CheckDocumentation(var boolCascade: Boolean);
     @precon  None.
     @postcon Returns true if the name was matched.
 
-    @param   strName as a String
+    @param   strName as a String as a Constant
     @return  a Boolean
 
   **)
-  Function FindMatch(strName : String) : Boolean;
+  Function FindMatch(Const strName : String) : Boolean;
 
   var
     i: Integer;
@@ -527,11 +531,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Children element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.Children(xmlParent : TElementContainer): Boolean;
+function TXMLModule.Children(Const xmlParent : TElementContainer): Boolean;
 
 begin
   Result := ChoiceSeq(xmlParent);
@@ -544,11 +548,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Choice element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.ChoiceSeq(xmlParent: TElementContainer): Boolean;
+function TXMLModule.ChoiceSeq(Const xmlParent: TElementContainer): Boolean;
 
 var
   strName: String;
@@ -635,11 +639,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Returns true of a IncludeSect or IgnoreSect was found and parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.ConditionalSect(xmlParent: TElementContainer): Boolean;
+function TXMLModule.ConditionalSect(Const xmlParent: TElementContainer): Boolean;
 begin
   Result := IncludeSect(xmlParent) or IgnoreSect(xmlParent);
 end;
@@ -651,10 +655,12 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Content element of the grammar.
 
-  @param   xmlParent as a TXMLElement
+  @nocheck EmptyRepeat
+
+  @param   xmlParent as a TXMLElement as a Constant
 
 **)
-procedure TXMLModule.Content(xmlParent : TXMLElement);
+procedure TXMLModule.Content(Const xmlParent : TXMLElement);
 begin
   Repeat
     // Do nothing
@@ -674,10 +680,10 @@ end;
   @precon  xmlParent must be a valid instance of a container
   @postcon Parses the ContentSpec element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.ContentSpec(xmlParent : TElementContainer);
+procedure TXMLModule.ContentSpec(Const xmlParent : TElementContainer);
 
 begin
   If CompareText(Token.Token, 'EMPTY') = 0 Then
@@ -749,11 +755,11 @@ End;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the DeclSep element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.DeclSep(xmlParent : TElementContainer) : Boolean;
+Function TXMLModule.DeclSep(Const xmlParent : TElementContainer) : Boolean;
 begin
   Result := PEReference(xmlParent);
   If Not Result Then
@@ -767,10 +773,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the DefaultDecl element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.DefaultDecl(xmlParent: TElementContainer);
+procedure TXMLModule.DefaultDecl(Const xmlParent: TElementContainer);
 begin
   If CompareText(Token.Token, '#REQUIRED')= 0  Then
     AddToExpression(xmlParent)
@@ -794,7 +800,7 @@ end;
   This is a destructor for the TXMLModule class.
 
   @precon  None.
-  @postcon Fress the memory fo this instance.
+  @postcon Frees the memory for this instance.
 
 
 **)
@@ -812,11 +818,11 @@ end;
   @postcon Parses the doc type information at the top of the XML file as per
            the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.DocTypeDecl(xmlParent : TElementContainer): Boolean;
+function TXMLModule.DocTypeDecl(Const xmlParent : TElementContainer): Boolean;
 
 Var
   D : TXMLDocType;
@@ -897,11 +903,11 @@ end;
   @precon  None.
   @postcon Parses the elements of the xml document (tags).
 
-  @param   E as a TXMLElement
+  @param   E as a TXMLElement as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.EatCharData(E : TXMLElement): Boolean;
+function TXMLModule.EatCharData(Const E : TXMLElement): Boolean;
 
 begin
   Result := (Token.Token[1] <> '<');
@@ -919,11 +925,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Element element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.Element(xmlParent : TElementContainer) : Boolean;
+Function TXMLModule.Element(Const xmlParent : TElementContainer) : Boolean;
 
 Var
   xmlChild : TXMLElement;
@@ -945,11 +951,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Returns true of the element was parsed as a ElementDecl.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.ElementDecl(xmlParent : TElementContainer): Boolean;
+function TXMLModule.ElementDecl(Const xmlParent : TElementContainer): Boolean;
 
 var
   E: TXMLElemDecl;
@@ -1002,10 +1008,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the EncName element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.EncName(xmlParent : TElementContainer);
+procedure TXMLModule.EncName(Const xmlParent : TElementContainer);
 
 var
   strToken: String;
@@ -1040,10 +1046,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the EncodingDecl elements of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.EncodingDecl(xmlParent : TElementContainer);
+procedure TXMLModule.EncodingDecl(Const xmlParent : TElementContainer);
 begin
   If CompareText(Token.Token, 'encoding') = 0 Then
     Begin
@@ -1060,11 +1066,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the EntityDecl element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.EntityDecl(xmlParent : TElementContainer): Boolean;
+function TXMLModule.EntityDecl(Const xmlParent : TElementContainer): Boolean;
 begin
   Result := GEDecl(xmlParent);
 end;
@@ -1076,10 +1082,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the EntityDef element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.EntityDef(xmlParent: TElementContainer);
+procedure TXMLModule.EntityDef(Const xmlParent: TElementContainer);
 begin
   If ExternalID(xmlParent) Then
     NDataDecl(xmlParent)
@@ -1094,11 +1100,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the EntityRef element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.EntityRef(xmlParent: TElementContainer): Boolean;
+function TXMLModule.EntityRef(Const xmlParent: TElementContainer): Boolean;
 
 Var
   strName  : String;
@@ -1131,11 +1137,11 @@ end;
   @precon  None.
   @postcon Parses the EntityValue element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.EntityValue(xmlParent : TElementContainer): Boolean;
+function TXMLModule.EntityValue(Const xmlParent : TElementContainer): Boolean;
 
 var
   strValue: String;
@@ -1164,15 +1170,15 @@ end;
 
 (**
 
-  This method parses the EnumeratedType element of the grammar.
+  This method parses the EnumerateType element of the grammar.
 
   @precon  xmlParent must be a valid instance of a container.
-  @postcon Parses the EnumeratedType element of the grammar.
+  @postcon Parses the EnumerateType element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.EnumerateType(xmlParent: TElementContainer);
+procedure TXMLModule.EnumerateType(Const xmlParent: TElementContainer);
 begin
   If Not NotationType(xmlParent) Then
     Enumeration(xmlParent);
@@ -1185,10 +1191,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Numeration element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.Enumeration(xmlParent: TElementContainer);
+procedure TXMLModule.Enumeration(Const xmlParent: TElementContainer);
 begin
   If Token.Token = '(' Then
     Begin
@@ -1219,10 +1225,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Eq element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.Eq(xmlParent : TElementContainer);
+procedure TXMLModule.Eq(Const xmlParent : TElementContainer);
 begin
   WhiteSpace(Nil);
   If Token.Token = '=' Then
@@ -1239,10 +1245,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the ETag element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.ETag(xmlParent : TElementContainer);
+procedure TXMLModule.ETag(Const xmlParent : TElementContainer);
 
 Var
   strName : String;
@@ -1289,11 +1295,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the ExternalID element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.ExternalID(xmlParent : TElementContainer) : Boolean;
+Function TXMLModule.ExternalID(Const xmlParent : TElementContainer) : Boolean;
 begin
   Result := False;
   If CompareText(Token.Token, 'SYSTEM') = 0 Then
@@ -1323,11 +1329,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Returns true of a TextDecl or ExtSubSetDecl was parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.ExtSubSet(xmlParent: TElementContainer): Boolean;
+function TXMLModule.ExtSubSet(Const xmlParent: TElementContainer): Boolean;
 
 begin
   DocTypeDecl(xmlParent);
@@ -1340,14 +1346,14 @@ end;
   This method parses the ExtSubSetDecl element of the grammar.
 
   @precon  xmlParent must be a valid instance of a container.
-  @postcon Returns true of a Markup, ConditionalSect or DeclSep was found and
+  @postcon Returns true of a Mark-up, ConditionalSect or DeclSep was found and
            parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.ExtSubSetDecl(xmlParent: TElementContainer) : Boolean;
+Function TXMLModule.ExtSubSetDecl(Const xmlParent: TElementContainer) : Boolean;
 begin
   Result := False;
   While (MarkupDecl(xmlParent) Or ConditionalSect(xmlParent) or DeclSep(xmlParent)) Do
@@ -1364,11 +1370,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Returns true if the element was a tokenized type.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.TokenizedType(xmlParent: TElementContainer): Boolean;
+function TXMLModule.TokenizedType(Const xmlParent: TElementContainer): Boolean;
 begin
   Result := IskeyWord(Token.Token, ['entities', 'entity', 'id', 'idref',
     'idrefs', 'nmtoken', 'nmtokens']);
@@ -1420,7 +1426,7 @@ Var
   iLine : Integer;
   (** Current column number **)
   iColumn : Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
+  (** Token stream position. Fast to increment this than read the stream position. **)
   iStreamPos : Integer;
   (** Token line **)
   iTokenLine : Integer;
@@ -1437,11 +1443,11 @@ Var
 
   (**
 
-    This INLINE procedure changes the whitepace tokens for more human readable
+    This INLINE procedure changes the whitespace tokens for more human readable
     tokens.
 
     @precon  strToken must be a non-null string.
-    @postcon Changes the whitepace tokens for more human readable
+    @postcon Changes the whitespace tokens for more human readable
              tokens.
 
     @param   strToken as a String as a reference
@@ -1617,11 +1623,11 @@ End;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the VersionInfo element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.VersionInfo(xmlParent : TElementContainer) : Boolean;
+Function TXMLModule.VersionInfo(Const xmlParent : TElementContainer) : Boolean;
 begin
   Result := False;
   WhiteSpace(Nil);
@@ -1641,10 +1647,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the VersionNum element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.VersionNum(xmlParent : TElementContainer);
+procedure TXMLModule.VersionNum(Const xmlParent : TElementContainer);
 
 var
   strNum: String;
@@ -1685,11 +1691,11 @@ end;
   @precon  None.
   @postcon Returns true if whitespace was encountered.
 
-  @param   E as a TXMLElement
+  @param   E as a TXMLElement as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.Whitespace(E : TXMLElement): Boolean;
+function TXMLModule.Whitespace(Const E : TXMLElement): Boolean;
 
 begin
   Result := False;
@@ -1736,10 +1742,14 @@ end;
   @postcon Parses the start and end of the XML declarations as defined in the
            grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.XMLDecl(xmlParent : TElementContainer);
+procedure TXMLModule.XMLDecl(Const xmlParent : TElementContainer);
+
+Var
+  xml: TElementContainer;
+  
 begin
   If Token.Token = '<?' Then
     Begin
@@ -1747,19 +1757,19 @@ begin
       NextNonCommentToken;
       If CompareText(Token.Token, 'xml') = 0 Then
         Begin
-          xmlParent := xmlParent.Add(TXMLDecl.Create('?' + Token.Token, scNone,
+          xml := xmlParent.Add(TXMLDecl.Create('?' + Token.Token, scNone,
             Token.Line, Token.Column, iiPublicObject, Nil));
           NextNonCommentToken;
-          If Not VersionInfo(xmlParent) Then
+          If Not VersionInfo(xml) Then
             ErrorAndSeekToken(strExpectedWord, 'version', strSeekableOnErrorTokens, stActual, Self);
           Whitespace(Nil);
-          EncodingDecl(xmlParent);
+          EncodingDecl(xml);
           Whitespace(Nil);
-          SDDecl(xmlParent);
+          SDDecl(xml);
           Whitespace(Nil);
           If Token.Token = '?' Then
             Begin
-              AddToExpression(xmlParent);
+              AddToExpression(xml);
               If Token.Token = '>' Then
                 NextNonCommentToken
               Else
@@ -1776,9 +1786,8 @@ end;
   This method parses the Name element of the grammar.
 
   @precon  None.
-  @postcon Returns an instance of a TXMLElement with the names as the xml
-           element identifier. Additionally the element is created as a child
-           of the given parent element.
+  @postcon Returns a String with the names as the xml element identifier. Additionally the element is
+           created as a child of the given parent element.
 
   @return  a String
 
@@ -1823,11 +1832,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Returns true IF a PI element was parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.XMLPI(xmlParent : TElementContainer): Boolean;
+function TXMLModule.XMLPI(Const xmlParent : TElementContainer): Boolean;
 
 Var
   pit : TXMLPI;
@@ -1863,7 +1872,7 @@ end;
 
   @precon  None.
   @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
+           Errors while providing declaration elements for browsing.
 
 **)
 procedure TXMLModule.ParseTokens;
@@ -1878,11 +1887,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the PEDecl element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.PEDecl(xmlParent: TElementContainer) : Boolean;
+Function TXMLModule.PEDecl(Const xmlParent: TElementContainer) : Boolean;
 
 Var
   strName : String;
@@ -1921,11 +1930,11 @@ end;
   @precon  None.
   @postcon Parses the PEReference element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.PEReference(xmlParent : TElementContainer): Boolean;
+function TXMLModule.PEReference(Const xmlParent : TElementContainer): Boolean;
 
 Var
   strName : String;
@@ -1957,11 +1966,11 @@ end;
   @precon  None.
   @postcon Parses the PITarget element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a TXMLPI
 
 **)
-Function TXMLModule.PITarget(xmlParent : TElementContainer) : TXMLPI;
+Function TXMLModule.PITarget(Const xmlParent : TElementContainer) : TXMLPI;
 
 Var
   strName : String;
@@ -2023,11 +2032,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the MarkupDecl element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.MarkupDecl(xmlParent : TElementContainer) : Boolean;
+function TXMLModule.MarkupDecl(Const xmlParent : TElementContainer) : Boolean;
 begin
   Result :=
     ElementDecl(xmlParent) Or
@@ -2045,12 +2054,12 @@ end;
   @precon  None.
   @postcon Parses the miscellaneous elements as defined in the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @param   iElements as an Integer as a reference
   @return  a Boolean
 
 **)
-Function TXMLModule.Misc(xmlParent : TElementContainer; var iElements : Integer) : Boolean;
+Function TXMLModule.Misc(Const xmlParent : TElementContainer; var iElements : Integer) : Boolean;
 
 begin
   Result := XMLComment;
@@ -2069,11 +2078,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Mixed element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.Mixed(xmlParent : TElementContainer): Boolean;
+function TXMLModule.Mixed(Const xmlParent : TElementContainer): Boolean;
 
 var
   strName: String;
@@ -2129,11 +2138,13 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Returns true if the element was a NameChar.
 
-  @param   xmlParent as a TElementContainer
+  @nohint xmlParent
+
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.NameChar(xmlParent: TElementContainer): Boolean;
+function TXMLModule.NameChar(Const xmlParent: TElementContainer): Boolean;
 begin
   Result := False;
   If Token.TokenType In [ttIdentifier, ttNumber] Then
@@ -2153,10 +2164,10 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the NDataDecl element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.NDataDecl(xmlParent : TElementContainer);
+procedure TXMLModule.NDataDecl(Const xmlParent : TElementContainer);
 
 var
   strName: String;
@@ -2188,11 +2199,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Returns true if an NmToken element was parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.NmToken(xmlParent: TElementContainer): Boolean;
+function TXMLModule.NmToken(Const xmlParent: TElementContainer): Boolean;
 begin
   Result := False;
   While NameChar(xmlParent) Do
@@ -2210,11 +2221,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the NotationDecl element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.NotationDecl(xmlParent : TElementContainer): Boolean;
+function TXMLModule.NotationDecl(Const xmlParent : TElementContainer): Boolean;
 var
   strName: String;
   N: TXMLElemDecl;
@@ -2260,11 +2271,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the NotationType element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.NotationType(xmlParent: TElementContainer): Boolean;
+function TXMLModule.NotationType(Const xmlParent: TElementContainer): Boolean;
 
 var
   strName: String;
@@ -2323,11 +2334,11 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Returns true if the grammar parsed was a GEDecl element.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.GEDecl(xmlParent: TElementContainer): Boolean;
+function TXMLModule.GEDecl(Const xmlParent: TElementContainer): Boolean;
 
 var
   strName: String;
@@ -2441,6 +2452,8 @@ end;
   @precon  None.
   @postcon Does nothings as conditional compilations is not supported.
 
+  @nocheck EmptyMethod
+
 **)
 Procedure TXMLModule.ProcessCompilerDirective;
 
@@ -2450,16 +2463,18 @@ End;
 
 (**
 
-  This method prases the XML file prolog section as defined in the xml grammar.
+  This method parses the XML file prolog section as defined in the xml grammar.
 
   @precon  xmlParent must be a valid container.
   @postcon Parses the XML file prolog section as defined in the xml grammar.
 
-  @param   xmlParent as a TElementContainer
+  @nocheck EmptyRepeat
+
+  @param   xmlParent as a TElementContainer as a Constant
   @param   iElements as an Integer as a reference
 
 **)
-procedure TXMLModule.Prolog(xmlParent : TElementContainer; var iElements : Integer);
+procedure TXMLModule.Prolog(Const xmlParent : TElementContainer; var iElements : Integer);
 
 begin
   XMLDecl(xmlParent);
@@ -2481,10 +2496,10 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Parses the PubIDLiteral element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.PubIDLiteral(xmlParent : TElementContainer);
+procedure TXMLModule.PubIDLiteral(Const xmlParent : TElementContainer);
 
 var
   i: Integer;
@@ -2516,10 +2531,10 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Parses the PublicID element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.PublicID(xmlParent: TElementContainer);
+procedure TXMLModule.PublicID(Const xmlParent: TElementContainer);
 begin
   If CompareText(Token.Token, 'PUBLIC') = 0 Then
     AddToExpression(xmlParent)
@@ -2537,11 +2552,11 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Returns true is a reference was parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.Reference(xmlParent: TElementContainer): Boolean;
+function TXMLModule.Reference(Const xmlParent: TElementContainer): Boolean;
 begin
   Result := False;
   If Not EntityRef(xmlParent) Then
@@ -2555,6 +2570,8 @@ end;
   @precon  None.
   @postcon Returns false always.
 
+  @nohint AToken
+
   @param   AToken as a TTokenInfo as a constant
   @return  a Boolean
 
@@ -2567,15 +2584,15 @@ End;
 
 (**
 
-  This method parses the SCDecl element of the grammar.
+  This method parses the SDDecl element of the grammar.
 
   @precon  xmlParent must be a valid container.
-  @postcon Parses the SCDecl element of the grammar.
+  @postcon Parses the SDDecl element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.SDDecl(xmlParent : TElementContainer);
+procedure TXMLModule.SDDecl(Const xmlParent : TElementContainer);
 
 Var
   strAnswer : String;
@@ -2605,11 +2622,11 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Returns true IF the tag has an ending forward slash.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a TXMLElement
 
 **)
-Function TXMLModule.STag(xmlParent : TElementContainer) : TXMLElement;
+Function TXMLModule.STag(Const xmlParent : TElementContainer) : TXMLElement;
 
 Var
   strXMLName: String;
@@ -2654,11 +2671,11 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon returns true of the element was a string type.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.StringType(xmlParent: TElementContainer): Boolean;
+function TXMLModule.StringType(Const xmlParent: TElementContainer): Boolean;
 begin
   Result := False;
   If CompareText(Token.Token, 'CDATA') = 0 Then
@@ -2675,10 +2692,10 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Parses the SystemLiteral element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.SystemLiteral(xmlParent : TElementContainer);
+procedure TXMLModule.SystemLiteral(Const xmlParent : TElementContainer);
 begin
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     AddToExpression(xmlParent)
@@ -2693,11 +2710,15 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Returns true of a TextDecl was found and parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-Function TXMLModule.TextDecl(xmlParent: TElementContainer) : Boolean;
+Function TXMLModule.TextDecl(Const xmlParent: TElementContainer) : Boolean;
+
+Var
+  xml : TElementContainer;
+  
 begin
   Result := False;
   If Token.Token = '<?' Then
@@ -2707,16 +2728,16 @@ begin
       If CompareText(Token.Token, 'xml') = 0 Then
         Begin
           Result := True;
-          xmlParent := xmlParent.Add(TXMLDecl.Create('?' + Token.Token, scNone,
+          xml := xmlParent.Add(TXMLDecl.Create('?' + Token.Token, scNone,
             Token.Line, Token.Column, iiPublicObject, Nil));
           NextNonCommentToken;
-          VersionInfo(xmlParent);
+          VersionInfo(xml);
           Whitespace(Nil);
-          EncodingDecl(xmlParent);
+          EncodingDecl(xml);
           Whitespace(Nil);
           If Token.Token = '?' Then
             Begin
-              AddToExpression(xmlParent);
+              AddToExpression(xml);
               If Token.Token = '>' Then
                 NextNonCommentToken
               Else
@@ -2730,10 +2751,10 @@ end;
 
 (**
 
-  This method deletes any root elements which dont and items in them.
+  This method deletes any root elements which don not and items in them.
 
   @precon  None.
-  @postcon Deletes any root elements which dont and items in them.
+  @postcon Deletes any root elements which don not and items in them.
 
 **)
 procedure TXMLModule.TidyUpEmptyElements;
@@ -2771,11 +2792,11 @@ End;
 
   This method is the starting position for the parsing of an XML module. It
   finds the first non comment token and begins the grammar checking from their
-  by deligating Syntax.
+  by delegating Syntax.
 
   @precon  None.
   @postcon It finds the first non comment token and begins the grammar checking
-           from their by deligating Syntax.
+           from their by delegating Syntax.
 
 **)
 procedure TXMLModule.Goal;
@@ -2837,11 +2858,11 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Returns true if an IgnoreSect element was found and parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.IgnoreSect(xmlParent: TElementContainer): Boolean;
+function TXMLModule.IgnoreSect(Const xmlParent: TElementContainer): Boolean;
 
 Var
   I : TXMLIgnoreElement;
@@ -2915,11 +2936,11 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Returns true IF an IncludeSect was found and parsed.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
   @return  a Boolean
 
 **)
-function TXMLModule.IncludeSect(xmlParent: TElementContainer): Boolean;
+function TXMLModule.IncludeSect(Const xmlParent: TElementContainer): Boolean;
 
 Var
   I : TXMLIncludeElement;
@@ -2965,10 +2986,10 @@ end;
   @precon  xmlParent must be a valid container.
   @postcon Parses the IntSubSet element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TElementContainer as a Constant
 
 **)
-procedure TXMLModule.IntSubSet(xmlParent : TElementContainer);
+procedure TXMLModule.IntSubSet(Const xmlParent : TElementContainer);
 begin
   If Not MarkupDecl(xmlParent) Then
     DeclSep(xmlParent);

@@ -5,8 +5,8 @@
   in the system.
 
   @Author  David Hoyle
-  @Version 1.042
-  @Date    19 Sep 2020
+  @Version 1.043
+  @Date    06 May 2021
 
   @license
 
@@ -47,7 +47,7 @@ Uses
   BADI.INI.Module,
   BADI.Pascal.Module,
   BADI.VB.Module,
-  BADI.VB.ModuleFull,
+  //: @debug BADI.VB.ModuleFull,
   BADI.XML.Module,
   BADI.Options, 
   BADI.Base.Module;

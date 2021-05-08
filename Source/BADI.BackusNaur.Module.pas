@@ -2,7 +2,7 @@
 
   BADI Backus Naur Module : A unit to tokenize Backus-Naur Grammar.
 
-  @Version    1.010
+  @Version    1.660
   @Author     David Hoyle
   @Date       06 May 2021
 
@@ -48,7 +48,7 @@ Uses
 Type
   (** This is the main class for dealing with backus-naur grammar files. **)
   TBackusNaurModule = Class(TBaseLanguageModule)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FSource        : String;
     FRules         : TLabelContainer;
     FRequiredRules : TStringList;
@@ -58,16 +58,16 @@ Type
     Procedure Goal;
     Procedure Syntax;
     Procedure Rule;
-    Procedure Expression(R : TBackusNaurRule);
-    Procedure RepeatOperator(R : TBackusNaurRule);
-    Procedure List(R : TBackusNaurRule);
-    Procedure SimpleExpression(R : TBackusNaurRule);
-    Procedure Term(R : TBackusNaurRule);
-    Procedure Literal(R : TBackusNaurRule);
-    Function  CharRef(R : TBackusNaurRule) : Boolean;
-    Function  LiteralChar(R : TBackusNaurRule) : Boolean;
-    Function  DecChar(R : TBackusNaurRule) : Boolean;
-    Function  HexChar(R : TBackusNaurRule) : Boolean;
+    Procedure Expression(Const R : TBackusNaurRule);
+    Procedure RepeatOperator(Const R : TBackusNaurRule);
+    Procedure List(Const R : TBackusNaurRule);
+    Procedure SimpleExpression(Const R : TBackusNaurRule);
+    Procedure Term(Const R : TBackusNaurRule);
+    Procedure Literal(Const R : TBackusNaurRule);
+    Function  CharRef(Const R : TBackusNaurRule) : Boolean;
+    Function  LiteralChar(Const R : TBackusNaurRule) : Boolean;
+    Function  DecChar(Const R : TBackusNaurRule) : Boolean;
+    Function  HexChar(Const R : TBackusNaurRule) : Boolean;
     Procedure Terminator;
     Procedure LineEnd;
     procedure SemiColon;
@@ -75,7 +75,7 @@ Type
     Procedure TokenizeStream;
     Procedure ParseTokens;
     Procedure EatLineEnds;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
     Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     procedure TidyUpEmptyElements;
@@ -131,18 +131,16 @@ Resourcestring
   (** This is an error message for expecting a ; but one not found. **)
   strExpectedSemiColon = 'Expected '';'' but ''%s'' found at line %d column ' +
     '%d.';
-  (** This is an error message for an invalid hexidecimal character. **)
-  strInvalidHexCharRef = 'Invalid hexidecimal character reference ''%s'' at ' +
+  (** This is an error message for an invalid hexadecimal character. **)
+  strInvalidHexCharRef = 'Invalid hexadecimal character reference ''%s'' at ' +
     'line %d column %d.';
   (** This is an error message for an invalid decimal character. **)
   strInvalidDecCharRef = 'Invalid decimal character reference ''%s'' at line ' +
     '%d column %d.';
   (** This is an error message for a missing terminal character. **)
-  strMissingTerminalChar = 'Missing terminal character ''%s'' at line %d col' +
-  'umn %d.';
+  strMissingTerminalChar = 'Missing terminal character ''%s'' at line %d column %d.';
   (** This is an error message where a rule or literal is expected but not found. **)
-  strExpectedRuleOrLiteral = 'Expected rule or literal but ''%s'' found at l' +
-    'ine %d column %d.';
+  strExpectedRuleOrLiteral = 'Expected rule or literal but ''%s'' found at line %d column %d.';
   (** This is an error message where a rule is NULL. **)
   strNULLIdentifierFound = 'NULL Identifier ''%s'' found at line %d column %d.';
 
@@ -172,14 +170,14 @@ Const
   This method checks for a CharRef and return true one was found.
 
   @precon  T must be a valid instance of a TBackusNaurRule class.
-  @postcon Checks for a CharRef and return true one was found. Additionally,
-           the token is added to the BNF rule.
+  @postcon Checks for a CharRef and return true one was found. Additionally, the token is added to the 
+           BNF rule.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
   @return  a Boolean
 
 **)
-Function TBackusNaurModule.CharRef(R: TBackusNaurRule) : Boolean;
+Function TBackusNaurModule.CharRef(Const R: TBackusNaurRule) : Boolean;
 begin
   Result := DecChar(R);
   If Not Result Then
@@ -293,18 +291,18 @@ End;
 
 (**
 
-  This method checks the token to see if its a Decimal Character, if so adds it
-  to the rule and returns true.
+  This method checks the token to see if its a Decimal Character, if so adds it to the rule and returns 
+  true.
 
   @precon  R must be a valid instance of a TBackusNaurRule class.
-  @postcon Checks the token to see if its a Decimal Character, if so adds it
-           to the rule and returns true.
+  @postcon Checks the token to see if its a Decimal Character, if so adds it to the rule and returns 
+           true.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
   @return  a Boolean
 
 **)
-Function TBackusNaurModule.DecChar(R: TBackusNaurRule) : Boolean;
+Function TBackusNaurModule.DecChar(Const R: TBackusNaurRule) : Boolean;
 
 var
   i: Integer;
@@ -333,7 +331,7 @@ end;
   This is a destructor for the TBackusNaurModule class.
 
   @precon  None.
-  @postcon Fress the memory fo this instance.
+  @postcon Frees the memory of this instance.
 
 
 **)
@@ -361,17 +359,15 @@ end;
 
 (**
 
-  This method parsers an expression as a list and an optional a further
-  expression.
+  This method parsers an expression as a list and an optional a further expression.
 
-  @precon  R must be a valid instance of a TBNFFule class.
-  @postcon Parsers an expression as a list and an optional a further
-           expression.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
+  @postcon Parsers an expression as a list and an optional a further expression.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
 
 **)
-procedure TBackusNaurModule.Expression(R : TBackusNaurRule);
+procedure TBackusNaurModule.Expression(Const R : TBackusNaurRule);
 
 Var
   iTokens : Integer;
@@ -428,7 +424,7 @@ Var
   iLine : Integer;
   (** Current column number **)
   iColumn : Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
+  (** Token stream position. Fast to increment this than read the stream position. **)
   iStreamPos : Integer;
   (** Token line **)
   iTokenLine : Integer;
@@ -607,7 +603,7 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
+           Errors while providing declaration elements for browsing.
 
 **)
 procedure TBackusNaurModule.ParseTokens;
@@ -693,10 +689,10 @@ end;
   @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Processes the list of terms in the grammar.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
 
 **)
-procedure TBackusNaurModule.List(R : TBackusNaurRule);
+procedure TBackusNaurModule.List(Const R : TBackusNaurRule);
 
 Var
   StartToken : TTokenInfo;
@@ -736,13 +732,13 @@ end;
 
   This method parses literal tokens and adds them to the rule if found.
 
-  @precon  R must be a valid instance of a TBNDRule class.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Parses literal tokens and adds them to the rule if found.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
 
 **)
-procedure TBackusNaurModule.Literal(R: TBackusNaurRule);
+procedure TBackusNaurModule.Literal(Const R: TBackusNaurRule);
 begin
   If CharRef(R) Then
     Begin
@@ -762,18 +758,18 @@ end;
 
 (**
 
-  This method checks the token to see if its a single character literal and if
-  so adds it the rule and returns true.
+  This method checks the token to see if its a single character literal and if so adds it the rule and 
+  returns true.
 
-  @precon  R must be a valid instance of a TBNDRule class.
-  @postcon Checks the token to see if its a single character literal and if
-           so adds it the rule and returns true.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
+  @postcon Checks the token to see if its a single character literal and if so adds it the rule and 
+           returns true.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
   @return  a Boolean
 
 **)
-Function TBackusNaurModule.LiteralChar(R: TBackusNaurRule) : Boolean;
+Function TBackusNaurModule.LiteralChar(Const R: TBackusNaurRule) : Boolean;
 
 begin
   Result := (Token.TokenType In [ttSingleLiteral, ttDoubleLiteral]) And
@@ -902,17 +898,16 @@ End;
 
 (**
 
-  This method checks to see if the token is either one of the repeat tokens and
-  adds it to the rule if so.
+  This method checks to see if the token is either one of the repeat tokens and adds it to the rule if so
+  .
 
   @precon  R must be a valid instance of a TBackusNaurRule class.
-  @postcon Checks to see if the token is either one of the repeat tokens and
-           adds it to the rule if so.
+  @postcon Checks to see if the token is either one of the repeat tokens and adds it to the rule if so.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
 
 **)
-procedure TBackusNaurModule.RepeatOperator(R: TBackusNaurRule);
+procedure TBackusNaurModule.RepeatOperator(Const R: TBackusNaurRule);
 begin
   If (Token.Token = '*') Or (Token.Token = '+') Then
     AddToExpression(R);
@@ -925,10 +920,10 @@ end;
   @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Processes the Terms of the grammar.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
 
 **)
-procedure TBackusNaurModule.Term(R : TBackusNaurRule);
+procedure TBackusNaurModule.Term(Const R : TBackusNaurRule);
 var
   iCode: Integer;
 
@@ -1047,10 +1042,10 @@ end;
   @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Parsers a simple expression looking for an exception operator.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
 
 **)
-procedure TBackusNaurModule.SimpleExpression(R: TBackusNaurRule);
+procedure TBackusNaurModule.SimpleExpression(Const R: TBackusNaurRule);
 begin
   Term(R);
   If Token.Token = '-' Then
@@ -1103,11 +1098,11 @@ End;
 
   This method is the starting position for the parsing of an backus-naur
   module. It finds the first non comment token and begins the grammar checking
-  from their by deligating Syntax.
+  from their by delegating Syntax.
 
   @precon  None.
   @postcon It finds the first non comment token and begins the grammar checking
-           from their by deligating Syntax.
+           from their by delegating Syntax.
 
 **)
 procedure TBackusNaurModule.Goal;
@@ -1150,18 +1145,18 @@ end;
 
 (**
 
-  This method checks the token to see if its a Hexidecimal Character, if so adds it
-  to the rule and returns true.
+  This method checks the token to see if its a Hexadecimal Character, if so adds it to the rule and 
+  returns true.
 
   @precon  R must be a valid instance of a TBackusNaurRule class.
-  @postcon Checks the token to see if its a Hexidecimal Character, if so adds it
-           to the rule and returns true.
+  @postcon Checks the token to see if its a Hexadecimal Character, if so adds it to the rule and returns
+           true.
 
-  @param   R as a TBackusNaurRule
+  @param   R as a TBackusNaurRule as a constant
   @return  a Boolean
 
 **)
-Function TBackusNaurModule.HexChar(R: TBackusNaurRule) : Boolean;
+Function TBackusNaurModule.HexChar(Const R: TBackusNaurRule) : Boolean;
 
 var
   i: Integer;

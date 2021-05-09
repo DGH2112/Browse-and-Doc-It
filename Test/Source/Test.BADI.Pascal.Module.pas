@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 59.370
-  @Date    08 May 2021
+  @Version 59.520
+  @Date    09 May 2021
 
   @nocheck HardCodedString HardCodedInteger HardCodedNumber
 
@@ -826,6 +826,49 @@ Begin
     [
       'Implemented Methods\Hello|Procedure Hello|scPrivate',
       'Implemented Methods\Hello2|Procedure Hello2|scPrivate'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  asm'#13#10 +
+    '      MOV   EDX, Colors '#13#10 +
+    '      MOV   ECX, Count '#13#10 +
+    '      DEC   ECX '#13#10 +
+    '      JS    @@END '#13#10 +
+    '      LEA   EAX, SysInfo '#13#10 +
+    '      CMP   [EAX].TSystemInfo.wProcessorLevel, 3 '#13#10 +
+    '      JE    @@386 '#13#10 +
+    '@@1:  MOV   EAX, [EDX+ECX*4] '#13#10 +
+    '      BSWAP EAX '#13#10 +
+    '      SHR   EAX,8 '#13#10 +
+    '      MOV   [EDX+ECX*4],EAX '#13#10 +
+    '      DEC   ECX '#13#10 +
+    '      JNS   @@1 '#13#10 +
+    '      JMP   @@END '#13#10 +
+    '@@386: '#13#10 +
+    '      PUSH  EBX '#13#10 +
+    '@@2:  XOR   EBX,EBX '#13#10 +
+    '      MOV   EAX, [EDX+ECX*4] '#13#10 +
+    '      MOV   BH, AL '#13#10 +
+    '      MOV   BL, AH '#13#10 +
+    '      SHR   EAX,16 '#13#10 +
+    '      SHL   EBX,8 '#13#10 +
+    '      MOV   BL, AL '#13#10 +
+    '      MOV   [EDX+ECX*4],EBX '#13#10 +
+    '      DEC   ECX '#13#10 +
+    '      JNS   @@2 '#13#10 +
+    '      POP   EBX '#13#10 +
+    '  @@END: '#13#10 +
+    '  end;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
     ]
   );
 End;

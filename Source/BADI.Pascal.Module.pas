@@ -3,8 +3,8 @@
   Object Pascal Module : A unit to tokenise Pascal source code.
 
   @Author  David Hoyle
-  @Version 4.230
-  @Date    08 May 2021
+  @Version 4.231
+  @Date    09 May 2021
 
   @license
 
@@ -801,7 +801,7 @@ Begin
     Begin
       Repeat
         NextNonCommentToken;
-      Until (Token.UToken = strEND) And (PrevToken.Token <> '@@');
+      Until (Token.UToken = strEND) And (PrevToken.Token <> '@');
       NextNonCommentToken;
     End;
 End;

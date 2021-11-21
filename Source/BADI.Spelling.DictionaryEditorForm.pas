@@ -43,7 +43,6 @@ Uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
-  System.ImageList,
   Vcl.ImgList;
 
 Type

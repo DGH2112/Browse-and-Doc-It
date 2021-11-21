@@ -3,8 +3,8 @@
   DFMModule : A unit to tokenise DFM code.
 
   @Author  David Hoyle
-  @Version 1.880
-  @Date    06 May 2021
+  @Version 1.882
+  @Date    21 Nov 2021
 
   @license
 
@@ -312,7 +312,7 @@ end;
 function TDFMModule.DFMObject(Const Container : TElementContainer): Boolean;
 
 Const
-  astrObjects : TArray<String> = ['inherited', 'inline', 'object'];
+  astrObjects : Array[0..2] Of String = ('inherited', 'inline', 'object');
   strINHERITED = 'INHERITED';
   strINLINE = 'INLINE';
   strEND = 'END';

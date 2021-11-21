@@ -3,8 +3,8 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 20.836
-  @Date    12 Sep 2020
+  @Version 20.838
+  @Date    21 Nov 2021
 
   @license
 
@@ -1370,8 +1370,7 @@ Begin
   Try
     iniFile.ReadSection(strCommentTagNamesINISection, sl);
     For strTagName In sl Do
-      FCommentTagNames.AddPair(
-        strTagName,
+      FCommentTagNames.Add(strTagName + '=' +  
         iniFile.ReadString(strCommentTagNamesINISection, strTagName, strDefaultTagName)
       );
   Finally
@@ -2394,7 +2393,7 @@ Begin
   If iIndex > -1 Then
     FCommentTagNames.Values[strExt] := strValue
   Else
-    FCommentTagNames.AddPair(strExt, strValue);
+    FCommentTagNames.Add(strExt + '=' + strValue);
 End;
 
 (**

@@ -4,8 +4,8 @@
   can react to Them changes in RAD Studio 10.2.2 and above.
 
   @Author  David Hoyle
-  @Version 1.001
-  @Date    19 Sep 2020
+  @Version 1.004
+  @Date    21 Nov 2021
 
   @license
 
@@ -38,7 +38,7 @@ Uses
 
 {$INCLUDE CompilerDefinitions.inc}
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Type
   (** A class which implements the INTAIDEThemingServicesNotifier interface. **)
   TBADIIDEThemeNotifier = Class(TInterfacedObject, IUnknown, IOTANotifier,
@@ -58,16 +58,16 @@ Type
     Constructor Create(Const ThemeFormProc : TNotifyEvent);
     Destructor Destroy; Override;
   End;
-{$ENDIF}
+{$ENDIF RS102}
 
 Implementation
 
 {$IFDEF DEBUG}
 Uses
   CodeSiteLogging;
-{$ENDIF}
+{$ENDIF DEBUG}
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 
 (**
 
@@ -191,7 +191,7 @@ Procedure TBADIIDEThemeNotifier.Modified;
 
 Begin
 End;
-{$ENDIF}
+{$ENDIF RS102}
 
 End.
 

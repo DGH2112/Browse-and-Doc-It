@@ -10,6 +10,7 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
   Font.Style = []
   ParentFont = False
   TabOrder = 0
+  PixelsPerInch = 96
   object pnlFugePanel: TPanel
     Left = 0
     Top = 0
@@ -54,35 +55,37 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
       OnGetText = vstExclusionsGetText
       OnPaintText = vstExclusionsPaintText
       OnMouseDown = vstExclusionsMouseDown
+      Touch.InteractiveGestures = [igPan, igPressAndTap]
+      Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
       Columns = <
         item
           Position = 0
-          Width = 105
-          WideText = 'RegEx Pattern'
+          Text = 'RegEx Pattern'
+          Width = 109
         end
         item
           Alignment = taCenter
           Position = 1
+          Text = 'Doc Conflicts'
           Width = 75
-          WideText = 'Doc Conflicts'
         end
         item
           Alignment = taCenter
           Position = 2
+          Text = 'Metrics'
           Width = 75
-          WideText = 'Metrics'
         end
         item
           Alignment = taCenter
           Position = 3
+          Text = 'Checks'
           Width = 75
-          WideText = 'Checks'
         end
         item
           Alignment = taCenter
           Position = 4
+          Text = 'Spelling'
           Width = 75
-          WideText = 'Spelling'
         end>
     end
     object btnAdd: TButton

@@ -16,6 +16,7 @@ object frameModuleExplorer: TframeModuleExplorer
   TabOrder = 0
   TabStop = True
   OnEnter = FrameEnter
+  PixelsPerInch = 96
   object stbStatusBar: TStatusBar
     Left = 0
     Top = 391

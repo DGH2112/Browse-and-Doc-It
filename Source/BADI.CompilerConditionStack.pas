@@ -3,8 +3,8 @@
   This module contains a class to handle compiler definition information as a stack.
 
   @Author  David Hoyle
-  @Version 1.477
-  @Date    06 May 2021
+  @Version 1.481
+  @Date    21 Nov 2021
 
   @license
 
@@ -59,9 +59,11 @@ Type
 Implementation
 
 uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   System.TypInfo,
-  BADI.ResourceStrings,
-  CodeSiteLogging;
+  BADI.ResourceStrings;
 
 (**
 

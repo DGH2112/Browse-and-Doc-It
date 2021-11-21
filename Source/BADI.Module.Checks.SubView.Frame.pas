@@ -50,7 +50,7 @@ Uses
   PlatformDefaultStyleActnCtrls,
   ActnPopup,
   ExtCtrls,
-  ImgList, System.ImageList;
+  ImgList;
 
 Type
   (** A frame to display the module checks in a sub-view. **)

@@ -3,8 +3,8 @@
   This module contains a class which implements the INTAEditViewNotifier for drawing on the editor.
 
   @Author  David Hoyle
-  @Version 6.456
-  @Date    19 Dec 2020
+  @Version 6.458
+  @Date    21 Nov 2021
   
   @license
 
@@ -43,7 +43,7 @@ Uses
 
 {$INCLUDE CompilerDefinitions.inc}
 
-{$IFDEF DXE100}
+{$IFDEF RS100}
 Type
   (** A class which implements the INTAEditViewNotifier for drawing on the editor. **)
   TBADIEditViewNotifier = Class(TNotifierObject, INTAEditViewNotifier)
@@ -96,14 +96,14 @@ Type
     Destructor Destroy; Override;
     Class Procedure ForceFullRepaint;
   End;
-{$ENDIF DXE100}
+{$ENDIF RS100}
 
 Implementation
 
 Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF DEBUG}
   System.SysUtils,
   System.StrUtils,
   Vcl.Controls,
@@ -114,7 +114,7 @@ Uses
   BADI.Functions,
   BADI.Constants;
 
-{$IFDEF DXE100}
+{$IFDEF RS100}
 Const
   (** A constant for the name of the IDE Edit Control. **)
   strTEditControlClsName = 'TEditControl';
@@ -677,7 +677,7 @@ Begin
     End;
 End;
 
-{$ENDIF DXE100}
+{$ENDIF RS100}
 
 End.
 

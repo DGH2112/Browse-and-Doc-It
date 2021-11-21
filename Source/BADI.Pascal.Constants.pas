@@ -4,8 +4,8 @@
   sub-classes.
 
   @Author  David Hoyle
-  @Version 1.001
-  @Date    19 Sep 2020
+  @Version 1.026
+  @Date    21 Nov 2021
 
   @license
 
@@ -70,8 +70,12 @@ Const
   );
   (** A list of reserved words which are allows to be used as identifiers. **)
   strIdentifierReservedWords : Array[0..5] Of String = (
-    'for', 'on', 'out', { 'private', 'protected', 'public', 'published', } 'reference', 'sealed',
-    { 'strict', } 'unsafe'
+    'for',
+    'on',
+    'out',
+    'reference',
+    'sealed',
+    'unsafe'
   );
   (** A sorted list of directives. Used for identifying tokens as
   directives. **)
@@ -88,7 +92,7 @@ Const
   (** A list of string representing the types of modules. **)
   strModuleTypes : Array[mtProgram..mtUnit] Of String = ('Program', 'Package',
     'Library', 'Unit');
-  (** A list of strings representing the stricted scope types. **)
+  (** A list of strings representing the strict scope types. **)
   strStrictedScope : Array[scPrivate..scProtected] Of String = ('private',
     'protected');
   (** A list of strings representing the scope types. **)

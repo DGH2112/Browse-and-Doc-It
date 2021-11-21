@@ -4,8 +4,8 @@
   a dialogue for setting those options.
 
   @Author  David Hoyle
-  @Version 1.014
-  @Date    19 Sep 2020
+  @Version 1.016
+  @Date    21 Nov 2021
 
   @license
 
@@ -47,9 +47,9 @@ Uses
   ExtCtrls,
   CheckLst,
   ImgList,
-  {$IFDEF DXE100}
+  {$IFDEF RS100}
   ImageList,
-  {$ENDIF}
+  {$ENDIF RS100}
   {$WARN UNIT_PLATFORM OFF} // For the FileCtrl unit
   FileCtrl,
   {$WARN UNIT_PLATFORM ON}

@@ -4,8 +4,8 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 2.175
-  @Date    19 Dec 2020
+  @Version 2.184
+  @Date    21 Nov 2021
   
   @license
 
@@ -44,9 +44,9 @@ Type
   TBADISourceEditorNotifier = Class(TNotifierObject, IInterface, IOTANotifier, IOTAEditorNotifier)
   Strict Private
     FFileName              : String;
-    {$IFDEF DXE100}
+    {$IFDEF RS100}
     FEditViewNotifierIndex : Integer;
-    {$ENDIF DXE100}
+    {$ENDIF RS100}
     FView                  : IOTAEditView;
   Strict Protected
     procedure InstallEditViewNotifier(const View: IOTAEditView);
@@ -89,9 +89,9 @@ Begin
   CodeSite.Send(csmGreen, 'TBADISourceEditorNotifier.Create', ExtractFileName(FFileName)); }
   {$ENDIF CODESITE}
   {$ENDIF DEBUG}
-  {$IFDEF DXE100}
+  {$IFDEF RS100}
   FEditViewNotifierIndex := -1;
-  {$ENDIF DXE100}
+  {$ENDIF RS100}
   FView := Nil;
   // Workaround for new modules create after the IDE has started
   If SE.EditViewCount > 0 Then
@@ -131,11 +131,13 @@ Procedure TBADISourceEditorNotifier.InstallEditViewNotifier(Const View: IOTAEdit
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InstallEditViewNotifier', tmoTiming);{$ENDIF}
+  {$IFDEF RS100}
   If FEditViewNotifierIndex = - 1 Then
     Begin
       FView := View;
       FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create(FFileName));
     End;
+  {$ENDIF RS100}
 End;
 
 (**
@@ -152,11 +154,13 @@ Procedure TBADISourceEditorNotifier.UninstallEditViewNotifier(Const View: IOTAEd
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallEditViewNotifier', tmoTiming);{$ENDIF}
+  {$IFDEF RS100}
   If FEditViewNotifierIndex > - 1 Then
     Begin
       View.RemoveNotifier(FEditViewNotifierIndex);
       FEditViewNotifierIndex := - 1;
     End;
+  {$ENDIF RS100}
 End;
 
 (**
@@ -195,7 +199,7 @@ Procedure TBADISourceEditorNotifier.ViewNotification(Const View: IOTAEditView; O
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ViewNotification', tmoTiming);{$ENDIF}
-  {$IFDEF DXE100}
+  {$IFDEF RS100}
   If Assigned(View) Then
     Begin
       Case Operation Of
@@ -203,7 +207,7 @@ Begin
         opRemove: UninstallEditViewNotifier(View);
       End;
     End;
-  {$ENDIF DXE100}
+  {$ENDIF RS100}
 End;
 
 End.

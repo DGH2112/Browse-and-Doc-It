@@ -42,7 +42,6 @@ Uses
   Vcl.Forms,
   Vcl.Dialogs,
   BADI.CustomOptionsFrame,
-  System.ImageList,
   Vcl.ImgList,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,

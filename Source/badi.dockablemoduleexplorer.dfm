@@ -13,7 +13,6 @@ object frmDockableModuleExplorer: TfrmDockableModuleExplorer
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   ShowHint = True
   PixelsPerInch = 96
   TextHeight = 16

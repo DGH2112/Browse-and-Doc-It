@@ -3,8 +3,8 @@
   This module contains a frame for displaying module methods and their metrics.
 
   @Author  David Hoyle
-  @Version 1.313
-  @Date    06 Sep 2020
+  @Version 1.321
+  @Date    21 Nov 2021
 
   @license
 
@@ -58,7 +58,7 @@ Uses
   Themes,
   BADI.Types,
   BADI.CustomVirtualStringTree,
-  UITypes, System.ImageList;
+  UITypes;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -135,10 +135,10 @@ Type
     FAtLimit       : Integer;
     FOverLimit     : Integer;
     FVSTMetrics    : TBADIEditorViewVirtualStringTree;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FThemingServicesNotifierIndex : Integer;
     FStyleServices : TCustomStyleServices;
-    {$ENDIF}
+    {$ENDIF RS102}
   Strict Protected
     Procedure vstStatisticsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       TextType: TVSTTextType; Var CellText: String);
@@ -226,7 +226,7 @@ Implementation
 Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF CODESITE}
   BADI.ResourceStrings,
   BADI.Options,
   BADI.Functions,
@@ -574,10 +574,10 @@ End;
 **)
 Constructor TframeBADIModuleMetricsEditorView.Create(AOwner: TComponent);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
 
 Begin
   Inherited Create(AOwner);
@@ -585,11 +585,11 @@ Begin
   FVSTMetrics.NodeDataSize := SizeOf(TBADIMetricRecord);
   LoadBADIImages(ilScopeImages);
   HookStyleServices(Nil);
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(HookStyleServices));
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 (**
@@ -717,17 +717,17 @@ End;
 **)
 Destructor TframeBADIModuleMetricsEditorView.Destroy;
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
 
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If FThemingServicesNotifierIndex > -1 Then
       ITS.RemoveNotifier(FThemingServicesNotifierIndex);
-  {$ENDIF}
+  {$ENDIF RS102}
   Inherited Destroy;
 End;
 
@@ -918,13 +918,13 @@ End;
 **)
 Procedure TframeBADIModuleMetricsEditorView.HookStyleServices(Sender : TObject);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
 
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
@@ -932,7 +932,7 @@ Begin
         FStyleServices := ITS.StyleServices;
         ITS.ApplyTheme(Self);
       End;
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 (**
@@ -1278,10 +1278,10 @@ Var
 Begin
   NodeData := FVSTMetrics.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Assigned(FStyleServices) Then
     TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
-  {$ENDIF}
+  {$ENDIF RS102}
   Case TBADIMetricColumn(Column) Of
     mcLength: TargetCanvas.Brush.Color := Colour(NodeData.FMetrics[mmLongMethods],
       FLimits.FMetrics[mmLongMethods]);
@@ -1489,10 +1489,10 @@ Var
 Begin
   TargetCanvas.Font.Style := [];
   TargetCanvas.Font.Color := clWindowText;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Assigned(FStyleServices) Then
     TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
-  {$ENDIF}
+  {$ENDIF RS102}
   Case TBADIMetricColumn(Column) Of
     mcLength..mcToxicity: TargetCanvas.Font.Color := clBlack;
   End;

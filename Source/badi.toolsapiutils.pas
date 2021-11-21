@@ -4,8 +4,8 @@
   throughout this project.
 
   @Author  David Hoyle
-  @Version 1.724
-  @Date    19 Sep 2020
+  @Version 1.728
+  @Date    21 Nov 2021
 
   @license
 
@@ -81,7 +81,7 @@ Implementation
 Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF DEBUG}
   Character;
 
 Const
@@ -143,17 +143,17 @@ End;
 **)
 Class Procedure TBADIToolsAPIFunctions.ApplyTheming(Const Component: TComponent);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF DXE102}
+{$ENDIF RS102}
   
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       ITS.ApplyTheme(Component);
-  {$ENDIF DXE102}
+  {$ENDIF RS102}
 End;
 
 (**
@@ -367,7 +367,7 @@ Begin
   Writer.Insert(PAnsiChar(strText));
   {$ELSE}
   Writer.Insert(PAnsiChar(UTF8Encode(strText)));
-  {$ENDIF}
+  {$ENDIF D2009}
 End;
 
 (**
@@ -737,29 +737,29 @@ End;
 Class Procedure TBADIToolsAPIFunctions.RegisterFormClassForTheming(Const AFormClass : TCustomFormClass;
   Const Component : TComponent = Nil);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
-  {$IFDEF DXE104} // Breaking change to the Open Tools API - They fixed the wrongly defined interface
+  {$IFDEF RS104} // Breaking change to the Open Tools API - They fixed the wrongly defined interface
   ITS : IOTAIDEThemingServices;
   {$ELSE}
   ITS : IOTAIDEThemingServices250;
-  {$ENDIF DXE104}
-{$ENDIF DXE102}
+  {$ENDIF RS104}
+{$ENDIF RS102}
   
 Begin
-  {$IFDEF DXE102}
-  {$IFDEF DXE104}
+  {$IFDEF RS102}
+  {$IFDEF RS104}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
   {$ELSE}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices250, ITS) Then
-  {$ENDIF DXE104}
+  {$ENDIF RS104}
     If ITS.IDEThemingEnabled Then
       Begin
         ITS.RegisterFormClass(AFormClass);
         If Assigned(Component) Then
           ITS.ApplyTheme(Component);
       End;
-  {$ENDIF DXE102}
+  {$ENDIF RS102}
 End;
 
 (**

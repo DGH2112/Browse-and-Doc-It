@@ -3,8 +3,8 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Version 1.361
-  @Date    19 Sep 2020
+  @Version 1.367
+  @Date    21 Nov 2021
 
   @license
 
@@ -60,9 +60,9 @@ Type
   TfrmDockableModuleExplorer = Class(TDockableForm)
   Strict Private
     FModuleExplorerFrame: TframeModuleExplorer;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FIDEThemingServciesNotifierIndex : Integer;
-    {$ENDIF}
+    {$ENDIF RS102}
   Strict Protected
     Class Procedure ShowDockableForm(Const Form: TfrmDockableModuleExplorer);
     Class Procedure CreateDockableForm(Var FormVar: TfrmDockableModuleExplorer;
@@ -97,7 +97,7 @@ Implementation
 Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF CODESITE}
   DeskUtil,
   ToolsAPI,
   BADI.ToolsAPIUtils;
@@ -122,10 +122,10 @@ Var
 **)
 Constructor TfrmDockableModuleExplorer.Create(AOwner: TComponent);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
   
 Begin
   Inherited Create(AOwner);
@@ -136,10 +136,10 @@ Begin
   FModuleExplorerFrame.Parent := Self;
   FModuleExplorerFrame.Align := alClient;
   ThemeForm(Nil);
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     FIDEThemingServciesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(ThemeForm))
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 (**
@@ -187,16 +187,16 @@ End;
 **)
 Destructor TfrmDockableModuleExplorer.Destroy;
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
   
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     ITS.RemoveNotifier(FIDEThemingServciesNotifierIndex);
-  {$ENDIF}
+  {$ENDIF RS102}
   FModuleExplorerFrame.Free;
   SaveStateNecessary := True;
   Inherited;
@@ -439,9 +439,9 @@ End;
 Procedure TfrmDockableModuleExplorer.ThemeForm(Sender : TObject);
 
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDockableModuleExplorer, Self);
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 (**

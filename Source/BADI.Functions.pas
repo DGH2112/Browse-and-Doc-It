@@ -2,9 +2,9 @@
 
   This method contains functions that are used global through out the application.
 
-  @Version 1.084
+  @Version 1.093
   @Author  David Hoyle.
-  @Date    12 Jul 2020
+  @Date    21 Nov 2021
 
   @license
 
@@ -276,7 +276,7 @@ var
 // Delphi 7s SHFolder.pas file is missing this constant.
 Const
   SHGFP_TYPE_CURRENT = 0; { current value for user, verify it exists }
-{$ENDIF}
+{$ENDIF D0007}
 
 begin
   SetLength(strBuffer, MAX_PATH);
@@ -358,9 +358,9 @@ Begin
   SetLength(Result, i);
 End;
 
-{$IFNDEF DXE102}
+{$IFNDEF RS102}
 {$WARN NO_RETVAL OFF}
-{$ENDIF}
+{$ENDIF RS102}
 (**
 
   This function converts a freeform text string representing dates and times
@@ -387,7 +387,7 @@ Const
   Delimiters : Set Of Char = ['-', ' ', '\', '/', ':', '.'];
   {$ELSE}
   Delimiters : Set Of AnsiChar = ['-', ' ', '\', '/', ':', '.'];
-  {$ENDIF}
+  {$ENDIF D2009}
   Days : Array[1..7] Of String = ('fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed');
   Months : Array[1..24] Of String = (
     'apr', 'april',
@@ -486,7 +486,7 @@ Var
         If ShortDateFormat[j] In Delimiters Then
         {$ELSE}
         If CharInSet({$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat[j], Delimiters) Then
-        {$ENDIF}
+        {$ENDIF D2009}
           AddToken(slFormat, str)
         Else
           str := str + {$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat[j];
@@ -497,7 +497,7 @@ Var
         If (slFormat[j][1] In ['d', 'D']) And (Length(slFormat[j]) > 2) Then
         {$ELSE}
         If (CharInSet(slFormat[j][1], ['d', 'D'])) And (Length(slFormat[j]) > 2) Then
-        {$ENDIF}
+        {$ENDIF D2009}
           slFormat.Delete(j);
       For j := 0 To slFormat.Count - 1 Do
         Begin
@@ -505,19 +505,19 @@ Var
           If slFormat[j][1] In ['d', 'D'] Then
           {$ELSE}
           If CharInSet(slFormat[j][1], ['d', 'D']) Then
-          {$ENDIF}
+          {$ENDIF D2009}
             iIndex0 := j;
           {$IFNDEF D2009}
           If slFormat[j][1] In ['m', 'M'] Then
           {$ELSE}
           If CharInSet(slFormat[j][1], ['m', 'M']) Then
-          {$ENDIF}
+          {$ENDIF D2009}
             iIndex1 := j;
           {$IFNDEF D2009}
           If slFormat[j][1] In ['y', 'Y'] Then
           {$ELSE}
           If CharInSet(slFormat[j][1], ['y', 'Y']) Then
-          {$ENDIF}
+          {$ENDIF D2009}
             iIndex2 := j;
         End;
     Finally
@@ -562,14 +562,14 @@ Begin
       If strDate[i] In Delimiters Then
       {$ELSE}
       If CharInSet(strDate[i], Delimiters) Then
-      {$ENDIF}
+      {$ENDIF D2009}
         Begin
           AddToken(sl, strToken);
           {$IFNDEF D2009}
           If (strDate[i] In [':']) And (iTime = -1) Then
           {$ELSE}
           If (CharInSet(strDate[i], [':'])) And (iTime = -1) Then
-          {$ENDIF}
+          {$ENDIF D2009}
             iTime := sl.Count - 1;
         End Else
           strToken := strToken + strDate[i];
@@ -639,9 +639,9 @@ Begin
     sl.Free;
   End;
 End;
-{$IFNDEF DXE102}
+{$IFNDEF RS102}
 {$WARN NO_RETVAL ON}
-{$ENDIF}
+{$ENDIF RS102}
 
 (**
 

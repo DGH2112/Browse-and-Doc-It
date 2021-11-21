@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 2.506
-  @Date    03 May 2021
+  @Version 2.528
+  @Date    21 Nov 2021
 
   @license
 
@@ -428,6 +428,9 @@ Const
   {$IFDEF VER340} // Delphi XE10.4 Denali
   strCompilerVersion = 'VER340';
   {$ENDIF}
+  {$IFDEF VER350} // Delphi 11.0 Alexandria
+  strCompilerVersion = 'VER350';
+  {$ENDIF}
   {$IFNDEF D0001}
     {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
   {$ENDIF}
@@ -602,9 +605,9 @@ begin
             TfrmDockableModuleExplorer.FollowEditorCursor(EditorSvcs.TopView.CursorPos.Line);
       If Assigned(EditorSvcs.TopView) Then
         Begin
-          {$IFDEF DXE100}
+          {$IFDEF RS100}
           TBADIEditViewNotifier.ForceFullRepaint;
-          {$ENDIF DXE100}
+          {$ENDIF RS100}
           EditorSvcs.TopView.Paint;
         End;
     End;
@@ -677,7 +680,7 @@ Const
 Var
   MS: IOTAModuleServices;
   P: IOTAProject;
-  
+
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateProjectDictionary', tmoTiming);{$ENDIF}
   If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then

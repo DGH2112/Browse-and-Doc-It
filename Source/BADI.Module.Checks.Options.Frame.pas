@@ -4,8 +4,8 @@
   to select the metrics and checks they wish to display.
 
   @Author  David Hoyle
-  @Version 1.006
-  @Date    19 Sep 2020
+  @Version 1.010
+  @Date    21 Nov 2021
 
   @license
 
@@ -63,9 +63,9 @@ Type
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     FVSTChecks : TBADIChecksOptionsVirtualStringTree;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FStyleServices: TCustomStyleServices;
-    {$ENDIF}
+    {$ENDIF RS102}
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -82,7 +82,7 @@ Implementation
 Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF CODESITE}
   ToolsAPI,
   BADI.Types,
   BADI.Constants,
@@ -126,19 +126,19 @@ Var
   eCheckSubOp: TBADIModuleCheckSubOp;
   N, S : PVirtualNode;
   NodeData : PCheckNodeData;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   ITS : IOTAIDEThemingServices;
-  {$ENDIF}
+  {$ENDIF RS102}
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(AOwner);
   CreateVirtualStringTree;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     FStyleServices := ITS.StyleServices;
-  {$ENDIF}
+  {$ENDIF RS102}
   FVSTChecks.NodeDataSize := SizeOf(TCheckNodeData);
   For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
     Begin
@@ -454,10 +454,10 @@ Procedure TframeBADIModuleChecksOptions.vstChecksPaintText(Sender: TBaseVirtualT
 
 Begin
   TargetCanvas.Font.Color := clWindowText;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Assigned(FStyleServices) Then
     TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 End.

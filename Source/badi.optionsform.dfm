@@ -13,13 +13,12 @@ object frmOptions: TfrmOptions
   Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  PixelsPerInch = 96
   DesignSize = (
     860
     562)
-  PixelsPerInch = 96
   TextHeight = 16
   object OptionTab: TPageControl
     Left = 10
@@ -31,58 +30,30 @@ object frmOptions: TfrmOptions
     TabOrder = 0
     object tabGeneralOptions: TTabSheet
       Caption = 'General Options'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tabSpecialTags: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tabModuleExplorer: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tabCodeBrowsing: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tabMenuShortcuts: TTabSheet
       Caption = 'Menu Shortcuts'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tabModuleExtensions: TTabSheet
       Caption = 'Module Extensions'

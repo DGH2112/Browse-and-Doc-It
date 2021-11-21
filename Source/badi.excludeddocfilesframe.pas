@@ -3,9 +3,9 @@
   This module contains a class which represents a frame interface for excluded document
   files.
 
-  @Version 1.036
+  @Version 1.045
   @Author  David Hoyle
-  @Date    19 Sep 2020
+  @Date    21 Nov 2021
 
   @license
 
@@ -50,7 +50,7 @@ Uses
   Generics.Collections,
   BADI.Types,
   BADI.Exclusions,
-  BADI.CustomOptionsFrame, System.ImageList;
+  BADI.CustomOptionsFrame;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -81,9 +81,9 @@ Type
       Shift: TShiftState);
   Strict Private
     FExclusions : TList<TBADIExclusionRec>;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FStyleServices : TCustomStyleServices;
-    {$ENDIF}
+    {$ENDIF RS102}
     FCallBackProc : TInputCloseQueryFunc;
     FSelectedItem : String;
   Strict Protected
@@ -104,10 +104,10 @@ Implementation
 Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF DEBUG}
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  {$ENDIF}
+  {$ENDIF STANDALONEAPP}
   RegularExpressions,
   RegularExpressionsCore,
   BADI.Base.Module,
@@ -227,11 +227,11 @@ End;
 Constructor TfmBADIExcludedDocFilesFrame.Create(AOwner: TComponent);
 
 {$IFNDEF STANDALONEAPP}
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
-{$ENDIF}
+{$ENDIF RS102}
+{$ENDIF STANDALONEAPP}
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
@@ -239,13 +239,13 @@ Begin
   FExclusions := TList<TBADIExclusionRec>.Create;
   vstExclusions.NodeDataSize := SizeOf(TBADIExclusionNode);
   {$IFNDEF STANDALONEAPP}
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       FStyleServices := ITS.StyleServices;
-  {$ENDIF}
-  {$ENDIF}
+  {$ENDIF RS102}
+  {$ENDIF STANDALONEAPP}
   FCallBackProc := 
     Function(Const astrPatterns : Array Of String) : Boolean
     ResourceString
@@ -411,10 +411,10 @@ Begin
     efSpelling:     TargetCanvas.Brush.Color := Colour[etSpelling      In recExclusion.FExclusions];
   Else
     TargetCanvas.Brush.Color := clWindow;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     If Assigned(FStyleServices) Then
       TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
-    {$ENDIF}
+    {$ENDIF RS102}
   End;
   TargetCanvas.FillRect(CellRect);
 End;
@@ -586,10 +586,10 @@ Begin
   Case TBADIExclusionField(Column) Of
     efDocConflicts..efSpelling: TargetCanvas.Font.Color := clBlack;
   Else
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     If Assigned(FStyleServices) Then
       TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
-    {$ENDIF}
+    {$ENDIF RS102}
   End;
 End;
 

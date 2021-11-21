@@ -1,5 +1,4 @@
-Contributing to Browse and Doc it
-=================================
+# Contributing to Browse and Doc it
 
 Please try and follows the things that are layed out below as it will make it easier to accept a pull request however not following the below does not necessarily exclude a pull request from being accepted.
 
@@ -13,21 +12,21 @@ Tools wise, I generally use [SourceTree](https://www.sourcetreeapp.com/) but tha
 
 Having not done this before as I've always been the sole contributor to my repositories so I borrowed the essense of the following from the [DUnitX](https://github.com/VSoftTechnologies/DUnitX) project:
 
-1. Create a GitHub Account (https://github.com/join);
+1. Create a [GitHub Account](https://github.com/join);
 2. Fork the [Browse and Doc It](https://www.davidghoyle.co.uk/WordPress/?page_id=872)
    Repository and setup your local repository as follows:
-     * Fork the repository (https://help.github.com/articles/fork-a-repo);
+     * [Fork the repository](https://help.github.com/articles/fork-a-repo);
      * Clone your Fork to your local machine;
      * Configure upstream remote to the **Development**
-       [Browse and Doc It](https://www.davidghoyle.co.uk/WordPress/?page_id=872)
-       repository (https://github.com/DGH2112/Browse-and-Doc-It);
+       [Browse and Doc It Web Site](https://www.davidghoyle.co.uk/WordPress/?page_id=872)
+       repository [Browse and Doc It on GitHub](https://github.com/DGH2112/Browse-and-Doc-It);
 3. For each change you want to make:
      * Create a new **Feature** or **BugFix** branch for your change;
      * Make your change in your new branch;
      * **Verify code compiles for ALL supported RAD Studio version (see below) and unit tests still pass**;
      * Commit change to your local repository;
      * Push change to your remote repository;
-     * Submit a Pull Request (https://help.github.com/articles/using-pull-requests);
+     * Submit a [Pull Request](https://help.github.com/articles/using-pull-requests);
      * Note: local and remote branches can be deleted after pull request has been accepted.
 
 **Note:** Getting changes from others requires [Syncing your Local repository](https://help.github.com/articles/syncing-a-fork) with the **Development** [Browse and Doc It](https://www.davidghoyle.co.uk/WordPress/?page_id=872) repository. This can happen at any time.
@@ -36,7 +35,7 @@ Having not done this before as I've always been the sole contributor to my repos
 
 [Browse and Doc It](https://www.davidghoyle.co.uk/WordPress/?page_id=872) has 2 dependencies as follows:
 
-* Virtualtrees - This is implemented as a sub-module and it modified to allow IDE theming (https://github.com/DGH2112/Virtual-Treeview-6.5.0-IDE);
+* Virtualtrees - This is implemented as a sub-module and it modified to allow IDE theming [https://github.com/DGH2112/Virtual-Treeview-6.5.0-IDE](https://github.com/DGH2112/Virtual-Treeview-6.5.0-IDE);
 * SynEdit 2.1.0 - this is ONLY requested to compile and run the test projects which allows you to parse directories of code for testing.
 
 ## Project Configuration
@@ -61,4 +60,4 @@ There are reams more I could and should write but for now the above will have to
 
 regards
 
-David Hoyle Jun 2019.
+David Hoyle Nov 2021

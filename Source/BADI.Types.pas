@@ -3,15 +3,15 @@
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.1
-  @Date    21 Jun 2019
+  @Version 1.593
+  @Date    06 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,7 +68,9 @@ Type
     ttCommentText,
     ttTagHeaderText,
     ttTagText,
-    ttSearchHighlight
+    ttSearchHighlight,
+    ttLineHighlight,
+    ttDocIssueEditorText
   );
   (** An enumerate for the scoping of identifiers. **)
   TScope = (
@@ -91,6 +93,8 @@ Type
   TMethodType = (mtConstructor, mtDestructor, mtProcedure, mtFunction, mtOperator);
   (** An enumerate for warning and errors. **)
   TErrorType = (etHint, etWarning, etError);
+  (** An enumerate for the type of documentation conflict. **)
+  TBADIConflictType = (ctDocumentation, ctMetric, ctCheck, ctSpelling);
   (** A type to return an array of strings **)
   TKeyWords = Array of String;
   (** A type for a set of AnsiChar - used for the function IsInSet() **)
@@ -105,6 +109,8 @@ Type
     dogConflicts,
     dogChecks,
     dogMetrics,
+    dogSpelling,
+    dogDoNotFollow,
     dogTypes,
     dogModule,
     dogMethod,
@@ -113,38 +119,75 @@ Type
     dogMiscellaneous
   );
 
-  (** This is a list of options valable for the display of module information
-      **)
+  (** This is a list of options available for the display of module information **)
   TDocOption = (
     doCustomDrawing,
     doShowCommentHints,
     doShowChildCountInTitles,
+    doFollowEditorCursor,
+    doShowDocIssueTotalsInEditor,
+    doAutoUpdateModuleDate,
+    doAutoUpdateModuleVersion,
 
     doShowErrors,
     doExpandErrors,
     doSyntaxHighlightErrors,
+    doShowErrorIconsInEditor,
+    doShowErrorMsgsInEditor,
+    doShowIDEErrors,
 
     doShowWarnings,
     doExpandWarnings,
     doSyntaxHighlightWarnings,
+    doShowWarningIconsInEditor,
+    doShowWarningMsgsInEditor,
 
     doShowHints,
     doExpandHints,
     doSyntaxHighlightHints,
+    doShowHintIconsInEditor,
+    doShowHintMsgsInEditor,
 
     doShowConflicts,
     doExpandDocConflicts,
     doSyntaxHighlightConflict,
+    doShowConflictIconsInEditor,
+    doShowConflictMsgsInEditor,
 
     doShowChecks,
     doExpandChecks,
     doSyntaxHighlightChecks,
     doAutoHideChecksWithNoissues,
+    doShowCheckIconsInEditor,
+    doShowCheckMsgsInEditor,
 
     doShowMetrics,
     doExpandMetrics,
     doSyntaxHighlightMetrics,
     doAutoHideMetricsWithNoissues,
+    doShowMetricIconsInEditor,
+    doShowMetricMsgsInEditor,
+
+    doShowSpelling,
+    doExpandSpelling,
+    doSyntaxHighlightSpelling,
+    doAutoHideSpellingWithNoissues,
+    doShowSpellingIconsInEditor,
+    doShowSpellingMsgsInEditor,
+    doSpellCheckComments,
+    doSpellCheckTags,
+    doSpellCheckResourceStrings,
+    doSpellCheckConstants,
+    doSpellCheckLiterals,
+    doSpellCheckDFMLiterals,
+
+    doDoNotFollowEditorIfErrors,
+    doDoNotFollowEditorIfWarnings,
+    doDoNotFollowEditorIfHints,
+    doDoNotFollowEditorIfConflicts,
+    doDoNotFollowEditorIfChecks,
+    doDoNotFollowEditorIfMetrics,
+    doDoNotFollowEditorIfSpelling,
 
     doShowUndocumentedTypes,
     doShowUndocumentedRecords,
@@ -222,6 +265,83 @@ Type
     iiCheckIncorrect,
     iiCheckItem,
     iiCheckMissing,
+
+    iiRedWarning,
+    iiAmberWarning,
+    iiYellowWarning,
+    iiGreenWarning,
+    iiBlueWarning,
+
+    iiRedStop,
+    iiAmberStop,
+    iiYellowStop,
+    iiGreenStop,
+    iiBlueStop,
+
+    iiRedProhibited,
+    iiAmberProhibited,
+    iiYellowProhibited,
+    iiGreenProhibited,
+    iiBlueProhibited,
+
+    iiRedBug,
+    iiAmberBug,
+    iiYellowBug,
+    iiGreenBug,
+    iiBlueBug,
+
+    iiRedUpArrow,
+    iiAmberUpArrow,
+    iiYellowUpArrow,
+    iiGreenUpArrow,
+    iiBlueUpArrow,
+
+    iiRedRightArrow,
+    iiAmberRightArrow,
+    iiYellowRightArrow,
+    iiGreenRightArrow,
+    iiBlueRightArrow,
+
+    iiRedDownArrow,
+    iiAmberDownArrow,
+    iiYellowDownArrow,
+    iiGreenDownArrow,
+    iiBlueDownArrow,
+
+    iiRedLeftArrow,
+    iiAmberLeftArrow,
+    iiYellowLeftArrow,
+    iiGreenLeftArrow,
+    iiBlueLeftArrow,
+
+    iiRedBookmark,
+    iiAmberBookmark,
+    iiYellowBookmark,
+    iiGreenBookmark,
+    iiBlueBookmark,
+
+    iiRedTick,
+    iiAmberTick,
+    iiYellowTick,
+    iiGreenTick,
+    iiBlueTick,
+
+    iiRedToDoTick,
+    iiAmberToDoTick,
+    iiYellowToDoTick,
+    iiGreenToDoTick,
+    iiBlueToDoTick,
+
+    iiRedToDoCross,
+    iiAmberToDoCross,
+    iiYellowToDoCross,
+    iiGreenToDoCross,
+    iiBlueToDoCross,
+
+    iiSpellingFolder,
+    iiSpellingItem,
+
+    iiBadTag,
 
     iiUsesLabel,
     iiUsesItem,
@@ -379,7 +499,7 @@ Type
     FBufferPos : Integer;
   End;
 
-  (** This enumerate defermines the status of the token's reference resolution. **)
+  (** This enumerate determines the status of the token's reference resolution. **)
   TTokenReference = (trUnknown, trUnresolved, trResolved);
 
   (** A type of a set of Characters. **)
@@ -392,7 +512,7 @@ Type
     FConflictType : TDocConflictIcon;
   End;
 
-  (** This enumerate defind the type of information to find. **)
+  (** This enumerate defines the type of information to find. **)
   TFindType = (ftName, ftIdentifier);
 
   (** This is a type for a set of characters and the return type of several
@@ -431,13 +551,18 @@ Type
   TBADITokenFontInfoTokenSet = Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
 
   (** An enumerate to define the different types of issues to limit output for. **)
-  TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts, ltChecks, ltMetrics);
+  TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts, ltChecks, ltMetrics, ltSpelling);
+  (** A set of the above enumerates. **)
+  TLimitTypes = Set of TLimitType;
 
-  (** This emunerate descibed the different types of doc comment .**)
+  (** This enumerate described the different types of doc comment .**)
   TCommentStyle = (csBlock, csLine, csInSitu);
   (** An enumerate to define the type of comment output that can be generated by
-      WriteComment. **)
+      WriteComment. @nospellings **)
   TCommentType = (ctNone, ctPascalBlock, ctPascalBrace, ctCPPBlock, ctCPPLine, ctVBLine, ctXML);
+
+  (** A set of the above comment types. **)
+  TCommentTypes = Set Of TCommentType;
 
   (** A silent parser abort exception. **)
   EBADIParserAbort = Class(Exception);
@@ -462,6 +587,7 @@ Type
     bmRefactorConstant,
     bmBADIMetrics,
     bmBADIChecks,
+    bmBADISpelling,
     bmSep3,
     bmOptions
   );
@@ -474,13 +600,13 @@ Type
     FMaskColor : TColor;
   End;
 
-  (** An event handelr signature to provide a call back function to request whether the given
+  (** An event handler signature to provide a call back function to request whether the given
      shortcut has already been implemented. **)
   TBADIShortcutUsedEvent = Function(Const iShortcut : TShortcut;
     Var strActionName : String) : Boolean Of Object;
 
   (** An enumerate to define the properties of a comment tag. **)
-  TBADITagProperty = (tpShowInTree, tpAutoExpand, tpShowInDoc, tpFixed, tpSyntax);
+  TBADITagProperty = (tpShowInTree, tpAutoExpand, tpShowInDoc, tpFixed, tpSyntax, tpShowInEditor);
 
   (** A set of tag properties. **)
   TBADITagProperties = Set Of TBADITagProperty;
@@ -493,11 +619,12 @@ Type
     FFontStyles    : TFontStyles;
     FFontColour    : TColor;
     FBackColour    : TColor;
-    Constructor Create(Const strName, strDescription : String;
-      Const setTagProperties : TBADITagProperties);
+    FIconImage     : TBADIImageIndex;
+    Constructor Create(Const strName, strDescription: String;
+  Const setTagProperties: TBADITagProperties; Const eImageIndex : TBADIImageIndex);
   End;
 
-  (** An enumerate to descibe each of the metrics. **)
+  (** An enumerate to describe each of the metrics. **)
   TBADIModuleMetric = (
     mmLongMethods,
     mmLongParameterLists,
@@ -524,7 +651,7 @@ Type
   (** A set of the above metric sub-options. **)
   TBADIModuleMetricSubOps = Set Of TBADIModuleMetricSubOp;
 
-  (** An enumerate to descibe each of the checks. **)
+  (** An enumerate to describe each of the checks. **)
   TBADIModuleCheck = (
     mcHardCodedIntegers,
     mcHardCodedNumbers,
@@ -604,7 +731,7 @@ Type
   TBADIToxicitySummation = (tsAddBeforePower, tsAddAfterPower);
 
   (** An enumerate to define the type of exclusion **)
-  TBADIExclusionType = (etDocumentation, etMetrics, etChecks);
+  TBADIExclusionType = (etDocumentation, etMetrics, etChecks, etSpelling);
   (** A set of the above exclusion types to be referenced against each exclusion pattern. **)
   TBADIExclusionTypes = Set Of TBADIExclusionType;
 
@@ -614,9 +741,44 @@ Type
     FExclusions: TBADIExclusionTypes;
   End;
 
-Implementation
+  (** An enumerate to define the Abstract Syntax Tree Labels that a module can use. **)
+  TBADIASTLabel = (
+    alTypesLabel,
+    alConstantsLabel,
+    alResourceStringsLabel,
+    alVariablesLabel,         
+    alThreadVarsLabel,        
+    alExportedHeadingsLabel,  
+    alExportsHeadingsLabel,
+    alImplementedMethodsLabel
+  );
 
-{ TBADISpecialTag }
+  (** An enumerate to define the type of information stored in each node - used for counting later. **)
+  TBADINodeType = (ntUnkown, ntModule, ntMethod);
+
+  (** An enumerate to define some options for when rendering the module metrics, checks, etc. **)
+  TBADIRenderOption = (
+    roClear,            // Clears the treeview before rendering
+    roAutoExpand,       // Auto expands the the treeview for the rendered module
+    roAutoExpandOnError // Auto expands the the treeview for the rendered module ONLY IF there are
+                        // issued
+  );
+  (** A set of the above enumerate options. **)
+  TBADIRenderOptions = Set Of TBADIRenderOption;
+
+  (** An enumerate to define the types of spelling issue. **)
+  TBADISpellingIssueType = (sitComment, sitTag, sitResourceString, sitConstant, sitLiteral);
+  
+  (** A record to describe the start, end and markers for different comment
+      types. **)
+  TCommentTypeRec = Record
+    FStart: String;
+    FMiddle: String;
+    FBlockEnd: String;
+    FLineEnd: String;
+  End;
+
+Implementation
 
 (**
 
@@ -628,10 +790,11 @@ Implementation
   @param   strName          as a String as a constant
   @param   strDescription   as a String as a constant
   @param   setTagProperties as a TBADITagProperties as a constant
+  @param   eImageIndex      as a TBADIImageIndex as a constant
 
 **)
 Constructor TBADISpecialTag.Create(Const strName, strDescription: String;
-  Const setTagProperties: TBADITagProperties);
+  Const setTagProperties: TBADITagProperties; Const eImageIndex : TBADIImageIndex);
 
 Begin
   FName := strName;
@@ -640,6 +803,7 @@ Begin
   FFontStyles := [];
   FFontColour := clNone;
   FBackColour := clNone;
+  FIconImage := eImageIndex;
 End;
 
 End.

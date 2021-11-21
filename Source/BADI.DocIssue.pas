@@ -3,15 +3,15 @@
   This module contains class to represent document issues and conflicts.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.108
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ Type
     Property Msg : String Read FMsg;
   Public
     Constructor Create(Const strMsg: String; Const AScope: TScope; Const iLine, iCol: Integer;
-      Const eErrorType : TErrorType); Reintroduce; Overload;
+      Const eErrorType : TErrorType);
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property returns the error type of the issue.
@@ -70,11 +70,12 @@ Type
     FMessage       : String;
     FCommentLine   : Integer;
     FCommentColumn : Integer;
+    FConflictType  : TBADIConflictType;
   Public
     //: @nometric LongParameterList
     Constructor Create(Const Args: Array Of Const; Const iIdentLine, iIdentColumn, iCommentLine,
       iCommentCol : Integer; Const strDocConflictMsg, strDocConflictDesc : String;
-      Const AImageIndex : TBADIImageIndex); ReIntroduce;
+      Const AImageIndex : TBADIImageIndex; Const eConflictType : TBADIConflictType);
     Destructor Destroy; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
@@ -95,6 +96,13 @@ Type
       @return  an Integer
     **)
     Property CommentColumn : Integer Read FCommentColumn;
+    (**
+      This property returns the type of the document conflict.
+      @precon  None.
+      @postcon Returns the type of the document conflict.
+      @return  a TBADIConflictType
+    **)
+    Property ConflictType : TBADIConflictType Read FConflictType;
   End;
 
 Implementation
@@ -206,11 +214,12 @@ End;
   @param   strDocConflictMsg  as a String as a constant
   @param   strDocConflictDesc as a String as a constant
   @param   AImageIndex        as a TBADIImageIndex as a constant
+  @param   eConflictType      as a TBADIConflictType as a constant
 
 **)
 Constructor TDocumentConflict.Create(Const Args: Array Of Const; Const iIdentLine, iIdentColumn,
   iCommentLine, iCommentCol: Integer; Const strDocConflictMsg, strDocConflictDesc: String;
-  Const AImageIndex: TBADIImageIndex);
+  Const AImageIndex: TBADIImageIndex; Const eConflictType : TBADIConflictType);
 
 Const
   strOutputFmt = '%4.4d';
@@ -218,6 +227,7 @@ Const
 Begin
   Inherited Create(Format(strOutputFmt, [iDocConflictCounter]), scGlobal, iIdentLine, iIdentColumn,
     AImageIndex, Nil);
+  FConflictType := eConflictType;
   Inc(iDocConflictCounter);
   If Length(Args) > 0 Then
     FMessage := Format(strDocConflictMsg, Args)
@@ -225,7 +235,7 @@ Begin
     FMessage := strDocConflictMsg;
   FCommentLine := iCommentLine;
   FCommentColumn := iCommentCol;
-  Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol);
+  Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol, 0);
 End;
 
 (**

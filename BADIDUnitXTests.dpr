@@ -4,6 +4,8 @@ program BADIDUnitXTests;
 {$IFNDEF TESTINSIGHT}
 {$APPTYPE CONSOLE}
 {$ENDIF}{$STRONGLINKTYPES ON}
+{$R 'LayeredExplorerImages.res' 'LayeredExplorerImages.RC'}
+
 uses
   System.SysUtils,
   {$IFDEF TESTINSIGHT}

@@ -1,12 +1,16 @@
-//: @stopdocumentation
 Program BrowseAndDocItTests;
 
 {$INCLUDE '..\Source\CompilerDefinitions.inc'}
 {$R 'BADIVerInfo.res' '..\BADIVerInfo.RC'}
+{$R 'LayeredExplorerImages.res' '..\LayeredExplorerImages.RC'}
+
+//: @debug {$APPTYPE CONSOLE}
 
 uses
   FastMM4,
   TestInsight.DUnit,
+  //: @debug GUITestRunner,
+  //: @debug TextTestRunner,
   SysUtils,
   Forms,
   Windows,
@@ -181,13 +185,24 @@ uses
   Test.BADI.Refactoring.Functions in 'Source\Test.BADI.Refactoring.Functions.pas',
   BADI.Interfaces in '..\Source\BADI.Interfaces.pas',
   BADI.IDEEditorColours in '..\Source\BADI.IDEEditorColours.pas',
-  BADI.Exclusions in '..\Source\BADI.Exclusions.pas';
+  BADI.Exclusions in '..\Source\BADI.Exclusions.pas',
+  BADI.ModuleStats in '..\Source\BADI.ModuleStats.pas',
+  Test.BADI.ModuleStats in 'Source\Test.BADI.ModuleStats.pas',
+  BADI.ModuleStatsList in '..\Source\BADI.ModuleStatsList.pas',
+  Test.BADI.ModuleStatsList in 'Source\Test.BADI.ModuleStatsList.pas',
+  BADI.SpellingIssue in '..\Source\BADI.SpellingIssue.pas';
 
 {$R *.RES}
 
 begin
+  TBADIOptions.BADIOptions.MaxDocOutputWidth := 80;
+  TBADIOptions.BADIOptions.ToxicityPower := 3;
+  TBADIOptions.BADIOptions.ToxicitySummartion := tsAddBeforePower;
+  TBADIOptions.BADIOptions.TokenLimit := 50;
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options - [doShowSpelling];
   RunRegisteredTests();
 end.
+
 
 
 

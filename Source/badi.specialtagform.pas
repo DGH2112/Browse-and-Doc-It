@@ -4,15 +4,15 @@
   through a single method.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.500
+  @Date    25 Apr 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,8 @@ Uses
   Buttons,
   CheckLst,
   BADI.Types,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls,
+  Vcl.ComCtrls;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -56,8 +57,6 @@ Type
     edtName: TEdit;
     lblDescription: TLabel;
     edtDescription: TEdit;
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     lbxTagProperties: TCheckListBox;
     lblTagProperties: TLabel;
     gbxFontStyles: TGroupBox;
@@ -71,13 +70,19 @@ Type
     cbxBackColour: TColorBox;
     lblBackColour: TLabel;
     pnlForm: TPanel;
+    btnCancel: TButton;
+    btnOK: TButton;
+    ilButtons: TImageList;
+    lblImageIndex: TLabel;
+    cbxImageIndex: TComboBoxEx;
     procedure btnOKClick(Sender: TObject);
   Strict Private
+    FBADIImages : TImageList;
   Strict Protected
-    Procedure InitialiseForm(Const SpecialTag : TBADISpecialTag);
+    Procedure InitialiseForm(Const BADIImages : TImageList; Const SpecialTag : TBADISpecialTag);
     Procedure FinaliseForm(Var SpecialTag : TBADISpecialTag);
   Public
-    Class Function Execute(Var SpecialTag : TBADISpecialTag): Boolean;
+    Class Function Execute(Const BADIImages : TImageList; Var SpecialTag : TBADISpecialTag): Boolean;
   End;
 
 Implementation
@@ -87,11 +92,14 @@ Uses
   ToolsAPI,
   BADI.ToolsAPIUtils,
   {$ENDIF}
-  BADI.Constants;
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
+  System.TypInfo,
+  BADI.Constants,
+  BADI.Functions;
 
 {$R *.DFM}
-
-{ TfrmSpecialTag }
 
 (**
 
@@ -127,17 +135,16 @@ End;
   This method accepts a name and description string and displays them for editing in the form. If the 
   user presses OK the form returns true.
 
-  @precon  strName is the tags name, strDescription is the tags description, boolShow is a boolean value
-           it indicate whether to show the tag in the browser, boolExpand is a boolean value it 
-           indicate whether to expand the tag in the browser and Returns true if the OK button was 
-           pressed.
+  @precon  BADIImages must be a valid instance.
   @postcon Displays the special tag form.
 
+  @param   BADIImages as a TImageList as a constant
   @param   SpecialTag as a TBADISpecialTag as a reference
   @return  a Boolean
 
 **)
-Class Function TfrmSpecialTag.Execute(Var SpecialTag : TBADISpecialTag): Boolean;
+Class Function TfrmSpecialTag.Execute(Const BADIImages : TImageList;
+  Var SpecialTag : TBADISpecialTag): Boolean;
 
 Var
   frm : TfrmSpecialTag;
@@ -145,11 +152,10 @@ Begin
   Result := False;
   frm := TfrmSpecialTag.Create(Application.MainForm);
   Try
-    { $IFDEF DXE102 
-    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmSpecialTag);
-    TBADIToolsAPIFunctions.ApplyTheming(Self);
+    {$IFNDEF STANDALONEAPP}
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmSpecialTag, frm);
     {$ENDIF}
-    frm.InitialiseForm(SpecialTag);
+    frm.InitialiseForm(BADIImages, SpecialTag);
     If frm.ShowModal = mrOK Then
       Begin
         frm.FinaliseForm(SpecialTag);
@@ -193,25 +199,37 @@ Begin
     Include(SpecialTag.FFontStyles, fsStrikeOut);
   SpecialTag.FFontColour := cbxFontColour.Selected;
   SpecialTag.FBackColour := cbxBackColour.Selected;
+  SpecialTag.FIconImage := TBADIImageIndex(cbxImageIndex.ItemIndex);
 End;
 
 (**
 
-  This method intialises the fopm with the information in the special tag.
+  This method initialises the form with the information in the special tag.
 
   @precon  None.
   @postcon The information for the special tag is set in the form controls.
 
+  @param   BADIImages as a TImageList as a constant
   @param   SpecialTag as a TBADISpecialTag as a constant
 
 **)
-Procedure TfrmSpecialTag.InitialiseForm(Const SpecialTag : TBADISpecialTag);
+Procedure TfrmSpecialTag.InitialiseForm(Const BADIImages : TImageList;
+  Const SpecialTag : TBADISpecialTag);
+
+Const
+  iFirstChar = 1;
+  iCharLen = 2;
 
 Var
   eTagProp : TBADITagProperty;
   iIndex: Integer;
+  eImageIndex: TBADIImageIndex;
+  strName: String;
+  Item: TComboExItem;
 
 Begin
+  FBADIImages := BADIImages;
+  cbxImageIndex.Images := BADIImages;
   edtName.Text := SpecialTag.FName;
   edtDescription.Text := SpecialTag.FDescription;
   For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
@@ -225,6 +243,15 @@ Begin
   chkStrikeout.Checked := fsStrikeOut In SpecialTag.FFontStyles;
   CbxFontColour.Selected := SpecialTag.FFontColour;
   cbxBackColour.Selected := SpecialTag.FBackColour;
+  For eImageIndex := Low(TBADIImageIndex) To High(TBADIImageIndex) Do
+    Begin
+      Item := cbxImageIndex.ItemsEx.Add;
+      strName := GetEnumName(TypeInfo(TBADIImageIndex), Ord(eImageIndex));
+      Delete(strName, iFirstChar, iCharLen);
+      Item.Caption := strName;
+      Item.ImageIndex := BADIImageIndex(eImageIndex, scNone);
+    End;
+  cbxImageIndex.ItemIndex := Integer(SpecialTag.FIconImage);
 End;
 
 End.

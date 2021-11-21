@@ -3,15 +3,15 @@
   This module contains a class to represent a generic property declaration.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ Uses
 
   @precon  Method is the property declaration that requires checking for document
            conflicts.
-  @postcon The passed property is systematicaly check for errors.
+  @postcon The passed property is systematically check for errors.
 
   @param   boolCascade as a Boolean as a reference
 
@@ -96,7 +96,7 @@ End;
   missing or no description.
 
   @precon  Method is valid property declaration to be checked for documentation.
-  @postcon Checks the passed property for docuemntation errors.
+  @postcon Checks the passed property for documentation errors.
 
 **)
 Procedure TGenericProperty.CheckPropertyDocumentation;

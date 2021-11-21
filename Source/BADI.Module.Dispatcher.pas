@@ -4,15 +4,15 @@
   can therefore true the required parser for a given file extension.
 
   @Author  David Hoyle
-  @Version 1.1
-  @Date    21 Jun 2019
+  @Version 1.287
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,14 +56,19 @@ Type
     Constructor Create;
     Destructor Destroy; Override;
     Class Function BADIDispatcher : TBADIDispatcher;
-    Procedure Add(Const Cls: TBaseLanguageModuleClass; const strExtensions: String;
-      Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+    Procedure Add(
+      Const Cls: TBaseLanguageModuleClass;
+      const strExtensions: String;
+      Const boolCanDoc: Boolean;
+      Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType;
+      Const setCommentTypes : TCommentTypes
+    );
     Function Dispatcher(Const Source, strFileName: String; Const boolModified: Boolean;
       Const ModuleOptions: TModuleOptions): TBaseLanguageModule;
     Function CanParseDocument(Const strFileName: String): Boolean;
     Function CanDocumentDocument(Const strFileName: String): Boolean;
-    Function GetCommentType(Const strFileName: String;
-      Const CommentStyle: TCommentStyle) : TCommentType;
+    Function GetCommentType(Const strFileName: String; Const CommentStyle: TCommentStyle) : TCommentType;
+    Function GetCommentTypes(Const strFileName: String) : TCommentTypes;
     (**
       This property returns a TModuleInfo reference for the indexed module.
       @precon  iIndex must be between 0 and Count - 1.
@@ -93,16 +98,22 @@ Uses
   @precon  None.
   @postcon Adds a set of registration information into the dispatcher.
 
-  @param   Cls           as a TBaseLanguageModuleClass as a Constant
-  @param   strExtensions as a String as a Constant
-  @param   boolCanDoc    as a Boolean as a Constant
-  @param   iBlockCmt     as a TCommentType as a Constant
-  @param   iLineCmt      as a TCommentType as a Constant
-  @param   iInSituCmt    as a TCommentType as a Constant
+  @param   Cls             as a TBaseLanguageModuleClass as a constant
+  @param   strExtensions   as a String as a constant
+  @param   boolCanDoc      as a Boolean as a constant
+  @param   iBlockCmt       as a TCommentType as a constant
+  @param   iLineCmt        as a TCommentType as a constant
+  @param   iInSituCmt      as a TCommentType as a constant
+  @param   setCommentTypes as a TCommentTypes as a constant
 
 **)
-Procedure TBADIDispatcher.Add(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
-  Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+Procedure TBADIDispatcher.Add(
+            Const Cls: TBaseLanguageModuleClass;
+            Const strExtensions: String;
+            Const boolCanDoc: Boolean;
+            Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType;
+            Const setCommentTypes : TCommentTypes
+          );
 
 Var
   iModule: Integer;
@@ -112,7 +123,9 @@ Begin
     If Modules[iModule].Cls = Cls Then
       Raise Exception.Create(Format( 'You cannot register the same module more than once (%s)',
         [Cls.ClassName]));
-  FModules.Add(TModuleInfo.Create(Cls, strExtensions, boolCanDoc, iBlockCmt, iLineCmt, iInSituCmt));
+  FModules.Add(
+    TModuleInfo.Create(Cls, strExtensions, boolCanDoc, iBlockCmt, iLineCmt, iInSituCmt, setCommentTypes)
+  );
 End;
 
 (**
@@ -180,7 +193,7 @@ End;
 
 (**
 
-  A constructor for the TModuleDispatcher class.
+  A constructor for the TBADIDispatcher class.
 
   @precon  None.
   @postcon Creates a object list to contain the module registration information.
@@ -222,7 +235,7 @@ End;
 
 (**
 
-  A destructor for the TModuleDispatcher class.
+  A destructor for the TBADIDispatcher class.
 
   @precon  None.
   @postcon Frees the memory used by the module registrations.
@@ -241,7 +254,7 @@ End;
   This function returns an instance of a TBaseLanguageModule assigned a specific
   language parser depending on the extension of the file passed.
 
-  @precon  Source must be a valid TStream of charcters to parse.
+  @precon  Source must be a valid TStream of characters to parse.
   @postcon Returns an instance of a TBaseLanguageModule assigned a specific
            language parser depending on the extension of the file passed.
 
@@ -295,6 +308,18 @@ Begin
       csLine:   Result := (FModules[iIndex] As TModuleInfo).LineCmt;
       csInSitu: Result := (FModules[iIndex] As TModuleInfo).InSituCmt;
     End;
+End;
+
+Function TBADIDispatcher.GetCommentTypes(Const strFileName: String) : TCommentTypes;
+
+Var
+  iIndex: Integer;
+
+Begin
+  Result := [];
+  iIndex := Find(ExtractFileExt(strFileName));
+  If iIndex > -1 Then
+    Result := (FModules[iIndex] As TModuleInfo).CommentTypes;
 End;
 
 (**

@@ -3,15 +3,15 @@
   This module contains code for creating the about box entry in RAD Studio.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.091
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,14 +41,18 @@ Implementation
 Uses
   ToolsAPI,
   SysUtils,
+  {$IFDEF RS110}
+  Graphics,
+  {$ELSE}
   Windows,
+  {$ENDIF RS110}
   BADI.Functions,
   Forms,
   BADI.Constants;
 
 {$IFDEF D2005}
 Var
-  (** An index for the About Box Plugin. - required for unloading the interface. **)
+  (** An index for the About Box Plug-in - required for unloading the interface. **)
   iAboutPlugin : Integer;
 {$ENDIF}
 
@@ -76,21 +80,42 @@ Var
   iMinor : Integer;
   iBugFix : Integer;
   iBuild : Integer;
+  {$IFDEF RS110}
+  AboutBoxBitMap : TBitMap;
+  {$ELSE}
   bmSplashScreen : HBITMAP;
+  {$ENDIF RS 110}
 
 Begin
   {$IFDEF D2005}
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
+  {$IFDEF RS110}
+  AboutBoxBitMap := TBitMap.Create();
+  Try
+    AboutBoxBitMap.LoadFromResourceName(hInstance, strBrowseAndDocItSplashScreenBitMap);
+    iAboutPlugin := (BorlandIDEServices As IOTAAboutBoxServices).AddPluginInfo(
+      Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1), Application.Title]),
+      strIDEExpertToBrowseAndDocumentYourSourceCode,
+      [AboutBoxBitMap],
+      {$IFDEF DEBUG} True {$ELSE} False {$ENDIF},
+      Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]),
+      Format(strSKUBuild, [iMajor, iMinor, iBugfix, iBuild])
+    );
+  Finally
+    AboutBoxBitMap.Free;
+  End;
+  {$ELSE}
   bmSplashScreen := LoadBitmap(hInstance, strBrowseAndDocItSplashScreenBitMap);
   iAboutPlugin := (BorlandIDEServices As IOTAAboutBoxServices).AddPluginInfo(
-    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1),
-      Application.Title]),
+    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1), Application.Title]),
     strIDEExpertToBrowseAndDocumentYourSourceCode,
     bmSplashScreen,
     {$IFDEF DEBUG} True {$ELSE} False {$ENDIF},
     Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]),
-    Format(strSKUBuild, [iMajor, iMinor, iBugfix, iBuild]));
-  {$ENDIF}
+    Format(strSKUBuild, [iMajor, iMinor, iBugfix, iBuild])
+  );
+  {$ENDIF RS110}
+  {$ENDIF D2005}
 End;
 
 (**

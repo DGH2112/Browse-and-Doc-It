@@ -4,15 +4,15 @@
   to parser VB.NET code later).
 
   @Author     David Hoyle
-  @Version    1.0
-  @Date    21 Jun 2019
+  @Version    1.685
+  @Date    06 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ Type
 
   **)
   TVBModule = Class(TBaseLanguageModule)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FTypesLabel: TLabelContainer;
     FConstantsLabel: TLabelContainer;
     FVariablesLabel: TLabelContainer;
@@ -77,36 +77,36 @@ Type
     { Grammer Parsers }
     Procedure Goal;
     Function  Version : Boolean;
-    Function  VBBegin(C : TElementContainer) : Boolean;
+    Function  VBBegin(Const C : TElementContainer) : Boolean;
     Function  Attributes : Boolean;
-    Function  Attribute(C : TElementContainer) : Boolean;
+    Function  Attribute(Const C : TElementContainer) : Boolean;
     Function  Options : Boolean;
     Function  Implements : Boolean;
     Function  Declarations : Boolean;
-    Function  Privates(C : TComment) : Boolean;
-    Function  Publics(C : TComment) : Boolean;
-    Function  Consts(Scope : TScope; C : TComment) : Boolean;
-    Function  Dims(Scope : TScope; C : TComment) : Boolean;
-    Function  Subs(Scope : TScope; C : TComment; boolStatic : Boolean;
-      DeclareLabel : TLabelContainer) : Boolean;
-    Function  Functions(Scope : TScope; C : TComment; boolStatic : Boolean;
-      DeclareLabel : TLabelContainer) : Boolean;
-    Function  Declares(Scope : TScope; C: TComment) : Boolean;
-    Function  Friends(C: TComment) : Boolean;
-    Function  Props(Scope : TScope; C : TComment; boolStatic : Boolean) : Boolean;
-    Function  Records(Scope : TScope; C : TComment) : Boolean;
-    Function  Enum(Scope : TScope; C: TComment) : Boolean;
-    Procedure Parameters(Container : TElementContainer);
-    Procedure MethodDecl(M : TGenericMethodDecl; C : TComment);
-    Procedure FindMethodEnd(AExceptionHnd : IExceptionHandling; strMethodType : String);
-    Function  Vars(Scope : TScope; C : TComment) : Boolean;
-    Function  Events(Scope : TScope; C : TComment) : Boolean;
-    Procedure ProcessVar(Variable: TVBVar);
-    Procedure CheckElementExceptionHandling(M: TGenericFunction;
-      ExceptionHandler: IExceptionHandling);
+    Function  Privates(Const C : TComment) : Boolean;
+    Function  Publics(Const C : TComment) : Boolean;
+    Function  Consts(Const Scope : TScope; Const C : TComment) : Boolean;
+    Function  Dims(Const Scope : TScope; Const C : TComment) : Boolean;
+    Function  Subs(Const Scope : TScope; Const C : TComment; Const boolStatic : Boolean;
+      Const DeclareLabel : TLabelContainer) : Boolean;
+    Function  Functions(Const Scope : TScope; Const C : TComment; Const boolStatic : Boolean;
+      Const DeclareLabel : TLabelContainer) : Boolean;
+    Function  Declares(Const Scope : TScope; Const C: TComment) : Boolean;
+    Function  Friends(Const C: TComment) : Boolean;
+    Function  Props(Const Scope : TScope; Const C : TComment; Const boolStatic : Boolean) : Boolean;
+    Function  Records(Const Scope : TScope; Const C : TComment) : Boolean;
+    Function  Enum(Const Scope : TScope; Const C: TComment) : Boolean;
+    Procedure Parameters(Const Container : TElementContainer);
+    Procedure MethodDecl(Const M : TGenericMethodDecl; Const C : TComment);
+    Procedure FindMethodEnd(Const AExceptionHnd : IExceptionHandling; Const strMethodType : String);
+    Function  Vars(Const Scope : TScope; Const C : TComment) : Boolean;
+    Function  Events(Const Scope : TScope; Const C : TComment) : Boolean;
+    Procedure ProcessVar(Const Variable: TVBVar);
+    Procedure CheckElementExceptionHandling(Const M: TGenericFunction;
+      Const ExceptionHandler: IExceptionHandling);
     Procedure PatchAndCheckReferences;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+  Strict Protected
+    Procedure ProcessCompilerDirective; Override;
     procedure TidyUpEmptyElements;
     Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
@@ -228,10 +228,10 @@ Begin
       AddTickCount('Parse');
       ResolvedForwardReferences;
       AddTickCount('Resolve');
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       PatchAndCheckReferences;
       AddTickCount('Refs');
       If doShowMissingVBExceptionWarnings In BADIOptions.Options Then
@@ -309,10 +309,8 @@ end;
   @precon  None.
   @postcon Not implemented.
 
-  @param   iSkip as an Integer as a reference
-
 **)
-procedure TVBModule.ProcessCompilerDirective(var iSkip: Integer);
+procedure TVBModule.ProcessCompilerDirective;
 begin
   {Do nothing}
 end;
@@ -710,12 +708,12 @@ end;
   @precon  None.
   @postcon Processes variable declarations.
 
-  @param   Scope as a TScope
-  @param   C     as a TComment
+  @param   Scope as a TScope as a constant
+  @param   C     as a TComment as a constant
   @return  a Boolean
 
 **)
-function TVBModule.Vars(Scope: TScope; C: TComment): Boolean;
+function TVBModule.Vars(Const Scope: TScope; Const C: TComment): Boolean;
 
 Var
   boolWithEvents : Boolean;
@@ -757,11 +755,13 @@ end;
   @precon  None .
   @postcon Processes the BEGIN / END section of a module version clause .
 
-  @param   C as a TElementContainer
+  @nocheck EmptyRepeat
+
+  @param   C as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.VBBegin(C : TElementContainer) : Boolean;
+Function TVBModule.VBBegin(Const C : TElementContainer) : Boolean;
 
 Var
   Container : TElementContainer;
@@ -860,11 +860,11 @@ end;
   @precon  None .
   @postcon Parses a single attribute at the top of the module .
 
-  @param   C as a TElementContainer
+  @param   C as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Attribute(C : TElementContainer) : Boolean;
+Function TVBModule.Attribute(Const C : TElementContainer) : Boolean;
 
 Var
   A : TVBAttribute;
@@ -1058,10 +1058,10 @@ End;
   @precon  Method must be a valid instance of a method .
   @postcon Parses parameters for method and properties .
 
-  @param   Container as a TElementContainer
+  @param   Container as a TElementContainer as a constant
 
 **)
-Procedure TVBModule.Parameters(Container : TElementContainer);
+Procedure TVBModule.Parameters(Const Container : TElementContainer);
 
 Var
   boolOptional : Boolean;
@@ -1160,15 +1160,17 @@ End;
   @precon  None.
   @postcon Defers parsing of subroutines to the MethodDecl method.
 
-  @param   Scope        as a TScope
-  @param   C            as a TComment
-  @param   boolStatic   as a Boolean
-  @param   DeclareLabel as a TLabelContainer
+  @nohint boolStatic
+
+  @param   Scope        as a TScope as a constant
+  @param   C            as a TComment as a constant
+  @param   boolStatic   as a Boolean as a constant
+  @param   DeclareLabel as a TLabelContainer as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Subs(Scope : TScope; C : TComment; boolStatic : Boolean;
-  DeclareLabel : TLabelContainer) : Boolean;
+Function TVBModule.Subs(Const Scope : TScope; Const C : TComment; Const boolStatic : Boolean;
+  Const DeclareLabel : TLabelContainer) : Boolean;
 
 Var
   M : TVBMethod;
@@ -1203,15 +1205,17 @@ End;
   @precon  None.
   @postcon Defers parsing of function to the MethodDecl method.
 
-  @param   Scope        as a TScope
-  @param   C            as a TComment
-  @param   boolStatic   as a Boolean
-  @param   DeclareLabel as a TLabelContainer
+  @nohint boolStatic
+
+  @param   Scope        as a TScope as a constant
+  @param   C            as a TComment as a constant
+  @param   boolStatic   as a Boolean as a constant
+  @param   DeclareLabel as a TLabelContainer as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Functions(Scope : TScope; C : TComment; boolStatic : Boolean;
-  DeclareLabel : TLabelContainer) : Boolean;
+Function TVBModule.Functions(Const Scope : TScope; Const C : TComment; Const boolStatic : Boolean;
+  Const DeclareLabel : TLabelContainer) : Boolean;
 
 Var
   M : TVBMethod;
@@ -1246,11 +1250,11 @@ End;
   @precon  M must be a valid method declaration.
   @postcon Parses the sub and function declarations.
 
-  @param   M as a TGenericMethodDecl
-  @param   C as a TComment
+  @param   M as a TGenericMethodDecl as a constant
+  @param   C as a TComment as a constant
 
 **)
-Procedure TVBModule.MethodDecl(M : TGenericMethodDecl; C : TComment);
+Procedure TVBModule.MethodDecl(Const M : TGenericMethodDecl; Const C : TComment);
 
 Var
   T : TVBTypeDecl;
@@ -1345,19 +1349,19 @@ end;
 
 (**
 
-  This method attempts to find the end of the method while looking for exception
-  / error handling code and exit statements.
+  This method attempts to find the end of the method while looking for exception / error handling code 
+  and exit statements.
 
   @precon  Method must be a valid TVBMethod instance .
-  @postcon Attempts to find the end of the method while looking for exception /
-           error handling code and exit statements .
+  @postcon Attempts to find the end of the method while looking for exception / error handling code and 
+           exit statements .
 
-  @param   AExceptionHnd as an IExceptionHandling
-  @param   strMethodType as a String
+  @param   AExceptionHnd as an IExceptionHandling as a constant
+  @param   strMethodType as a String as a constant
 
 **)
-Procedure TVBModule.FindMethodEnd(AExceptionHnd : IExceptionHandling;
-  strMethodType : String);
+Procedure TVBModule.FindMethodEnd(Const AExceptionHnd : IExceptionHandling;
+  Const strMethodType : String);
 
 Begin
   RollBackToken;
@@ -1438,18 +1442,16 @@ End;
 
 (**
 
-  This method sets the scope to private and defers parsing to a sub routine
-  based on the key word found.
+  This method sets the scope to private and defers parsing to a sub routine based on the key word found.
 
   @precon  None.
-  @postcon Sets the scope to private and defers parsing to a sub routine based
-           on the key word found.
+  @postcon Sets the scope to private and defers parsing to a sub routine based on the key word found.
 
-  @param   C as a TComment
+  @param   C as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Privates(C : TComment) : Boolean;
+Function TVBModule.Privates(Const C : TComment) : Boolean;
 Begin
   Result := False;
   If Token.UToken = 'PRIVATE' Then
@@ -1470,18 +1472,16 @@ End;
 
 (**
 
-  This method sets the scope to private and defers parsing to a sub routine
-  based on the key word found.
+  This method sets the scope to private and defers parsing to a sub routine based on the key word found.
 
   @precon  None.
-  @postcon Sets the scope to private and defers parsing to a sub routine based
-           on the key word found.
+  @postcon Sets the scope to private and defers parsing to a sub routine based on the key word found.
 
-  @param   C as a TComment
+  @param   C as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Publics(C : TComment) : Boolean;
+Function TVBModule.Publics(Const C : TComment) : Boolean;
 Begin
   Result := False;
   If Token.UToken = 'PUBLIC' Then
@@ -1539,12 +1539,12 @@ end;
   @precon  None.
   @postcon Parses visual basic constants.
 
-  @param   Scope as a TScope
-  @param   C     as a TComment
+  @param   Scope as a TScope as a constant
+  @param   C     as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Consts(Scope : TScope; C : TComment) : Boolean;
+Function TVBModule.Consts(Const Scope : TScope; Const C : TComment) : Boolean;
 
 Var
   Con : TVBConstant;
@@ -1606,12 +1606,12 @@ End;
   @precon  None.
   @postcon Processes DIM statements.
 
-  @param   Scope as a TScope
-  @param   C     as a TComment
+  @param   Scope as a TScope as a constant
+  @param   C     as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Dims(Scope : TScope; C : TComment) : Boolean;
+Function TVBModule.Dims(Const Scope : TScope; Const C : TComment) : Boolean;
 
 Begin
   Result := False;
@@ -1630,12 +1630,12 @@ End;
   @precon  None.
   @postcon Processes the declare statement.
 
-  @param   Scope as a TScope
-  @param   C     as a TComment
+  @param   Scope as a TScope as a constant
+  @param   C     as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Declares(Scope : TScope; C: TComment) : Boolean;
+Function TVBModule.Declares(Const Scope : TScope; Const C: TComment) : Boolean;
 
 Var
   R : Boolean;
@@ -1664,11 +1664,11 @@ end;
   @precon  None.
   @postcon Processes friend statements.
 
-  @param   C as a TComment
+  @param   C as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Friends(C: TComment) : Boolean;
+Function TVBModule.Friends(Const C: TComment) : Boolean;
 
 Var
   R : Boolean;
@@ -1696,13 +1696,15 @@ end;
   @precon  None.
   @postcon Processes the properties statements.
 
-  @param   Scope      as a TScope
-  @param   C          as a TComment
-  @param   boolStatic as a Boolean
+  @nohint boolStatic
+
+  @param   Scope      as a TScope as a constant
+  @param   C          as a TComment as a constant
+  @param   boolStatic as a Boolean as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Props(Scope : TScope; C : TComment; boolStatic : Boolean) : Boolean;
+Function TVBModule.Props(Const Scope : TScope; Const C : TComment; Const boolStatic : Boolean) : Boolean;
 
 Var
   pt : TVBPropertyType;
@@ -1767,12 +1769,12 @@ End;
   @precon  None.
   @postcon Processes Type/Record declarations.
 
-  @param   Scope as a TScope
-  @param   C     as a TComment
+  @param   Scope as a TScope as a constant
+  @param   C     as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Records(Scope : TScope; C : TComment) : Boolean;
+Function TVBModule.Records(Const Scope : TScope; Const C : TComment) : Boolean;
 
 Var
   R : TVBRecordDecl;
@@ -1882,11 +1884,11 @@ Function TVBModule.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
     @precon  None.
     @postcon Marks the element item as referenced is the token is found.
 
-    @param   Section as a TElementContainer
+    @param   Section as a TElementContainer as a constant
     @return  a Boolean
 
   **)
-  Function CheckElement(Section : TElementContainer) : Boolean;
+  Function CheckElement(Const Section : TElementContainer) : Boolean;
 
   Var
     boolFound: Boolean;
@@ -1946,11 +1948,11 @@ procedure TVBModule.PatchAndCheckReferences;
     @precon  None.
     @postcon Returns true if the identifier contains an underscore.
 
-    @param   strIdentifier as a String
+    @param   strIdentifier as a String as a constant
     @return  a Boolean
 
   **)
-  Function IsEventHandler(strIdentifier : String) : Boolean;
+  Function IsEventHandler(Const strIdentifier : String) : Boolean;
 
   Var
     i: Integer;
@@ -1985,19 +1987,18 @@ end;
 
 (**
 
-  This method checks the exception handling for the given function and it`s
-  exception handler.
+  This method checks the exception handling for the given function and it`s exception handler.
 
   @precon  M and ExceptionHandler must be valid instances.
-  @postcon Checks the exception handling for the given function and it`s
-           exception handler and outputs an issue IF something is missing.
+  @postcon Checks the exception handling for the given function and it`s exception handler and outputs 
+           an issue IF something is missing.
 
-  @param   M                as a TGenericFunction
-  @param   ExceptionHandler as an IExceptionHandling
+  @param   M                as a TGenericFunction as a constant
+  @param   ExceptionHandler as an IExceptionHandling as a constant
 
 **)
-procedure TVBModule.CheckElementExceptionHandling(M: TGenericFunction;
-  ExceptionHandler : IExceptionHandling);
+procedure TVBModule.CheckElementExceptionHandling(Const M: TGenericFunction;
+  Const ExceptionHandler : IExceptionHandling);
 
 var
   boolNoTag: Boolean;
@@ -2090,14 +2091,13 @@ end;
 
   This method processes a variable declaration on a line.
 
-  @precon  Variable must be a value instance of a previous created variable
-           descendant.
+  @precon  Variable must be a value instance of a previous created variable descendant.
   @postcon Processes a variable declaration on a line.
 
-  @param   Variable as a TVBVar
+  @param   Variable as a TVBVar as a constant
 
 **)
-procedure TVBModule.ProcessVar(Variable: TVBVar);
+procedure TVBModule.ProcessVar(Const Variable: TVBVar);
 
 var
   strHigh: string;
@@ -2181,12 +2181,12 @@ end;
   @precon  None.
   @postcon Processes Enumerate declarations.
 
-  @param   Scope as a TScope
-  @param   C     as a TComment
+  @param   Scope as a TScope as a constant
+  @param   C     as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Enum(Scope : TScope; C: TComment) : Boolean;
+Function TVBModule.Enum(Const Scope : TScope; Const C: TComment) : Boolean;
 
 Var
   E : TVBEnumerateDecl;
@@ -2259,12 +2259,12 @@ end;
   @precon  None.
   @postcon The event if found is parsed and added to the module tree.
 
-  @param   Scope as a TScope
-  @param   C     as a TComment
+  @param   Scope as a TScope as a constant
+  @param   C     as a TComment as a constant
   @return  a Boolean
 
 **)
-Function TVBModule.Events(Scope: TScope; C: TComment): Boolean;
+Function TVBModule.Events(Const Scope: TScope; Const C: TComment): Boolean;
 
 Var
   E : TEventDecl;

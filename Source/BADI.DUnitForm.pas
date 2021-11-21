@@ -1,18 +1,18 @@
 (**
 
-  This module defines a class which reprepsents a form for selecting
-  DUnit Unit Tetsing Options.
+  This module defines a class which represents a form for selecting
+  DUnit Unit Testing Options.
 
-  @Version 1.0
+  @Version 1.048
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ uses
   ImgList,
   ExtCtrls,
   UITypes,
-  BADI.ElementContainer, System.ImageList;
+  BADI.ElementContainer;
 
 type
   (** A class to represent the form interface. **)
@@ -61,8 +61,6 @@ type
     rdoExistingProject: TRadioButton;
     cbxExistingProject: TComboBox;
     rdoNewProject: TRadioButton;
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     gbxUnit: TGroupBox;
     rdoExistingUnit: TRadioButton;
     cbxExistingUnit: TComboBox;
@@ -81,6 +79,9 @@ type
     lblMethodName: TLabel;
     edtClassName: TEdit;
     edtMethodName: TEdit;
+    btnOK: TButton;
+    btnCancel: TButton;
+    ilButtons: TImageList;
     Procedure rdoNewExistingProject(Sender: TObject);
     Procedure btnOKClick(Sender: TObject);
     Procedure rdoNewExistingUnit(Sender: TObject);
@@ -429,7 +430,7 @@ End;
 
 (**
 
-  This is an error event hanlder for errors raised in the DUnitCreator module.
+  This is an error event handler for errors raised in the DUnit Creator module.
 
   @precon  None.
   @postcon Displays an error in a dialogue box.
@@ -457,40 +458,54 @@ Class Procedure TfrmDUnit.Execute(Const objDUnitCreator : TDUnitCreator);
 
 var
   strUnitTobeTested: String;
+  F: TfrmDUnit;
 
 Begin
-  With TfrmDUnit.Create(Application.MainForm) Do
-    Try
-      objDUnitCreator.Errors := ErrorProc;
-      FDUnitCreator := objDUnitCreator;
-      InitialiseTreeView;
-      rdoNewExistingProject(Nil);
-      rdoNewExistingUnit(Nil);
-      If ShowModal = mrOK Then
-        Begin
-          If cbxBaseClass.Items.IndexOf(cbxBaseClass.Text) = -1 Then
-            cbxBaseClass.Items.Add(cbxBaseClass.Text);
-          SaveSettings;
-          strUnitTobeTested := TBADIToolsAPIFunctions.ActiveSourceEditor.FileName;
-          BuildTestCaseList;
-          If rdoNewProject.Checked Then
-            objDUnitCreator.CreateTestProject(edtNewProjectName.Text)
-          Else
-            objDUnitCreator.ActivateProject(cbxExistingProject.ItemIndex);
-          objDUnitCreator.AddUnitToBeTested(strUnitToBeTested);
-          strUnitToBeTested := ChangeFileExt(ExtractFileName(strUnitToBeTested), '');
-          If rdoNewUnit.Checked Then
-            objDUnitCreator.CreateTestUnit(edtNewUnitName.Text,
-              strUnitToBeTested, FTestCases, cbxBaseClass.Text,
-              edtTestSuiteName.Text, edtClassName.Text, edtMethodName.Text)
-          Else
-            objDUnitCreator.UpdateTestUnit(cbxExistingUnit.ItemIndex,
-              strUnitToBeTested, FTestCases, cbxBaseClass.Text,
-              edtTestSuiteName.Text, edtClassName.Text, edtMethodName.Text);
-        End;
-    Finally
-      Free;
-    End;
+  F := TfrmDUnit.Create(Application.MainForm);
+  Try
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDUnit, F);
+    objDUnitCreator.Errors := F.ErrorProc;
+    F.FDUnitCreator := objDUnitCreator;
+    F.InitialiseTreeView;
+    F.rdoNewExistingProject(Nil);
+    F.rdoNewExistingUnit(Nil);
+    If F.ShowModal = mrOK Then
+      Begin
+        If F.cbxBaseClass.Items.IndexOf(F.cbxBaseClass.Text) = -1 Then
+          F.cbxBaseClass.Items.Add(F.cbxBaseClass.Text);
+        F.SaveSettings;
+        strUnitTobeTested := TBADIToolsAPIFunctions.ActiveSourceEditor.FileName;
+        F.BuildTestCaseList;
+        If F.rdoNewProject.Checked Then
+          objDUnitCreator.CreateTestProject(F.edtNewProjectName.Text)
+        Else
+          objDUnitCreator.ActivateProject(F.cbxExistingProject.ItemIndex);
+        objDUnitCreator.AddUnitToBeTested(strUnitToBeTested);
+        strUnitToBeTested := ChangeFileExt(ExtractFileName(strUnitToBeTested), '');
+        If F.rdoNewUnit.Checked Then
+          objDUnitCreator.CreateTestUnit(
+            F.edtNewUnitName.Text,
+            strUnitToBeTested,
+            F.FTestCases,
+            F.cbxBaseClass.Text,
+            F.edtTestSuiteName.Text,
+            F.edtClassName.Text,
+            F.edtMethodName.Text
+          )
+        Else
+          objDUnitCreator.UpdateTestUnit(
+            F.cbxExistingUnit.ItemIndex,
+            strUnitToBeTested,
+            F.FTestCases,
+            F.cbxBaseClass.Text,
+            F.edtTestSuiteName.Text,
+            F.edtClassName.Text,
+            F.edtMethodName.Text
+          );
+      End;
+  Finally
+    F.Free;
+  End;
 End;
 
 (**
@@ -531,7 +546,7 @@ end;
 
 (**
 
-  This is an OnFormDestroy Event Hanlder for the TfrmDUnit class.
+  This is an On Form Destroy Event Handler for the TfrmDUnit class.
 
   @precon  None.
   @postcon Frees the memory used by the Root Element of the tree view.
@@ -923,7 +938,7 @@ End;
 
 (**
 
-  This is an OnGetImageIndex for the virtual tree view.
+  This is an On Get Image Index for the virtual tree view.
 
   @precon  None.
   @postcon Returns the adjusted image index for scope for the associated module
@@ -952,10 +967,10 @@ end;
 
 (**
 
-  This is an OnGetText event handler for the virtual tree view.
+  This is an On Get Text event handler for the virtual tree view.
 
   @precon  None.
-  @postcon Returns the AsString text of the associated module element.
+  @postcon Returns the As String text of the associated module element.
 
   @param   Sender   as a TBaseVirtualTree
   @param   Node     as a PVirtualNode

@@ -4,15 +4,15 @@
   the token colours from the IDE.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.022
+  @Date    02 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,32 +78,34 @@ Const
   strBDSEnviroVar = 'BDS';
   strHelpRegKey = 'Software\Embarcadero\%s\%s\Editor\Highlight';
   strTokenHighlightMap : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
-    'Illegal Char',                     // ttUnknown
-    'Whitespace',                       // ttWhiteSpace
-    'Reserved word',                    // ttReservedWord
-    'Identifier',                       // ttIdentifier
-    'Number',                           // ttNumber
-    'Symbol',                           // ttSymbol
-    'Whitespace',                       // ttLineEnd
-    'String',                           // ttSingleLiteral
-    'Character',                        // ttDoubleLiteral
-    'Comment',                          // ttLineComment
-    'Comment',                          // ttBlockComment
-    'Tags',                             // ttHTMLStartTag
-    'Tags',                             // ttHTMLEndTag
-    'Reserved word',                    // ttDirective
-    'Preprocessor',                     // ttCompilerDirective
-    'Hot Link',                         // ttLinkTag
-    'ttTreeHeader',                     // ttTreeHeader
-    'Whitespace',                       // ttFileEnd
-    'Whitespace',                       // ttLineContinuation
-    'Tags',                             // ttCustomUserToken
-    'Marked Block',                     // ttExplorerHighlight
-    'Plain text',                       // ttPlainText
-    'Comment',                          // ttCommentText
-    'Attribute Names',                  // ttTagHeaderText
-    'Attribute Values',                 // ttTagText 
-    'Additional search match highlight' // Search Highlight
+    'Illegal Char',                      // ttUnknown
+    'Whitespace',                        // ttWhiteSpace
+    'Reserved word',                     // ttReservedWord
+    'Identifier',                        // ttIdentifier
+    'Number',                            // ttNumber
+    'Symbol',                            // ttSymbol
+    'Whitespace',                        // ttLineEnd
+    'String',                            // ttSingleLiteral
+    'Character',                         // ttDoubleLiteral
+    'Comment',                           // ttLineComment
+    'Comment',                           // ttBlockComment
+    'Tags',                              // ttHTMLStartTag
+    'Tags',                              // ttHTMLEndTag
+    'Reserved word',                     // ttDirective
+    'Preprocessor',                      // ttCompilerDirective
+    'Hot Link',                          // ttLinkTag
+    'ttTreeHeader',                      // ttTreeHeader
+    'Whitespace',                        // ttFileEnd
+    'Whitespace',                        // ttLineContinuation
+    'Tags',                              // ttCustomUserToken
+    'Marked Block',                      // ttExplorerHighlight
+    'Plain text',                        // ttPlainText
+    'Comment',                           // ttCommentText
+    'Attribute Names',                   // ttTagHeaderText
+    'Attribute Values',                  // ttTagText 
+    'Additional search match highlight', // Search Highlight
+    'Line Highlight',                    // Line Highlight
+    'ttDocIssueEditorText'               // Doc Issue Editor Text
   );
 
 Var
@@ -124,6 +126,9 @@ Begin
       Finally
         R.Free;
       End;
+    End Else
+    Begin
+      iBGColour := clNone;
     End;
 End;
 
@@ -133,7 +138,7 @@ End;
   and returns that alternate point instead of the standard BDS if found.
 
   @precon  None.
-  @postcon Returns the activty IDEs registration point.
+  @postcon Returns the active IDEs registration point.
 
   @return  a String
 
@@ -177,7 +182,7 @@ End;
 
 (**
 
-  This method reads an IDE Editor Token inforamtion from the given registry.
+  This method reads an IDE Editor Token information from the given registry.
 
   @precon  Reg must be a valid instance.
   @postcon The token is read from the registry.

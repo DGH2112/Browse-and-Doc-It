@@ -3,8 +3,10 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 59.520
+  @Date    09 May 2021
+
+  @nocheck HardCodedString HardCodedInteger HardCodedNumber
 
   @license
 
@@ -334,6 +336,13 @@ type
     Procedure TestCodeFailure40;
     Procedure TestCodeFailure41;
     Procedure TestCodeFailure42;
+    Procedure TestCodeFailure43;
+    Procedure TestCodeFailure44;
+    Procedure TestCodeFailure45;
+    Procedure TestCodeFailure46;
+    Procedure TestCodeFailure47;
+    Procedure TestCodeFailure48;
+    Procedure TestCodeFailure49;
   Public
   End;
 
@@ -817,6 +826,49 @@ Begin
     [
       'Implemented Methods\Hello|Procedure Hello|scPrivate',
       'Implemented Methods\Hello2|Procedure Hello2|scPrivate'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  asm'#13#10 +
+    '      MOV   EDX, Colors '#13#10 +
+    '      MOV   ECX, Count '#13#10 +
+    '      DEC   ECX '#13#10 +
+    '      JS    @@END '#13#10 +
+    '      LEA   EAX, SysInfo '#13#10 +
+    '      CMP   [EAX].TSystemInfo.wProcessorLevel, 3 '#13#10 +
+    '      JE    @@386 '#13#10 +
+    '@@1:  MOV   EAX, [EDX+ECX*4] '#13#10 +
+    '      BSWAP EAX '#13#10 +
+    '      SHR   EAX,8 '#13#10 +
+    '      MOV   [EDX+ECX*4],EAX '#13#10 +
+    '      DEC   ECX '#13#10 +
+    '      JNS   @@1 '#13#10 +
+    '      JMP   @@END '#13#10 +
+    '@@386: '#13#10 +
+    '      PUSH  EBX '#13#10 +
+    '@@2:  XOR   EBX,EBX '#13#10 +
+    '      MOV   EAX, [EDX+ECX*4] '#13#10 +
+    '      MOV   BH, AL '#13#10 +
+    '      MOV   BL, AH '#13#10 +
+    '      SHR   EAX,16 '#13#10 +
+    '      SHL   EBX,8 '#13#10 +
+    '      MOV   BL, AL '#13#10 +
+    '      MOV   [EDX+ECX*4],EBX '#13#10 +
+    '      DEC   ECX '#13#10 +
+    '      JNS   @@2 '#13#10 +
+    '      POP   EBX '#13#10 +
+    '  @@END: '#13#10 +
+    '  end;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
     ]
   );
 End;
@@ -2380,6 +2432,186 @@ Begin
     '    TXTColumnPositionComparer.Create);'#13#10 +
     'End;',
     [ttErrors],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure43;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  var i : Integer := 1;'#13#10 +
+    '  var j := 1',
+    [ttErrors],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  const s = ''Hello'';',
+    [ttErrors],
+    []
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure44;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure Hello();',
+    'Procedure Hello();'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  const s = ''Hello'';'#13#10 +
+    '  WriteLn(s);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttHints, ttChecks],
+    []
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure45;
+
+Begin
+  
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'procedure GetAdaptersInfo; stdcall; external ''GetAdaptersInfo'';',
+    [ttErrors..ttHints, ttChecks],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure46;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '{$IFDEF PROFILECODE}'#13#10 +
+    'Type'#13#10 +
+    '  TProfiler = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '    FStackTop      : Integer;'#13#10 +
+    '    FRootProfile   : TProfile;'#13#10 +
+    '    FCurrentProfile: TProfile;'#13#10 +
+    '    {$IFNDEF CONSOLE}'#13#10 +
+    '    FProgressForm  : TForm;'#13#10 +
+    '    FLabel         : TLabel;'#13#10 +
+    '    {$ENDIF}'#13#10 +
+    '  Strict Protected'#13#10 +
+    '    Procedure DumpProfileInformation;'#13#10 +
+    '    {$IFNDEF CONSOLE}'#13#10 +
+    '    Procedure Msg(strMsg: String; boolForce : Boolean = False);'#13#10 +
+    '    {$ENDIF}'#13#10 +
+    '  Public'#13#10 +
+    '    Constructor Create;'#13#10 +
+    '    Destructor Destroy; Override;'#13#10 +
+    '    Procedure Start(strMethodName: String);'#13#10 +
+    '    Procedure Stop;'#13#10 +
+    '  End;'#13#10 +
+    '{$ENDIF}',
+    '',
+    [ttErrors],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure47;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Const strTokenTypeInfo : TBADITokenFontInfoTokenSet = ('#13#10 +
+    '  (FForeColour : clRed;        FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clMaroon;     FStyles : [fsBold];               FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clInfoText;   FStyles : [];                     FBackColour: clInfoBk),'#13#10 +
+    '  (FForeColour : clWindowText; FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clNavy;       FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clPurple;     FStyles : [fsBold, fsUnderline];  FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clNone),'#13#10 +
+    '  (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone)'#13#10 +
+    ');',
+    [ttErrors],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure48;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Type'#13#10 +
+    '  TSimpleIndexComparer<T> = Class(TInterfacedObject, IComparer<TXTSimpleIndexRecord<T>>)'#13#10 +
+    '  Strict Private'#13#10 +
+    '  Strict Protected'#13#10 +
+    '  Public'#13#10 +
+    '    Function Compare(Const recLeft, recRight : TXTSimpleIndexRecord<T>) : Integer;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Function TSimpleIndexComparer<T>.Compare(Const recLeft, recRight : TXTSimpleIndexRecord<T>) : Integer;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure49;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Test;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  NodeData1 := Sender.GetNodeData(Node1);'#13#10 +
+    '  NodeData2 := Sender.GetNodeData(Node2);'#13#10 +
+    '  If NodeData1.FShiftLevel = NodeData2.FShiftLevel Then'#13#10 +
+    '    Begin'#13#10 +
+    '      Result := NodeData1.FDateIndex - NodeData2.FDateIndex;'#13#10 +
+    '      If Result = 0 Then'#13#10 +
+    '        Result := NodeData1.FShiftIndex - NodeData2.FShiftIndex;'#13#10 +
+    '    End'#13#10 +
+    '  Else If NodeData1.FShiftLevel < NodeData2.FShiftLevel Then'#13#10 +
+    '    Result := -1'#13#10 +
+    '  Else'#13#10 +
+    '    Result := 1;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
     []
   );
 End;
@@ -5719,6 +5951,18 @@ Begin
     [ttErrors, ttWarnings],
     []
   );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Library MyLibrary.Namespace;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
 End;
 
 Procedure TestTPascalModule.TestOPPackage;
@@ -5743,6 +5987,25 @@ Begin
       'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone'
     ]
   );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Package MyPackage.Namespace;'#13#10 +
+    ''#13#10 +
+    'Requires'#13#10 +
+    '  VCL50;'#13#10 +
+    ''#13#10 +
+    'Contains'#13#10 +
+    '  DGHLibrary In ''DGHLibrary.pas'';'#13#10 +
+    ''#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Requires\VCL50|VCL50|scNone',
+      'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestOPProgram;
@@ -5752,6 +6015,18 @@ Begin
     TPascalModule,
     strNone,
     'Program MyProgram;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Program MyProgram.Namespace;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  WriteLn(''Hello'');'#13#10 +
@@ -5802,6 +6077,39 @@ Begin
     TPascalModule,
     strNone,
     'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Windows;'#13#10 +
+    ''#13#10 +
+    '  Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  i = 10;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\Interface\Windows|Windows|scPublic',
+      'Exported Headings\Hello|Procedure Hello|scPublic',
+      'Constants\i|i = 10|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPublic'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
+    'Unit MyUnit.Namespace;'#13#10 +
     ''#13#10 +
     'Interface'#13#10 +
     ''#13#10 +
@@ -6150,6 +6458,88 @@ End;
 Procedure TestTPascalModule.TestProcessCompilerDirective;
 
 Begin
+  TestGrammarForErrors( // Test IFDEF ENDIF
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ENDIF'
+  );
+  TestGrammarForErrors( // Test IFDEF ELSE ENDIF 1
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 0|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ELSE $ENDIF 1'
+  );
+  TestGrammarForErrors( // Test IFDEF ELSE ENDIF 2
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH1}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFDEF $ELSE $ENDIF 1'
+  );
+  TestGrammarForErrors( // Test IFNDEF ELSE ENDIF 1
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 0|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFNDEF $ELSE $ENDIF 0'
+  );
+  TestGrammarForErrors( // Test IFNDEF ELSE ENDIF 2
+    TPascalModule,
+    strUnit,
+    '{$DEFINE DGH1}'#13#10,
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ], 0, 0, 0, 0, 0, 0, '$IFNDEF $ELSE $ENDIF 0'
+  );
+  TestGrammarForErrors( // Test IF IFEND
+    TPascalModule,
+    strUnit,
+    '',
+    'type'#13#10 +
+    '  TMyclass = class'#13#10 +
+    '    property qwerty;'#13#10 +
+    '    //{$if CompilerVersion >= 34}property Hello;{$ifend}'#13#10 +
+    '    property Goodbye;'#1#10 +
+    '  end;',
+    [ttErrors, ttWarnings],
+    [], 0, 0, 0, 0, 0, 0, '$IF $IFEND'
+  );
+  //---------------------------------------------------------------------------------------------
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -6166,15 +6556,47 @@ Begin
     'Var iMyVar : Integer;'#13#10 +
     '{$ENDIF}'#13#10 +
     ''#13#10 +
-    '{$IFOPT R=}'#13#10 +
+    'Procedure Test();'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  {$IFOPT R=}'#13#10 +
     '  WriteLn(''Hello!'');'#13#10 +
-    '{$ENDIF}'#13#10 +
+    '  {$ENDIF}'#13#10 +
+    'End;'#13#10 +
     ''#13#10 +
     '{$EXTERNALSYM MySymbol}',
     [ttErrors, ttWarnings],
     [
       'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
-    ]
+    ], 0, 0, 0, 0, 0, 0, 'Complex 1'
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Uses'#13#10 +
+    '  Classes,'#13#10 +
+    '  {$IFNDEF CONSOLE}'#13#10 +
+    '  Forms,'#13#10 +
+    '  {$ENDIF}'#13#10 +
+    '  SysUtils;'#13#10 +
+    ''#13#10 +
+    '{$IFDEF PROFILECODE}'#13#10 +
+    'Type'#13#10 +
+    '  TProfiler = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '    FStackTop : Integer;'#13#10 +
+    '    {$IFNDEF CONSOLE}'#13#10 +
+    '    FLabel : TLabel;'#13#10 +
+    '    {$ENDIF}'#13#10 +
+    '  Strict Protected'#13#10 +
+    '  Public'#13#10 +
+    '  End;'#13#10 +
+    '{$ENDIF}'#13#10 +
+    '',
+    '{$IFDEF PROFILECODE}'#13#10 +
+    '{$ENDIF}',
+    [ttErrors, ttWarnings],
+    [], 0, 0, 0, 0, 0, 0, 'Complex 2'
   );
 End;
 
@@ -6447,6 +6869,24 @@ Begin
     [ttErrors, ttWarnings],
     [
       'Types\TRecordHelper|TRecordHelper = Record Helper For Integer|scPublic',
+      'Types\TRecordHelper\Methods\AsString|Function AsString(i : Integer) : String|scPublic',
+      'Implemented Methods\TRecordHelper\AsString|Function AsString(i : Integer) : String|scPublic'
+    ]
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TRecordHelper = Record Helper For System.Integer'#13#10 +
+    '    Function AsString(i : Integer) : String;'#13#10 +
+    '  End;',
+    'Function TRecordHelper.AsString(i : Integer) : String;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TRecordHelper|TRecordHelper = Record Helper For System.Integer|scPublic',
       'Types\TRecordHelper\Methods\AsString|Function AsString(i : Integer) : String|scPublic',
       'Implemented Methods\TRecordHelper\AsString|Function AsString(i : Integer) : String|scPublic'
     ]

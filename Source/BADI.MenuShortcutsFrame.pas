@@ -1,17 +1,17 @@
 (**
 
-  This module contains a frame for editing the menu actino shortcuts.
+  This module contains a frame for editing the menu action shortcuts.
 
   @Author  David Hoyle
-  @version 1.0
-  @Date    21 Jun 2019
+  @version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ Uses
   This is an on click event handler for the Assign button.
 
   @precon  None.
-  @postcon Assgins the hot key shortcut to the selected list view item.
+  @postcon Assigns the hot key shortcut to the selected list view item.
 
   @param   Sender as a TObject
 
@@ -141,7 +141,7 @@ End;
   in use.
 
   @precon  ShortcutUsed must be a valid method or Nil.
-  @postcon The callbeck event handler is set.
+  @postcon The call back event handler is set.
 
   @param   ShortCutUsed as a TBADIShortcutUsedEvent as a constant
 
@@ -157,7 +157,7 @@ End;
   This method loads the menu action shortcuts into the frames list view.
 
   @precon  None.
-  @postcon The frames listview is loads with the menu shortcuts.
+  @postcon The frames list view is loads with the menu shortcuts.
 
 **)
 Procedure TfmBADIMenuShortcuts.LoadSettings;
@@ -185,7 +185,7 @@ End;
   This is an on select item event handler for the list view.
 
   @precon  None.
-  @postcon Enables or disables the hotkey control and assgined button and initialises the hotkey
+  @postcon Enables or disables the hot key control and assigned button and initialises the hot key
            control with the selected shortcut.
 
   @param   Sender   as a TObject

@@ -3,15 +3,15 @@
   This module contains constants to be used throughout the Browse and Doc It application.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 2.650
+  @Date    03 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ Const
   (** A default list of symbols which should have spaces after them. **)
   strSpaceAfterSymbols = ['=', ':', '+', '-', '*', '\', ','];
 
-  (** A set of characters for whitespace **)
+  (** A set of characters for white space **)
   strWhiteSpace : Set Of AnsiChar = [#32, #9];
   (** A set of characters for line feed and carriage return **)
   strLineEnd : Set of AnsiChar = [#10, #13];
@@ -70,6 +70,8 @@ Const
     strOptionGroupConflicts,
     strOptionGroupChecks,
     strOptionGroupMetrics,
+    strOptionGroupSpelling,
+    strOptionGroupDoNotFollow,
     strOptionGroupTypes,
     strOptionGroupModule,
     strOptionGroupMethods,
@@ -83,34 +85,70 @@ Const
     (FDescription : strDrawSynHighModuleExplorer;             FEnabled : False; FGroup: dogGeneral),
     (FDescription : strShowCommentsInTheHints;                FEnabled : False; FGroup: dogGeneral),
     (FDescription : strShowChildCountinTitles;                FEnabled : False; FGroup: dogGeneral),
+    (FDescription : strFollowEditorCursor;                    FEnabled : False; FGroup: dogGeneral),
+    (FDescription : strShowDocIssueTotalsInEditor;            FEnabled :  True; FGroup: dogGeneral),
+    (FDescription : strAutoUpdateModuleDate;                  FEnabled :  True; FGroup: dogGeneral),
+    (FDescription : strAutoUpdateModuleVersion;               FEnabled :  True; FGroup: dogGeneral),
 
     (FDescription : strShowErrors;                            FEnabled : True;  FGroup: dogErrors),
     (FDescription : strExpandErrors;                          FEnabled:   True; FGroup: dogErrors),
     (FDescription : strSyntaxHighlightErrors;                 FEnabled : False; FGroup: dogErrors),
+    (FDescription : strShowErrorIconsInEditor;                FEnabled :  True; FGroup: dogErrors),
+    (FDescription : strShowErrorMsgsInEditor;                 FEnabled : False; FGroup: dogErrors),
+    (FDescription : strShowIDEErrors;                         FEnabled : False; FGroup: dogErrors),
 
     (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogWarnings),
     (FDescription : strExpandWarnings;                        FEnabled:   True; FGroup: dogWarnings),
     (FDescription : strSyntaxHighlightWarnings;               FEnabled : False; FGroup: dogWarnings),
+    (FDescription : strShowWarningIconsInEditor;              FEnabled :  True; FGroup: dogWarnings),
+    (FDescription : strShowWarningMsgsInEditor;               FEnabled : False; FGroup: dogWarnings),
 
     (FDescription : strShowHints;                             FEnabled : False; FGroup: dogHints),
     (FDescription : strExpandHints;                           FEnabled:   True; FGroup: dogHints),
     (FDescription : strSyntaxHighlightHints;                  FEnabled : False; FGroup: dogHints),
+    (FDescription : strShowHintIconsInEditor;                 FEnabled :  True; FGroup: dogHints),
+    (FDescription : strShowHintMsgsInEditor;                  FEnabled : False; FGroup: dogHints),
 
     (FDescription : strShowDocumentationConflicts;            FEnabled : False; FGroup: dogConflicts),
     (FDescription : strExpandDocConflicts;                    FEnabled:   True; FGroup: dogConflicts),
     (FDescription : strSyntaxHighlightDocumentationConflicts; FEnabled : False; FGroup: dogConflicts),
+    (FDescription : strShowConflictIconsInEditor;             FEnabled :  True; FGroup: dogConflicts),
+    (FDescription : strShowConflictMsgsInEditor;              FEnabled : False; FGroup: dogConflicts),
 
     (FDescription : strShowModuleChecks;                      FEnabled : False; FGroup: dogChecks),
     (FDescription : strExpandChecks;                          FEnabled:   True; FGroup: dogChecks),
     (FDescription : strSyntaxHighlightChecks;                 FEnabled : False; FGroup: dogChecks),
     (FDescription : strAutoHideChecksWithNoIssues;            FEnabled : False; FGroup: dogChecks),
+    (FDescription : strShowCheckIconsInEditor;                FEnabled :  True; FGroup: dogChecks),
+    (FDescription : strShowCheckMsgsInEditor;                 FEnabled : False; FGroup: dogChecks),
 
     (FDescription : strShowModuleMetrics;                     FEnabled : False; FGroup: dogMetrics),
     (FDescription : strExpandMetrics;                         FEnabled:   True; FGroup: dogMetrics),
     (FDescription : strSyntaxHighlightMetrics;                FEnabled : False; FGroup: dogMetrics),
     (FDescription : strAutoHideMetricsWithNoIssues;           FEnabled : False; FGroup: dogMetrics),
+    (FDescription : strShowMetricIconsInEditor;               FEnabled :  True; FGroup: dogMetrics),
+    (FDescription : strShowMetricMsgsInEditor;                FEnabled : False; FGroup: dogMetrics),
 
+    (FDescription : strShowModuleSpelling;                    FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strExpandSpelling;                        FEnabled:   True; FGroup: dogSpelling),
+    (FDescription : strSyntaxHighlightSpelling;               FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strAutoHideSpellingWithNoIssues;          FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strShowSpellingIconsInEditor;             FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strShowSpellingMsgsInEditor;              FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckComments;                    FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckTags;                        FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckResourceStrings;             FEnabled :  True; FGroup: dogSpelling),
+    (FDescription : strSpellCheckConstants;                   FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckLiterals;                    FEnabled : False; FGroup: dogSpelling),
+    (FDescription : strSpellCheckDFMLiterals;                 FEnabled :  True; FGroup: dogSpelling),
 
+    (FDescription : strDoNotFollowEditorIfErrors;             FEnabled : True;  FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfWarnings;           FEnabled : True;  FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfHints;              FEnabled : True;  FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfConflicts;          FEnabled : False; FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfChecks;             FEnabled : True;  FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfMetrics;            FEnabled : False; FGroup: dogDoNotFollow),
+    (FDescription : strDoNotFollowEditorIfSpelling;           FEnabled : False; FGroup: dogDoNotFollow),
 
     (FDescription : strShowUndocumentedTypes;                 FEnabled : False; FGroup: dogTypes),
     (FDescription : strShowUndocumentedRecords;               FEnabled : False; FGroup: dogTypes),
@@ -163,35 +201,36 @@ Const
 
   (** This is a default set of font information for the application. **)
   strTokenTypeInfo : TBADITokenFontInfoTokenSet = (
-    (FForeColour : clRed;        FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [fsBold];               FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clMaroon;     FStyles : [fsBold];               FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clBlack;      FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clInfoText;   FStyles : [];                     FBackColour: clInfoBk),
-    (FForeColour : clWindowText; FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clNavy;       FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clPurple;     FStyles : [fsBold, fsUnderline];  FBackColour: clNone),
-    (FForeColour : clMaroon;     FStyles : [];                     FBackColour: clNone),
-    (FForeColour : clAqua;       FStyles : [];                     FBackColour: clNone)
-  );
-
-  (** This is a list of image resource masks to be placed of the below images to create vesions
+    (FForeColour : clRed;           FStyles : [];                     FBackColour: clNone),  // ttUnknown,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttWhiteSpace,
+    (FForeColour : clWindowText;    FStyles : [fsBold];               FBackColour: clNone),  // ttReservedWord,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttIdentifier,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttNumber,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttSymbol,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttLineEnd,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttSingleLiteral,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttDoubleLiteral,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttLineComment,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttBlockComment,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttHTMLStartTag,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttHTMLEndTag,
+    (FForeColour : clWindowText;    FStyles : [fsBold];               FBackColour: clNone),  // ttDirective,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttCompilerDirective,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttLinkTag,
+    (FForeColour : clWindowText;    FStyles : [fsBold];               FBackColour: clNone),  // ttTreeHeader,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttFileEnd,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttLineContinuation,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttCustomUserToken,
+    (FForeColour : clInfoText;      FStyles : [];                     FBackColour: clInfoBk),// ttExplorerHighlight,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttPlainText,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttCommentText,
+    (FForeColour : clWindowText;    FStyles : [fsBold, fsUnderline];  FBackColour: clNone),  // ttTagHeaderText,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone),  // ttTagText,
+    (FForeColour : clHighlightText; FStyles : [];                     FBackColour: clHighlight), // ttSearchHighlight,
+    (FForeColour : clHighlightText; FStyles : [];                     FBackColour: clHighlight), // ttLineHighlight,
+    (FForeColour : clWindowText;    FStyles : [];                     FBackColour: clNone)   // ttDocIssueEditorText
+  );                                                                                      
+  (** This is a list of image resource masks to be placed of the below images to create versions
       for different scopes. **)
   BADIScopeList : Array[Low(TScope)..High(TScope)] Of TImageIndexInfo = (
     (FResourceName : 'NoneMask';                      FMaskColour: clLime),
@@ -204,8 +243,10 @@ Const
     (FResourceName : 'FriendMask';                    FMaskColour: clLime)
   );
 
-  (** This is a list of Image Resource name to be loaded fom the executable. **)
-  BADIImageList : Array[Succ(Low(TBADIImageIndex))..High(TBADIImageIndex)] Of TImageIndexInfo = (
+  (** This is a list of Image Resource name to be loaded from the executable. **)
+  BADIImageList : Array[TBADIImageIndex] Of TImageIndexInfo = (
+    (FResourceName : 'Module';                        FMaskColour: clLime),
+
     (FResourceName : 'Module';                        FMaskColour: clLime),
 
     (FResourceName : 'ErrorFolder';                   FMaskColour: clLime),
@@ -230,6 +271,83 @@ Const
     (FResourceName : 'CheckItem';                     FMaskColour: clFuchsia),
     (FResourceName : 'CheckMissing';                  FMaskColour: clFuchsia),
 
+    (FResourceName : 'RedWarning';                    FMaskColour: clFuchsia),
+    (FResourceName : 'AmberWarning';                  FMaskColour: clFuchsia),
+    (FResourceName : 'YellowWarning';                 FMaskColour: clFuchsia),
+    (FResourceName : 'GreenWarning';                  FMaskColour: clFuchsia),
+    (FResourceName : 'BlueWarning';                   FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedStop';                       FMaskColour: clFuchsia),
+    (FResourceName : 'AmberStop';                     FMaskColour: clFuchsia),
+    (FResourceName : 'YellowStop';                    FMaskColour: clFuchsia),
+    (FResourceName : 'GreenStop';                     FMaskColour: clFuchsia),
+    (FResourceName : 'BlueStop';                      FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedProhibited';                 FMaskColour: clFuchsia),
+    (FResourceName : 'AmberProhibited';               FMaskColour: clFuchsia),
+    (FResourceName : 'YellowProhibited';              FMaskColour: clFuchsia),
+    (FResourceName : 'GreenProhibited';               FMaskColour: clFuchsia),
+    (FResourceName : 'BlueProhibited';                FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedBug';                        FMaskColour: clFuchsia),
+    (FResourceName : 'AmberBug';                      FMaskColour: clFuchsia),
+    (FResourceName : 'YellowBug';                     FMaskColour: clFuchsia),
+    (FResourceName : 'GreenBug';                      FMaskColour: clFuchsia),
+    (FResourceName : 'BlueBug';                       FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedUpArrow';                    FMaskColour: clFuchsia),
+    (FResourceName : 'AmberUpArrow';                  FMaskColour: clFuchsia),
+    (FResourceName : 'YellowUpArrow';                 FMaskColour: clFuchsia),
+    (FResourceName : 'GreenUpArrow';                  FMaskColour: clFuchsia),
+    (FResourceName : 'BlueUpArrow';                   FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedRightArrow';                 FMaskColour: clFuchsia),
+    (FResourceName : 'AmberRightArrow';               FMaskColour: clFuchsia),
+    (FResourceName : 'YellowRightArrow';              FMaskColour: clFuchsia),
+    (FResourceName : 'GreenRightArrow';               FMaskColour: clFuchsia),
+    (FResourceName : 'BlueRightArrow';                FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedDownArrow';                  FMaskColour: clFuchsia),
+    (FResourceName : 'AmberDownArrow';                FMaskColour: clFuchsia),
+    (FResourceName : 'YellowDownArrow';               FMaskColour: clFuchsia),
+    (FResourceName : 'GreenDownArrow';                FMaskColour: clFuchsia),
+    (FResourceName : 'BlueDownArrow';                 FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedLeftArrow';                  FMaskColour: clFuchsia),
+    (FResourceName : 'AmberLeftArrow';                FMaskColour: clFuchsia),
+    (FResourceName : 'YellowLeftArrow';               FMaskColour: clFuchsia),
+    (FResourceName : 'GreenLeftArrow';                FMaskColour: clFuchsia),
+    (FResourceName : 'BlueLeftArrow';                 FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedBookmark';                   FMaskColour: clFuchsia),
+    (FResourceName : 'AmberBookmark';                 FMaskColour: clFuchsia),
+    (FResourceName : 'YellowBookmark';                FMaskColour: clFuchsia),
+    (FResourceName : 'GreenBookmark';                 FMaskColour: clFuchsia),
+    (FResourceName : 'BlueBookmark';                  FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedTick';                       FMaskColour: clFuchsia),
+    (FResourceName : 'AmberTick';                     FMaskColour: clFuchsia),
+    (FResourceName : 'YellowTick';                    FMaskColour: clFuchsia),
+    (FResourceName : 'GreenTick';                     FMaskColour: clFuchsia),
+    (FResourceName : 'BlueTick';                      FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedToDoTick';                   FMaskColour: clFuchsia),
+    (FResourceName : 'AmberToDoTick';                 FMaskColour: clFuchsia),
+    (FResourceName : 'YellowToDoTick';                FMaskColour: clFuchsia),
+    (FResourceName : 'GreenToDoTick';                 FMaskColour: clFuchsia),
+    (FResourceName : 'BlueToDoTick';                  FMaskColour: clFuchsia),
+
+    (FResourceName : 'RedToDoCross';                  FMaskColour: clFuchsia),
+    (FResourceName : 'AmberToDoCross';                FMaskColour: clFuchsia),
+    (FResourceName : 'YellowToDoCross';               FMaskColour: clFuchsia),
+    (FResourceName : 'GreenToDoCross';                FMaskColour: clFuchsia),
+    (FResourceName : 'BlueToDoCross';                 FMaskColour: clFuchsia),
+
+    (FResourceName : 'SpellingFolder';                FMaskColour: clLime),
+    (FResourceName : 'SpellingItem';                  FMaskColour: clLime),
+    
+    (FResourceName : 'BadTag';                        FMaskColour: clLime),
+    
     (FResourceName : 'UsesLabel';                     FMaskColour: clLime),
     (FResourceName : 'UsesItem';                      FMaskColour: clLime),
 
@@ -438,7 +556,9 @@ Const
     strTokenCommentText,
     strTokenTagHeaderText,
     strTokenTagText,
-    strSearchHighlight
+    strSearchHighlight,
+    strLineHighlight,
+    strDocIssueEditorText
   );
 
   (** A constant string to represent the position of the main procedure code in
@@ -466,6 +586,7 @@ Const
     (FName: 'BADIRefactorConstant'; FCaption: strMenuRefactorConstant; FShortcut: 'CTRL+SHIFT+ALT+C';     FMaskColor: clLime),
     (FName: 'BADIMetrics';          FCaption: strMenuMetrics;          FShortcut: 'CTRL+SHIFT+ALT+S';     FMaskColor: clLime),
     (FName: 'BADIChecks';           FCaption: strMenuChecks;           FShortcut: 'CTRL+SHIFT+ALT+H';     FMaskColor: clFuchsia),
+    (FName: 'BADISpelling';         FCaption: strMenuSpelling;         FShortcut: 'CTRL+SHIFT+ALT+Z';     FMaskColor: clLime),
     (FName: 'BADISep3';             FCaption: strMenuSep;              FShortcut: '';                     FMaskColor: clLime),
     (FName: 'BADIOptions';          FCaption: strMenuOptions;          FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime)
   );
@@ -479,7 +600,8 @@ Const
     strTagPropExpand,
     strTagPropShowInDocs,
     strTagPropFixedFont,
-    strTagPropSyntax
+    strTagPropSyntax,
+    strTagPropShowInEditor
   );
 
   (** A constant name for the Long Method metric so it can be disabled. **)
@@ -500,7 +622,7 @@ Const
   strHCNumIgmoreZeroNoMetric = 'HCNumIgmoreZero';
   (** A constant name for the Hard Coded Strings metric so it can be disabled. **)
   strHardCodedStringNoMetric = 'HardCodedString';
-  (** A constant name for the Hard Coded Strings Igmore Empty metric so it can be disabled. **)
+  (** A constant name for the Hard Coded Strings Ignore Empty metric so it can be disabled. **)
   strHCStrIgnoreEmptyNoMetric = 'HCStrIgnoreEmpty';
   (** A constant name for the Hard Coded String Ignore Single metric so it can be disabled. **)
   strHCStrIgnoreSingleNoMetric = 'HCStrIgnoreSingle';
@@ -510,11 +632,11 @@ Const
   strWithStatementNoMetric = 'WithStatement';
   (** A constant name for the Goto Statement metric so it can be disabled. **)
   strGotoStatementNoMetric = 'GotoStatement';
-  (** A constant name for the NestedIFDepth metric so it can be disabled. **)
+  (** A constant name for the Nested IF Depth metric so it can be disabled. **)
   strNestedIFDepthNoMetric = 'NestedIFDepth';
   (** A constant name for the Cyclometric Complexity metric so it can be disabled. **)
   strCyclometricComplexityNoMetric = 'CyclometricComplexity';
-  (** A constant name for the Cyclometric Complexity Igmore Expressions metric so it can be disabled. **)
+  (** A constant name for the Cyclometric Complexity Ignore Expressions metric so it can be disabled. **)
   strCCIncludeExpressionNoMetric = 'CCIncludeExpression';
   (** A constant name for the Toxicity metric so it can be disabled. **)
   strToxicityNoMetric = 'Toxicity';
@@ -546,9 +668,34 @@ Const
   strEmptyMethodNoMetric = 'EmptyMethod';
   (** A constant name for the Missing CONST in Parameters metric so it can be disabled. **)
   strMissingCONSTInParamNoMetric = 'MissingCONSTInParam';
-  (** A constant name for the Missign Const in Parameters Ignore Event handlers metric so it can be
+  (** A constant name for the Missing Constant in Parameters Ignore Event handlers metric so it can be
       disabled. **)
   strMCParmListIgnoreEventsNoMetric = 'MCParmListIgnoreEvents';
+  (** A resource for disabling all errors on an element and its sub elements. **)
+  strNoError = 'noerror';
+  (** A resource for disabling all warnings on an element and its sub elements. **)
+  strNoWarning = 'nowarning';
+  (** A resource for disabling all hints on an element and its sub elements. **)
+  strNoHint = 'nohint';
+  (** A resource for disabling all hints on an element and its sub elements. **)
+  strNoHints = 'nohints';
+  (** A resource for disabling all metrics on an element and its sub elements. **)
+  strNoMetrics = 'nometrics';
+  (** A resource for disabling all checks on an element and its sub elements. **)
+  strNoChecks = 'nochecks';
+  (** A resource for disabling all spellings on an element and its sub elements. **)
+  strNoSpellings = 'nospellings';
+  (** A resource for disabling a metric on an element and its sub elements. **)
+  strNoMetric = 'nometric';
+  (** A resource for disabling a check on an element and its sub elements. **)
+  strNoCheck = 'nocheck';
+  (** A resource for disabling a spelling on an element and its sub elements. **)
+  strNoSpelling = 'nospelling';
+  (** A resource for disabling documentation on an element and its sub elements. **)
+  strStopDocumentation = 'stopdocumentation';
+  (** A resource for disabling documentation on an element and its sub elements. **)
+  strNoDocumentation = 'nodocumentation';
+
 
   (** A constant array of default options for the Module Metrics. **)
   ModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord = (
@@ -608,7 +755,7 @@ Const
       FLimitType: ltFloat)
   );
 
-  (** A constant array of information for the mnetric sub-options. **)
+  (** A constant array of information for the metric sub-options. **)
   ModuleMetricSubOps : Array[Low(TBADIModuleMetricSubOp)..High(TBADIModuleMetricSubOp)] Of
     TBADIMetricSubOpRecord = (
     (FName: 'MethodCCIncIF';         FDescription: strMethodCCIncIF;         FParentMetric: mmCyclometricComplexity),
@@ -819,6 +966,49 @@ Const
     (FName: 'MCParmListIgnoreEvents'; FDescription: strMissingCONSTInParamIgnoreEventHandlersCat; FParentCheck: mcMissingCONSTInParemterList)
   );
 
+  (** A constant array of strings for the names of the limit types. **)
+  astrLimitType : Array[TLimitType] Of String = (
+    strErrors,
+    strWarnings,
+    strHints,
+    strConflicts,
+    strChecks,
+    strMetrics,
+    strSpelling
+  );
+
+  (** A constant to define a light green colour for the columns if an item is under the limit. **)
+  iLightGreen = $80FF80;
+  (** A constant to define a light amber colour for the columns if an item is at the limit. **)
+  iLightRed = $8080FF;
+  (** A constant to define a light red colour for the columns if an item is over the limit. **)
+  iLightAmber = $80CCFF;
+  (** A constant to define a light aqua colour for the columns if an item is over the limit but which
+      have been overridden. **)
+  iLightAqua = $FFFF80;
+  (** A constant to define a light yellow colour. **)
+  iLightYellow = $80FFFF;
+
+  (** A constant array of string representing spelling issue types. **)
+  astrSpellingIssueType : Array[TBADISpellingIssueType] Of String = (
+    strComment,
+    strTag,
+    strResourceString,
+    strConstant,
+    strLiteral
+  );
+
+  (** A constant array to define the comment start, end and markers for the
+      different styles of source code. **)
+  astrCmtTerminals: Array [Low(TCommentType) .. High(TCommentType)] Of TCommentTypeRec = (
+    (FStart: '';     FMiddle: '';    FBlockEnd: '';    FLineEnd: ''),
+    (FStart: '(**';  FMiddle: '';    FBlockEnd: '**)'; FLineEnd: '**)'),
+    (FStart: '{:';   FMiddle: '';    FBlockEnd: '}';   FLineEnd: '}'),
+    (FStart: '/**';  FMiddle: '';    FBlockEnd: '**/'; FLineEnd: '**/'),
+    (FStart: '//:';  FMiddle: '//:'; FBlockEnd: '';    FLineEnd: ''),
+    (FStart: ''':';  FMiddle: ''':'; FBlockEnd: ''':'; FLineEnd: ''),
+    (FStart: '<!--'; FMiddle: '';    FBlockEnd: '-->'; FLineEnd: '-->'));
+    
 Implementation
 
 End.

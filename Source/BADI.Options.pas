@@ -3,15 +3,15 @@
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 20.838
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,9 +33,10 @@ Interface
 
 Uses
   Classes,
-  Graphics,
   Generics.Collections,
   RegularExpressions,
+  VCL.Graphics,
+  VCL.Controls,
   IniFiles,
   BADI.Types,
   BADI.Interfaces;
@@ -46,42 +47,57 @@ Type
   (** This is a class to define a set of options for the application. **)
   TBADIOptions = Class(TInterfacedObject, IBADIOptions)
   Strict Private
-    FOptions                : TDocOptions;
-    FDefines                : TStringList;
-    FSpecialTags            : TList<TBADISpecialTag>;
-    FExpandedNodes          : TStringList;
-    FINIFileName            : String;
-    FUpdateInterval         : Cardinal;
-    FScopesToRender         : TScopes;
-    FBrowsePosition         : TBrowsePosition;
-    FTreeFontName           : String;
-    FTreeFontSize           : Integer;
-    FFixedFontName          : String;
-    FFixedFontSize          : Integer;
-    FIDEEditorColours       : IBADIIDEEditorColours;
-    FTokenFontInfo          : Array[False..True] Of TBADITokenFontInfoTokenSet;
-    FUseIDEEditorColours    : Boolean;
-    FExclusions             : IBADIExclusions;
-    FMethodDescriptions     : TStringList;
-    FScopesToDocument       : TScopes;
-    FModuleExplorerBGColour : Array[False..True] Of TColor;
-    FTokenLimit             : Integer;
-    FMaxDocOutputWidth      : Integer;
-    FManagedNodesLife       : Integer;
-    FTreeColour             : TColor;
-    FProfilingCode          : TStringList;
-    FIssueLimits            : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
-    FBADIMenuShortCuts      : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
-    FModuleMetrics          : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
-    FModuleMetricSubOps     : TBADIModuleMetricSubOps;
-    FToxicityPower          : Integer;
-    FToxicitySummation      : TBADIToxicitySummation;
-    FModuleChecks           : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord;
-    FModuleCheckSubOps      : TBADIModuleCheckSubOps;
-    FLowMetricMargin        : Double;
-    FHighMetricMargin       : Double;
-    FRefactorConstNewLine   : Boolean;
-    FRequiresIDEEditorColoursUpdating: Boolean;
+    FOptions                          : TDocOptions;
+    FDefines                          : TStringList;
+    FSpecialTags                      : TList<TBADISpecialTag>;
+    FExpandedNodes                    : TStringList;
+    FINIFileName                      : String;
+    FUpdateInterval                   : Cardinal;
+    FScopesToRender                   : TScopes;
+    FBrowsePosition                   : TBrowsePosition;
+    FTreeFontName                     : String;
+    FTreeFontSize                     : Integer;
+    FFixedFontName                    : String;
+    FFixedFontSize                    : Integer;
+    FIDEEditorColours                 : IBADIIDEEditorColours;
+    FTokenFontInfo                    : Array[False..True] Of TBADITokenFontInfoTokenSet;
+    FUseIDEEditorColours              : Boolean;
+    FExclusions                       : IBADIExclusions;
+    FMethodDescriptions               : TStringList;
+    FScopesToDocument                 : TScopes;
+    FModuleExplorerBGColour           : Array[False..True] Of TColor;
+    FTokenLimit                       : Integer;
+    FMaxDocOutputWidth                : Integer;
+    FManagedNodesLife                 : Integer;
+    FTreeColour                       : TColor;
+    FProfilingCode                    : TStringList;
+    FIssueLimits                      : Array[TLimitType] Of Integer;
+    FBADIMenuShortCuts                : Array[TBADIMenu] Of String;
+    FModuleMetrics                    : Array[TBADIModuleMetric] Of TBADIMetricRecord;
+    FModuleMetricSubOps               : TBADIModuleMetricSubOps;
+    FToxicityPower                    : Integer;
+    FToxicitySummation                : TBADIToxicitySummation;
+    FModuleChecks                     : Array[TBADIModuleCheck] Of TBADICheckRecord;
+    FModuleCheckSubOps                : TBADIModuleCheckSubOps;
+    FLowMetricMargin                  : Double;
+    FHighMetricMargin                 : Double;
+    FRefactorConstNewLine             : Boolean;
+    FRequiresIDEEditorColoursUpdating : Boolean;
+    FModuleDateFmt                    : String;
+    FModuleVersionIncrement           : Double;
+    FDoNotFollowEditor                : TLimitTypes;
+    FScopeImageList                   : TImageList;
+    FLanguageDictionaryFile           : String;
+    FLanguageDictionary               : TStringList;
+    FLocalDictionaryFile              : String;
+    FLocalDictionary                  : TStringList;
+    FProjectDictionaryFile            : String;
+    FProjectDictionary                : TStringList;
+    FIgnoreDictionaryFile             : String;
+    FIgnoreDictionary                 : TStringList;
+    FSpellingMistakeColour            : TColor;
+    FCommentTagNames                  : TStringList;
+    FCommentTypes                     : TStringList;
   Strict Protected
     // IBADIOptions
     Function  GetOptions : TDocOptions;
@@ -148,6 +164,12 @@ Type
     Procedure SetRefactorConstNewLine(Const boolNewLine : Boolean);
     Function  GetUseIDEEditorColours : Boolean;
     Procedure SetUseIDEEditorColours(Const boolUseIDEEditorColours : Boolean);
+    Function  GetModuleDateFmt : String;
+    Procedure SetModuleDateFmt(Const strValue : String);
+    Function  GetModuleVersionIncrement : Double;
+    Procedure SetModuleVersionIncrement(Const dblValue : Double);
+    Function  GetDoNotFollowEditor : TLimitTypes;
+    Procedure SetDoNotFollowEditor(Const setLimitTypes : TLimitTypes);
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure RequiresIDEEditorColoursUpdate;
@@ -164,6 +186,10 @@ Type
     Procedure LoadExtensions(Const iniFile: TMemIniFile);
     Procedure LoadMetrics(Const iniFile: TMemIniFile);
     Procedure LoadChecks(Const iniFile: TMemIniFile);
+    Procedure LoadDictionaries(Const iniFile: TMemIniFile);
+    Procedure LoadCommentTags(Const iniFile: TMemIniFile);
+    Procedure LoadCommentTypes(Const iniFile: TMemIniFile);
+    Procedure UpdateDoNotFollowEditor();
     Procedure SaveDocOptions(Const iniFile: TMemIniFile);
     Procedure SaveSpecialTags(Const iniFile: TMemIniFile);
     Procedure SaveManagedNodes(Const iniFile: TMemIniFile);
@@ -176,6 +202,28 @@ Type
     Procedure SaveExtensions(Const iniFile: TMemIniFile);
     Procedure SaveMetrics(Const iniFile: TMemIniFile);
     Procedure SaveChecks(Const iniFile: TMemIniFile);
+    Procedure SaveDictionaries(Const iniFile: TMemIniFile);
+    Procedure SaveCommentTags(Const iniFile: TMemIniFile);
+    Procedure SaveCommentTypes(Const iniFile: TMemIniFile);
+    Function  GetScopeImageList : TImageList;
+    Function  GetLanguageDictionary : TStringList;
+    Function  GetLanguageDictionaryFile : String;
+    Procedure SetLanguageDictionaryFile(Const strValue : String);
+    Function  GetLocalDictionaryFile : String;
+    Procedure SetLocalDictionaryFile(Const strValue : String);
+    Function  GetLocalDictionary : TStringList;
+    Function  GetProjectDictionaryFile : String;
+    Procedure SetProjectDictionaryFile(Const strValue : String);
+    Function  GetProjectDictionary : TStringList;
+    Function  GetIgnoreDictionaryFile : String;
+    Procedure SetIgnoreDictionaryFile(Const strValue : String);
+    Function  GetIgnoreDictionary : TStringList;
+    Function  GetSpellingMistakeColour : TColor;
+    Procedure SetSpellingMistakeColour(Const iColour : TColor);
+    Function  GetCommentTagName(Const strExt : String) : String;
+    Procedure SetCommentTagName(Const strExt, strValue : String);
+    Function  GetCommentType(Const strExt : String) : TCommentType;
+    Procedure SetCommentType(Const strExt : String; Const eValue : TCommentType);
   Public
     Constructor Create(Const IDEEditorColours : IBADIIDEEditorColours);
     Destructor Destroy; Override;
@@ -199,7 +247,7 @@ Uses
 Const
   (** An INI section name for the special tag names. **)
   strSpecialTagNames = 'SpecialTagNames';
-  (** An INI section name for the special tag informtion. **)
+  (** An INI section name for the special tag information. **)
   strSpecialTags = 'SpecialTags';
   (** An INI key for special tag font styles. **)
   strSpecialTagFontStyles = 'SpecialTagFontStyles';
@@ -207,93 +255,83 @@ Const
   strSpecialTagFontForeColours = 'SpecialTagFontForeColours';
   (** An INI key for special tag font back colours. **)
   strSpecialTagFontBackColours = 'SpecialTagFontBackColours';
-  (** An ini section name for the managed nodes. **)
+  (** An INI key for special tag image indexes. **)
+  strSpecialTagImageIndexes = 'SpecialTagImageIndexes';
+  (** An INI section name for the managed nodes. **)
   strManagedExpandedNodes = 'ManagedExpandedNodes';
-  (** An ini section name for the documentation options. **)
+  (** An INI section name for the documentation options. **)
   strDocOptions = 'Options';
-  (** An ini section name for the modules options. **)
+  (** An INI section name for the modules options. **)
   strModuleExplorer = 'ModuleExplorer';
-  (** An ini key for the update interval **)
+  (** An INI key for the update interval **)
   strUpdateInterval = 'UpdateInterval';
-  (** An ini key for the Scopes to render in the explorer **)
+  (** An INI key for the Scopes to render in the explorer **)
   strScopesToRender = 'ScopesToRender';
-  (** An ini section name for general settings. **)
+  (** An INI section name for general settings. **)
   strSetup = 'Setup';
-  (** An ini key for the browse position **)
+  (** An INI key for the browse position **)
   strBrowsePosition = 'BrowsePosition';
-  (** An ini key for the proportional font name **)
+  (** An INI key for the proportional font name **)
   strFontName = 'Name';
-  (** An ini key for the proportional font size **)
+  (** An INI key for the proportional font size **)
   strFontSize = 'Size';
-  (** An ini key for the fixed font name **)
+  (** An INI key for the fixed font name **)
   strFixedFontName = 'FixedName';
-  (** An ini key for the fixed font size **)
+  (** An INI key for the fixed font size **)
   strFixedFontSize = 'FixedSize';
-  (** An ini key for the token font information **)
+  (** An INI key for the token font information **)
   strTokenFontInfo = 'TokenFontInfo';
-  (** An ini key for the token font colour **)
+  (** An INI key for the token font colour **)
   strFontColour = '%s.Colour';
-  (** An ini key for the token font style **)
+  (** An INI key for the token font style **)
   strFontStyles = '%s.Styles';
-  (** An ini key for the token font back colour **)
+  (** An INI key for the token font back colour **)
   strFontBackColour = '%s.BackColour';
-  (** An ini section name for the method descriptions. **)
+  (** An INI section name for the method descriptions. **)
   strMethodDescriptions = 'MethodDescriptions';
-  (** An ini section name for the excluded documentation files. **)
+  (** An INI section name for the excluded documentation files. **)
   strExcludeDocFiles = 'ExcludeDocFiles';
-  (** An ini section name for the exclusions for documentation, metrics and check files. **)
+  (** An INI section name for the exclusions for documentation, metrics and check files. **)
   strExclusions = 'Exclusions';
-  (**  An ini section name for documentation options. **)
+  (**  An INI section name for documentation options. **)
   strDocumentation = 'Documentation';
-  (** An ini key for the module explorer background colour **)
+  (** An INI key for the module explorer background colour **)
   strBGColour = 'BGColour';
-  (** An ini key for token limit **)
+  (** An INI key for token limit **)
   strTokenLimit = 'TokenLimit';
-  (** An ini key for max documentation output width **)
+  (** An INI key for max documentation output width **)
   strMaxDocOutputWidth = 'MaxDocOutputWidth';
-  (** An ini key for managed node life in days **)
+  (** An INI key for managed node life in days **)
   strManagedNodesLife = 'ManagedNodesLife';
-  (** An ini key for explorer tree colour. **)
+  (** An INI key for explorer tree colour. **)
   strTreeColour = 'TreeColour';
-  (** An ini key for scopes **)
+  (** An INI key for scopes **)
   strScopes = 'Scopes';
-  (** An ini section name for the profiling options **)
+  (** An INI section name for the profiling options **)
   strProfilingCode = 'ProfilingCode';
-  (** An ini key for issue limits **)
+  (** An INI key for issue limits **)
   strIssuesLimits = 'Issues Limits';
-  (** An ini key for errors **)
-  strErrors = 'Errors';
-  (** An ini key for warnings **)
-  strWarnings = 'Warnings';
-  (** An ini key for hints **)
-  strHints = 'Hints';
-  (** An ini key for conflicts **)
-  strConflicts = 'Conflicts';
-  (** An ini key for metrics **)
-  strMetrics = 'Metrics';
-  (** An ini key for checks **)
-  strChecks = 'Checks';
-  (** An ini section name for the module metrics **)
+  (** An INI section name for the module metrics **)
   strModuleMetrics = 'Module Metrics';
-  (** An ini section name for the module checks **)
+  (** An INI section name for the module checks **)
   strModuleChecks = 'Module Checks';
-  (** An ini key for enabled metrics **)
+  (** An INI key for enabled metrics **)
   strEnabled = '.Enabled';
-  (** An ini key for metrics limits **)
+  (** An INI key for metrics limits **)
   strLimit = '.Limit';
-  (** An ini section name for the metrics margins **)
+  (** An INI section name for the metrics margins **)
   strMetricMargins = 'MetricMargins';
-  (** An ini key for the low metric margin. **)
+  (** An INI key for the low metric margin. **)
   strLowMargin = 'LowMargin';
-  (** An ini key for the high metric margin. **)
+  (** An INI key for the high metric margin. **)
   strHighMargin = 'HighMargin';
-  (** An ini section name for the module extensions **)
+  (** An INI section name for the module extensions **)
   strModuleExtensions = 'ModuleExtensions';
-  (** An ini section name for the refactorings **)
+  (** An INI section name for the refactorings **)
   strRefactorings = 'Refactorings';
-  (** An ini key for new lines in refactoring. **)
+  (** An INI key for new lines in refactoring. **)
   strNewLine = 'NewLine';
-  (** An ini section name for the shortcuts **)
+  (** An INI section name for the shortcuts **)
   strBADIMenuShortcuts = 'BADIMenuShortcuts';
   (** A constant string to define the INI key for Toxicity Power **)
   strToxicityPower = 'ToxicityPower';
@@ -301,9 +339,27 @@ Const
   strToxicitySummation = 'ToxicitySummation';
   (** An INI Key for Using IDE Editor Colours rather than custom colours. **)
   strUseIDEEditorColours = 'UseIDEEditorColours';
+  (** A constant to define the INI section for the automatic module settings. **)
+  strAutomaticModuleUpdatesINISection = 'Automatic Module Updates';
+  (** A constant for the module date format. **)
+  strDateFormatINIKey = 'Date Format';
+  (** A constant for the module version increment. **)
+  strIncrementINIKey = 'Increment';
+  (** A constant for the language dictionary INI Key. **)
+  strLanguageDictionaryINIKey = 'LanguageDictionary';
+  (** A constant for the local dictionary INI Key. **)
+  strLocalDictionaryINIKey = 'LocalDictionary';
+  (** A constant for the ignore dictionary INI Key. **)
+  strIgnoreDictionaryINIKey = 'IgnoreDictionary';
+  (** A constant for the Spelling Mistake Colour INI Key. **)
+  strSpellingMistakeColourINIKey = 'Spelling Mistake Colour';
+  (** A constant for the Comment Tag Names INI Section **)
+  strCommentTagNamesINISection = 'CommentTagNames';
+  (** A constant for the Comment Types INI Section **)
+  strCommentTypesINISection = 'CommentTypes';
 
 Var
-  (** This is a class varaiable to hide and hold the BADI Options instance reference. **)
+  (** This is a class variable to hide and hold the BADI Options instance reference. **)
   FBADIOptionsInstance  : IBADIOptions;
 
 (**
@@ -311,7 +367,7 @@ Var
   This class method returns the singleton instance of the BADI Options class.
 
   @precon  None.
-  @postcon returns the instance of the BADI Options (and creates it if it hasnt alrady been done).
+  @postcon returns the instance of the BADI Options (and creates it if it hasn`t already been done).
 
   @return  an IBADIOptions
 
@@ -326,7 +382,7 @@ End;
 
 (**
 
-  This is the constructor method for the TBrowseAndDocItOptions class.
+  This is the constructor method for the TBADIOptions class.
 
   @precon  None.
   @postcon Does nothing at the moment.
@@ -341,27 +397,30 @@ Type
     FTagName : String;
     FTagDesc : String;
     FTagOps  : TBADITagProperties;
+    FTagImage: TBADIImageIndex;
   End;
   
 Const
-  DefaultSpecialTags : Array[0..14] Of TDefaultSpecialTag = (
-    (FTagName: 'todo';      FTagDesc: 'Things To Do';           FTagOps: [tpShowInTree..tpShowInDoc]),
-    (FTagName: 'precon';    FTagDesc: 'Pre-Conditions';         FTagOps: []),
-    (FTagName: 'postcon';   FTagDesc: 'Post-Conditions';        FTagOps: []),
-    (FTagName: 'param';     FTagDesc: 'Parameters';             FTagOps: []),
-    (FTagName: 'return';    FTagDesc: 'Returns';                FTagOps: []),
-    (FTagName: 'note';      FTagDesc: 'Notes';                  FTagOps: []),
-    (FTagName: 'see';       FTagDesc: 'Also See';               FTagOps: []),
-    (FTagName: 'exception'; FTagDesc: 'Exception Raised';       FTagOps: []),
-    (FTagName: 'bug';       FTagDesc: 'Known Bugs';             FTagOps: [tpShowInTree..tpShowInDoc]),
-    (FTagName: 'debug';     FTagDesc: 'Debugging Code';         FTagOps: [tpShowInTree..tpShowInDoc]),
-    (FTagName: 'date';      FTagDesc: 'Date Code Last Updated'; FTagOps: []),
-    (FTagName: 'author';    FTagDesc: 'Code Author';            FTagOps: []),
-    (FTagName: 'version';   FTagDesc: 'Code Version';           FTagOps: []),
-    (FTagName: 'refactor';  FTagDesc: 'Refactorings';           FTagOps: [tpShowInTree..tpShowInDoc]),
-    (FTagName: 'code';      FTagDesc: 'Code Example';           FTagOps: [tpShowInTree..tpFixed])
+  DefaultSpecialTags : Array[0..15] Of TDefaultSpecialTag = (
+    (FTagName: 'todo';      FTagDesc: 'Things To Do';           FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiRedToDoCross),
+    (FTagName: 'done';      FTagDesc: 'Completed Things To Do'; FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiGreenToDoCross),
+    (FTagName: 'precon';    FTagDesc: 'Pre-Conditions';         FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'postcon';   FTagDesc: 'Post-Conditions';        FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'param';     FTagDesc: 'Parameters';             FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'return';    FTagDesc: 'Returns';                FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'note';      FTagDesc: 'Notes';                  FTagOps: [];                          FTagImage: iiToDoItem),
+    (FTagName: 'see';       FTagDesc: 'Also See';               FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'exception'; FTagDesc: 'Exception Raised';       FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'bug';       FTagDesc: 'Known Bugs';             FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiRedBug),
+    (FTagName: 'debug';     FTagDesc: 'Debugging Code';         FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiYellowBug),
+    (FTagName: 'date';      FTagDesc: 'Date Code Last Updated'; FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'author';    FTagDesc: 'Code Author';            FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'version';   FTagDesc: 'Code Version';           FTagOps: [];                          FTagImage: iiNone),
+    (FTagName: 'refactor';  FTagDesc: 'Refactorings';           FTagOps: [tpShowInTree..tpShowInDoc]; FTagImage: iiBlueBookmark),
+    (FTagName: 'code';      FTagDesc: 'Code Example';           FTagOps: [tpShowInTree..tpFixed];     FTagImage: iiNone)
   );
-var
+  
+Var
   iTag: Integer;
 
 Begin
@@ -376,11 +435,27 @@ Begin
       TBADISpecialTag.Create(
         DefaultSpecialTags[iTag].FTagName,
         DefaultSpecialTags[iTag].FTagDesc,
-        DefaultSpecialTags[iTag].FTagOps)
-      );
+        DefaultSpecialTags[iTag].FTagOps,
+        DefaultSpecialTags[iTag].FTagImage
+      )
+    );
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
   FExpandedNodes.Duplicates := dupIgnore;
+  FLanguageDictionary := TStringList.Create;
+  FLanguageDictionary.Sorted := True;
+  FLanguageDictionary.Duplicates := dupIgnore;
+  FLocalDictionary := TStringList.Create;
+  FLocalDictionary.Sorted := True;
+  FLocalDictionary.Duplicates := dupIgnore;
+  FProjectDictionary := TStringList.Create;
+  FProjectDictionary.Sorted := True;
+  FProjectDictionary.Duplicates := dupIgnore;
+  FignoreDictionary := TStringList.Create;
+  FignoreDictionary.Sorted := True;
+  FignoreDictionary.Duplicates := dupIgnore;
+  FCommentTagNames := TStringList.Create;
+  FCommentTypes := TStringList.Create;
   FINIFileName := BuildRootKey;
   FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
   FExclusions := TBADIExclusions.Create;
@@ -388,14 +463,16 @@ Begin
   FScopesToDocument := [scPublished, scPublic, scProtected, scPrivate];
   FProfilingCode := TStringList.Create;
   FRequiresIDEEditorColoursUpdating := True;
+  FScopeImageList := TImageList.Create(Nil);
+  LoadBADIImages(FScopeImageList);
 End;
 
 (**
 
-  This is the destructor method for the TBrowseAndDocItOptions class.
+  This is the destructor method for the TBADIOptions class.
 
   @precon  none.
-  @postcon Does onthing at the moment except call the inherited destroy method.
+  @postcon Does nothing at the moment except call the inherited destroy method.
 
 **)
 Destructor TBADIOptions.Destroy;
@@ -403,9 +480,16 @@ Destructor TBADIOptions.Destroy;
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   SaveSettings;
+  FCommentTypes.Free;
+  FCommentTagNames.Free;
+  FScopeImageList.Free;
   FProfilingCode.Free;
   FMethodDescriptions.Free;
   FExpandedNodes.Free;
+  FLanguageDictionary.Free;
+  FLocalDictionary.Free;
+  FProjectDictionary.Free;
+  FIgnoreDictionary.Free;
   FSpecialTags.Free;
   FDefines.Free;
   Inherited Destroy;
@@ -413,10 +497,10 @@ End;
 
 (**
 
-  This is a getter method for the BrowsePosition property.
+  This is a getter method for the Browse Position property.
 
   @precon  None.
-  @postcon Returns the position the cursor shold be placed when browsing.
+  @postcon Returns the position the cursor should be placed when browsing.
 
   @return  a TBrowsePosition
 
@@ -429,10 +513,59 @@ End;
 
 (**
 
+  This is a getter method for the Comment Tag Name property.
+
+  @precon  None.
+  @postcon Returns the comment tag name for the given file extension.
+
+  @param   strExt as a String as a constant
+  @return  a String
+
+**)
+Function TBADIOptions.GetCommentTagName(Const strExt: String): String;
+
+Const
+  strToDoDefaultTagName = 'todo';
+
+Var
+  iIndex: Integer;
+
+Begin
+  Result := strToDoDefaultTagName;
+  iIndex := FCommentTagNames.IndexOfName(strExt);
+  If iIndex > -1 Then
+    Result := FCommentTagNames.ValueFromIndex[iIndex];
+End;
+
+(**
+
+  This is a getter method for the Comment Type property.
+
+  @precon  None.
+  @postcon Returns the comment type associated with the given file extension.
+
+  @param   strExt as a String as a constant
+  @return  a TCommentType
+
+**)
+Function TBADIOptions.GetCommentType(Const strExt: String): TCommentType;
+
+Var
+  iIndex: Integer;
+
+Begin
+  Result := TBADIDispatcher.BADIDispatcher.GetCommentType(strExt, csBlock);
+  iIndex := FCommentTypes.IndexOf(strExt);
+  If iIndex > -1 Then
+    Result := TCommentType(FCommentTypes.Objects[iIndex]);
+End;
+
+(**
+
   This is a getter method for the Defines property.
 
   @precon  None.
-  @postcon Returns a strings ist containing all the conditional defines for the current project.
+  @postcon Returns a strings list containing all the conditional defines for the current project.
 
   @return  a TStringList
 
@@ -445,7 +578,23 @@ End;
 
 (**
 
-  This is a getter method for the ExcludeDocFiles property.
+  This is a getter method for the Do Not Follow Editor property.
+
+  @precon  None.
+  @postcon Returns the set of limits which should prevent the module explorer following the editor.
+
+  @return  a TLimitTypes
+
+**)
+Function TBADIOptions.GetDoNotFollowEditor: TLimitTypes;
+
+Begin
+  Result := FDoNotFollowEditor;
+End;
+
+(**
+
+  This is a getter method for the Exclude Doc Files property.
 
   @precon  None.
   @postcon Returns a string list of filename / path patterns to be used to ignore documentation.
@@ -461,7 +610,7 @@ End;
 
 (**
 
-  This is a getter method for the ExpandedNodes property.
+  This is a getter method for the Expanded Nodes property.
 
   @precon  None.
   @postcon Returns a string list of the paths of all the expanded nodes.
@@ -477,7 +626,7 @@ End;
 
 (**
 
-  This is a getter method for the FixedFontName property.
+  This is a getter method for the Fixed Font Name property.
 
   @precon  None.
   @postcon Returns the font name to be used for fixed font output.
@@ -493,10 +642,10 @@ End;
 
 (**
 
-  This is a getter method for the FixedFontSize property.
+  This is a getter method for the Fixed Font Size property.
 
   @precon  None.
-  @postcon Returns the fone size to be used for fixed font output.
+  @postcon Returns the font size to be used for fixed font output.
 
   @return  an Integer
 
@@ -509,7 +658,7 @@ End;
 
 (**
 
-  This is a getter method for the HighMetricMargin property.
+  This is a getter method for the High Metric Margin property.
 
   @precon  None.
   @postcon Returns the value to be used as the upper limit for the metric margin.
@@ -525,7 +674,39 @@ End;
 
 (**
 
-  This is a getter method for the INIFileName property.
+  This is a getter method for the Ignore Dictionary property.
+
+  @precon  None.
+  @postcon Returns the string list for the ignore dictionary.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetIgnoreDictionary: TStringList;
+
+Begin
+  Result := FIgnoreDictionary;
+End;
+
+(**
+
+  This is a getter method for the Ignore Dictionary File property.
+
+  @precon  None.
+  @postcon Returns the filename of the ignore dictionary.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetIgnoreDictionaryFile: String;
+
+Begin
+  Result := FIgnoreDictionaryFile;
+End;
+
+(**
+
+  This is a getter method for the INI Filename property.
 
   @precon  None.
   @postcon Returns the filename and path for BADI INI file.
@@ -541,7 +722,7 @@ End;
 
 (**
 
-  This is a getter method for the IssueLimit property.
+  This is a getter method for the Issue Limit property.
 
   @precon  None.
   @postcon Returns the numerical limit for the given limit type.
@@ -558,7 +739,71 @@ End;
 
 (**
 
-  This is a getter method for the LowMetricMargin property.
+  This is a getter method for the Language Dictionary property.
+
+  @precon  None.
+  @postcon Returns the string list for the language dictionary.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetLanguageDictionary: TStringList;
+
+Begin
+  Result := FLanguageDictionary;
+End;
+
+(**
+
+  This is a getter method for the Language Dictionary File property.
+
+  @precon  None.
+  @postcon Returns the filename of the language dictionary.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetLanguageDictionaryFile: String;
+
+Begin
+  Result := FLanguageDictionaryFile;
+End;
+
+(**
+
+  This is a getter method for the Local Dictionary property.
+
+  @precon  None.
+  @postcon Returns the string list for the local dictionary.
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetLocalDictionary: TStringList;
+
+Begin
+  REsult := FLocalDictionary;
+End;
+
+(**
+
+  This is a getter method for the Local Dictionary File property.
+
+  @precon  None.
+  @postcon Returns the filename of the local dictionary.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetLocalDictionaryFile: String;
+
+Begin
+  Result := FLocalDictionaryFile;
+End;
+
+(**
+
+  This is a getter method for the Low Metric Margin property.
 
   @precon  None.
   @postcon Returns the value to be used for the lower metric margin.
@@ -574,10 +819,10 @@ End;
 
 (**
 
-  This is a getter method for the ManagedNodesLife property.
+  This is a getter method for the Managed Nodes Life property.
 
   @precon  None.
-  @postcon Returns the number of days a node is to be managaed in the expanded nodes list.
+  @postcon Returns the number of days a node is to be managed in the expanded nodes list.
 
   @return  an Integer
 
@@ -590,10 +835,10 @@ End;
 
 (**
 
-  This is a getter method for the MaxDocOutputWidth property.
+  This is a getter method for the Max Document Output Width property.
 
   @precon  None.
-  @postcon Returns the maximum otuput width to be used for docuentation be a line feed is inserted.
+  @postcon Returns the maximum output width to be used for documentation be a line feed is inserted.
 
   @return  an Integer
 
@@ -606,7 +851,7 @@ End;
 
 (**
 
-  This is a getter method for the MenuShortcut property.
+  This is a getter method for the Menu Shortcut property.
 
   @precon  None.
   @postcon Returns the string representation of the enumerated menu shortcut.
@@ -623,7 +868,7 @@ End;
 
 (**
 
-  This is a getter method for the MethodDescriptions property.
+  This is a getter method for the Method Descriptions property.
 
   @precon  None.
   @postcon Returns a string list of method descriptions name value pairs (method pattern = description).
@@ -639,7 +884,7 @@ End;
 
 (**
 
-  This is a getter method for the ModuleCheck property.
+  This is a getter method for the Module Check property.
 
   @precon  None.
   @postcon Returns the module check configuration for the given metric.
@@ -656,7 +901,7 @@ End;
 
 (**
 
-  This is a getter method for the ModuleCheckSubOps property.
+  This is a getter method for the Module Check Sub Ops property.
 
   @precon  None.
   @postcon Returns the module check sub options set.
@@ -672,7 +917,23 @@ End;
 
 (**
 
-  This is a getter method for the ModuleExploirerBGColour property.
+  This is a getter method for the Module Date Format property.
+
+  @precon  None.
+  @postcon Returns the module date format.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetModuleDateFmt: String;
+
+Begin
+  Result := FModuleDateFmt;
+End;
+
+(**
+
+  This is a getter method for the Module Explorer Background Colour property.
 
   @precon  None.
   @postcon Returns the default background colour for the explorer rendering.
@@ -689,7 +950,7 @@ End;
 
 (**
 
-  This is a getter method for the ModuleMetric property.
+  This is a getter method for the Module Metric property.
 
   @precon  None.
   @postcon Returns the module metric configuration for the given metric.
@@ -706,7 +967,7 @@ End;
 
 (**
 
-  This is a getter method for the ModuleMetricSubOps property.
+  This is a getter method for the Module Metric Sub Ops property.
 
   @precon  None.
   @postcon Returns the module metric sub options set.
@@ -718,6 +979,22 @@ Function TBADIOptions.GetModuleMetricSubOps: TBADIModuleMetricSubOps;
 
 Begin
   Result := FModuleMetricSubOps;
+End;
+
+(**
+
+  This is a getter method for the Module Version Increment property.
+
+  @precon  None.
+  @postcon Returns the module version increment.
+
+  @return  a Double
+
+**)
+Function TBADIOptions.GetModuleVersionIncrement: Double;
+
+Begin
+  Result := FModuleVersionIncrement;
 End;
 
 (**
@@ -738,7 +1015,7 @@ End;
 
 (**
 
-  This is a getter method for the ProfilingCode property.
+  This is a getter method for the Profiling Code property.
 
   @precon  None.
   @postcon Returns the profiling code template for the given filename.
@@ -765,10 +1042,42 @@ End;
 
 (**
 
-  This is a getter method for the RefactorConstNewLine property.
+  This is a getter method for the Project Dictionary property.
 
   @precon  None.
-  @postcon Returns whether a new line shoudl be inserted for constant refactoring.
+  @postcon Returns string list for the Project Dictionary
+
+  @return  a TStringList
+
+**)
+Function TBADIOptions.GetProjectDictionary: TStringList;
+
+Begin
+  Result := FProjectDictionary;
+End;
+
+(**
+
+  This is a getter method for the Project Dictionary File property.
+
+  @precon  None.
+  @postcon Returns the filename of the project dictionary.
+
+  @return  a String
+
+**)
+Function TBADIOptions.GetProjectDictionaryFile: String;
+
+Begin
+  Result := FProjectDictionaryFile;
+End;
+
+(**
+
+  This is a getter method for the Refactor Constant New Line property.
+
+  @precon  None.
+  @postcon Returns whether a new line should be inserted for constant refactoring.
 
   @return  a Boolean
 
@@ -781,7 +1090,23 @@ End;
 
 (**
 
-  This is a getter method for the ScopesToDocument property.
+  This is a getter method for the Scope Image List property.
+
+  @precon  None.
+  @postcon Returns the Scope Image List.
+
+  @return  a TImageList
+
+**)
+Function TBADIOptions.GetScopeImageList: TImageList;
+
+Begin
+  Result := FScopeImageList;
+End;
+
+(**
+
+  This is a getter method for the Scopes To Document property.
 
   @precon  None.
   @postcon Returns the scopes to be documented.
@@ -813,7 +1138,7 @@ End;
 
 (**
 
-  This is a getter method for the SpecialTags property.
+  This is a getter method for the Special Tags property.
 
   @precon  None.
   @postcon Returns a list of the special tags.
@@ -829,10 +1154,26 @@ End;
 
 (**
 
-  This is a getter method for the TokenFontInfo property.
+  This is a getter method for the Spelling Mistake Colour property.
 
   @precon  None.
-  @postcon Retursn the record information for the token type.
+  @postcon Returns the colour to be used for the spelling mistake colour.
+
+  @return  a TColor
+
+**)
+Function TBADIOptions.GetSpellingMistakeColour: TColor;
+
+Begin
+  Result := FSpellingMistakeColour;
+End;
+
+(**
+
+  This is a getter method for the Token Font Info property.
+
+  @precon  None.
+  @postcon Returns the record information for the token type.
 
   @param   boolUseIDEEditorColours as a Boolean as a constant
   @return  a TBADITokenFontInfoTokenSet
@@ -849,8 +1190,8 @@ End;
 
 (**
 
-  This is a getter method for the TokenLimit property.
-
+  This is a getter method for the Token Limit property.
+                                         
   @precon  None.
   @postcon Returns the maximum number of tokens to render in the module explorer.
 
@@ -865,10 +1206,10 @@ End;
 
 (**
 
-  This is a getter method for the ToxicityPower property.
+  This is a getter method for the Toxicity Power property.
 
   @precon  None.
-  @postcon Returns the power to be used to calculate the toxcity of method.
+  @postcon Returns the power to be used to calculate the toxicity of method.
 
   @return  an Integer
 
@@ -881,7 +1222,7 @@ End;
 
 (**
 
-  This is a getter method for the ToxicitySummation property.
+  This is a getter method for the Toxicity Summation property.
 
   @precon  None.
   @postcon Returns the type of summation to be used in the toxicity calculation.
@@ -897,7 +1238,7 @@ End;
 
 (**
 
-  This is a getter method for the TreeColour property.
+  This is a getter method for the Tree Colour property.
 
   @precon  None.
   @postcon Returns the colour to be used to render the tree in the module explorer.
@@ -913,7 +1254,7 @@ End;
 
 (**
 
-  This is a getter method for the TreeFontName property.
+  This is a getter method for the Tree Font Name property.
 
   @precon  None.
   @postcon Returns the name of the font to be used for the proportional font text.
@@ -929,7 +1270,7 @@ End;
 
 (**
 
-  This is a getter method for the TreeFontSize property.
+  This is a getter method for the Tree Font Size property.
 
   @precon  None.
   @postcon Returns the font size to be used for the tree proportional font in the module explorer.
@@ -945,7 +1286,7 @@ End;
 
 (**
 
-  This is a getter method for the Updateinterval property.
+  This is a getter method for the Update Interval property.
 
   @precon  None.
   @postcon Returns the update interval for refreshing the module explorer (in milliseconds).
@@ -961,7 +1302,7 @@ End;
 
 (**
 
-  This is a getter method for the UseIDEEditorColours property.
+  This is a getter method for the Use IDE Editor Colours property.
 
   @precon  None.
   @postcon Returns whether the module explorer uses custom colours or editor colours.
@@ -980,7 +1321,7 @@ End;
   This method loads the module checks from the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The checks are loaded fromt the INI file.
+  @postcon The checks are loaded from the INI file.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1003,6 +1344,87 @@ Begin
   For eChecksSubOp := Low(TBADIModuleCheckSubOp) To High(TBADIModuleCheckSubOp) Do
     If iniFile.ReadBool(strModuleChecks, ModuleCheckSubOps[eChecksSubOp].FName + strEnabled, True) Then
       Include(FModuleCheckSubOps, eChecksSubOp);
+End;
+
+(**
+
+  This method loads the comment tag names associated with the the file extensions in to the string list.
+
+  @precon  None.
+  @postcon The file extension = tag name pairs are loaded into the string list.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadCommentTags(Const iniFile: TMemIniFile);
+
+Const
+  strDefaultTagName = 'todo';
+
+Var
+  sl : TStringList;
+  strTagName: String;
+  
+Begin
+  sl := TstringList.Create;
+  Try
+    iniFile.ReadSection(strCommentTagNamesINISection, sl);
+    For strTagName In sl Do
+      FCommentTagNames.Add(strTagName + '=' +  
+        iniFile.ReadString(strCommentTagNamesINISection, strTagName, strDefaultTagName)
+      );
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This method loads the comment types associated with file extensions.
+
+  @precon  None.
+  @postcon The comment types associated with file extensions are loaded from the INI file.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadCommentTypes(Const iniFile: TMemIniFile);
+
+Var
+  sl: TStringList;
+  strTagName: String;
+
+Begin
+  sl := TstringList.Create;
+  Try
+    iniFile.ReadSection(strCommentTypesINISection, sl);
+    For strTagName In sl Do
+      FCommentTypes.AddObject(
+        strTagName,
+        TObject(iniFile.ReadInteger(strCommentTypesINISection, strTagName, Integer(ctNone)))
+      );
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This method loads the dictionary filenames from the INI File and loads the dictionaries into string
+  lists.
+
+  @precon  None.
+  @postcon The dictionary filenames are set and the dictionaries loaded if the filenames are valid.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadDictionaries(Const iniFile: TMemIniFile);
+
+Begin
+  SetLanguageDictionaryFile(iniFile.ReadString(strSetup, strLanguageDictionaryINIKey, ''));
+  SetLocalDictionaryFile(iniFile.ReadString(strSetup, strLocalDictionaryINIKey, ''));
+  SetIgnoreDictionaryFile(iniFile.ReadString(strSetup, strIgnoreDictionaryINIKey, ''));
 End;
 
 (**
@@ -1099,7 +1521,7 @@ End;
   This method loads the file extensions from the INI file that are associated with the parsers.
 
   @precon  iniFile must be a valid instance.
-  @postcon The exteniions are loaded from the INI file.
+  @postcon The extensions are loaded from the INI file.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1143,7 +1565,7 @@ End;
   This method loads the limit information from the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The lmit imformation is loaded.
+  @postcon The limit information is loaded.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1153,13 +1575,13 @@ Procedure TBADIOptions.LoadLimits(Const iniFile: TMemIniFile);
 Const
   iDefaultLimit = 10;
 
+Var
+  eLimitType : TLimitType;
+
 Begin
-  FIssueLimits[ltErrors] := iniFile.ReadInteger(strIssuesLimits, strErrors, iDefaultLimit);
-  FIssueLimits[ltWarnings] := iniFile.ReadInteger(strIssuesLimits, strWarnings, iDefaultLimit);
-  FIssueLimits[ltHints] := iniFile.ReadInteger(strIssuesLimits, strHints, iDefaultLimit);
-  FIssueLimits[ltConflicts] := iniFile.ReadInteger(strIssuesLimits, strConflicts, iDefaultLimit);
-  FIssueLimits[ltMetrics] := iniFile.ReadInteger(strIssuesLimits, strMetrics, iDefaultLimit);
-  FIssueLimits[ltChecks] := iniFile.ReadInteger(strIssuesLimits, strChecks, iDefaultLimit);
+  For eLimitType := Low(TLimitType) To High(TLimitType) Do
+    FIssueLimits[eLimitType] :=
+      iniFile.ReadInteger(strIssuesLimits, astrLimitType[eLimitType], iDefaultLimit);
 End;
 
 (**
@@ -1198,7 +1620,7 @@ End;
   This method loads the method descriptions from the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The method descrpitions are loaded.
+  @postcon The method descriptions are loaded.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1226,7 +1648,7 @@ End;
   This method loads the module metrics from the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The metrics are loaded fromt the INI file.
+  @postcon The metrics are loaded from the INI file.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1328,7 +1750,7 @@ End;
   This method loads the profiling options from the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The profiling options are laoded.
+  @postcon The profiling options are loaded.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1357,13 +1779,18 @@ End;
 
 (**
 
-  This method loads the applications settings from an ini file.
+  This method loads the applications settings from an INI file.
 
   @precon  None.
-  @postcon Loads the applications settings from an ini file.
+  @postcon Loads the applications settings from an INI file.
 
 **)
 Procedure TBADIOptions.LoadSettings;
+
+Const
+  strDefaultDateFmt = 'dd mmm yyyy';
+  dblDefaultIncrement = 0.00001;
+  strDefaultSpellingMistakeColour = 'clRed';
 
 Var
   iniFile : TMemIniFile;
@@ -1385,7 +1812,17 @@ Begin
     LoadExtensions(iniFile);
     LoadMetrics(iniFile);
     LoadChecks(iniFile);
+    LoadDictionaries(iniFile);
+    LoadCommentTags(iniFile);
+    LoadCommentTypes(iniFile);
+    UpdateDoNotFollowEditor();
     FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
+    FModuleDateFmt := iniFile.ReadString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey,
+      strDefaultDateFmt);
+    FModuleVersionIncrement := iniFile.ReadFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey,
+      dblDefaultIncrement);
+    FSpellingMistakeColour := StringToColor(iniFile.ReadString(strSetup, strSpellingMistakeColourINIKey,
+      strDefaultSpellingMistakeColour));
   Finally
     iniFile.Free;
   End;
@@ -1396,7 +1833,7 @@ End;
   This method loads the shortcuts for the menu options from the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The shoirtcuts are loaded.
+  @postcon The shortcuts are loaded.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1414,7 +1851,7 @@ End;
 
 (**
 
-  This method loads ther special tag information from the INI file.
+  This method loads the special tag information from the INI file.
 
   @precon  iniFile must be a valid instance.
   @postcon The special tags are loaded from the INI file.
@@ -1438,9 +1875,14 @@ Begin
       FSpecialTags.Clear;
     For iTag := 0 To sl.Count - 1 Do
       Begin
-        iSTIndex := FSpecialTags.Add(TBADISpecialTag.Create(sl[iTag],
-          iniFile.ReadString(strSpecialTagNames, sl[iTag], ''),
-          TBADITagProperties(Byte(iniFile.ReadInteger(strSpecialTags, sl[iTag], 0)))));
+        iSTIndex := FSpecialTags.Add(
+          TBADISpecialTag.Create(
+            sl[iTag],
+            iniFile.ReadString(strSpecialTagNames, sl[iTag], ''),
+            TBADITagProperties(Byte(iniFile.ReadInteger(strSpecialTags, sl[iTag], 0))),
+            TBADIImageIndex(iniFile.ReadInteger(strSpecialTagImageIndexes, sl[iTag], Integer(iiNone)))
+          )
+        );
         ST := FSpecialTags[iSTIndex];
         ST.FFontStyles := TFontStyles(Byte(iniFile.ReadInteger(strSpecialTagFontStyles, sl[iTag], 0)));
         ST.FFontColour := StringToColor(iniFile.ReadString(strSpecialTagFontForeColours, sl[iTag],
@@ -1471,7 +1913,7 @@ End;
 (**
 
   This method registers that the options needs to reload the IDE Editor Colours. This cannot be done in
-  the SaveSettings method as the IDE has not necessarily saved the Editore Colour changes at that time.
+  the SaveSettings method as the IDE has not necessarily saved the Editor Colour changes at that time.
 
   @precon  None.
   @postcon The marker is updated so that the next call to GetTokenFontInfo will update the cached IDE
@@ -1489,7 +1931,7 @@ End;
   This method saves the checks to the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The check setings are saved.
+  @postcon The check settings are saved.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1515,6 +1957,78 @@ End;
 
 (**
 
+  This method saves the comment tags associated with a file extension to the INI file.
+
+  @precon  None.
+  @postcon The comment tag associated with a file extension are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveCommentTags(Const iniFile: TMemIniFile);
+
+Var
+  iTag : Integer;
+  
+Begin
+  For iTag := 0 To FCommentTagNames.Count - 1 Do
+    iniFile.WriteString(
+      strCommentTagNamesINISection,
+      FCommentTagNames.Names[iTag],
+      FCommentTagNames.ValueFromIndex[iTag]
+    );  
+End;
+
+(**
+
+  This method saves the comment types associated with a file extension to the INI file.
+
+  @precon  None.
+  @postcon The comment types associated with a file extension are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveCommentTypes(Const iniFile: TMemIniFile);
+
+Var
+  iTag: Integer;
+
+Begin
+  For iTag := 0 To FCommentTypes.Count - 1 Do
+    iniFile.WriteInteger(
+      strCommentTypesINISection,
+      FCommentTypes[iTag],
+      Integer(FCommentTypes.Objects[iTag])
+    );  
+End;
+
+(**
+
+  This method saves the dictionary filenames and dictionaries.
+
+  @precon  None.
+  @postcon Saves the dictionary filenames and dictionaries.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveDictionaries(Const iniFile: TMemIniFile);
+
+Begin
+  iniFile.WriteString(strSetup, strLanguageDictionaryINIKey, FLanguageDictionaryFile);
+  iniFile.WriteString(strSetup, strLocalDictionaryINIKey, FLocalDictionaryFile);
+  If FileExists(FLocalDictionaryFile) Then
+    FLocalDictionary.SaveToFile(FLocalDictionaryFile);
+  iniFile.WriteString(strSetup, strIgnoreDictionaryINIKey, FIgnoreDictionaryFile);
+  If FileExists(FIgnoreDictionaryFile) Then
+    FIgnoreDictionary.SaveToFile(FIgnoreDictionaryFile);
+  If DirectoryExists(ExtractFilePath(FProjectDictionaryFile) )Then
+    FProjectDictionary.SaveToFile(FProjectDictionaryFile);
+End;
+
+(**
+
   This method saves the documentation options to the INI file.
 
   @precon  iniFile must be a valid instance.
@@ -1535,10 +2049,10 @@ End;
 
 (**
 
-  This method saves the new exclusions for documentation, metrics and checks to the ini file.
+  This method saves the new exclusions for documentation, metrics and checks to the INI file.
 
   @precon  iniFile must be a valid iniFile instance.
-  @postcon The exclusions are saved to the ini File.
+  @postcon The exclusions are saved to the INI File.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1560,7 +2074,7 @@ End;
 
 (**
 
-  This methods saves the extensions associated with parsers to the ini file.
+  This methods saves the extensions associated with parsers to the INI file.
 
   @precon  iniFile must be a valid instance.
   @postcon The extensions are saved.
@@ -1582,7 +2096,7 @@ End;
 
 (**
 
-  This method saves the limit information to the ini file.
+  This method saves the limit information to the INI file.
 
   @precon  iniFile must be a valid instance.
   @postcon The limit information is saved.
@@ -1592,20 +2106,19 @@ End;
 **)
 Procedure TBADIOptions.SaveLimits(Const iniFile: TMemIniFile);
 
+Var
+  eLimitType : TLimitType;
+
 Begin
-  iniFile.WriteInteger(strIssuesLimits, strErrors, FIssueLimits[ltErrors]);
-  iniFile.WriteInteger(strIssuesLimits, strWarnings, FIssueLimits[ltWarnings]);
-  iniFile.WriteInteger(strIssuesLimits, strHints, FIssueLimits[ltHints]);
-  iniFile.WriteInteger(strIssuesLimits, strConflicts, FIssueLimits[ltConflicts]);
-  iniFile.WriteInteger(strIssuesLimits, strMetrics, FIssueLimits[ltMetrics]);
-  iniFile.WriteInteger(strIssuesLimits, strChecks, FIssueLimits[ltChecks]);
+  For eLimitType := Low(TLimitType) To High(TLimitType) Do
+    iniFile.WriteInteger(strIssuesLimits, astrLimitType[eLimitType], FIssueLimits[eLimitType]);
 End;
 
 (**
 
-  This method save the managed nodes to the ini file.
+  This method save the managed nodes to the INI file.
 
-  @precon  iniFile must be a valid insatnce.
+  @precon  iniFile must be a valid instance.
   @postcon The managed nodes are saved.
 
   @param   iniFile as a TMemIniFile as a constant
@@ -1650,7 +2163,7 @@ End;
   This method saves the metrics to the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The metric setings are saved.
+  @postcon The metric settings are saved.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1680,10 +2193,10 @@ End;
 
 (**
 
-  This method saves the module explorer options to the ini file.
+  This method saves the module explorer options to the INI file.
 
   @precon  iniFile must be a valid instance.
-  @postcon The module explorer optins are saved.
+  @postcon The module explorer options are saved.
 
   @param   iniFile as a TMemIniFile as a constant
 
@@ -1751,10 +2264,10 @@ End;
 
 (**
 
-  This method saves the applications settings to an ini file.
+  This method saves the applications settings to an INI file.
 
   @precon  None.
-  @postcon Saves the applications settings to an ini file.
+  @postcon Saves the applications settings to an INI file.
 
 **)
 Procedure TBADIOptions.SaveSettings;
@@ -1778,7 +2291,14 @@ Begin
     SaveExtensions(iniFile);
     SaveMetrics(iniFile);
     SaveChecks(iniFile);
+    SaveDictionaries(iniFile);
+    SaveCommentTags(iniFile);
+    SaveCommentTypes(iniFile);
     iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
+    iniFile.WriteString(strAutomaticModuleUpdatesINISection, strDateFormatINIKey, FModuleDateFmt);
+    iniFile.WriteFloat(strAutomaticModuleUpdatesINISection, strIncrementINIKey, FModuleVersionIncrement);
+    iniFile.WriteString(strSetup, strSpellingMistakeColourINIKey, ColorToString(FSpellingMistakeColour));
+    UpdateDoNotFollowEditor();
     iniFile.UpdateFile;
   Finally
     iniFile.Free;
@@ -1807,7 +2327,7 @@ End;
 
 (**
 
-  This method saves the special tags to the ini file.
+  This method saves the special tags to the INI file.
 
   @precon  iniFile must be a valid instance.
   @postcon The special tags are saved.
@@ -1819,28 +2339,26 @@ Procedure TBADIOptions.SaveSpecialTags(Const iniFile: TMemIniFile);
 
 Var
   iTag: Integer;
+  ST: TBADISpecialTag;
 
 Begin
   iniFile.EraseSection(strSpecialTags);
   iniFile.EraseSection(strSpecialTagNames);
   For iTag := 0 To FSpecialTags.Count - 1 Do
     Begin
-      iniFile.WriteInteger(strSpecialTags, FSpecialTags[iTag].FName,
-        Byte(FSpecialTags[iTag].FTagProperties));
-      iniFile.WriteString(strSpecialTagNames, FSpecialTags[iTag].FName,
-        FSpecialTags[iTag].FDescription);
-      iniFile.WriteInteger(strSpecialTagFontStyles, FSpecialTags[iTag].FName,
-        Byte(FSpecialTags[iTag].FFontStyles));
-      iniFile.WriteString(strSpecialTagFontForeColours, FSpecialTags[iTag].FName,
-        ColorToString(FSpecialTags[iTag].FFontColour));
-      iniFile.WriteString(strSpecialTagFontBackColours, FSpecialTags[iTag].FName,
-        ColorToString(FSpecialTags[iTag].FBackColour));
+      ST := FSpecialTags[iTag];
+      iniFile.WriteInteger(strSpecialTags, ST.FName, Byte(ST.FTagProperties));
+      iniFile.WriteString(strSpecialTagNames, ST.FName, ST.FDescription);
+      iniFile.WriteInteger(strSpecialTagFontStyles, ST.FName, Byte(ST.FFontStyles));
+      iniFile.WriteString(strSpecialTagFontForeColours, ST.FName, ColorToString(ST.FFontColour));
+      iniFile.WriteString(strSpecialTagFontBackColours, ST.FName, ColorToString(ST.FBackColour));
+      iniFile.WriteInteger(strSpecialTagImageIndexes, ST.FName, Integer(ST.FIconImage));
     End;
 End;
 
 (**
 
-  This is a setter method for the BrowsePosition property.
+  This is a setter method for the Browse Position property.
 
   @precon  None.
   @postcon Sets the browsing position to be used.
@@ -1856,7 +2374,71 @@ End;
 
 (**
 
-  This is a setter method for the FixedFontName property.
+  This is a setter method for the Comment Tag Name property.
+
+  @precon  None.
+  @postcon Sets the tag name for the given file extension.
+
+  @param   strExt   as a String as a constant
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetCommentTagName(Const strExt, strValue: String);
+
+Var
+  iIndex: Integer;
+
+Begin
+  iIndex := FCommentTagNames.IndexOfName(strExt);
+  If iIndex > -1 Then
+    FCommentTagNames.Values[strExt] := strValue
+  Else
+    FCommentTagNames.Add(strExt + '=' + strValue);
+End;
+
+(**
+
+  This is a setter method for the Comment Types property.
+
+  @precon  None.
+  @postcon Sets the comments type associated with the given extension.
+
+  @param   strExt as a String as a constant
+  @param   eValue as a TCommentType as a constant
+
+**)
+Procedure TBADIOptions.SetCommentType(Const strExt: String; Const eValue: TCommentType);
+
+Var
+  iIndex: Integer;
+
+Begin
+  iIndex := FCommentTypes.IndexOf(strExt);
+  If iIndex > -1 Then
+    FCommentTypes.Objects[iIndex] := TObject(eValue)
+  Else
+    FCommentTypes.AddObject(strExt, TObject(eValue));
+End;
+
+(**
+
+  This is a setter method for the Do Not Follow Editor property.
+
+  @precon  None.
+  @postcon Set the set of limits which should prevent the module explorer following the editor.
+
+  @param   setLimitTypes as a TLimitTypes as a constant
+
+**)
+Procedure TBADIOptions.SetDoNotFollowEditor(Const setLimitTypes : TLimitTypes);
+
+Begin
+  FDoNotFollowEditor := setLimitTypes;
+End;
+
+(**
+
+  This is a setter method for the Fixed Font Name property.
 
   @precon  None.
   @postcon Sets the name of the fixed font to be used.
@@ -1872,7 +2454,7 @@ End;
 
 (**
 
-  This is a setter method for the FixedFontSize property.
+  This is a setter method for the Fixed Font Size property.
 
   @precon  None.
   @postcon Sets the size of the fixed font to be used.
@@ -1888,7 +2470,7 @@ End;
 
 (**
 
-  This is a setter method for the HighMetricMargin property.
+  This is a setter method for the High Metric Margin property.
 
   @precon  None.
   @postcon Sets the value of the high metric margin over which issues should be highlighted and below
@@ -1905,7 +2487,27 @@ End;
 
 (**
 
-  This is a setter method for the IssueLimit property.
+  This is a setter method for the Ignore Dictionary File property.
+
+  @precon  None.
+  @postcon Returns the filename of the ignore dictionary.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetIgnoreDictionaryFile(Const strValue: String);
+
+Begin
+  If FileExists(FIgnoreDictionaryFile) Then
+    FIgnoreDictionary.SaveToFile(FIgnoreDictionaryFile);
+  FIgnoreDictionaryFile := strValue;
+  If FileExists(FIgnoreDictionaryFile) Then
+    FIgnoreDictionary.LoadFromFile(FIgnoreDictionaryFile);
+End;
+
+(**
+
+  This is a setter method for the Issue Limit property.
 
   @precon  None.
   @postcon Sets the numerical limit for the given limit type.
@@ -1922,7 +2524,51 @@ End;
 
 (**
 
-  This is a setter method for the LowMetricMargin property.
+  This is a setter method for the Language Dictionary File property.
+
+  @precon  None.
+  @postcon Returns the filename of the language dictionary.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetLanguageDictionaryFile(Const strValue: String);
+
+Begin
+  If CompareText(FLanguageDictionaryFile, strValue) <> 0 Then
+    Begin
+      FLanguageDictionaryFile := strValue;
+      If FileExists(FLanguageDictionaryFile) Then
+        FLanguageDictionary.LoadFromFile(FLanguageDictionaryFile);
+    End;
+End;
+
+(**
+
+  This is a setter method for the Local Dictionary File property.
+
+  @precon  None.
+  @postcon Returns the filename of the local dictionary.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetLocalDictionaryFile(Const strValue: String);
+
+Begin
+  If CompareText(FLocalDictionaryFile, strValue) <> 0 Then
+    Begin
+      If FileExists(FLocalDictionaryFile) Then
+        FLocalDictionary.SaveToFile(FLocalDictionaryFile);
+      FLocalDictionaryFile := strValue;
+      If FileExists(FLocalDictionaryFile) Then
+        FLocalDictionary.LoadFromFile(FLocalDictionaryFile);
+    End;
+End;
+
+(**
+
+  This is a setter method for the Low Metric Margin property.
 
   @precon  None.
   @postcon Sets the valid of the low margin for metrics below which is okay and above should be
@@ -1939,10 +2585,10 @@ End;
 
 (**
 
-  This is a setter method for the ManagedNodesLife property.
+  This is a setter method for the Managed Nodes Life property.
 
   @precon  None.
-  @postcon Sets the valud in days for how long a managed node should be kept.
+  @postcon Sets the value in days for how long a managed node should be kept.
 
   @param   iNodeLife as an Integer as a constant
 
@@ -1955,7 +2601,7 @@ End;
 
 (**
 
-  This is a setter method for the MaxDocOutputWidth property.
+  This is a setter method for the Max Document Output Width property.
 
   @precon  None.
   @postcon Sets the maximum width of documentation output beyond which the information should be wrapped.
@@ -1971,7 +2617,7 @@ End;
 
 (**
 
-  This is a setter method for the MenuShortcut property.
+  This is a setter method for the Menu Shortcut property.
 
   @precon  None.
   @postcon Sets the string representation of the enumerated menu shortcut.
@@ -1990,7 +2636,7 @@ End;
 
 (**
 
-  This is a setter method for the ModuleCheck property.
+  This is a setter method for the Module Check property.
 
   @precon  None.
   @postcon Sets the module check configuration.
@@ -2008,7 +2654,7 @@ End;
 
 (**
 
-  This is a setter method for the ModuleCheckSubOps property.
+  This is a setter method for the Module Check Sub Ops property.
 
   @precon  None.
   @postcon Sets the module check sub-options set.
@@ -2024,7 +2670,23 @@ End;
 
 (**
 
-  This is a setter method for the ModuleExplorerBGColour property.
+  This is a setter method for the Module Date Format property.
+
+  @precon  None.
+  @postcon Updates the module date format.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetModuleDateFmt(Const strValue: String);
+
+Begin
+  FModuleDateFmt := strValue;
+End;
+
+(**
+
+  This is a setter method for the Module Explorer Background Colour property.
 
   @precon  None.
   @postcon Sets the background colours of the module explorer.
@@ -2042,7 +2704,7 @@ End;
 
 (**
 
-  This is a setter method for the ModuleMetric property.
+  This is a setter method for the Module Metric property.
 
   @precon  None.
   @postcon Sets the module metric configuration.
@@ -2060,7 +2722,7 @@ End;
 
 (**
 
-  This is a setter method for the ModuleMetricSubOps property.
+  This is a setter method for the Module Metric Sub Ops property.
 
   @precon  None.
   @postcon Sets the value of the Module Metric sub-options set.
@@ -2076,10 +2738,26 @@ End;
 
 (**
 
+  This is a setter method for the Module Version Increment property.
+
+  @precon  None.
+  @postcon Updates the module version increment.
+
+  @param   dblValue as a Double as a constant
+
+**)
+Procedure TBADIOptions.SetModuleVersionIncrement(Const dblValue: Double);
+
+Begin
+  FModuleVersionIncrement := dblValue;
+End;
+
+(**
+
   This is a setter method for the Options property.
 
   @precon  None.
-  @postcon Sets the main Documenation options set.
+  @postcon Sets the main Documentation options set.
 
   @param   setOptions as a TDocOptions as a constant
 
@@ -2092,7 +2770,7 @@ End;
 
 (**
 
-  This is a setter method for the ProfilingCode property.
+  This is a setter method for the Profiling Code property.
 
   @precon  None.
   @postcon saves the profiling code for the given filename.
@@ -2109,10 +2787,33 @@ End;
 
 (**
 
-  This is a setter method for the RefactorConstNewLine property.
+  This is a setter method for the Project Dictionary File property.
 
   @precon  None.
-  @postcon Sets whether a new line should be aded when inserted a constant refactoring.
+  @postcon If the filename has changed the old file is saved (if it exists) and the new file is loaded.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TBADIOptions.SetProjectDictionaryFile(Const strValue: String);
+
+Begin
+  If CompareText(FProjectDictionaryFile, strValue) <> 0 Then
+    Begin
+      If DirectoryExists(ExtractFilePath(FProjectDictionaryFile)) Then
+        FProjectDictionary.SaveToFile(FProjectDictionaryFile);
+      FProjectDictionaryFile := strValue;
+      If FileExists(FProjectDictionaryFile) Then
+        FProjectDictionary.LoadFromFile(FProjectDictionaryFile);
+    End;
+End;
+
+(**
+
+  This is a setter method for the Refactor Constant New Line property.
+
+  @precon  None.
+  @postcon Sets whether a new line should be added when inserted a constant refactoring.
 
   @param   boolNewLine as a Boolean as a constant
 
@@ -2125,7 +2826,7 @@ End;
 
 (**
 
-  This is a setter method for the ScopesToDocument property.
+  This is a setter method for the Scopes To Document property.
 
   @precon  None.
   @postcon Sets the value of the scopes to document set.
@@ -2141,7 +2842,7 @@ End;
 
 (**
 
-  This is a setter method for the ScopesToRender property.
+  This is a setter method for the Scopes To Render property.
 
   @precon  None.
   @postcon Sets the value of the scopes to Render set.
@@ -2157,7 +2858,23 @@ End;
 
 (**
 
-  This is a setter method for the TokenFontInfo property.
+  This is a setter method for the Spelling Mistake Colour property.
+
+  @precon  None.
+  @postcon Sets the colour to be used for spelling mistakes in the editor.
+
+  @param   iColour as a TColor as a constant
+
+**)
+Procedure TBADIOptions.SetSpellingMistakeColour(Const iColour: TColor);
+
+Begin
+  FSpellingMistakeColour := iColour;
+End;
+
+(**
+
+  This is a setter method for the Token Font Info property.
 
   @precon  None.
   @postcon Sets the indexed Token Font Information record.
@@ -2175,7 +2892,7 @@ End;
 
 (**
 
-  This is a setter method for the TokenLimit property.
+  This is a setter method for the Token Limit property.
 
   @precon  None.
   @postcon Sets the limit for the tokens to be rendered.
@@ -2191,10 +2908,10 @@ End;
 
 (**
 
-  This is a setter method for the ToxicityPower property.
+  This is a setter method for the Toxicity Power property.
 
   @precon  None.
-  @postcon Sets the polynomial power to be used to conbine metrics for the toxicity calculation.
+  @postcon Sets the polynomial power to be used to combine metrics for the toxicity calculation.
 
   @param   iPower as an Integer as a constant
 
@@ -2207,10 +2924,10 @@ End;
 
 (**
 
-  This is a setter method for the ToxicitySummation property.
+  This is a setter method for the Toxicity Summation property.
 
   @precon  None.
-  @postcon Sets the enumerate value which determines how the metrics are combined for the toxcicity
+  @postcon Sets the enumerate value which determines how the metrics are combined for the toxicity
            calculation.
 
   @param   eToxicitySummartion as a TBADIToxicitySummation as a constant
@@ -2224,7 +2941,7 @@ End;
 
 (**
 
-  This is a setter method for the TreeColour property.
+  This is a setter method for the Tree Colour property.
 
   @precon  None.
   @postcon Sets the colour of the module explorer tree.
@@ -2240,7 +2957,7 @@ End;
 
 (**
 
-  This is a setter method for the TreeFontName property.
+  This is a setter method for the Tree Font Name property.
 
   @precon  None.
   @postcon Sets the font name for the proportional font used in the tree.
@@ -2256,7 +2973,7 @@ End;
 
 (**
 
-  This is a setter method for the TreeFontSize property.
+  This is a setter method for the Tree Font Size property.
 
   @precon  None.
   @postcon Sets the font size for the proportional font used in the tree.
@@ -2272,7 +2989,7 @@ End;
 
 (**
 
-  This is a setter method for the UpdateInterval property.
+  This is a setter method for the Update Interval property.
 
   @precon  None.
   @postcon Sets the update interval for the module explorer in milliseconds.
@@ -2288,7 +3005,7 @@ End;
 
 (**
 
-  This is a setter method for the UseIDEEditorColours property.
+  This is a setter method for the Use IDE Editor Colours property.
 
   @precon  None.
   @postcon Sets whether the IDE Editor colours should b e used for the module explorer or custom colours.
@@ -2302,5 +3019,35 @@ Begin
   FUseIDEEditorColours := boolUseIDEEditorColours;
 End;
 
-End.
+(**
 
+  This method updates the Do not Follow Editor property based on the documentation options.
+
+  @precon  None.
+  @postcon The Do Not Follow Editor options are updated.
+
+**)
+Procedure TBADIOptions.UpdateDoNotFollowEditor();
+
+Const
+  aLimitOptions : Array[TLimitType] Of TDocOption = (
+    doDoNotFollowEditorIfErrors,
+    doDoNotFollowEditorIfWarnings,
+    doDoNotFollowEditorIfHints,
+    doDoNotFollowEditorIfConflicts,
+    doDoNotFollowEditorIfChecks,
+    doDoNotFollowEditorIfMetrics,
+    doDoNotFollowEditorIfSpelling
+  );
+
+Var
+  eDocIssue: TLimitType;
+  
+Begin
+  FDoNotFollowEditor := [];
+  For eDocIssue := Low(TLimitType) To High(TLimitType) Do
+    If aLimitOptions[eDocIssue] In FOptions Then
+      Include(FDoNotFollowEditor, eDocIssue);
+End;
+
+End.

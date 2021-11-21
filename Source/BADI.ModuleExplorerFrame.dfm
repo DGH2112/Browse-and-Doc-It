@@ -16,11 +16,12 @@ object frameModuleExplorer: TframeModuleExplorer
   TabOrder = 0
   TabStop = True
   OnEnter = FrameEnter
+  PixelsPerInch = 96
   object stbStatusBar: TStatusBar
     Left = 0
-    Top = 394
+    Top = 391
     Width = 408
-    Height = 19
+    Height = 22
     Panels = <
       item
         Width = 65
@@ -34,8 +35,10 @@ object frameModuleExplorer: TframeModuleExplorer
       item
         Width = 50
       end>
+    ParentFont = True
     ParentShowHint = False
     ShowHint = True
+    UseSystemFont = False
   end
   object tbrExplorerScope: TToolBar
     Left = 0
@@ -162,21 +165,6 @@ object frameModuleExplorer: TframeModuleExplorer
       Top = 0
       Action = actTypes
     end
-  end
-  object edtExplorerFilter: TEdit
-    Left = 0
-    Top = 22
-    Width = 408
-    Height = 24
-    Align = alTop
-    TabOrder = 1
-    OnChange = edtExplorerFilterChange
-    OnKeyPress = edtExplorerFilterKeyPress
-    OnMouseActivate = edtExplorerFilterMouseActivate
-  end
-  object ilScopeImages: TImageList
-    Left = 29
-    Top = 67
   end
   object ilToolbar: TImageList
     Height = 12
@@ -569,7 +557,7 @@ object frameModuleExplorer: TframeModuleExplorer
   object alToolbar: TActionList
     Images = ilToolbar
     Left = 33
-    Top = 173
+    Top = 189
     object actLocal: TAction
       Category = 'Scope'
       Caption = 'actLocal'
@@ -711,6 +699,43 @@ object frameModuleExplorer: TframeModuleExplorer
       ImageIndex = 15
       OnExecute = actLocalExecute
       OnUpdate = actLocalUpdate
+    end
+    object actAddToLocalDictionary: TAction
+      Category = 'Spelling'
+      Caption = '&Add to Local Dictionary'
+      OnExecute = actAddToLocalDictionaryExecute
+      OnUpdate = actSpellingUpdate
+    end
+    object actAddToProjectDictionary: TAction
+      Category = 'Spelling'
+      Caption = 'Add to &Project Dictionary'
+      OnExecute = actAddToProjectDictionaryExecute
+      OnUpdate = actSpellingUpdate
+    end
+    object actIgnoreSpellingMistake: TAction
+      Category = 'Spelling'
+      Caption = '&Ignore Spelling Mistake'
+      OnExecute = actIgnoreSpellingMistakeExecute
+      OnUpdate = actSpellingUpdate
+    end
+  end
+  object tmFilter: TTimer
+    Interval = 100
+    OnTimer = tmFilterTimer
+    Left = 32
+    Top = 232
+  end
+  object pmExplorerContext: TPopupMenu
+    Left = 176
+    Top = 128
+    object AddtoDictionary1: TMenuItem
+      Action = actAddToLocalDictionary
+    end
+    object AddtoProjectDictionary1: TMenuItem
+      Action = actAddToProjectDictionary
+    end
+    object IgnoreSpellingMistake1: TMenuItem
+      Action = actIgnoreSpellingMistake
     end
   end
 end

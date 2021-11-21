@@ -1,4 +1,0 @@
-VERSION 1.0 CLASS
-BEGIN
-  Hello = 1
-END

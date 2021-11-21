@@ -1,17 +1,17 @@
 (**
 
-  This module contains a frame for editing the method descrptions.
+  This module contains a frame for editing the method descriptions.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.004
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ Uses
   ComCtrls,
   BADI.CustomOptionsFrame,
   VirtualTrees,
-  System.Generics.Collections, System.ImageList, Vcl.ImgList;
+  System.Generics.Collections;
 
 Type
   (** This class represents the frame interface. **)
@@ -123,7 +123,7 @@ End;
   This method is an on click event handler for the Add Description button.
 
   @precon  None.
-  @postcon Aloows the user to add a method description to the list.
+  @postcon Allows the user to add a method description to the list.
 
 
   @param   Sender as a TObject
@@ -206,7 +206,7 @@ End;
 
 (**
 
-  A constructor for the TfmBADIMethodDescriptionFrame class.
+  A constructor for the TfmBADIMethodDescriptionsFrame class.
 
   @precon  None.
   @postcon Creates a generic list to temporarily store the method patterns and descriptions.
@@ -225,7 +225,7 @@ End;
 
 (**
 
-  A destructor for the TfmBADIMethodDescriptionFrame class.
+  A destructor for the TfmBADIMethodDescriptionsFrame class.
 
   @precon  None.
   @postcon Frees the generic collection.
@@ -243,7 +243,7 @@ End;
   This method loads the method description options from the BADI options class.
 
   @precon  None.
-  @postcon The method descrption options are loaded into the frame controls.
+  @postcon The method description options are loaded into the frame controls.
 
 **)
 Procedure TfmBADIMethodDescriptionsFrame.LoadSettings;
@@ -308,7 +308,7 @@ End;
   This method saves the method description options to the BADI options class.
 
   @precon  None.
-  @postcon The method descrption options are saved from the frame controls.
+  @postcon The method description options are saved from the frame controls.
 
 **)
 Procedure TfmBADIMethodDescriptionsFrame.SaveSettings;

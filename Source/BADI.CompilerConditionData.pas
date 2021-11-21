@@ -3,15 +3,15 @@
   This module contains a class to represent each compiler definition to be placed on the stack.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.298
+  @Date    06 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2021  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,41 +31,24 @@ Unit BADI.CompilerConditionData;
 
 Interface
 
-Uses
-  BADI.Types;
+uses
+  BADI.Types,
+  BADI.Interfaces;
 
 Type
-  (** This class represents a single stack entry on the CompilerCondition stacks. **)
-  TCompilerConditionData = Class
-    {$IFDEF D2005} Strict {$ENDIF} Private
+  (** This class represents a single stack entry on the Compiler Condition stacks. **)
+  TCompilerConditionData = Class(TInterfacedObject, IBADICompilerConditionData)
+  Strict Private
     FCompilerDefType : TCompilerDefType;
     FCompilerCondition: TCompilerCondition;
     FTokenIndex: TTokenIndex;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
+    Function  GetCompilerDefType : TCompilerDefType;
+    Function  GetCompilerCondition : TCompilerCondition;
+    Function  GetTokenIndex : TTokenIndex;
   Public
     Constructor Create(Const iCompilerDefType : TCompilerDefType;
       Const iCompilerCondition: TCompilerCondition; Const iTokenIndex: TTokenIndex);
-    (**
-      This property provide access to the compiler definition type of the class.
-      @precon  None.
-      @postcon Returns the compiler definiton type of the stack item.
-      @return  a TCompilerDefType
-    **)
-    Property CompilerDefType : TCompilerDefType Read FCompilerDefType;
-    (**
-      This property gets and sets the compiler condition (include code or exclude code).
-      @precon  None.
-      @postcon Gets and sets the compiler condition (include code or exclude code).
-      @return  a TCompilerCondition
-    **)
-    Property CompilerCondition: TCompilerCondition Read FCompilerCondition;
-    (**
-      This property gets or sets the token index of the compiler condition.
-      @precon  None.
-      @postcon Gets or sets the token index of the compiler condition.
-      @return  a TTokenIndex
-    **)
-    Property TokenIndex: TTokenIndex Read FTokenIndex;
   End;
 
 Implementation
@@ -89,6 +72,54 @@ Begin
   FCompilerDefType := iCompilerDefType;
   FCompilerCondition := iCompilerCondition;
   FTokenIndex := iTokenIndex;
+End;
+
+(**
+
+  This is a getter method for the Compiler Condition property.
+
+  @precon  None.
+  @postcon Returns the compiler condition.
+
+  @return  a TCompilerCondition
+
+**)
+Function TCompilerConditionData.GetCompilerCondition: TCompilerCondition;
+
+Begin
+  Result := FCompilerCondition;
+End;
+
+(**
+
+  This is a getter method for the Compiler Definition Type property.
+
+  @precon  None.
+  @postcon Returns the compiler definition type.
+
+  @return  a TCompilerDefType
+
+**)
+Function TCompilerConditionData.GetCompilerDefType: TCompilerDefType;
+
+Begin
+  Result := FCompilerDefType;
+End;
+
+(**
+
+  This is a getter method for the Token Index property.
+
+  @precon  None.
+  @postcon Returns the Token index.
+
+  @return  a TTokenIndex
+
+**)
+Function TCompilerConditionData.GetTokenIndex: TTokenIndex;
+
+Begin
+  Result := FTokenIndex;
 End;
 
 End.

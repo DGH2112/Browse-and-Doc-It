@@ -3,15 +3,15 @@
   This module contains a custom virtual string tree class for the BADI module explorer.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.010
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,18 +37,21 @@ Uses
   BADI.ModuleExplorer.TreeNodeInfo;
 
 Type
-  (** This is a descendant of the TVirtualStringTree in order to override the
-      OnGetNodeWidth method. **)
+  (** This is a descendant of the TVirtualStringTree in order to override the On Get Node Width
+      method. **)
   TBADIVirtualStringTree = Class(TVirtualStringTree)
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    //: @nometric MissingCONSTInParam
-    Function DoGetNodeWidth(Node: PVirtualNode; Column: TColumnIndex;
-      Canvas: TCanvas = Nil) : Integer; Override;
+    Function DoGetNodeWidth(Node: PVirtualNode; Column: TColumnIndex; Canvas: TCanvas = Nil) : Integer;
+      Override;
   End;
+
+  (** This is an enumerate to defines the information type in the explorer module tree nodes. **)
+  TBADINodeType = (ntLabel, ntDocConflict, ntDocIssue, ntElement, ntSpellingIssue);
 
   (** This record described the data sorted in the virtual tree view. **)
   TBADITreeData = Record
     FNode : TBADITreeNodeInfo;
+    FNodeType : TBADINodeType;
   End;
   (** A type to define a pointer to the above tree record. **)
   PBADITreeData = ^TBADITreeData;

@@ -1,10 +1,10 @@
 (**
   
-  This module contains a clas to represent a form for editing the exclusions.
+  This module contains a class to represent a form for editing the exclusions.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    18 Jul 2020
 
   @license
 

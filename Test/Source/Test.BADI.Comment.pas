@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.005
+  @Date    24 May 2020
 
   @license
 
@@ -98,8 +98,8 @@ Begin
         Break;
       End;
   TBADIOptions.BADIOptions.SpecialTags.Add(TBADISpecialTag.Create('code', 'Example Code',
-    [tpShowInTree..tpFixed]));
-  FComment := TComment.Create(strComment, 12, 34);
+    [tpShowInTree..tpFixed], iiNone));
+  FComment := TComment.Create(strComment, 12, 34, 0);
 End;
 
 Procedure TestTComment.TearDown;
@@ -201,12 +201,12 @@ Begin
     CheckEquals(ttSymbol, ReturnValue.Tokens[11].TokenType);
     CheckEquals('todo', ReturnValue.Tag[0].TagName);
     CheckEquals(15, ReturnValue.Tag[0].Line);
-    CheckEquals(26, ReturnValue.Tag[0].Column);
+    CheckEquals( 4, ReturnValue.Tag[0].Column);
     CheckEquals('Requires implementing.', ReturnValue.Tag[0].AsString(80, False));
     CheckEquals('Requires <e>implementing</e>.', ReturnValue.Tag[0].AsString(80, True));
     CheckEquals('see', ReturnValue.Tag[1].TagName);
     CheckEquals(16, ReturnValue.Tag[1].Line);
-    CheckEquals(26, ReturnValue.Tag[1].Column);
+    CheckEquals( 4, ReturnValue.Tag[1].Column);
     CheckEquals('Something1 interesting.', ReturnValue.Tag[1].AsString(80, False));
     CheckEquals(2, ReturnValue.TagCount);
     CheckEquals(12, ReturnValue.Line);
@@ -345,7 +345,7 @@ Begin
     ''#13#10 +
     '@todo This is the first todo item.'#13#10 +
     '@todo This is the second todo item.'#13#10 +
-    '@todo This is the third todo item.'#13#10, 0, 0);
+    '@todo This is the third todo item.'#13#10, 0, 0, 0);
   Try
     CheckEquals(8, C.TokenCount);
     CheckEquals(3, C.TagCount);

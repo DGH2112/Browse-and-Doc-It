@@ -1,18 +1,18 @@
 (**
 
-  This module contains the code to intialise all the open tools API interfaces for the
+  This module contains the code to initialise all the open tools API interfaces for the
   project.
 
-  @Version 1.0
+  @Version 1.001
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    02 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

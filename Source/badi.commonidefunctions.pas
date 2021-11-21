@@ -1,18 +1,18 @@
 (**
 
   This module contains common code that can be used within each of the IDE
-  imlpementations (Delphi and VB).
+  implementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 2.010
+  @Date    03 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,9 +36,6 @@ Uses
   SysUtils,
   Windows,
   Classes,
-  {$IFDEF EUREKALOG}
-  EBase,
-  {$ENDIF EUREKALOG}
   BADI.Base.Module,
   BADI.ElementContainer,
   BADI.Generic.FunctionDecl,
@@ -46,46 +43,7 @@ Uses
   BADI.Types,
   BADI.Comment;
 
-Type
   {$INCLUDE 'CompilerDefinitions.inc'}
-(** This is a procedure to return the success of the parse in the thread. **)
-  TParserNotify = Procedure(Const boolSuccessfulParse: Boolean) Of Object;
-  (** This is a procedure to allow the thread to get information from the
-      calling IDE. **)
-  TEditorInformation = Function(Var strFileName: String; Var boolModified: Boolean)
-    : String Of Object;
-  (** This is a procedure to allow the thread to render the module in the
-      calling IDEs main thread. **)
-  TRenderDocumentTree = Procedure(Const Module: TBaseLanguageModule) Of Object;
-  (** This is a procedure to allow the thread to display an error message in
-      the calling IDEs main thread. **)
-  TThreadExceptionMsg = Procedure(Const strExceptionMsg: String) Of Object;
-
-  (** This is a class to manage thread used to parse code. Its main aim is
-      to ensure that only 1 thread is active at a time and provide a mechanism
-      to terminate a working thread. **)
-  TBrowseAndDocItThreadManager = Class
-    {$IFDEF D2005} Strict {$ENDIF} Private
-    FThread             : TThread;
-    FSuccessfulParseProc: TParserNotify;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure TerminateThread(Sender: TObject);
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    Function Parse(Const SuccessfulParseProc: TParserNotify; Const EditorInfo: TEditorInformation;
-      Const RenderDocumentTree: TRenderDocumentTree;
-      Const ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
-  End;
-
-  (** A record to describe the start, end and markers for different comment
-      types. **)
-  TCommentTypeRec = Record
-    FStart: String;
-    FMiddle: String;
-    FBlockEnd: String;
-    FLineEnd: String;
-  End;
 
   Function FindFunction(Const iLine: Integer; Const Container: TElementContainer;
     Const ContainerClass: TGenericFunctionClass): TGenericFunction;
@@ -109,7 +67,7 @@ Const
     ' as a constant', ' as an out parameter');
   (** A list of vowels. **)
   strVowels: Set Of AnsiChar = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
-  (** A constant array of outputs for the ArrayOf property. **)
+  (** A constant array of outputs for the Array Of property. **)
   strArrayOf: Array [False .. True] Of String = ('', 'Array Of ');
 
 ResourceString
@@ -124,61 +82,21 @@ ResourceString
   strPropertyAlreadyExists = 'The property "%s" already has a comment. Do you' +
     ' want to continue?';
 
-Type
-  (** This class defines a thread in which the parsing of the code and
-      rendering of the module explorer is done. **)
-  TBrowseAndDocItThread = Class( {$IFDEF EUREKALOG} TThreadEx {$ELSE} TThread {$ENDIF EUREKALOG} )
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FModule            : TBaseLanguageModule;
-    FSource            : String;
-    FFileName          : String;
-    FModified          : Boolean;
-    FRenderDocumentTree: TRenderDocumentTree;
-    FThreadExceptionMsg: TThreadExceptionMsg;
-    FSuccessfulParse   : Boolean;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure Execute; Override;
-    Procedure RenderModuleExplorer;
-    Procedure ShowException;
-  Public
-    Constructor CreateBrowseAndDocItThread(Const EditorInfo: TEditorInformation;
-      Const RenderDocumentTree: TRenderDocumentTree; Const ThreadExceptionMsg: TThreadExceptionMsg;
-      Const TerminateThread: TNotifyEvent);
-    Destructor Destroy; Override;
-    (**
-      This property gets and sets the SuccessfulParse variable of the thread.
-      @precon  None.
-      @postcon Gets and sets the SuccessfulParse variable of the thread.
-      @return  a Boolean
-    **)
-    Property SuccessfulParse: Boolean Read FSuccessfulParse Write FSuccessfulParse;
-  End;
-
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   BADI.Options,
   BADI.Functions,
   BADI.Module.Dispatcher,
-  Dialogs;
+  Dialogs, BADI.Constants;
 
 Const
   (** A constant to define the with of the tag formatting in method / property
       comments. **)
   iTagWidth: Integer = 8;
-  (** A constant array to define the comment start, end and markers for the
-      different styles of source code. **)
-  strCmtTerminals: Array [Low(TCommentType) .. High(TCommentType)] Of TCommentTypeRec = (
-    (FStart: '';     FMiddle: '';    FBlockEnd: '';    FLineEnd: ''),
-    (FStart: '(**';  FMiddle: '';    FBlockEnd: '**)'; FLineEnd: '**)'),
-    (FStart: '{:';   FMiddle: '';    FBlockEnd: '}';   FLineEnd: '}'),
-    (FStart: '/**';  FMiddle: '';    FBlockEnd: '**/'; FLineEnd: '**/'),
-    (FStart: '//:';  FMiddle: '//:'; FBlockEnd: '';    FLineEnd: ''),
-    (FStart: ''':';  FMiddle: ''':'; FBlockEnd: ''':'; FLineEnd: ''),
-    (FStart: '<!--'; FMiddle: '';    FBlockEnd: '-->'; FLineEnd: '-->'));
   (** A pre-condition comment tag. **)
   strPreConTag = 'precon';
   (** A post-condition comment tag. **)
@@ -187,7 +105,7 @@ Const
   strParamTag = 'param';
   (** A return comment tag. **)
   strReturnTag = 'return';
-  (** A constant string for formating the type of a parameter **)
+  (** A constant string for formatting the type of a parameter **)
   strFormatAs = '   %-*s as ';
   (** A indentation padding for a comment. **)
   iCommentPadding = 2;
@@ -277,11 +195,11 @@ Begin
   If CommentType In [ctPascalBlock .. ctCPPBlock] Then
     AddToComment(strCommentText, StringOfChar(#32, iIndent));
   If CommentType In [ctPascalBlock, ctPascalBrace, ctCPPBlock] Then
-    AddToComment(strCommentText, strCmtTerminals[CommentType].FBlockEnd + #13#10)
+    AddToComment(strCommentText, astrCmtTerminals[CommentType].FBlockEnd + #13#10)
   Else
     Begin
       If CommentType In [ctCPPLine, ctVBLine] Then
-        strInsert := strCmtTerminals[CommentType].FMiddle
+        strInsert := astrCmtTerminals[CommentType].FMiddle
       Else
         strInsert := '';
       sl          := TStringList.Create;
@@ -305,7 +223,7 @@ End;
   This procedure outputs the comment header to the comment text.
 
   @precon  None.
-  @postcon The comment header is outptu to the comment text.
+  @postcon The comment header is output to the comment text.
 
   @param   strCommentText as a String as a reference
   @param   CommentType    as a TCommentType as a constant
@@ -320,7 +238,7 @@ Begin
   If CommentType In [ctPascalBlock .. ctCPPBlock] Then
     AddToComment(strCommentText, StringOfChar(#32, iIndent));
   If CommentType In [ctPascalBlock, ctPascalBrace, ctCPPBlock] Then
-    AddToComment(strCommentText, strCmtTerminals[CommentType].FStart + #13#10);
+    AddToComment(strCommentText, astrCmtTerminals[CommentType].FStart + #13#10);
   If boolPadOut Then
     AddToComment(strCommentText, #13#10);
 End;
@@ -393,10 +311,10 @@ Var
 
 Begin
   Result         := '';
-  strAllCmtStart := strCmtTerminals[CommentType].FStart;
-  strCmtMiddle   := strCmtTerminals[CommentType].FMiddle;
-  strBlockCmtEnd := strCmtTerminals[CommentType].FBlockEnd;
-  strLineCmtEnd  := strCmtTerminals[CommentType].FLineEnd;
+  strAllCmtStart := astrCmtTerminals[CommentType].FStart;
+  strCmtMiddle   := astrCmtTerminals[CommentType].FMiddle;
+  strBlockCmtEnd := astrCmtTerminals[CommentType].FBlockEnd;
+  strLineCmtEnd  := astrCmtTerminals[CommentType].FLineEnd;
   Case CommentStyle Of
     csBlock:
       Begin
@@ -425,7 +343,7 @@ End;
   This method returns a description for the method if it is a constructor, destructor, getter or setter
   method, else it returns an empty String.
 
-  @precon  Method is a valid instance of a method declatation to be described.
+  @precon  Method is a valid instance of a method declaration to be described.
   @postcon Returns a description of the method is applicable. CursorAdjust provide delta movements for
            the cursor from column 1 if the first line of the new comment.
 
@@ -454,11 +372,11 @@ End;
 
 (**
 
-  This method recursively works throug the hierarchy of elements looking for the method which is closest
+  This method recursively works through the hierarchy of elements looking for the method which is closest
   to be on or just above the current cursor line.
 
   @precon  Container must be a valid TElementContainer instance.
-  @postcon Recursively works throug the hierarchy of elements looking for the method which is closest to
+  @postcon Recursively works through the hierarchy of elements looking for the method which is closest to
            be on or just above the current cursor line.
 
   @param   iLine          as an Integer as a constant
@@ -627,7 +545,7 @@ Begin
   For i := 0 To MD.Count - 1 Do
     If Like(MD.Names[i], Func.Identifier) Then
       Begin
-        C := TComment.Create(MD.ValueFromIndex[i], 0, 0);
+        C := TComment.Create(MD.ValueFromIndex[i], 0, 0, 0);
         Try
           strDescription := Indent(C.AsString(iMaxCommentWidth - iIndent - iCommentPadding, True),
             iIndent + iCommentPadding);
@@ -701,7 +619,7 @@ End;
 
 (**
 
-  This method creates a new comment using the existing comment information and returns it int he comment
+  This method creates a new comment using the existing comment information and returns it in the comment
   text.
 
   @precon  Func must be a valid instance.
@@ -734,12 +652,15 @@ Procedure UpdateComment(Var strCommentText : String; Const Func : TGenericFuncti
     i: Integer;
 
   Begin
-    i := Func.Comment.FindTag(strTag);
-    If i > -1 Then
+    If Assigned(Func.Comment) Then
       Begin
-        strCommentText := strCommentText + OutputTag(iCommentPadding + iIndent, Func.Comment.Tag[i],
-          iMaxCommentWidth);
-        boolCon := True;
+        i := Func.Comment.FindTag(strTag);
+        If i > -1 Then
+          Begin
+            strCommentText := strCommentText + OutputTag(iCommentPadding + iIndent, Func.Comment.Tag[i],
+              iMaxCommentWidth);
+            boolCon := True;
+          End;
       End;
   End;
 
@@ -839,223 +760,6 @@ Begin
   FunctionReturn(Result, Func, boolExtraLine, iIndent);
   BlockFooter(Result, boolExtraLine, boolPadOut, CommentType, iIndent);
   UpdateCursor(CursorDelta, P, CommentType, boolPadOut);
-End;
-
-{ TBrowseAndDocItThreadManager }
-
-(**
-
-  A constructor for the TBrowseAndDocItThreadManager class.
-
-  @precon  None.
-  @postcon Intialises the thread variable to null.
-
-**)
-Constructor TBrowseAndDocItThreadManager.Create;
-
-Begin
-  FThread := Nil;
-End;
-
-(**
-
-  A destructor for the TBrowseAndDocItThreadManager class.
-
-  @precon  None.
-  @postcon Terminate any working thread.
-
-**)
-Destructor TBrowseAndDocItThreadManager.Destroy;
-
-Begin
-  If FThread <> Nil Then
-    FThread.Terminate;
-  Inherited Destroy;
-End;
-
-(**
-
-  This method parses the given code reference ONLY IF there is no current parsing thread.
-
-  @precon  None.
-  @postcon Parses the given code reference ONLY IF there is no current parsing thread.
-
-  @param   SuccessfulParseProc as a TParserNotify as a constant
-  @param   EditorInfo          as a TEditorInformation as a constant
-  @param   RenderDocumentTree  as a TRenderDocumentTree as a constant
-  @param   ThreadExceptionMsg  as a TThreadExceptionMsg as a constant
-  @return  a Boolean
-
-**)
-Function TBrowseAndDocItThreadManager.Parse(Const SuccessfulParseProc: TParserNotify;
-  Const EditorInfo: TEditorInformation; Const RenderDocumentTree: TRenderDocumentTree;
-  Const ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
-
-Begin
-  Result               := False;
-  FSuccessfulParseProc := SuccessfulParseProc;
-  If FThread = Nil Then
-    Begin
-      FThread := TBrowseAndDocItThread.CreateBrowseAndDocItThread(EditorInfo,
-        RenderDocumentTree, ThreadExceptionMsg, TerminateThread);
-      Result := True;
-    End;
-End;
-
-(**
-
-  This method is an on terminate event handler for threads.
-
-  @precon  None.
-  @postcon Called by the freeing thread which sets the thread variable to nil.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TBrowseAndDocItThreadManager.TerminateThread(Sender: TObject);
-
-Begin
-  If Assigned(FThread) Then
-    If Assigned(FThread.FatalException) Then
-      Begin
-        {$IFDEF EUREKALOG}
-        HandleException(FThread.FatalException);
-        {$ELSE}
-        If FThread.FatalException Is Exception Then
-          ShowException(FThread.FatalException, Nil);
-        {$ENDIF}
-      End;
-  FThread := Nil;
-  If Assigned(FSuccessfulParseProc) Then
-    If Sender Is TBrowseAndDocItThread Then
-      FSuccessfulParseProc((Sender As TBrowseAndDocItThread).SuccessfulParse);
-End;
-
-{ TBrowseAndDocItThread }
-
-(**
-
-  This is a constructor for the TBrowseAndDocItThread class.
-
-  @precon  None.
-  @postcon Creates a suspended thread and sets up a stream with the contents of the active editor and
-           then resumed the thread in order to parse the contents.
-
-  @param   EditorInfo         as a TEditorInformation as a constant
-  @param   RenderDocumentTree as a TRenderDocumentTree as a constant
-  @param   ThreadExceptionMsg as a TThreadExceptionMsg as a constant
-  @param   TerminateThread    as a TNotifyEvent as a constant
-
-**)
-Constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(Const EditorInfo: TEditorInformation;
-  Const RenderDocumentTree: TRenderDocumentTree; Const ThreadExceptionMsg: TThreadExceptionMsg;
-  Const TerminateThread: TNotifyEvent);
-
-Begin
-  FSuccessfulParse    := False;
-  FreeOnTerminate     := True; // Self Freeing...
-  FRenderDocumentTree := RenderDocumentTree;
-  FThreadExceptionMsg := ThreadExceptionMsg;
-  OnTerminate         := TerminateThread;
-  FSource             := '';
-  If Assigned(EditorInfo) Then
-    FSource := EditorInfo(FFileName, FModified);
-  Inherited Create(False);
-  //NameThreadForDebugging();
-End;
-
-(**
-
-  This is a destructor for the TBrowseAndDocItThread class.
-
-  @precon  None.
-  @postcon Frees the stream memory.
-
-**)
-Destructor TBrowseAndDocItThread.Destroy;
-
-Begin
-  Inherited Destroy;
-End;
-
-(**
-
-  This execute method parses the code of the active editor stored in the
-  memory stream and render the information in the explorer module.
-
-  @precon  FMemoryStream must be a valid stream of chars to parse.
-  @postcon Parses the code of the active editor stored in the memory stream and
-           render the information in the explorer module.
-
-  @nometric ExceptionEating
-
-**)
-Procedure TBrowseAndDocItThread.Execute;
-
-Const
-  strBrowseAndDocItParsingThread = 'BrowseAndDocItParsingThread';
-
-Begin
-  Try
-    {$IFDEF EUREKALOG}
-    NameThread(strBrowseAndDocItParsingThread);
-    SetEurekaLogStateInThread(0, True);
-    {$ENDIF EUREKALOG}
-    If FFileName <> '' Then
-      FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified,
-        [moParse, moCheckForDocumentConflicts])
-    Else
-      FModule := Nil;
-    Try
-      If Terminated Then
-        Exit;
-      Synchronize(RenderModuleExplorer);
-      FSuccessfulParse := True;
-    Finally
-      FModule.Free;
-    End;
-  Except
-    On E: EBADIParserAbort Do
-      Exit;
-  End;
-End;
-
-(**
-
-  This method synchronizes with the main IDE thread and renders the module
-  explorer.
-
-  @precon  FModule must be a valid TBaseLanguageModule instance.
-  @postcon Synchronizes with the main IDE thread and renders the module
-           explorer.
-
-**)
-Procedure TBrowseAndDocItThread.RenderModuleExplorer;
-
-Begin
-  If Assigned(FRenderDocumentTree) Then
-    FRenderDocumentTree(FModule);
-End;
-
-(**
-
-  This method displays the raised exception message pass via the FFileName
-  field.
-
-  @precon  None.
-  @postcon Displays the raised exception message pass via the FFileName
-           field.
-
-**)
-Procedure TBrowseAndDocItThread.ShowException;
-
-Const
-  strMsg =
-    'Exception in TBrowseAndDocItThread:'#13#10 +
-    '  Exception: %s';
-Begin
-  If Assigned(FThreadExceptionMsg) Then
-    FThreadExceptionMsg(Format(strMsg, [FFileName]));
 End;
 
 End.

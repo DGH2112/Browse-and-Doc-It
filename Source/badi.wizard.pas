@@ -3,15 +3,15 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.922
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,8 @@ Uses
   {$IFNDEF D2005}
   ExtCtrls,
   Contnrs,
-  {$ENDIF}
+  {$ENDIF D2005}
+  BADI.Interfaces,
   BADI.EditorNotifier,
   BADI.IDEOptionsInstaller,
   BADI.IDEMenuInstaller;
@@ -57,6 +58,7 @@ Type
     FEditorIndex             : Integer;
     FBNFHighlighterIndex     : Integer;
     FEidolonHighlighterIndex : Integer;
+    FModuleStatsList         : IBADIModuleStatsList;
   Strict Protected
     // IOTAWizard
     Function GetIDString: String;
@@ -72,6 +74,8 @@ Type
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
     Procedure UpdateMenuShortcuts(Sender : TObject);
+    Procedure InitialisingMsg(Const strMsg : String);
+    Procedure IDEErrors(Const slIDEErrors : TStringList);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -80,23 +84,27 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF DEBUG}
+  System.SysUtils,
   BADI.DockableModuleExplorer,
   BADI.Constants, 
   BADI.Module.Metrics, 
   BADI.Module.Metrics.SubView, 
   BADI.Module.Checks, 
   BADI.Module.Checks.SubView,
+  BADI.Module.Spelling, 
   BADI.SplashScreen, 
   BADI.AboutBox, 
   BADI.BNFHighlighter,
-  BADI.EidolonHighlighter;
+  BADI.EidolonHighlighter,
+  BADI.IDENotifier,
+  BADI.ModuleStatsList;
 
 (**
 
-  This is the constructor method for the TPascalDocWizard class. This constructor create
+  This is the constructor method for the TBrowseAndDocItWizard class. This constructor create
   the explorer form and menus.
 
   @precon  None.
@@ -107,12 +115,14 @@ Uses
 Constructor TBrowseAndDocItWizard.Create;
 
 Begin
+  {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF DEBUG}
   Inherited Create;
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
+  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange, IDEErrors);
   AddSplashScreen;
   AddAboutBoxEntry;
-  FEditorNotifier := TEditorNotifier.Create;
+  FModuleStatsList := TBADIModuleStatsList.Create;
+  FEditorNotifier := TEditorNotifier.Create(FModuleStatsList);
   FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(FEditorNotifier);
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
@@ -122,8 +132,10 @@ Begin
     TEidolonHighlighter.Create);
   RegisterMetricsEditorView;
   RegisterChecksEditorView;
+  RegisterSpellingEditorView;
   RegisterEditorMetricsSubView;
   RegisterEditorChecksSubView;
+  TBADIIDENotifier.InstallIDENotifier(FModuleStatsList);
 End;
 
 (**
@@ -137,6 +149,8 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
+  {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF DEBUG}
+  TBADIIDENotifier.UninstallIDENotifier;
   UnregisterEditorChecksSubView;
   UnregisterEditorMetricsSubView;
   UnregisterChecksEditorView;
@@ -156,7 +170,7 @@ End;
 
 (**
 
-  This is an exceute method for the wizard. Since this wizard is not implemented
+  This is an execute method for the wizard. Since this wizard is not implemented
   as a menu wizard this method has no code but is required for the interface.
 
   @nocheck EmptyMethod
@@ -211,7 +225,7 @@ End;
   This is a getter method for the MenuText property.
 
   @precon  None.
-  @postcon Reutns the Menu text for the wizard.
+  @postcon Returns the Menu text for the wizard.
 
   @return  a string
 
@@ -260,12 +274,76 @@ Begin
   Result := [wsEnabled];
 End;
 
-//Procedure TBrowseAndDocItWizard.ModuleExplorerClick(Sender: TObject);
-//
-//Begin
-//  If Assigned(FBADIIDEMenuInstaller) Then
-//    FBADIIDEMenuInstaller.ModuleExplorerClick(Sender);
-//End;
+(**
+
+  This is an event handler to extract IDE Error messages to be displayed in the module explorer.
+
+  @precon  slIDEErrors must be a valid instance passed to the event handler.
+  @postcon IDE Errors are added to the string list.
+
+  @param   slIDEErrors as a TStringList as a constant
+
+**)
+Procedure TBrowseAndDocItWizard.IDEErrors(Const slIDEErrors: TStringList);
+
+Const
+  strErrorRecord = '%s|%s|%d|%d';
+
+Var
+  MS : IOTAModuleServices;
+  Module : IOTAModule;
+  ModuleErrors : IOTAModuleErrors;
+  Errors: TOTAErrors;
+  iError: Integer;
+
+Begin
+  {$IFDEF DEBUG}
+  CodeSite.TraceMethod(Self, 'IDEErrors', tmoTiming);
+  {$ENDIF DEBUG}
+  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
+    Begin
+      Module := MS.CurrentModule;
+      If Assigned(Module) Then BEGIN
+        If Supports(Module, IOTAModuleErrors, ModuleErrors) Then
+          Begin
+            {$IFDEF DEBUG}
+            CodeSite.Send(csmCheckPoint, 'Errors := ModuleErrors.GetErrors;');
+            {$ENDIF DEBUG}
+            Errors := ModuleErrors.GetErrors; //: @bug Locks the IDE here under unknown circumstances.
+            {$IFDEF DEBUG}
+            CodeSite.Send(csmCheckPoint, 'For iError := Low(Errors) To High(Errors) Do');
+            {$ENDIF DEBUG}
+            For iError := Low(Errors) To High(Errors) Do
+              slIDEErrors.Add(Format(strErrorRecord, [
+                Module.FileName,
+                Errors[iError].Text,
+                Errors[iError].Start.Line,
+                Errors[iError].Start.CharIndex
+              ]));
+          End;
+      END;
+    End;
+End;
+
+(**
+
+  This method outputs a message on the splash screen as the IDE is loaded.
+
+  @precon  None.
+  @postcon The messages is displayed on the splash screen.
+
+  @param   strMsg as a String as a constant
+
+**)
+Procedure TBrowseAndDocItWizard.InitialisingMsg(Const strMsg: String);
+
+Var
+  SSS : IOTASplashScreenServices;
+  
+Begin
+  If Supports(SplashScreenServices, IOTASplashScreenServices, SSS) Then
+    SSS.StatusMessage(strMsg);
+End;
 
 (**
 
@@ -320,5 +398,4 @@ Begin
 End;
 
 End.
-
 

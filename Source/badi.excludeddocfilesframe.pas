@@ -3,16 +3,16 @@
   This module contains a class which represents a frame interface for excluded document
   files.
 
-  @Version 1.0
+  @Version 1.045
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ Uses
   Generics.Collections,
   BADI.Types,
   BADI.Exclusions,
-  BADI.CustomOptionsFrame, System.ImageList;
+  BADI.CustomOptionsFrame;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -81,9 +81,9 @@ Type
       Shift: TShiftState);
   Strict Private
     FExclusions : TList<TBADIExclusionRec>;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FStyleServices : TCustomStyleServices;
-    {$ENDIF}
+    {$ENDIF RS102}
     FCallBackProc : TInputCloseQueryFunc;
     FSelectedItem : String;
   Strict Protected
@@ -104,10 +104,10 @@ Implementation
 Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF DEBUG}
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  {$ENDIF}
+  {$ENDIF STANDALONEAPP}
   RegularExpressions,
   RegularExpressionsCore,
   BADI.Base.Module,
@@ -121,10 +121,10 @@ Type
   (** A pointer to the above node data structure. **)
   PBADIExclusionNode = ^TBADIExclusionNode;
   (** An enumerate to describe the fields in the treeview. **)
-  TBADIExclusionField = (efPattern, efDocConflicts, efMetrics, efChecks);
+  TBADIExclusionField = (efPattern, efDocConflicts, efMetrics, efChecks, efSpelling);
 
 ResourceString
-  (** A string for the InputQuery dialogue title / caption. **)
+  (** A string for the Input Query dialogue title / caption. **)
   strExclusions = 'Exclusions';
   (**  string for the input query regular expression prompt. **)
   strValidReEx = 'Regular Expression for the exclusion';
@@ -217,7 +217,7 @@ End;
   A constructor for the TfmBADIExcludedDocFilesFrame class.
 
   @precon  None.
-  @postcon Creates a collection for the excclusions to be displayed.
+  @postcon Creates a collection for the exclusions to be displayed.
 
   @nocheck MissingCONSTInParam
 
@@ -227,11 +227,11 @@ End;
 Constructor TfmBADIExcludedDocFilesFrame.Create(AOwner: TComponent);
 
 {$IFNDEF STANDALONEAPP}
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
-{$ENDIF}
+{$ENDIF RS102}
+{$ENDIF STANDALONEAPP}
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
@@ -239,13 +239,13 @@ Begin
   FExclusions := TList<TBADIExclusionRec>.Create;
   vstExclusions.NodeDataSize := SizeOf(TBADIExclusionNode);
   {$IFNDEF STANDALONEAPP}
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       FStyleServices := ITS.StyleServices;
-  {$ENDIF}
-  {$ENDIF}
+  {$ENDIF RS102}
+  {$ENDIF STANDALONEAPP}
   FCallBackProc := 
     Function(Const astrPatterns : Array Of String) : Boolean
     ResourceString
@@ -315,7 +315,7 @@ End;
 
 (**
 
-  This method updates the exclusions treeview with the contents of the FExclusions colection.
+  This method updates the exclusions treeview with the contents of the FExclusions collection.
 
   @precon  None.
   @postcon The exclusions treeview is updated.
@@ -406,14 +406,15 @@ Begin
   recExclusion := FExclusions[NodeData.FIndex];
   Case TBADIExclusionField(Column) Of
     efDocConflicts: TargetCanvas.Brush.Color := Colour[etDocumentation In recExclusion.FExclusions];
-    efMetrics:      TargetCanvas.Brush.Color := Colour[etMetrics In recExclusion.FExclusions];
-    efChecks:       TargetCanvas.Brush.Color := Colour[etChecks  In recExclusion.FExclusions];
+    efMetrics:      TargetCanvas.Brush.Color := Colour[etMetrics       In recExclusion.FExclusions];
+    efChecks:       TargetCanvas.Brush.Color := Colour[etChecks        In recExclusion.FExclusions];
+    efSpelling:     TargetCanvas.Brush.Color := Colour[etSpelling      In recExclusion.FExclusions];
   Else
     TargetCanvas.Brush.Color := clWindow;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     If Assigned(FStyleServices) Then
       TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
-    {$ENDIF}
+    {$ENDIF RS102}
   End;
   TargetCanvas.FillRect(CellRect);
 End;
@@ -489,10 +490,11 @@ Var
 Begin
   NodeData := vstExclusions.GetNodeData(Node);
   Case TBADIExclusionField(Column) Of
-    efPattern: CellText := FExclusions[NodeData.FIndex].FExclusionPattern;
+    efPattern:      CellText := FExclusions[NodeData.FIndex].FExclusionPattern;
     efDocConflicts: CellText := strYesNo[etDocumentation in FExclusions[NodeData.FIndex].FExclusions];
-    efMetrics: CellText := strYesNo[etMetrics in FExclusions[NodeData.FIndex].FExclusions];
-    efChecks: CellText := strYesNo[etChecks in FExclusions[NodeData.FIndex].FExclusions];
+    efMetrics:      CellText := strYesNo[etMetrics in FExclusions[NodeData.FIndex].FExclusions];
+    efChecks:       CellText := strYesNo[etChecks in FExclusions[NodeData.FIndex].FExclusions];
+    efSpelling:     CellText := strYesNo[etSpelling in FExclusions[NodeData.FIndex].FExclusions];
   End;
 End;
 
@@ -518,7 +520,7 @@ Procedure TfmBADIExcludedDocFilesFrame.vstExclusionsMouseDown(Sender: TObject; B
     This procedure toggles the inclusion / exclusion of the given enumerate in the exclusion property.
 
     @precon  None.
-    @postcon The property is togged with the opposite of the given enumerate.
+    @postcon The property is toggled with the opposite of the given enumerate.
 
     @param   recExclusion      as a TBADIExclusionRec as a reference
     @param   BADIExclusionType as a TBADIExclusionType as a constant
@@ -549,6 +551,7 @@ Begin
         efDocConflicts: ToggleExclusion(recExclusion, etDocumentation);
         efMetrics:      ToggleExclusion(recExclusion, etMetrics);
         efChecks:       ToggleExclusion(recExclusion, etChecks);
+        efSpelling:     ToggleExclusion(recExclusion, etSpelling);
       End;
       FExclusions[NodeData.FIndex] := recExclusion;
       vstExclusions.Invalidate;
@@ -581,12 +584,12 @@ Begin
   recExclusion := FExclusions[NodeData.FIndex];;
   TargetCanvas.Font.Color := clWindowText;
   Case TBADIExclusionField(Column) Of
-    efDocConflicts .. efChecks: TargetCanvas.Font.Color := clBlack;
+    efDocConflicts..efSpelling: TargetCanvas.Font.Color := clBlack;
   Else
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     If Assigned(FStyleServices) Then
       TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
-    {$ENDIF}
+    {$ENDIF RS102}
   End;
 End;
 

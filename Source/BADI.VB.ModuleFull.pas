@@ -4,15 +4,15 @@
   to parser VB.NET code later).
 
   @Author     David Hoyle
-  @Version    1.0
-  @Date    21 Jun 2019
+  @Version    1.010
+  @Date    06 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ Type
     Function QualifiedIdentifier(Container : TElementContainer;
       TokenTypes : TBADITokenTypes) : String;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     procedure TidyUpEmptyElements;
     Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
@@ -212,10 +212,10 @@ Begin
       AddTickCount('Parse');
       ResolvedForwardReferences;
       AddTickCount('Resolve');
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone, 0);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       PatchAndCheckReferences;
       AddTickCount('Refs');
       If doShowMissingVBExceptionWarnings In BADIOptions.Options Then
@@ -314,10 +314,8 @@ end;
   @precon  None.
   @postcon Not implemented.
 
-  @param   iSkip as an Integer as a reference
-
 **)
-procedure TVBModule.ProcessCompilerDirective(var iSkip: Integer);
+procedure TVBModule.ProcessCompilerDirective;
 begin
   {Do nothing}
 end;

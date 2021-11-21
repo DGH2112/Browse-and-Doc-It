@@ -1,18 +1,18 @@
 (**
 
-  This module contains a class which represent the abtract base container for ALL containers in
+  This module contains a class which represent the abstract base container for ALL containers in
   the Browse and Doc It system.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.076
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
-    
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,31 +43,33 @@ Uses
 
 Type
   (** This class defines an object that can contain tokens and has line and
-      column numbers. It is the anscester for TTag, TComment and
+      column numbers. It is the ancestor for TTag, TComment and
       TElementContainer. **)
   TBADIBaseContainer = Class Abstract
   Strict Private
-    FName : String;
-    FLine : Integer;
+    FName   : String;
+    FScope  : TScope;
+    FLine   : Integer;
     FColumn : Integer;
     FTokens : TObjectList;
-    FFixed : Boolean;
+    FFixed  : Boolean;
   Strict Protected
     Function GetTokenCount : Integer;
     Function GetTokens(Const iIndex : Integer) : TTokenInfo;
     Function GetName: String; Virtual;
     Procedure SetName(Const Value : String); Virtual;
   Public
-    Constructor Create(Const strName : String; Const iLine, iColumn  : Integer);
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer); Virtual;
     Destructor Destroy; Override;
-    Procedure AddToken(Const strToken : String; Const ATokenType : TBADITokenType = ttUnknown);
-      Overload; Virtual;
+    Procedure AddToken(Const strToken : String; Const ATokenType : TBADITokenType = ttUnknown;
+      Const iLine : Integer = 0; Const iColumn : Integer = 0); Overload; Virtual;
     Procedure AddToken(Const AToken : TTokenInfo); Overload; Virtual;
     Procedure AppendToken(Const AToken : TTokenInfo); Virtual;
     Procedure InsertToken(Const strToken : String; Const iIndex : Integer;
-      Const ATokenType : TBADITokenType = ttUnknown);
-    Procedure DeleteToken(Const iIndex : Integer);
-    Procedure ClearTokens;
+      Const ATokenType : TBADITokenType = ttUnknown); Virtual;
+    Procedure DeleteToken(Const iIndex : Integer); Virtual;
+    Procedure ClearTokens; Virtual;
     //: @nometric LongParameterList
     Function BuildStringRepresentation(Const boolIdentifier, boolForDocumentation : Boolean;
       Const strDelimiter : String; Const iMaxWidth : Integer;
@@ -103,6 +105,13 @@ Type
       @return  an Integer
     **)
     Property Column : Integer Read FColumn Write FColumn;
+    (**
+      This property returns the Scope of the element.
+      @precon  None.
+      @postcon Returns the Scope of the element.
+      @return  a TScope
+    **)
+    Property Scope : TScope Read FScope Write FScope;
     (**
       This property returns an instance of the indexed token from the
       collection.
@@ -143,13 +152,15 @@ Uses
 
   @param   strToken   as a String as a constant
   @param   ATokenType as a TBADITokenType as a constant
+  @param   iLine      as an Integer as a constant
+  @param   iColumn    as an Integer as a constant
 
 **)
 Procedure TBADIBaseContainer.AddToken(Const strToken: String;
-  Const ATokenType: TBADITokenType = ttUnknown);
+  Const ATokenType: TBADITokenType = ttUnknown; Const iLine : Integer = 0; Const iColumn : Integer = 0);
 
 Begin
-  AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), ATokenType));
+  AddToken(TTokenInfo.Create(strToken, 0, iLine, iColumn, Length(strToken), ATokenType));
 End;
 
 (**
@@ -158,7 +169,7 @@ End;
 
   @precon  AToken must be a valid token instance.
   @postcon Adds the given TTokenInfo object to the token collection. Note that the calling code must not
-           free this memeory - it will be freed by this container.
+           free this memory - it will be freed by this container.
 
   @param   AToken as a TTokenInfo as a constant
 
@@ -173,7 +184,7 @@ End;
 
   This method append a copy of the given token to the tokens collection.
 
-  @precon  AToken mustbe a valid instance of a TTokenInfo.
+  @precon  AToken must be a valid instance of a TTokenInfo.
   @postcon Append a copy of the given token to the tokens collection. Note, the calling code is
            responsible for freeing the AToken instance only.
 
@@ -189,11 +200,11 @@ End;
 
 (**
 
-  This method builds a string from the identifer and tokens and tries to present it with the style of
+  This method builds a string from the identifier and tokens and tries to present it with the style of
   code you would probably except.
 
   @precon  None.
-  @postcon Builds a string from the identifer and tokens and tries to present it with the style of code
+  @postcon Builds a string from the identifier and tokens and tries to present it with the style of code
            you would probably except.
 
   @nometric LongParameterList HardCodedInteger
@@ -220,6 +231,7 @@ Function TBADIBaseContainer.BuildStringRepresentation(
 
 Const
   strLFCRSpaceSpace = #13#10#32#32;
+  iTwoSpaces = 2;
 
 Var
   iToken: Integer;
@@ -264,7 +276,7 @@ Begin
               Else
                 Begin
                   Result := Result + strLFCRSpaceSpace;
-                  iLength := 2;
+                  iLength := iTwoSpaces;
                 End;
           Result := Result + T.Token;
           Inc(iLength, T.Length);
@@ -297,15 +309,18 @@ End;
   @postcon Create the token collection and initialises the Line and Column data.
 
   @param   strName as a String as a constant
+  @param   AScope  as a TScope as a constant
   @param   iLine   as an Integer as a constant
   @param   iColumn as an Integer as a constant
 
 **)
-Constructor TBADIBaseContainer.Create(Const strName : String; Const iLine, iColumn  : Integer);
+Constructor TBADIBaseContainer.Create(Const strName : String; Const AScope: TScope; Const iLine,
+  iColumn  : Integer);
 
 Begin
   FTokens := TObjectList.Create(True);
   FName := strName;
+  FScope := AScope;
   FLine := iLine;
   FColumn := iColumn;
   FFixed := False;

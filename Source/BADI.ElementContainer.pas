@@ -1,18 +1,20 @@
 ﻿(**
 
-  This module contains classes to represent an asbtract element container (ancestor for all things)
-  and a label container for tree view headers adn the like.
+  This module contains classes to represent an abstract element container (ancestor for all things)
+  and a label container for tree view headers and the like.
 
   @Author  David Hoyle
-  @Version 1.1
-  @Date    21 Jun 2019
+  @Version 2.203
+  @Date    19 Sep 2020
+
+  @nospelling noXxxxx
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +57,6 @@ Type
   Strict Private
     FElements : TObjectList;
     FComment : TComment;
-    FScope : TScope;
     FImageIndex : TBADIImageIndex;
     FSorted  : Boolean;
     FReferenced : Boolean;
@@ -74,6 +75,8 @@ Type
       Const Element: TElementContainer): Boolean;
     Function  CheckCommentForNoEWH(Const strEWH: String; Const strParameters : Array of Const;
       Const Element: TElementContainer): Boolean;
+    Function  CheckCommentForNoSpelling(Const Comment: TComment;
+  Const strIdentifier : String): Boolean;
     Function  CheckIdentifier(Const Container: TElementContainer; Const strIdentifier,
       strTagName: String): Boolean;
     Function  DocConflictImage(Const DocConflictRec: TDocConflictTable): TBADIImageIndex;
@@ -99,14 +102,15 @@ Type
     Property BADIOptions : IBADIOptions Read FBADIOptions;
   Public
     Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
-      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Virtual;
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); 
+        Reintroduce; overload; Virtual;
     Destructor Destroy; Override;
-    //: @nowarnings
     Function  Add(Const AElement : TElementContainer) : TElementContainer; Overload; Virtual;
     Function  Add(Const Token : TTokenInfo; Const AScope : TScope; Const AImageIndex : TBADIImageIndex;
       Const AComment : TComment) : TElementContainer; Overload; Virtual;
     Function  Add(Const strToken : String; Const AImageIndex : TBADIImageIndex;
-      Const AScope : TScope; Const AComment : TComment) : TElementContainer; Overload; Virtual;
+      Const AScope : TScope; Const iLine : Integer = 0; Const iColumn : Integer = 0;
+      Const AComment : TComment = Nil) : TElementContainer; Overload; Virtual;
     Function  AddUnique(Const AElement : TElementContainer) : TElementContainer; Virtual;
     Procedure AddTokens(Const AElement : TElementContainer); Virtual;
     Function  FindElement(Const strName : String;
@@ -124,10 +128,13 @@ Type
     Procedure AddDocumentConflict(Const Args: Array Of Const; Const iIdentLine, iIdentColumn: Integer;
       Const Container: TElementContainer; Const strCategory: String;
       Const DocConflictRec: TDocConflictTable);
-    Function AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
-      Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : TBADIIssueState;
     Function AddCheck(Const Args: Array of Const; Const iLine, iColumn : Integer;
       Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : TBADIIssueState;
+    Function AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
+      Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : TBADIIssueState;
+    Function AddSpelling(Const strWord : String; Const AScope : TScope;
+      Const eSpellingIssueType : TBADISpellingIssueType;  Const iWordLine, iWordColumn: Integer;
+      Const Comment: TComment) : TBADIIssueState;
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
@@ -156,13 +163,6 @@ Type
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
-    (**
-      This property returns the Scope of the element.
-      @precon  None.
-      @postcon Returns the Scope of the element.
-      @return  a TScope
-    **)
-    Property Scope : TScope Read FScope Write FScope;
     (**
       This property returns the Image Index of the element.
       @precon  None.
@@ -220,6 +220,9 @@ Type
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   {$IFDEF PROFILECODE}
   Profiler,
   {$ENDIF}
@@ -230,7 +233,8 @@ Uses
   BADI.Functions,
   BADI.Constants,
   BADI.Comment.Tag,
-  BADI.Base.Module;
+  BADI.Base.Module,
+  BADI.SpellingIssue;
 
 Type
   (** A record to describe error, warning, and hint messages. **)
@@ -248,20 +252,6 @@ ResourceString
   strCanNotAddNullToken = 'Can not add a null token to the collection!';
   (** A error resource string for adding a null string to the container **)
   strCanNotAddANullString = 'Can not add a null string to the collection!';
-  (** A resource for disabling all errors on an element and its sub elements. **)
-  strNoError = 'noerror';
-  (** A resource for disabling all warnings on an element and its sub elements. **)
-  strNoWarning = 'nowarning';
-  (** A resource for disabling all hints on an element and its sub elements. **)
-  strNoHint = 'nohint';
-  (** A resource for disabling all metrics on an element and its sub elements. **)
-  strNoMetrics = 'nometrics';
-  (** A resource for disabling all checks on an element and its sub elements. **)
-  strNoChecks = 'nochecks';
-  (** A resource for disabling a metric on an element and its sub elements. **)
-  strNoMetric = 'nometric';
-  (** A resource for disabling a check on an element and its sub elements. **)
-  strNoCheck = 'nocheck';
   (** A error resource string for sorted after adding elements. **)
   strCanNotSetSortedAfterAdding = 'Can not set sorted after adding elements.';
   (** A message for too many hints. **)
@@ -272,7 +262,7 @@ ResourceString
   strTooManyErrors = 'Too many errors...';
 
 Const
-  (** A constant to descrienb the format of a title with its child count. **)
+  (** A constant to describe the format of a title with its child count. **)
   strTitleCountFmt = '%s (%d)';
   (** A constant array to describe the various resource strings got error, warning and hint messages. **)
   recIssues: Array [Low(TErrorType)..High(TErrorType)] Of TIssueRec = (
@@ -291,12 +281,15 @@ Const
   @param   strToken    as a String as a constant
   @param   AImageIndex as a TBADIImageIndex as a constant
   @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
   @param   AComment    as a TComment as a constant
   @return  a TElementContainer
 
 **)
 Function TElementContainer.Add(Const strToken: String; Const AImageIndex: TBADIImageIndex;
-  Const AScope: TScope; Const AComment: TComment): TElementContainer;
+  Const AScope: TScope; Const iLine : Integer; Const iColumn : Integer;
+  Const AComment: TComment): TElementContainer;
 
 Var
   i: Integer;
@@ -306,7 +299,7 @@ Begin
   i := Find(strToken);
   If i < 0 Then
     Begin
-      Result := TLabelContainer.Create(strToken, AScope, 0, 0, AImageIndex, AComment);
+      Result := TLabelContainer.Create(strToken, AScope, iLine, iColumn, AImageIndex, AComment);
       Result.FParent := Self;
       FElements.Insert(Abs(i) - 1, Result);
     End
@@ -322,13 +315,10 @@ End;
 
 (**
 
-  This method adds and passed elemtn container to this classes element collection.
+  This method adds and passed element container to this classes element collection.
 
   @precon  AElement must be a valid TElementContainer.
-  @postcon Adds and passed elemtn container to this classes element collection.
-
-  @nohints
-  @nowarnings
+  @postcon Adds and passed element container to this classes element collection.
 
   @param   AElement as a TElementContainer as a constant
   @return  a TElementContainer
@@ -356,7 +346,7 @@ Begin
         Result.Comment.Assign(AElement.Comment);
       If Not AElement.ClassNameIs(Result.ClassName) Then
         Begin
-          E := FindRoot.Add(strErrors, iiErrorFolder, scNone, Nil);
+          E := FindRoot.Add(strErrors, iiErrorFolder, scNone);
           E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName, Result.ClassName,
             AElement.Name]), scNone, AElement.Line, AElement.Column, etError));
           Raise EBADIParserAbort.Create(strParsingAborted);
@@ -475,20 +465,16 @@ Begin
   E := FindRoot;
   E := AddRootContainer(E, strChecks, iiCheckFolder);
   E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiCheckFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltChecks] Then
-    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
-      ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltChecks] Then
-    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiCheckMissing));
+  E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
+    ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon, ctCheck));
 End;
 
 (**
 
-  This method adds a specific documentation conflict to the Docuemntation conflict collection.
+  This method adds a specific documentation conflict to the Documentation conflict collection.
 
   @precon  None.
-  @postcon Adds a specific documentation conflict to the Docuemntation conflict collection.
+  @postcon Adds a specific documentation conflict to the Documentation conflict collection.
 
   @param   Args           as an Array Of Const as a constant
   @param   iIdentLine     as an Integer as a constant
@@ -515,12 +501,8 @@ Begin
   E := FindRoot;
   E := AddRootContainer(E, strDocumentationConflicts, iiDocConflictFolder);
   E := AddCategory(E, strCategory, iiDocConflictFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltConflicts] Then
-    E.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iLine, iColumn,
-      DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltConflicts] Then
-    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiDocConflictMissing));
+  E.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iLine, iColumn,
+    DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon, ctDocumentation));
 End;
 
 (**
@@ -545,26 +527,13 @@ Procedure TElementContainer.AddIssue(Const strFmtMsg: String; Const strParameter
 
 Var
   i: TElementContainer;
-  iCount: Integer;
-  iIssueLimit: Integer;
 
 Begin
   If Not CheckEWHOptions(ErrorType) Or CheckForNoEWH(ErrorType, strParameters, Container) Then
     Exit;
   I := FindRoot;
   I := AddRootContainer(I, recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage);
-  iCount := i.ElementCount;
-  Case ErrorType Of
-    etError:   iIssueLimit := BADIOptions.IssueLimits[ltErrors];
-    etWarning: iIssueLimit := BADIOptions.IssueLimits[ltWarnings];
-    etHint:    iIssueLimit := BADIOptions.IssueLimits[ltHints];
-  Else
-    iIssueLimit := BADIOptions.IssueLimits[ltErrors];
-  End;
-  If iCount < iIssueLimit Then
-    i.Add(TDocIssue.Create(Format(strFmtMsg, strParameters), AScope, iLine, iCol, ErrorType))
-  Else If iCount = iIssueLimit Then
-    i.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 0, 0, ErrorType));
+  i.Add(TDocIssue.Create(Format(strFmtMsg, strParameters), AScope, iLine, iCol, ErrorType));
 End;
 
 (**
@@ -587,26 +556,13 @@ Procedure TElementContainer.AddIssue(Const strMsg: String; Const AScope: TScope;
 
 Var
   i: TElementContainer;
-  iCount: Integer;
-  iIssueLimit: Integer;
 
 Begin
   If Not CheckEWHOptions(ErrorType) Or CheckForNoEWH(ErrorType, [Container.Identifier], Container) Then
     Exit;
   I := FindRoot;
   I := AddRootContainer(I, recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage);
-  iCount := i.ElementCount;
-  Case ErrorType Of
-    etError:   iIssueLimit := BADIOptions.IssueLimits[ltErrors];
-    etWarning: iIssueLimit := BADIOptions.IssueLimits[ltWarnings];
-    etHint:    iIssueLimit := BADIOptions.IssueLimits[ltHints];
-  Else
-    iIssueLimit := BADIOptions.IssueLimits[ltErrors];
-  End;
-  If iCount < iIssueLimit Then
-    i.Add(TDocIssue.Create(strMsg, AScope, iLine, iCol, ErrorType))
-  Else If iCount = iIssueLimit Then
-    i.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 0, 0, ErrorType));
+  i.Add(TDocIssue.Create(strMsg, AScope, iLine, iCol, ErrorType));
 End;
 
 (**
@@ -654,21 +610,19 @@ Begin
   E := FindRoot;
   E := AddRootContainer(E, strMetrics, iiMetricFolder);
   E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
-    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
-      ModuleMetrics[eMetric].FMessage, ModuleMetrics[eMetric].FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
-    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiMetricMissing));
+  E.Add(
+    TDocumentConflict.Create(Args, iLine, iColumn, iL, iC, ModuleMetrics[eMetric].FMessage,
+      ModuleMetrics[eMetric].FDescription, iIcon, ctMetric)
+  );
 End;
 
 (**
 
-  This method adds a root element container to the module for capturing errors, warnigns, hints,
+  This method adds a root element container to the module for capturing errors, warnings, hints,
   metrics, etc.
 
   @precon  Container must be a valid instance.
-  @postcon A container is added to the geiven container if it does not already exist.
+  @postcon A container is added to the given container if it does not already exist.
 
   @param   Container    as a TElementContainer as a constant
   @param   strLabelText as a String as a constant
@@ -688,7 +642,61 @@ End;
 
 (**
 
-  This methof adds the given elements tokens to the current containers tokens.
+  Added a method to add spelling mistakes to the modules list of issues.
+
+  @precon  None.
+  @postcon If spelling is not disabled the given word is added to the spelling mistakes list.
+
+  @param   strWord            as a String as a constant
+  @param   AScope             as a TScope as a constant
+  @param   eSpellingIssueType as a TBADISpellingIssueType as a constant
+  @param   iWordLine          as an Integer as a constant
+  @param   iWordColumn        as an Integer as a constant
+  @param   Comment            as a TComment as a constant
+  @return  a TBADIIssueState
+
+**)
+Function TElementContainer.AddSpelling(Const strWord : String; Const AScope : TScope;
+  Const eSpellingIssueType : TBADISpellingIssueType; Const iWordLine, iWordColumn: Integer;
+  Const Comment: TComment) : TBADIIssueState;
+
+Var
+  E: TElementContainer;
+  iL, iC: Integer;
+
+Begin
+  Result := isAdded;
+  If BADIOptions.Exclusions.ShouldExclude(ModuleFileName, etSpelling) Then
+    Begin
+      Result := isDisabled;
+      Exit;
+    End;
+  If Not (doShowSpelling In BADIOptions.Options) Then
+    Begin
+      Result := isDisabled;
+      Exit;
+    End;
+  If CheckCommentForNoSpelling(Self.Comment, strWord) Or CheckCommentForNoSpelling(Comment, strWord) Then
+    Begin
+      Result := isOverride;
+      Exit;
+    End;
+  E := FindRoot;
+  E := AddCategory(E, strSpellingMistakes, iiSpellingFolder);
+  E := AddCategory(E, astrSpellingIssueType[eSpellingIssueType], iiSpellingFolder);
+  iL := iWordLine;
+  iC := iWordColumn;
+  If Assigned(Comment) Then
+    Begin
+      iL := Comment.Line;
+      iC := Comment.Column;
+    End;
+  E.Add(TBADISpellingIssue.Create(strWord, AScope, eSpellingIssueType, iWordLine, iWordColumn, iL, iC));
+End;
+
+(**
+
+  This method adds the given elements tokens to the current containers tokens.
 
   @precon  None.
   @postcon Adds the given elements tokens to the current containers tokens.
@@ -758,7 +766,7 @@ Var
 
 Begin
   Name := Source.Name;
-  FScope := Source.FScope;
+  Scope := Source.Scope;
   Line := Source.Line;
   Column := Source.Column;
   FComment := Source.Comment;
@@ -865,8 +873,8 @@ End;
   @postcon Returns return if @@nometric or @@nometrics is found in the element comment or parent comment
            .
 
-  @nometreicor
-  @nometricsin the elements comment and all parent comments and if foudn and matches the metric being 
+  @nometric or
+  @nometrics in the elements comment and all parent comments and if foudn and matches the metric being 
            checked returns return.
 
   @param   eMetric as a TBADIModuleMetric as a constant
@@ -914,11 +922,49 @@ End;
 
 (**
 
-  This method recrusively checks the documentation of the module. Descendants need to override this to
+  This method checks whether there are tag to disable spelling in general or on a specific word.
+
+  @precon  None.
+  @postcon Returns return if spelling should be disabled.
+
+  @param   Comment       as a TComment as a constant
+  @param   strIdentifier as a String as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.CheckCommentForNoSpelling(Const Comment: TComment;
+  Const strIdentifier : String): Boolean;
+
+Var
+  iTag: Integer;
+  T: TTag;
+  iToken: Integer;
+
+Begin
+  Result := False;
+  If Assigned(Comment) Then
+    If Comment.FindTag(strNoSpellings) > -1 Then
+      Result := True
+    Else
+      Begin
+        iTag := Comment.FindTag(strNoSpelling);
+        If iTag > -1 Then
+          Begin
+            T := Comment.Tag[iTag];
+            For iToken := 0 To T.TokenCount - 1 Do
+              If CompareText(strIdentifier, T.Tokens[iToken].Token) = 0 Then
+                Result := True
+          End;
+      End;
+End;
+
+(**
+
+  This method recursively checks the documentation of the module. Descendants need to override this to
   implement document checking.
 
   @precon  None.
-  @postcon Recrusively checks the documentation of the module.
+  @postcon Recursively checks the documentation of the module.
 
   @param   boolCascade as a Boolean as a reference
 
@@ -966,11 +1012,11 @@ End;
 
 (**
 
-  This method checks for a stop or no documnetation tag and returns true if found in the elements comment
+  This method checks for a stop or no documentation tag and returns true if found in the elements comment
   of one of the parent comments.
 
   @precon  None.
-  @postcon Checks for a stop or no documnetation tag and returns true if found in the elements comment
+  @postcon Checks for a stop or no documentation tag and returns true if found in the elements comment
            of one of the parent comments.
 
   @param   Container as a TElementContainer as a constant
@@ -978,10 +1024,6 @@ End;
 
 **)
 Function TElementContainer.CheckForNoDocumentation(Const Container : TElementContainer) : Boolean;
-
-Const
-  strStopDocumentation = 'stopdocumentation';
-  strNoDocumentation = 'nodocumentation';
 
 Var
   E : TElementContainer;
@@ -1003,11 +1045,11 @@ End;
 
 (**
 
-  This method checks the container comment (and its parents) for noXxxx(s) tags and returns true if they 
+  This method checks the container comment (and its parents) for noXxxxx(s) tags and returns true if they 
   were found to signify that an issue is not required.
 
   @precon  None.
-  @postcon Checks the container comment (and its parents) for noXxxx(s) tags and returns true if they 
+  @postcon Checks the container comment (and its parents) for noXxxxx(s) tags and returns true if they 
            were found to signify that an issue is not required.
 
   @param   ErrorType     as a TErrorType as a constant
@@ -1042,7 +1084,7 @@ End;
   This method looks for the given identifier in the given containers tag comment tokens.
 
   @precon  Container must be a valid instance.
-  @postcon Trues true if the identifier is a token of the containers comment tag.
+  @postcon Returns true if the identifier is a token of the containers comment tag.
 
   @param   Container     as a TElementContainer as a constant
   @param   strIdentifier as a String as a constant
@@ -1079,18 +1121,18 @@ End;
 (**
 
   This method recursively checks the referenced property and outputs a hint if any element is not
-  refrernced which has a scope of Local or Private.
+  referenced which has a scope of Local or Private.
 
   @precon  None.
   @postcon Recursively checks the referenced property and outputs a hint if any element is not
-           refrernced which has a scope of Local or Private.
+           referenced which has a scope of Local or Private.
 
 **)
 Procedure TElementContainer.CheckReferences;
 
   (**
 
-    This procedure recurses the elmeents parents building a fully qualified identifier.
+    This procedure recurses the elements parents building a fully qualified identifier.
 
     @precon  None.
     @postcon Return a fully qualified identifier.
@@ -1156,10 +1198,9 @@ Constructor TElementContainer.Create(Const strName: String; Const AScope: TScope
   Const iLine, iColumn: Integer; Const AImageIndex: TBADIImageIndex; Const AComment: TComment);
 
 Begin
-  Inherited Create(strName, iLine, iColumn);
+  Inherited Create(strName, AScope, iLine, iColumn);
   FElements := TObjectList.Create(True);
   FComment := AComment;
-  FScope := AScope;
   FImageIndex := AImageIndex;
   FSorted := True;
   FReferenced := False;
@@ -1314,7 +1355,7 @@ Function TElementContainer.Find(Const strName: String; Const FindType: TFindType
 
   (**
 
-    This method implements a sequential search for thr element in the current elements collection.
+    This method implements a sequential search for the element in the current elements collection.
 
     @precon  None.
     @postcon The position of the element is returned if found else the position it should be inserted is
@@ -1397,10 +1438,10 @@ End;
 
 (**
 
-  This function finds the occurance of the token and returns its index if found else returns -1.
+  This function finds the occurrence of the token and returns its index if found else returns -1.
 
   @precon  None.
-  @postcon Finds the occurance of the token and returns its index if found else returns -1.
+  @postcon Finds the occurrence of the token and returns its index if found else returns -1.
 
   @param   strToken as a String as a constant
   @return  an Integer
@@ -1466,7 +1507,7 @@ End;
 Function TElementContainer.GetImageIndexAdjustedForScope: Integer;
 
 Begin
-  Result := BADIImageIndex(FImageIndex, FScope);
+  Result := BADIImageIndex(FImageIndex, Scope);
 End;
 
 (**

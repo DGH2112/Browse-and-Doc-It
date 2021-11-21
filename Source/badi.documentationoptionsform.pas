@@ -1,18 +1,18 @@
-(**
+﻿(**
 
   This module contains a class which represent a form for defining the option
   for Documentation.
 
-  @Version 1.0
+  @Version 1.051
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    02 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,8 +51,6 @@ type
   (** A class to represent the form interface. **)
   TfrmDocumentationOptions = class(TForm)
     rgpDocumentationOptions: TRadioGroup;
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     gbxScopeOptions: TGroupBox;
     chkLocal: TCheckBox;
     chkPrivate: TCheckBox;
@@ -60,6 +58,9 @@ type
     chkPublic: TCheckBox;
     chkPublished: TCheckBox;
     lblCSSComment: TLabel;
+    btnOK: TButton;
+    ilButtons: TImageList;
+    btnCancel: TButton;
   private
     { Private declarations }
   public
@@ -70,21 +71,24 @@ type
 implementation
 
 Uses
-  BADI.Base.Module, BADI.Types, BADI.Options;
+  {$IFNDEF STANDALONEAPP}
+  BADI.ToolsAPIUtils,
+  {$ENDIF}
+  BADI.Base.Module,
+  BADI.Types,
+  BADI.Options;
 
 {$R *.dfm}
 
-{ TfrmDocumentationOptions }
-
 (**
 
-  This is the forms main interface method for invokking the dialogue.
+  This is the forms main interface method for invoking the dialogue.
 
   @precon  None.
-  @postcon Returns the documentation type require in the var parameter if the
-           dialogue is accepted while returning true, else returns false.
+  @postcon Returns the documentation type require in the var parameter if the dialogue is accepted while
+           returning true, else returns false.
 
-  @param   ADocType as a TDocType as a Reference
+  @param   ADocType as a TDocType as a reference
   @return  a Boolean
 
 **)
@@ -92,43 +96,47 @@ class function TfrmDocumentationOptions.Execute(var ADocType: TDocType): Boolean
 
 Var
   i : TDocType;
+  F: TfrmDocumentationOptions;
 
 begin
   Result := False;
-  With TfrmDocumentationOptions.Create(Nil) Do
-    Try
-      For i := Low(TDocType) to High(TDocType) Do
-        rgpDocumentationOptions.Items.Add(strDocumentationTypes[i]);
-      rgpDocumentationOptions.ItemIndex := Byte(ADocType);
-      chkLocal.Checked := scLocal In TBADIOptions.BADIOptions.ScopesToDocument;
-      chkPrivate.Checked := scPrivate In TBADIOptions.BADIOptions.ScopesToDocument;
-      chkProtected.Checked := scProtected In TBADIOptions.BADIOptions.ScopesToDocument;
-      chkPublic.Checked := scPublic In TBADIOptions.BADIOptions.ScopesToDocument;
-      chkPublished.Checked := scPublished In TBADIOptions.BADIOptions.ScopesToDocument;
-      If ShowModal = mrOK Then
-        Begin
-          ADocType := TDocType(rgpDocumentationOptions.ItemIndex);
-          TBADIOptions.BADIOptions.ScopesToDocument := [];
-          If chkLocal.Checked Then
-            TBADIOptions.BADIOptions.ScopesToDocument :=
-              TBADIOptions.BADIOptions.ScopesToDocument + [scLocal];
-          If chkPrivate.Checked Then
-            TBADIOptions.BADIOptions.ScopesToDocument :=
-              TBADIOptions.BADIOptions.ScopesToDocument + [scPrivate];
-          If chkProtected.Checked Then
-            TBADIOptions.BADIOptions.ScopesToDocument :=
-              TBADIOptions.BADIOptions.ScopesToDocument + [scProtected];
-          If chkPublic.Checked Then
-            TBADIOptions.BADIOptions.ScopesToDocument :=
-              TBADIOptions.BADIOptions.ScopesToDocument + [scPublic];
-          If chkPublished.Checked Then
-            TBADIOptions.BADIOptions.ScopesToDocument :=
-              TBADIOptions.BADIOptions.ScopesToDocument + [scPublished];
-          Result := True;
-        End;
-    Finally
-      Free;
-    End;
+  F := TfrmDocumentationOptions.Create(Nil);
+  Try
+    {$IFNDEF STANDALONEAPP}
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmDocumentationOptions, F);
+    {$ENDIF}
+    For i := Low(TDocType) to High(TDocType) Do
+      F.rgpDocumentationOptions.Items.Add(strDocumentationTypes[i]);
+    F.rgpDocumentationOptions.ItemIndex := Byte(ADocType);
+    F.chkLocal.Checked := scLocal In TBADIOptions.BADIOptions.ScopesToDocument;
+    F.chkPrivate.Checked := scPrivate In TBADIOptions.BADIOptions.ScopesToDocument;
+    F.chkProtected.Checked := scProtected In TBADIOptions.BADIOptions.ScopesToDocument;
+    F.chkPublic.Checked := scPublic In TBADIOptions.BADIOptions.ScopesToDocument;
+    F.chkPublished.Checked := scPublished In TBADIOptions.BADIOptions.ScopesToDocument;
+    If F.ShowModal = mrOK Then
+      Begin
+        ADocType := TDocType(F.rgpDocumentationOptions.ItemIndex);
+        TBADIOptions.BADIOptions.ScopesToDocument := [];
+        If F.chkLocal.Checked Then
+          TBADIOptions.BADIOptions.ScopesToDocument :=
+            TBADIOptions.BADIOptions.ScopesToDocument + [scLocal];
+        If F.chkPrivate.Checked Then
+          TBADIOptions.BADIOptions.ScopesToDocument :=
+            TBADIOptions.BADIOptions.ScopesToDocument + [scPrivate];
+        If F.chkProtected.Checked Then
+          TBADIOptions.BADIOptions.ScopesToDocument :=
+            TBADIOptions.BADIOptions.ScopesToDocument + [scProtected];
+        If F.chkPublic.Checked Then
+          TBADIOptions.BADIOptions.ScopesToDocument :=
+            TBADIOptions.BADIOptions.ScopesToDocument + [scPublic];
+        If F.chkPublished.Checked Then
+          TBADIOptions.BADIOptions.ScopesToDocument :=
+            TBADIOptions.BADIOptions.ScopesToDocument + [scPublished];
+        Result := True;
+      End;
+  Finally
+    F.Free;
+  End;
 end;
 
 end.

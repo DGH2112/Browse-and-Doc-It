@@ -1,18 +1,18 @@
 (**
 
-  EidolonModule : A unit to parser Eidolon code. Please refer to the file
+  Eidolon Module : A unit to parser Eidolon code. Please refer to the file
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.012
+  @Date    06 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ Type
     Destructor Destroy; Override;
     Function  ReservedWords: TKeyWords; Override;
     Function  Directives: TKeyWords; Override;
-    Procedure ProcessCompilerDirective(Var iSkip: Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     Function  ReferenceSymbol(Const AToken: TTokenInfo): Boolean; Override;
     Function  AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
       Override;
@@ -131,10 +131,10 @@ End;
 
 (**
 
-  This method creates the heirarchical sections from the section name given.
+  This method creates the hierarchical sections from the section name given.
 
   @precon  None.
-  @postcon Creates the heirarchical sections from the section name given and returns the most nested 
+  @postcon Creates the hierarchical sections from the section name given and returns the most nested 
            level.
 
   @param   strSectionName as a String as a constant
@@ -236,10 +236,10 @@ Begin
     Begin
       ParseTokens;
       AddTickCount(strParse);
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
       AddTickCount(strRefs);
@@ -252,7 +252,7 @@ End;
   This is a destructor for the TINIModule class.
 
   @precon  None.
-  @postcon Fress the memory fo this instance.
+  @postcon Frees the memory for this instance.
 
 
 **)
@@ -296,12 +296,12 @@ End;
 
 (**
 
-  This method eats the whitespace when found and puts the token at the next non
-  whitespace token.
+  This method eats the white space when found and puts the token at the next non
+  white space token.
 
   @precon  None.
-  @postcon Eats the whitespace when found and puts the token at the next non
-           whitespace token.
+  @postcon Eats the white space when found and puts the token at the next non
+           white space token.
 
 **)
 Procedure TINIModule.EatWhitespace;
@@ -378,11 +378,11 @@ End;
 
   This method is the starting position for the parsing of an Eidolon module. It
   finds the first non comment token and begins the grammar checking from their
-  by deligating Syntax.
+  by delegating Syntax.
 
   @precon  None.
   @postcon It finds the first non comment token and begins the grammar checking
-           from their by deligating Syntax.
+           from their by delegating Syntax.
 
   @nocheck EmptyWhile
 
@@ -485,7 +485,7 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
+           Errors while providing declaration elements for browsing.
 
 **)
 Procedure TINIModule.ParseTokens;
@@ -504,10 +504,8 @@ End;
   @nocheck EmptyMethod
   @nohint iSkip
 
-  @param   iSkip as an Integer as a reference
-
 **)
-Procedure TINIModule.ProcessCompilerDirective(Var iSkip: Integer);
+Procedure TINIModule.ProcessCompilerDirective;
 
 Begin
   // Do nothing, i.e. Conditional Compilation is NOT supported.
@@ -617,10 +615,10 @@ End;
 
 (**
 
-  This method deletes any root elements which dont and items in them.
+  This method deletes any root elements which don`t and items in them.
 
   @precon  None.
-  @postcon Deletes any root elements which dont and items in them.
+  @postcon Deletes any root elements which don`t and items in them.
 
 **)
 Procedure TINIModule.TidyUpEmptyElements;
@@ -683,7 +681,7 @@ Var
   iLine: Integer;
   (** Current column number **)
   iColumn: Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
+  (** Token stream position. Fast to increment this than read the stream position. **)
   iStreamPos: Integer;
   (** Token line **)
   iTokenLine: Integer;
@@ -699,11 +697,11 @@ Var
 
   (**
 
-    This INLINE procedure changes the whitepace tokens for more human readable
+    This INLINE procedure changes the white space tokens for more human readable
     tokens.
 
     @precon  strToken must be a non-null string.
-    @postcon Changes the whitepace tokens for more human readable
+    @postcon Changes the white space tokens for more human readable
              tokens.
 
     @param   strToken as a String as a reference

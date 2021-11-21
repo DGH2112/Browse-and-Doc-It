@@ -115,8 +115,8 @@ Begin
   Checkequals
     ('Property MyProperty['#13#10#32#32'Param1 : Integer;'#13#10#32#32'Param2 : String'#13#10'] : String'#13#10'  Read FValue'#13#10'  Write FValue'#13#10,
     FPascalProperty.AsString(True, True));
-  FPascalProperty.ImplementsSpec.Add('mythingy', iiNone, scNone, Nil);
-  FPascalProperty.ImplementsSpec.Add('mythingy2', iiNone, scNone, Nil);
+  FPascalProperty.ImplementsSpec.Add('mythingy', iiNone, scNone);
+  FPascalProperty.ImplementsSpec.Add('mythingy2', iiNone, scNone);
   Checkequals
     ('Property MyProperty[Param1 : Integer; Param2 : String] : String Read FValue Write FValue Implements mythingy, mythingy2',
     FPascalProperty.AsString(True, False));

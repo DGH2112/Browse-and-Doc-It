@@ -3,15 +3,15 @@
   This module contains interfaces for use with the VB parser.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ Uses
   Classes;
 
 Type
-  (** An interface to define exception handling capabilties which are
+  (** An interface to define exception handling capabilities which are
       implemented by methods and properties. **)
   IExceptionHandling = Interface
     Function GetHasPush : Boolean;
@@ -111,7 +111,7 @@ Type
     **)
     Property ExitCol : Integer Read GetExitCol Write SetExitCol;
     (**
-      This property returns the name of the method with the ExceptionHandling.
+      This property returns the name of the method with the Exception Handling.
       @precon  None.
       @postcon R
       @return  a String

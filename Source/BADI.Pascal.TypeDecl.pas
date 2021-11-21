@@ -3,15 +3,15 @@
   This module contains a class which implements an Object Pascal specific Type Declaration.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ Type
     (**
       This property determines whether the type is typed or not.
       @precon  None.
-      @postcon Gets or sets whether the type is typed (preceeded by TYPE);
+      @postcon Gets or sets whether the type is typed (preceded by TYPE);
       @return  a Boolean
     **)
     Property IsTyped: Boolean Read FIsTyped Write FIsTyped;
@@ -153,7 +153,7 @@ Type
     Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
     Procedure AddDimension;
     (**
-      This property defines the number of dmiensions that the array contains.
+      This property defines the number of dimensions that the array contains.
       @precon  None.
       @postcon Returns the number of dimension that the array contains.
       @return  an Integer
@@ -246,7 +246,7 @@ End;
 Function TTypes.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Const
-  (** A string represetnation of whether a type is typed. **)
+  (** A string representation of whether a type is typed. **)
   strIsTyped : Array[False..True] Of String = ('', ' Type');
 
 Begin

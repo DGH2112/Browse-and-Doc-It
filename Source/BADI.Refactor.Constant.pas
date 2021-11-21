@@ -1,17 +1,17 @@
 (**
   
-  This module contains cade to refactor a constant from Object Pascal code.
+  This module contains code to refactor a constant from Object Pascal code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.002
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ Const
     
 (**
 
-  This method attempts to breal a long token down into smaller bits.
+  This method attempts to break a long token down into smaller bits.
 
   @precon  None.
   @postcon If the token is too long a token broken down into bits is returned.
@@ -110,8 +110,8 @@ Const
 
   (**
 
-    This method searches backwards from the breapoint to find a more natural point in the text to break
-    it up into piece. If one is foudn that position is returned.
+    This method searches backwards from the break point to find a more natural point in the text to break
+    it up into piece. If one is found that position is returned.
 
     @precon  None.
     @postcon A new breakpoint position is returned.
@@ -168,7 +168,7 @@ End;
 (**
 
   This method checks the an existing constant or resource string that has been declared for the same
-  literal so that is canbe promoted and reused.
+  literal so that is can be promoted and reused.
   
   @precon  None.
   @postcon Returns true if an existing declarations is found and refactoring should not be done.
@@ -278,7 +278,7 @@ End;
   A constructor for the TBADIRefactorConstant class.
 
   @precon  None.
-  @postcon Gets the IDEs blockindent for the refactorings.
+  @postcon Gets the IDEs block indent for the refactorings.
 
 **)
 Constructor TBADIRefactorConstant.Create;
@@ -306,7 +306,7 @@ End;
   dialogue and then based on options chosen the refactoring proceeds.
 
   @precon  SE must be a valid instance.
-  @postcon The user is presented with a refactoring dialogue to chose th refactoring and is accepted
+  @postcon The user is presented with a refactoring dialogue to chose the refactoring and is accepted
            the refactoring proceeds.
 
   @param   SE      as an IOTASourceEditor as a constant
@@ -460,6 +460,7 @@ Const
   strDeclaration = '%*s%s = ';
 
 Var
+  EditorSvcs : IOTAEditorServices;
   iIndex: Integer;
   CP : TOTACharPos;
   RII: TBADIRefactoringInsertionInfo;
@@ -467,41 +468,44 @@ Var
   strRefactoring : String;
 
 Begin
-  Case FRefactoringInfo.Scope Of
-    scLocal: RII := RefactorLocal;
-    scPrivate: RII := RefactorImplementation;
-    scPublic: RII := RefactorInterface;
-  End;
-  CP.Line := RII.FLine;
-  CP.CharIndex := 0;
-  iIndex := FSourceEditor.EditViews[0].CharPosToPos(CP);
-  Case FRefactoringInfo.Scope Of
-    scLocal: CP.CharIndex := FindIndentOfFirstTokenOnLine(FModule, FRefactoringInfo.Method.Line) - 1;
-    scPrivate: CP.CharIndex := FRefactoringInfo.ImplementationToken.Column - 1;
-    scPublic: CP.CharIndex := FRefactoringInfo.InterfaceToken.Column - 1;
-  End;
-  UR := FSourceEditor.CreateUndoableWriter;
-  UR.CopyTo(iIndex);
-  Case RII.FType Of
-    ritAppend:
-      Begin
-        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
-        TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring),
-          CP.CharIndex) + ';'#13#10);
+  If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+    Begin
+      Case FRefactoringInfo.Scope Of
+        scLocal: RII := RefactorLocal;
+        scPrivate: RII := RefactorImplementation;
+        scPublic: RII := RefactorInterface;
       End;
-    ritCreate:
-      Begin
-        If RII.FPosition = ripAfter Then
-          If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            TBADIToolsAPIFunctions.OutputText(UR, #13#10);
-        TBADIToolsAPIFunctions.OutputText(UR, Format(strSection, [CP.CharIndex, '',
-          strSectionKeywords[FRefactoringInfo.RefactoringType]]));
-        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
-        TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
-        If RII.FPosition = ripBefore Then
-          If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            TBADIToolsAPIFunctions.OutputText(UR, #13#10);
+      CP.Line := RII.FLine;
+      CP.CharIndex := 0;
+      iIndex := EditorSvcs.TopView.CharPosToPos(CP);
+      Case FRefactoringInfo.Scope Of
+        scLocal: CP.CharIndex := FindIndentOfFirstTokenOnLine(FModule, FRefactoringInfo.Method.Line) - 1;
+        scPrivate: CP.CharIndex := FRefactoringInfo.ImplementationToken.Column - 1;
+        scPublic: CP.CharIndex := FRefactoringInfo.InterfaceToken.Column - 1;
       End;
+      UR := FSourceEditor.CreateUndoableWriter;
+      UR.CopyTo(iIndex);
+      Case RII.FType Of
+        ritAppend:
+          Begin
+            strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
+            TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring),
+              CP.CharIndex) + ';'#13#10);
+          End;
+        ritCreate:
+          Begin
+            If RII.FPosition = ripAfter Then
+              If TBADIOptions.BADIOptions.RefactorConstNewLine Then
+                TBADIToolsAPIFunctions.OutputText(UR, #13#10);
+            TBADIToolsAPIFunctions.OutputText(UR, Format(strSection, [CP.CharIndex, '',
+              strSectionKeywords[FRefactoringInfo.RefactoringType]]));
+            strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
+            TBADIToolsAPIFunctions.OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
+            If RII.FPosition = ripBefore Then
+              If TBADIOptions.BADIOptions.RefactorConstNewLine Then
+                TBADIToolsAPIFunctions.OutputText(UR, #13#10);
+          End;
+    End;
   End;
 
 End;
@@ -518,18 +522,22 @@ End;
 Procedure TBADIRefactorConstant.ReplaceToken;
 
 Var
+  EditorSvcs : IOTAEditorServices;
   CharPos: TOTACharPos;
   UR: IOTAEditWriter;
   iIndex: Integer;
 
 Begin
-  CharPos.Line := FRefactoringInfo.Token.Line;
-  CharPos.CharIndex := FRefactoringInfo.Token.Column - 1;
-  iIndex := FSourceEditor.EditViews[0].CharPosToPos(CharPos);
-  UR := FSourceEditor.CreateUndoableWriter;
-  UR.CopyTo(iIndex);
-  UR.DeleteTo(iIndex + FRefactoringInfo.Token.Length);
-  TBADIToolsAPIFunctions.OutputText(UR, FRefactoringInfo.Name);
+  If Supports(BorlandIDEServices, IOTAEditorServices, EditorSvcs) Then
+    Begin
+      CharPos.Line := FRefactoringInfo.Token.Line;
+      CharPos.CharIndex := FRefactoringInfo.Token.Column - 1;
+      iIndex := EditorSvcs.TopView.CharPosToPos(CharPos);
+      UR := FSourceEditor.CreateUndoableWriter;
+      UR.CopyTo(iIndex);
+      UR.DeleteTo(iIndex + FRefactoringInfo.Token.Length);
+      TBADIToolsAPIFunctions.OutputText(UR, FRefactoringInfo.Name);
+    End;
 End;
 
 (**

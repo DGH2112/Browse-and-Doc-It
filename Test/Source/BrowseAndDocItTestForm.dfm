@@ -13,7 +13,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDefault
+  Position = poDesigned
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
@@ -57,8 +57,12 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
         Width = 100
       end
       item
-        Width = 100
+        Width = 200
+      end
+      item
+        Width = 50
       end>
+    OnMouseDown = sbrStatusBarMouseDown
   end
   object atbToolbar: TToolBar
     Left = 0
@@ -1532,5 +1536,9 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   object XPManifest: TXPManifest
     Left = 432
     Top = 136
+  end
+  object pmStatusBar: TPopupMenu
+    Left = 432
+    Top = 200
   end
 end

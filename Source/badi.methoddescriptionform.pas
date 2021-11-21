@@ -3,15 +3,15 @@
   This module contains a class to add and edit method descriptions.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.038
+  @Date    25 Apr 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,9 +54,10 @@ Type
     edtPattern: TEdit;
     lblDescription: TLabel;
     edtDescription: TEdit;
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     pnlForm: TPanel;
+    btnCancel: TButton;
+    btnOK: TButton;
+    ilButtons: TImageList;
   Strict Private
   Strict Protected
   Public
@@ -81,7 +82,7 @@ Uses
 
   @precon  None.
   @postcon If the dialogue is confirmed then the pattern and description are
-           returned in the var parameters and the function retuen true.
+           returned in the var parameters and the function return true.
 
 
   @param   strPattern     as a String as a reference
@@ -96,16 +97,10 @@ Var
   
 Begin
   Result := False;
-  { $IFDEF DXE102
-  TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmMethodDescriptions);
-  TBADIToolsAPIFunctions.ApplyTheming(Self);
-  {$ENDIF}
   F := TfrmMethodDescriptions.Create(Nil);
   Try
-    { $IFDEF DXE102
-    If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
-      If ITS.IDEThemingEnabled Then
-        ITS.ApplyTheme(F);
+    {$IFNDEF STANDALONEAPP}
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmMethodDescriptions, F);
     {$ENDIF}
     F.edtPattern.Text := strPattern;
     F.edtDescription.Text := strDescription;

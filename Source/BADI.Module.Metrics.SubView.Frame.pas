@@ -1,19 +1,19 @@
 (**
   
   A module which contains a descendant class from the metrics frame so that the frame name can be changed
-  so there are no component casses in the IDE between the CustomEditView and the CustomEditorSubView when
-  using the same frame.
+  so there are no component classes in the IDE between the Custom Edit View and the Custom Editor Sub
+  View when using the same frame.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.004
+  @Date    28 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,10 +51,10 @@ Uses
   ActnList,
   Menus,
   PlatformDefaultStyleActnCtrls,
-  ActnPopup, System.ImageList;
+  ActnPopup;
 
 Type
-  (** A descendant class for the subview frame. **)
+  (** A descendant class for the sub-view frame. **)
   TframeBADIModuleMetricsSubView = Class(TframeBADIModuleMetricsEditorView)
   Strict Private
   Strict Protected

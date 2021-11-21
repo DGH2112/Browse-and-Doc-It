@@ -1,17 +1,17 @@
-/*
+/**
 
   This RC file contains menu icons for the BADI menu in the IDE.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.002
+  @Date    29 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
 
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,20 +26,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-*/
-BADIModuleExplorerImage   BITMAP "..\Images\BADIModuleExplorer.bmp"
-BADIDocumentationImage    BITMAP "..\Images\BADIDocumentation.bmp"
-BADIDUnitImage            BITMAP "..\Images\BADIDUnit.bmp"
-BADIProfilingImage        BITMAP "..\Images\BADIProfiling.bmp"
-BADIFocusEditorImage      BITMAP "..\Images\BADIFocusEditor.bmp"
-BADIMethodCommentImage    BITMAP "..\Images\BADIMethodComment.bmp"
-BADIPropertyCommentImage  BITMAP "..\Images\BADIPropertyComment.bmp"
-BADIBlockCommentImage     BITMAP "..\Images\BADIBlockComment.bmp"
-BADILineCommentImage      BITMAP "..\Images\BADILineComment.bmp"
-BADIInSituCommentImage    BITMAP "..\Images\BADIInSituComment.bmp"
-BADIToDoCommentImage      BITMAP "..\Images\BADIToDoComment.bmp"
-BADIRefactorConstantImage BITMAP "..\Images\BADIRefactorConstant.bmp"
-BADIMetricsImage          BITMAP "..\Images\BADIMetrics.bmp"
-BADIChecksImage           BITMAP "..\Images\BADIChecks.bmp"
-BADIOptionsImage          BITMAP "..\Images\BADIOptions.bmp"
+**/
+BADIModuleExplorerImage   BITMAP "Images\BADIModuleExplorer.bmp"
+BADIDocumentationImage    BITMAP "Images\BADIDocumentation.bmp"
+BADIDUnitImage            BITMAP "Images\BADIDUnit.bmp"
+BADIProfilingImage        BITMAP "Images\BADIProfiling.bmp"
+BADIFocusEditorImage      BITMAP "Images\BADIFocusEditor.bmp"
+BADIMethodCommentImage    BITMAP "Images\BADIMethodComment.bmp"
+BADIPropertyCommentImage  BITMAP "Images\BADIPropertyComment.bmp"
+BADIBlockCommentImage     BITMAP "Images\BADIBlockComment.bmp"
+BADILineCommentImage      BITMAP "Images\BADILineComment.bmp"
+BADIInSituCommentImage    BITMAP "Images\BADIInSituComment.bmp"
+BADIToDoCommentImage      BITMAP "Images\BADIToDoComment.bmp"
+BADIRefactorConstantImage BITMAP "Images\BADIRefactorConstant.bmp"
+BADIMetricsImage          BITMAP "Images\BADIMetrics.bmp"
+BADIChecksImage           BITMAP "Images\BADIChecks.bmp"
+BADISpellingImage         BITMAP "Images\BADISpelling.bmp"
+BADIOptionsImage          BITMAP "Images\BADIOptions.bmp"
 

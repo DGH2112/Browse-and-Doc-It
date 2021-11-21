@@ -2,16 +2,16 @@
 
   This method contains functions that are used global through out the application.
 
-  @Version 1.0
+  @Version 1.093
   @Author  David Hoyle.
-  @Date    21 Jun 2019
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ Uses
   Classes,
   Dialogs,
   Controls,
-  Graphics,
+  Vcl.Graphics,
+  WinApi.Windows,
   BADI.Types,
   BADI.Interfaces,
   BADI.Base.Container,
@@ -52,21 +53,21 @@ Type
 
   Procedure DisplayException(Const strMsg: String); Overload;
   Procedure DisplayException(Const strMsg: String; Const Params: Array Of Const); Overload;
-  Function IsKeyWord(Const strWord: String; Const strWordList: Array Of String): Boolean;
-  Function IsInSet(Const C: Char; Const strCharSet: TSetOfAnsiChar): Boolean; InLine;
-  Function PrologCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
-  Function EpilogCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
-  Function OutputCommentAndTag(Const C: TBADIBaseContainer; Const iMaxWidth: Integer;
+  Function  IsKeyWord(Const strWord: String; Const strWordList: Array Of String): Boolean;
+  Function  IsInSet(Const C: Char; Const strCharSet: TSetOfAnsiChar): Boolean; InLine;
+  Function  PrologCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
+  Function  EpilogCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
+  Function  OutputCommentAndTag(Const C: TBADIBaseContainer; Const iMaxWidth: Integer;
     Const boolShowHTML, boolFixed: Boolean): String;
-  Function BuildLangIndepRep(Const Param: TGenericParameter): String;
-  Function BADIImageIndex(Const iBADIImageIndex: TBADIImageIndex; Const AScope: TScope): Integer;
+  Function  BuildLangIndepRep(Const Param: TGenericParameter): String;
+  Function  BADIImageIndex(Const iBADIImageIndex: TBADIImageIndex; Const AScope: TScope): Integer;
   Procedure BuildNumber(Var iMajor, iMinor, iBugFix, iBuild: Integer);
-  Function BuildRootKey: String;
-  Function Like(Const strPattern, strText: String): Boolean;
-  Function ConvertDate(Const strDate: String): TDateTime;
-  Function GetField(Const strText: String; Const Ch: Char; Const iIndex: Integer;
+  Function  BuildRootKey: String;
+  Function  Like(Const strPattern, strText: String): Boolean;
+  Function  ConvertDate(Const strDate: String): TDateTime;
+  Function  GetField(Const strText: String; Const Ch: Char; Const iIndex: Integer;
     Const boolIgnoreQuotes: Boolean = True): String;
-  Function CharCount(Const cChar: Char; Const strText: String;
+  Function  CharCount(Const cChar: Char; Const strText: String;
     Const boolIgnoreQuotes: Boolean = True): Integer;
   Procedure LoadBADIImages(Const ilScopeImages: TImageList);
   Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean; 
@@ -75,12 +76,12 @@ Type
     boolSyntax : Boolean; Const iForeColour, iBackColour : TColor; Const FontStyles : TFontStyles;
     Const TokenFontInfoTokenSet : TBADITokenFontInfoTokenSet; Const iBGColour : TColor;
     Const Canvas : TCanvas);
-  Function BlendColour(Const iBaseColour, iHighlightColour : TColor; Const dblBlend : Double) : TColor;
+  Function  BlendColour(Const iBaseColour, iHighlightColour : TColor; Const dblBlend : Double) : TColor;
+  Procedure DrawIcon(Const Canvas : TCanvas; Var R : TRect; Const eLimitType : TLimitType);
 
 Implementation
 
 Uses
-  Windows,
   BADI.Constants,
   SHFolder,
   UITypes;
@@ -275,7 +276,7 @@ var
 // Delphi 7s SHFolder.pas file is missing this constant.
 Const
   SHGFP_TYPE_CURRENT = 0; { current value for user, verify it exists }
-{$ENDIF}
+{$ENDIF D0007}
 
 begin
   SetLength(strBuffer, MAX_PATH);
@@ -357,9 +358,9 @@ Begin
   SetLength(Result, i);
 End;
 
-{$IFNDEF DXE102}
+{$IFNDEF RS102}
 {$WARN NO_RETVAL OFF}
-{$ENDIF}
+{$ENDIF RS102}
 (**
 
   This function converts a freeform text string representing dates and times
@@ -386,7 +387,7 @@ Const
   Delimiters : Set Of Char = ['-', ' ', '\', '/', ':', '.'];
   {$ELSE}
   Delimiters : Set Of AnsiChar = ['-', ' ', '\', '/', ':', '.'];
-  {$ENDIF}
+  {$ENDIF D2009}
   Days : Array[1..7] Of String = ('fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed');
   Months : Array[1..24] Of String = (
     'apr', 'april',
@@ -485,7 +486,7 @@ Var
         If ShortDateFormat[j] In Delimiters Then
         {$ELSE}
         If CharInSet({$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat[j], Delimiters) Then
-        {$ENDIF}
+        {$ENDIF D2009}
           AddToken(slFormat, str)
         Else
           str := str + {$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat[j];
@@ -496,7 +497,7 @@ Var
         If (slFormat[j][1] In ['d', 'D']) And (Length(slFormat[j]) > 2) Then
         {$ELSE}
         If (CharInSet(slFormat[j][1], ['d', 'D'])) And (Length(slFormat[j]) > 2) Then
-        {$ENDIF}
+        {$ENDIF D2009}
           slFormat.Delete(j);
       For j := 0 To slFormat.Count - 1 Do
         Begin
@@ -504,19 +505,19 @@ Var
           If slFormat[j][1] In ['d', 'D'] Then
           {$ELSE}
           If CharInSet(slFormat[j][1], ['d', 'D']) Then
-          {$ENDIF}
+          {$ENDIF D2009}
             iIndex0 := j;
           {$IFNDEF D2009}
           If slFormat[j][1] In ['m', 'M'] Then
           {$ELSE}
           If CharInSet(slFormat[j][1], ['m', 'M']) Then
-          {$ENDIF}
+          {$ENDIF D2009}
             iIndex1 := j;
           {$IFNDEF D2009}
           If slFormat[j][1] In ['y', 'Y'] Then
           {$ELSE}
           If CharInSet(slFormat[j][1], ['y', 'Y']) Then
-          {$ENDIF}
+          {$ENDIF D2009}
             iIndex2 := j;
         End;
     Finally
@@ -561,14 +562,14 @@ Begin
       If strDate[i] In Delimiters Then
       {$ELSE}
       If CharInSet(strDate[i], Delimiters) Then
-      {$ENDIF}
+      {$ENDIF D2009}
         Begin
           AddToken(sl, strToken);
           {$IFNDEF D2009}
           If (strDate[i] In [':']) And (iTime = -1) Then
           {$ELSE}
           If (CharInSet(strDate[i], [':'])) And (iTime = -1) Then
-          {$ENDIF}
+          {$ENDIF D2009}
             iTime := sl.Count - 1;
         End Else
           strToken := strToken + strDate[i];
@@ -638,9 +639,9 @@ Begin
     sl.Free;
   End;
 End;
-{$IFNDEF DXE102}
+{$IFNDEF RS102}
 {$WARN NO_RETVAL ON}
-{$ENDIF}
+{$ENDIF RS102}
 
 (**
 
@@ -679,6 +680,47 @@ ResourceString
 
 Begin
   ShowMessage(Format(strException + StrMsg, Params));
+End;
+
+(**
+
+  This method renders a document issue icon onto the editor window at the end of the line with the issue.
+
+  @precon  None.
+  @postcon The icon is rendered on the editor window and the left of R is moved to the right of the 
+           drawn icon.
+
+  @param   Canvas     as a TCanvas as a constant
+  @param   R          as a TRect as a reference
+  @param   eLimitType as a TLimitType as a constant
+
+**)
+Procedure DrawIcon(Const Canvas : TCanvas; Var R : TRect; Const eLimitType : TLimitType);
+
+Const
+  astrIconResNames : Array[TLimitType] Of String = (
+    'Error',
+    'Warning',
+    'Hint',
+    'DocConflict',
+    'Check',
+    'Metric',
+    'Spelling'
+  );
+
+Var
+  B : Vcl.Graphics.TBitMap;
+    
+Begin
+  B := Vcl.Graphics.TBitMap.Create;
+  Try
+    B.LoadFromResourceName(hInstance, astrIconResNames[eLimitType]);
+    B.Transparent := True;
+    Canvas.Draw(R.Left, R.Top + (R.Height - B.Height) Div 2, B);
+    Inc(R.Left, B.Width);
+  Finally
+    B.Free;
+  End;
 End;
 
 (**
@@ -1009,28 +1051,24 @@ Const
 
 Var
   R: TRect;
-  MainImage: Graphics.TBitmap;
-  ScopeImage: Graphics.TBitmap;
+  MainImage: Vcl.Graphics.TBitmap;
+  ScopeImage: Vcl.Graphics.TBitmap;
   iImage: TBADIImageIndex;
   iScope: TScope;
-  x: Integer;
-  y: Integer;
 
 Begin
   R := Rect(0, 0, iBitMapSize, iBitMapSize);
-  MainImage := Graphics.TBitMap.Create;
+  MainImage := Vcl.Graphics.TBitMap.Create;
   Try
-    ScopeImage := Graphics.TBitmap.Create;
+    ScopeImage := Vcl.Graphics.TBitmap.Create;
     Try
       For iImage := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
         For iScope := Low(TScope) To High(TScope) Do
           Begin
               MainImage.LoadFromResourceName(hInstance, BADIImageList[iImage].FResourceName);
               ScopeImage.LoadFromResourceName(hInstance, BADIScopeList[iScope].FResourceName);
-              For x := 0 To 11 Do
-                For y := 0 To 11 Do
-                  If ScopeImage.Canvas.Pixels[x, y] <> BADIScopeList[iScope].FMaskColour Then
-                    MainImage.Canvas.Pixels[x, y] := ScopeImage.Canvas.Pixels[x, y];
+              ScopeImage.Transparent := True;
+              MainImage.Canvas.Draw(0, 0, ScopeImage);
               ilScopeImages.AddMasked(MainImage, BADIImageList[iImage].FMaskColour);
           End;
     Finally

@@ -4,15 +4,15 @@
   throughout this project.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.728
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ Uses
   System.SysUtils,
   System.Classes,
   VCL.Forms,
+  VCL.Controls,
   WinAPI.Windows,
   BADI.Types,
   BADI.ElementContainer;
@@ -51,11 +52,14 @@ Type
 
   (** A record to encapsulate the custom Tools API functions **)
   TBADIToolsAPIFunctions = Record
+  Strict Private
+  Public
     Class Function ProjectGroup: IOTAProjectGroup; Static;
     Class Function ActiveProject : IOTAProject; Static;
     Class Function ProjectModule(Const Project : IOTAProject) : IOTAModule; Static;
     Class Function ActiveSourceEditor : IOTASourceEditor; Static;
     Class Function SourceEditor(Const Module : IOTAModule) : IOTASourceEditor; Static;
+    Class Function FormEditor(Const Module : IOTAModule) : INTAFormEditor; Static;
     Class Procedure OutputMessage(Const strText : String); Overload; Static;
     Class Procedure OutputMessage(Const strFileName, strText, strPrefix : String; Const iLine,
       iCol : Integer); Overload; Static;
@@ -66,18 +70,23 @@ Type
       iIdentColumn : Integer; Const BrowsePosition : TBrowsePosition); Overload; Static;
     Class Procedure PositionCursor(Const iIdentLine, iIdentCol, iCommentLine: Integer;
       Const BrowsePosition : TBrowsePosition); Overload; Static;
-    {$IFDEF DXE102}
-    Class Procedure RegisterFormClassForTheming(Const AFormClass : TCustomFormClass); Static;
+    Class Procedure RegisterFormClassForTheming(Const AFormClass : TCustomFormClass;
+      Const Component : TComponent = Nil); Static;
     Class Procedure ApplyTheming(Const Component : TComponent); Static;
-    {$ENDIF}
+    Class Procedure FocusActiveEditor; Static;
   End;
 
 Implementation
 
-{$IFDEF D2009}
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   Character;
-{$ENDIF}
+
+Const
+  (** A constant for the BADI Message Group Name. **)
+  strBADIGroupName = 'BADI';
 
 (**
 
@@ -114,19 +123,17 @@ End;
 Class Function TBADIToolsAPIFunctions.ActiveSourceEditor : IOTASourceEditor;
 
 Var
-  MS : IOTAModuleServices;
+  ES : IOTAEditorServices;
 
 Begin
   Result := Nil;
-  If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
-    If Assigned(MS.CurrentModule) Then
-      Result := SourceEditor(MS.CurrentModule);
+  If Supports(BorlandIDEServices, IOTAEditorServices, ES) Then
+    Result := ES.TopBuffer;
 End;
 
-{$IFDEF DXE102}
 (**
 
-  This method apply theming to the given componentif theming is enabled and available.
+  This method apply theming to the given component if theming is enabled and available.
 
   @precon  None.
   @postcon The component is themed if theming is available and enabled.
@@ -136,15 +143,18 @@ End;
 **)
 Class Procedure TBADIToolsAPIFunctions.ApplyTheming(Const Component: TComponent);
 
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
+{$ENDIF RS102}
   
 Begin
+  {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       ITS.ApplyTheme(Component);
+  {$ENDIF RS102}
 End;
-{$ENDIF}
 
 (**
 
@@ -153,7 +163,7 @@ End;
   clear.
 
   @precon  Msg is a set of clear message enumerates to define which messages
-           from the IDE messge window are cleared.
+           from the IDE message window are cleared.
   @postcon The messages in the IDE message window are clear in line with
            the passed enumerate.
 
@@ -179,7 +189,7 @@ End;
 
 (**
 
-  This method returna memory stream of the source code editor.
+  This method returns memory stream of the source code editor.
 
   @precon  SourceEditor is the editor to get the source code from.
   @postcon Returns a memory stream of the file.
@@ -220,7 +230,69 @@ End;
 
 (**
 
-  This procedure provides a smiple procedural interface for sending a message
+  This method attempts to focus the edit control as the OTA IOTASourceEditor.Show does not do this.
+
+  @precon  None.
+  @postcon The code editor is focused for editing.
+
+**)
+Class Procedure TBADIToolsAPIFunctions.FocusActiveEditor;
+
+Const
+  strTEditControl = 'TEditControl';
+  
+Var
+  i  : Integer;
+  frm: TCustomForm;
+  E: IOTASourceEditor;
+
+Begin
+  E := ActiveSourceEditor;
+  If Assigned(E) Then
+    Begin
+      E.Show;
+      // IDE hack to focus the editor window because the above line doesn't do it
+      frm   := E.EditViews[0].GetEditWindow.Form;
+      For i := 0 To frm.ComponentCount - 1 Do
+        If frm.Components[i].ClassName = strTEditControl Then
+          Begin
+            If (frm.Components[i] As TWinControl).Visible Then
+              (frm.Components[i] As TWinControl).SetFocus;
+            Break;
+          End;
+    End;
+End;
+
+(**
+
+  This method returns the form editor code for the passed module.
+
+  @precon  Module is the module for which a form editor interface is required.
+  @postcon Returns the source editor interface for the given module.
+
+  @param   Module as an IOTAModule as a constant
+  @return  an INTAFormEditor
+
+**)
+Class Function TBADIToolsAPIFunctions.FormEditor(Const Module : IOTAModule) : INTAFormEditor;
+
+Var
+  iFileCount : Integer;
+  i : Integer;
+
+Begin
+  Result := Nil;
+  If Not Assigned(Module) Then
+    Exit;
+  iFileCount := Module.GetModuleFileCount;
+  For i := 0 To iFileCount - 1 Do
+    If Supports(Module.GetModuleFileEditor(i), INTAFormEditor, Result) Then
+      Break;
+End;
+
+(**
+
+  This procedure provides a simple procedural interface for sending a message
   to the IDE`s message window.
 
   @precon  strText is the tool message to be displayed.
@@ -233,19 +305,23 @@ Class Procedure TBADIToolsAPIFunctions.OutputMessage(Const strText : String);
 
 Var
   MS : IOTAMessageServices;
+  MsgGroup: IOTAMessageGroup;
   
 Begin
   If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
-    MS.AddTitleMessage(strText);
+    Begin
+      MsgGroup := MS.AddMessageGroup(strBADIGroupName);
+      MS.AddTitleMessage(strText, MsgGroup);
+    End;
 End;
 
 (**
 
-  This procedure provides a smiple procedural interface for sending a message to the IDE`s message
+  This procedure provides a simple procedural interface for sending a message to the IDE`s message
   window.
 
   @precon  strFileName is the name of the file associated with the message, strText is the message
-           to be displayed, strPrefix is the prefix text infront of the message, e.g. [Warning],
+           to be displayed, strPrefix is the prefix text in front of the message, e.g. [Warning],
            iLine is the line in the file where the message applies and iCol is the column in the
            file where the message applies.
   @postcon Adds a tools message to the IDE message window.
@@ -262,17 +338,22 @@ Class Procedure TBADIToolsAPIFunctions.OutputMessage(Const strFileName, strText,
 
 Var
   MS : IOTAMessageServices;
+  MsgGroup: IOTAMessageGroup;
+  LineRef: Pointer;
   
 Begin
   If Supports(BorlandIDEServices, IOTAMessageServices, MS) Then
-    MS.AddToolMessage(strFileName, strText, strPrefix, iLine, iCol);
+    Begin
+      MsgGroup := MS.AddMessageGroup(strBADIGroupName);
+      MS.AddToolMessage(strFileName, strText, strPrefix, iLine, iCol, Nil, LineRef, MsgGroup);
+    End;
 End;
 
 (**
 
   This procedure outputs the given text to the given edit writer.
 
-  @precon  Writer must be a valid instance of an IOTAEditWriter interface.
+  @precon  Writer must be a valid instance.
   @postcon Outputs the given text to the given edit writer.
 
   @param   Writer  as an IOTAEditWriter as a Constant
@@ -286,13 +367,13 @@ Begin
   Writer.Insert(PAnsiChar(strText));
   {$ELSE}
   Writer.Insert(PAnsiChar(UTF8Encode(strText)));
-  {$ENDIF}
+  {$ENDIF D2009}
 End;
 
 (**
 
-  This method move the active editors cursor to the supplied position and centres the cursor on th screen
-  .
+  This method move the active editors cursor to the supplied position and centres the cursor on the
+  screen.
 
   @precon  None.
   @postcon When a selection is made in the explorer the cursor is placed in the editor.
@@ -308,7 +389,7 @@ Class Procedure TBADIToolsAPIFunctions.PositionCursor(Const iIdentLine, iIdentCo
 
   (**
 
-    This method unfolders the method code at the nearest position to the cursor.
+    This method unfolds the method code at the nearest position to the cursor.
 
     @precon  EV must be a valid instance.
     @postcon The method code at the cursor is unfolded.
@@ -442,7 +523,7 @@ Class Procedure TBADIToolsAPIFunctions.PositionCursor(Const Container : TElement
 
   (**
 
-    This method unfolders the method code at the nearest position to the cursor.
+    This method unfolds the method code at the nearest position to the cursor.
 
     @precon  EV must be a valid instance.
     @postcon The method code at the cursor is unfolded.
@@ -610,10 +691,10 @@ end;
 
 (**
 
-  This function finds the open tools api module interface for the given project
+  This function finds the open tools API module interface for the given project
   source.
 
-  @precon  A valid open tools api project source.
+  @precon  A valid open tools API project source.
   @postcon Returns the module interface for the given project source.
 
   @param   Project as an IOTAProject as a Constant
@@ -642,37 +723,53 @@ Begin
     End;
 End;
 
-{$IFDEF DXE102}
 (**
 
-  This method regsiters the given form class for theming is theming is enabled and available.
+  This method registers the given form class for theming is theming is enabled and available.
 
   @precon  None.
-  @postcon The form is regsitered for theming is available and enabled.
+  @postcon The form is registered for theming is available and enabled.
 
   @param   AFormClass as a TCustomFormClass as a constant
+  @param   Component  as a TComponent as a constant
 
 **)
-Class Procedure TBADIToolsAPIFunctions.RegisterFormClassForTheming(Const AFormClass : TCustomFormClass);
+Class Procedure TBADIToolsAPIFunctions.RegisterFormClassForTheming(Const AFormClass : TCustomFormClass;
+  Const Component : TComponent = Nil);
 
+{$IFDEF RS102}
 Var
+  {$IFDEF RS104} // Breaking change to the Open Tools API - They fixed the wrongly defined interface
+  ITS : IOTAIDEThemingServices;
+  {$ELSE}
   ITS : IOTAIDEThemingServices250;
+  {$ENDIF RS104}
+{$ENDIF RS102}
   
 Begin
+  {$IFDEF RS102}
+  {$IFDEF RS104}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+  {$ELSE}
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices250, ITS) Then
+  {$ENDIF RS104}
     If ITS.IDEThemingEnabled Then
-      ITS.RegisterFormClass(AFormClass);
+      Begin
+        ITS.RegisterFormClass(AFormClass);
+        If Assigned(Component) Then
+          ITS.ApplyTheme(Component);
+      End;
+  {$ENDIF RS102}
 End;
-{$ENDIF}
 
 (**
 
   This method returns the source code editor for the passed module.
 
-  @precon  Module is the module for which a source ditor interface is required.
+  @precon  Module is the module for which a source editor interface is required.
   @postcon Returns the source editor interface for the given module.
 
-  @param   Module as an IOTAModule as a Constant
+  @param   Module as an IOTAModule as a constant
   @return  an IOTASourceEditor
 
 **)
@@ -688,8 +785,10 @@ Begin
     Exit;
   iFileCount := Module.GetModuleFileCount;
   For i := 0 To iFileCount - 1 Do
-    If Module.GetModuleFileEditor(i).QueryInterface(IOTASourceEditor, Result) = S_OK Then
+    If Supports(Module.GetModuleFileEditor(i), IOTASourceEditor, Result) Then
       Break;
 End;
 
 End.
+
+

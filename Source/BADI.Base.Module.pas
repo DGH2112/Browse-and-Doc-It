@@ -4,15 +4,15 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 2.735
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,42 +32,46 @@ Unit BADI.Base.Module;
 
 Interface
 
-Uses
-  Classes,
-  Contnrs,
+uses
+  System.Classes,
+  System.Contnrs,
+  System.RegularExpressions,
   BADI.Options,
   BADI.Types,
   BADI.TokenInfo,
   BADI.Comment,
   BADI.ElementContainer,
-  BADI.CompilerConditionStack;
+  BADI.CompilerConditionStack,
+  BADI.Interfaces;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** This is an abtract class from which all language modules should be
+  (** This is an abstract class from which all language modules should be
       derived. **)
   TBaseLanguageModule = Class Abstract (TElementContainer)
   Strict Private
-    FOwnedItems : TObjectList;
-    FTokenIndex : TTokenIndex;
-    FDocErrors: TElementContainer;
-    FTickList : TObjectList;
-    FModuleName : String;
-    FBodyComment : TObjectList;
-    FFileName: String;
-    FModified : Boolean;
-    FCompilerDefs : TStringList;
-    FPreviousTokenIndex : TTokenIndex;
-    FCompilerConditionStack : TCompilerConditionStack;
-    FCompilerConditionUndoStack : TCompilerConditionStack;
-    FLastComment: TTokenInfo;
-    FCommentClass : TCommentClass;
-    FShouldUndoCompilerStack: Boolean;
-    FLastBodyCommentLine: Integer;
-    FModuleOptions : TModuleOptions;
-    FTokenStack : TArrayOfInteger;
-    FTokenStackTop : Integer;
+    FOwnedItems                 : TObjectList;
+    FTokenIndex                 : TTokenIndex;
+    FDocErrors                  : TElementContainer;
+    FTickList                   : TObjectList;
+    FModuleName                 : String;
+    FBodyComment                : TObjectList;
+    FFileName                   : String;
+    FModified                   : Boolean;
+    FCompilerDefs               : TStringList;
+    FPreviousTokenIndex         : TTokenIndex;
+    FCompilerConditionStack     : IBADICompilerConditionStack;
+    FCompilerConditionUndoStack : IBADICompilerConditionStack;
+    FLastComment                : TTokenInfo;
+    FCommentClass               : TCommentClass;
+    FShouldUndoCompilerStack    : Boolean;
+    FLastBodyCommentLine        : Integer;
+    FModuleOptions              : TModuleOptions;
+    FTokenStack                 : TArrayOfInteger;
+    FTokenStackTop              : Integer;
+    FIdentifierList             : TStringList;
+    FReplaceAmpersandRegEx      : TRegEx;
   Strict Protected
     Function  GetToken : TTokenInfo;
     function  GetOpTickCountName(Const iIndex: Integer): String;
@@ -82,14 +86,15 @@ Type
     Function  EndOfTokens : Boolean;
     Procedure NextNonCommentToken; Virtual;
     Procedure ProcessBodyComments;
-    Procedure RollBackToken; deprecated;
+    Procedure RollBackToken; {$IFNDEF DEBUG} deprecated; {$ENDIF DEBUG}
     Procedure PushTokenPosition;
     Procedure PopTokenPosition;
     Function  GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Virtual; Abstract;
     Procedure SetTokenIndex(Const iIndex : TTokenIndex);
     procedure AppendToLastToken(Const strToken : String);
-    procedure ProcessCompilerDirective(Var iSkip : Integer); Virtual; Abstract;
+    Procedure CheckTagSpelling(Const Comment : TComment; Const strTagName : String);
+    procedure ProcessCompilerDirective(); Virtual; Abstract;
     Function  GetModuleName : String; Virtual;
     function  GetBytes: Int64;
     function  GetLines: Integer;
@@ -97,11 +102,11 @@ Type
       Const SeekToken : TSeekToken; Const Container : TElementContainer);
     Function GetHighPerformanceTickCount : Double;
     (**
-      Returns a refernce the to owned items collection. This is used to manage
-      the life time of all the ident lists and comments found in the module.
+      Returns a reference the to owned items collection. This is used to manage
+      the life time of all the identifier lists and comments found in the module.
       @precon  None.
-      @postcon Returns a refernce the to owned items collection. This is used to
-               manage the life time of all the ident lists and comments found in
+      @postcon Returns a reference the to owned items collection. This is used to
+               manage the life time of all the identifier lists and comments found in
                the module.
       @return  a TObjectList
     **)
@@ -153,6 +158,14 @@ Type
     Procedure AddToExpression(Const Container : TElementContainer);
     function  IsToken(Const strToken: String; Const Container: TElementContainer): Boolean;
     Procedure AddBodyComment(Const C : TComment);
+    Procedure CheckCommentSpelling; Virtual;
+    Procedure CheckStringSpelling; Virtual;
+    procedure CheckSpelling(Const strWord : String; Const AScope : TScope;
+      Const eSpellingIssueType : TBADISpellingIssueType; Const iLine, iColumn : Integer;
+      Const Comment : TComment);
+    Procedure AddIdentifier(Const strIdentifier : String);
+    Procedure ProcessLiteralsForSpelling(Const E: TElementContainer;
+      Const eSpellingIssueType : TBADISpellingIssueType);
     Class Function  DefaultProfilingTemplate : String; Virtual;
     { Properties }
     (**
@@ -166,10 +179,10 @@ Type
     **)
     Property OpTickCount[Const strStart, strFinish : String] : Double Read GetOpTickCount;
     (**
-      Thie property returns the number of operation tick counter storeed in the
+      This property returns the number of operation tick counter stored in the
       collection.
       @precon  None.
-      @postcon Returns the number of operation tick counter storeed in the
+      @postcon Returns the number of operation tick counter stored in the
                collection.
       @return  an Integer
     **)
@@ -230,21 +243,21 @@ Type
     Property Modified : Boolean Read FModified;
     (**
       This property defines a compiler condition stack for use in the
-      ProcessCompilerDefintions method.
+      ProcessCompilerDirective method.
       @precon  None.
       @postcon Provides access to the compiler condition stack.
-      @return  a TCompilerConditionStack
+      @return  a IBADICompilerConditionStack
     **)
-    Property CompilerConditionStack : TCompilerConditionStack
+    Property CompilerConditionStack : IBADICompilerConditionStack
       Read FCompilerConditionStack;
     (**
       This property defines a compiler condition undo stack for use in the
-      ProcessCompilerDefintions method.
+      ProcessCompilerDirective method.
       @precon  None.
       @postcon Provides access to the compiler condition undo stack.
-      @return  a TCompilerConditionStack
+      @return  a IBADICompilerConditionStack
     **)
-    Property CompilerConditionUndoStack : TCompilerConditionStack
+    Property CompilerConditionUndoStack : IBADICompilerConditionStack
       Read FCompilerConditionUndoStack;
     (**
       This property returns the number of bytes in the file.
@@ -282,28 +295,33 @@ Type
 Implementation
 
 Uses
-  SysUtils,
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
+  System.SysUtils,
+  System.StrUtils,
+  System.INIFiles,
   Windows,
-  INIFiles,
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.Comment.Tag,
   BADI.Constants,
-  BADI.TickOption;
+  BADI.TickOption,
+  BADI.Generic.Tokenizer;
 
 Const
-  (** A constant for the growth capcity of the compiler def stack. **)
+  (** A constant for the growth capacity of the compiler definitions stack. **)
   iStackCapacity = 10;
 
 (**
 
   This method adds the comment to the comment collection if it has content and is more than 1 line 
-  different from the last added comemnt, else appends the contents of the comment to the last added 
+  different from the last added comment, else appends the contents of the comment to the last added 
   comment and frees the passed comment.
 
   @precon  None.
   @postcon Adds the comment to the comment collection if it has content and is more than 1 line 
-           different from the last added comemnt, else appends the contents of the comment to the last
+           different from the last added comment, else appends the contents of the comment to the last
            added comment and frees the passed comment.
 
   @param   C as a TComment as a constant
@@ -315,7 +333,7 @@ var
   Cmt: TComment;
 
 begin
-  If C <> Nil Then
+  If Assigned(C) Then
     If (C.TokenCount > 0) Or (C.TagCount > 0) Then
       Begin
         If FBodyComment.Count > 0 Then
@@ -359,6 +377,23 @@ end;
 
 (**
 
+  This method adds an identifier to a list so that these can be omitted from the list of spelling
+  mistakes.
+
+  @precon  None.
+  @postcon The given identifier is added to the list.
+
+  @param   strIdentifier as a String as a constant
+
+**)
+Procedure TBaseLanguageModule.AddIdentifier(Const strIdentifier: String);
+
+Begin
+  FIdentifierList.Add(strIdentifier);
+End;
+
+(**
+
   This method adds a timer count to the modules OpTickCount collection. This
   can be used to provide timing / profiling information on operations.
 
@@ -377,11 +412,11 @@ end;
 
 (**
 
-  This method adds the current toen to the passed generic container if it is not nil and moves to the 
+  This method adds the current token to the passed generic container if it is not nil and moves to the 
   next non comment token.
 
   @precon  None.
-  @postcon Adds the current toen to the passed generic container if it is not nil and moves to the next 
+  @postcon Adds the current token to the passed generic container if it is not nil and moves to the next 
            non comment token.
 
   @param   Container as a TElementContainer as a constant
@@ -397,10 +432,10 @@ End;
 
 (**
 
-  This method appends the pased token string to the previous token.
+  This method appends the passed token string to the previous token.
 
   @precon  None.
-  @postcon Appends the pased token string to the previous token.
+  @postcon Appends the passed token string to the previous token.
 
   @param   strToken as a String as a Constant
 
@@ -416,7 +451,7 @@ End;
   This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Override and default GetAsString method and returns the name of the module.
+  @postcon Override and default AsString method and returns the name of the module.
 
   @nohint boolShowIdentifier boolForDocumentation
   
@@ -430,6 +465,46 @@ Function TBaseLanguageModule.AsString(Const boolShowIdentifier, boolForDocumenta
 begin
   Result := ExtractFileName(Name);
 end;
+
+(**
+
+  This method cycles through each comment in the module and checks the spelling of each token.
+
+  @precon  None.
+  @postcon The tokens of the main comment are checked for spelling and if any fail they are added to the
+           spelling mistakes list.
+
+**)
+Procedure TBaseLanguageModule.CheckCommentSpelling;
+
+Const
+  strPrecon = 'precon';
+  strPostcon = 'postcon';
+
+Var
+  iComment : Integer;
+  Cmt : TComment;
+  iToken : Integer;
+  Token : TTokenInfo;
+
+Begin
+  If doSpellCheckComments In TBADIOptions.BADIOptions.Options Then
+    For iComment := 0 To BodyCommentCount - 1 Do
+      Begin
+        Cmt := BodyComment[iComment];
+        For iToken := 0 To Cmt.TokenCount - 1 Do
+          Begin
+            Token := Cmt.Tokens[iToken];
+            If (Token.TokenType In [ttIdentifier]) And (Token.Length > 1) Then
+              CheckSpelling(Token.Token, scNone, sitComment, Token.Line, Token.Column, Cmt);
+          End;
+        If doSpellCheckTags In TBADIOptions.BADIOptions.Options Then
+          Begin
+            CheckTagSpelling(Cmt, strPrecon);
+            CheckTagSpelling(Cmt, strPostcon);
+          End;
+      End;
+End;
 
 (**
 
@@ -454,7 +529,7 @@ Const
     This procedure check the modules comment for a missing author tag.
 
     @precon  None.
-    @postcon If the module comment is missing an author tag a documentation conflict message os output.
+    @postcon If the module comment is missing an author tag a documentation conflict message is output.
 
   **)
   Procedure CheckAuthor;
@@ -477,7 +552,7 @@ Const
     This procedure check the modules comment for a missing version tag.
 
     @precon  None.
-    @postcon If the module comment is missing an version tag a documentation conflict message os output.
+    @postcon If the module comment is missing an version tag a documentation conflict message is output.
 
   **)
   Procedure CheckVersion;
@@ -568,10 +643,117 @@ End;
 
 (**
 
+  This method checks the given word against the various lists and if found to be not ignored and added to
+  the local dictionary or in the main language dictionary, it is added to the list of spelling mistakes.
+
+  @precon  None.
+  @postcon The word is added to the spelling mistakes list of not in any dictionary or ignore list.
+
+  @param   strWord            as a String as a constant
+  @param   AScope             as a TScope as a constant
+  @param   eSpellingIssueType as a TBADISpellingIssueType as a constant
+  @param   iLine              as an Integer as a constant
+  @param   iColumn            as an Integer as a constant
+  @param   Comment            as a TComment as a constant
+
+**)
+procedure TBaseLanguageModule.CheckSpelling(Const strWord : String; Const AScope : TScope;
+  Const eSpellingIssueType : TBADISpellingIssueType; Const iLine, iColumn : Integer;
+  Const Comment : TComment);
+
+Var
+  boolFound: Boolean;
+  iIndex : Integer;
+
+Begin
+  boolFound :=
+    BADIOptions.LanguageDictionary.Find(strWord, iIndex) Or
+    BADIOptions.LocalDictionary.Find(strWord, iIndex) Or
+    BADIOptions.IgnoreDictionary.Find(strWord, iIndex) Or
+    BADIOptions.ProjectDictionary.Find(strWord, iIndex) Or
+    FIdentifierList.Find(strWord, iIndex);
+  If Not boolFound And (strWord.ToUpper <> strWord) Then
+    AddSpelling(strWord, AScope, eSpellingIssueType, iLine, iColumn, Comment);
+End;
+
+(**
+
+  This method check string literals for spelling mistakes.
+
+  @precon  None.
+  @postcon Each string literal in the modules token list if parsed for individual words and then checked
+           against various dictionary before being added the the spelling mistakes list.
+
+**)
+Procedure TBaseLanguageModule.CheckStringSpelling;
+
+Var
+  iToken: Integer;
+  Token : TTokenInfo;
+  sl : TStringList;
+  i : Integer;
+  EmptyKeyWordList : TKeyWords;
+
+Begin
+  If doSpellCheckLiterals In TBADIOptions.BADIOptions.Options Then
+    For iToken := 0 To TokenCount - 1 Do
+      Begin
+        Token := Tokens[iToken];
+        If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
+          Begin
+            sl := Tokenize(Token.Token.DeQuotedString, EmptyKeyWordList, EmptyKeyWordList);
+            Try
+              For i := 0 To sl.Count - 1 Do
+                If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
+                  If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
+                    CheckSpelling(sl[i], scNone, sitLiteral, Token.Line, Token.Column, Nil);
+            Finally
+              sl.Free;
+            End;
+          End;
+      End;
+End;
+
+(**
+
+  This method checks the named tag in the given comment for spelling issues.
+
+  @precon  Comment must be a valid instance.
+  @postcon Any words in the tag tokens that are not in dictionaries or ignore lists will be added to the
+           list of spelling mistakes.
+
+  @param   Comment    as a TComment as a constant
+  @param   strTagName as a String as a constant
+
+**)
+Procedure TBaseLanguageModule.CheckTagSpelling(Const Comment : TComment; Const strTagName : String);
+
+Var
+  iIndex: Integer;
+  T: TTag;
+  iToken: Integer;
+  Token : TTokenInfo;
+
+Begin
+  iIndex := Comment.FindTag(strTagName);
+  If iIndex > -1 Then
+    Begin
+      T := Comment.Tag[iIndex];
+      For iToken := 0 To T.TokenCount - 1 Do
+        Begin
+          Token := T.Tokens[iToken];
+          If (Token.TokenType In [ttIdentifier]) And (Token.Length > 1) Then
+            CheckSpelling(Token.Token, scNone, sitTag, Token.Line, Token.Column, Comment);
+        End;
+    End;
+End;
+
+(**
+
   This is the constructor method for the TBaseLanguageModule class.
 
   @precon  None.
-  @postcon Initialise this base class and Tokensizes the passed stream of characters.
+  @postcon Initialise this base class and Tokenises the passed stream of characters.
 
   @nohint  Source
 
@@ -586,6 +768,7 @@ constructor TBaseLanguageModule.CreateParser(Const Source, strFileName : String;
 
 begin
   Inherited Create(strFileName, scGlobal, 0, 0, iiModule, Nil);
+  FReplaceAmpersandRegEx := TRegEx.Create('&(\w)', [roIgnoreCase, roCompiled, roSingleLine]);
   FModuleOptions := ModuleOptions;
   FFileName := strFileName;
   FModified := IsModified;
@@ -601,6 +784,9 @@ begin
   FCompilerDefs.CaseSensitive := False;
   {$ENDIF}
   FCompilerDefs.Sorted := True;
+  FIdentifierList := TStringList.Create;
+  FIdentifierList.Sorted := True;
+  FIdentifierList.Duplicates := dupIgnore;
   FCompilerConditionStack := TCompilerConditionStack.Create;
   FCompilerConditionUndoStack := TCompilerConditionStack.Create;
   FCommentClass := CommentClass;
@@ -610,10 +796,10 @@ end;
 
 (**
 
-  This method returns the default profilin template for this module.
+  This method returns the default profiling template for this module.
 
   @precon  None.
-  @postcon Returns the default profilin template for this module.
+  @postcon Returns the default profiling template for this module.
 
   @return  a String
 
@@ -661,8 +847,7 @@ end;
 **)
 destructor TBaseLanguageModule.Destroy;
 begin
-  FCompilerConditionUndoStack.Free;
-  FCompilerConditionStack.Free;
+  FIdentifierList.Free;
   FCompilerDefs.Free;
   FBodyComment.Free;
   FTickList.Free;
@@ -709,7 +894,7 @@ Procedure TBaseLanguageModule.ErrorAndSeekToken(Const strMsg, strParam : String;
 
   (**
 
-    This method counts the number of occurrances of "%s" in the string and returns that number.
+    This method counts the number of occurrences of "%s" in the string and returns that number.
 
     @precon  None.
     @postcon Returns the number of string parameters in the text.
@@ -1011,11 +1196,11 @@ end;
 
 (**
 
-  This method check the current token against the passed string and if true returns true and addeds the 
+  This method check the current token against the passed string and if true returns true and adds the 
   token to the generic container.
 
   @precon  None.
-  @postcon Check the current token against the passed string and if true returns true and addeds the 
+  @postcon Check the current token against the passed string and if true returns true and adds the 
            token to the generic container.
 
   @param   strToken  as a String as a constant
@@ -1045,45 +1230,38 @@ procedure TBaseLanguageModule.NextNonCommentToken;
 
 Var
   boolContinue : Boolean;
-  iSkip : Integer;
 
 begin
-  iSkip := 0;
   FShouldUndoCompilerStack := False;
   // Catch first token as directive
   If Token.TokenType = ttCompilerDirective Then
     Begin
-      ProcessCompilerDirective(iSkip);
+      ProcessCompilerDirective;
       FShouldUndoCompilerStack := True;
     End;
   Repeat
     ProcessBodyComments;
     If Not (Tokens[FTokenIndex].TokenType In [ttLineComment, ttBlockComment,
-      ttCompilerDirective]) And (iSkip = 0) Then
+      ttCompilerDirective]) And CompilerConditionStack.CanParse Then
       FPreviousTokenIndex := FTokenIndex;
     NextToken;
     If Token.TokenType = ttCompilerDirective Then
       Begin
-        ProcessCompilerDirective(iSkip);
+        ProcessCompilerDirective;
         FShouldUndoCompilerStack := True;
       End;
     boolContinue := (
-      (
-        Token.TokenType In [ttLineComment, ttBlockComment, ttCompilerDirective]
-      ) And
-      Not EndOfTokens
-    ) Or (iSkip > 0)
+      (Token.TokenType In [ttLineComment, ttBlockComment, ttCompilerDirective]) And Not EndOfTokens
+    ) Or Not CompilerConditionStack.CanParse;
   Until Not boolContinue;
 end;
 
 (**
 
-  This method moves the toke to the next token in the token list or raises an
-  EDocException.
+  This method moves the token to the next token in the token list.
 
   @precon  None.
-  @postcon Moves the token to the next token in the token list or raises an
-           EDocException.
+  @postcon Moves the token to the next token in the token list.
 
 **)
 Procedure TBaseLanguageModule.NextToken;
@@ -1121,18 +1299,17 @@ End;
 
 (**
 
-  This method moves the toke to the previous token in the token list or raises
-  an EDocException.
+  This method moves the token to the previous token in the token list.
 
   @precon  None.
-  @postcon Moves the token to the previous token in the token list or raises an
-           EDocException.
+  @postcon Moves the token to the previous token in the token list.
 
 **)
-procedure TBaseLanguageModule.PreviousToken;
-begin
+Procedure TBaseLanguageModule.PreviousToken;
+
+Begin
   Dec(FTokenIndex);
-end;
+End;
 
 (**
 
@@ -1168,7 +1345,7 @@ end;
   Process any body comments and add them to the body comment collection.
 
   @precon  None.
-  @postcon Any body comments found are processed and added tot he body comment collection.
+  @postcon Any body comments found are processed and added to the body comment collection.
 
 **)
 Procedure TBaseLanguageModule.ProcessBodyComments;
@@ -1191,10 +1368,53 @@ End;
 
 (**
 
+  This method processes the the spell checking of the string literals for the given element.
+
+  @precon  E must be a valid instance.
+  @postcon All spelling mistakes in the string literals of the given element are output.
+
+  @param   E                  as a TElementContainer as a constant
+  @param   eSpellingIssueType as a TBADISpellingIssueType as a constant
+
+**)
+Procedure TBaseLanguageModule.ProcessLiteralsForSpelling(Const E: TElementContainer;
+  Const eSpellingIssueType : TBADISpellingIssueType);
+
+Var
+  iToken: Integer;
+  T: TTokenInfo;
+  sl: TStringList;
+  i: Integer;
+  strToken: String;
+  EmptyKeyWordList : TKeyWords;
+
+Begin
+  Begin
+    For iToken := 0 To E.TokenCount - 1 Do
+      If E.Tokens[iToken].TokenType In [ttSingleLiteral] Then
+        Begin
+          T := E.Tokens[iToken];
+          strToken := T.Token.DeQuotedString;
+          strToken := FReplaceAmpersandRegEx.Replace(strToken, '\1');
+          sl := Tokenize(strToken, EmptyKeyWordList, EmptyKeyWordList);
+          Try
+            For i := 0 To sl.Count - 1 Do
+              If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
+                If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
+                  CheckSpelling(sl[i], E.Scope, eSpellingIssueType, T.Line, T.Column, Nil);
+          Finally
+            sl.Free;
+          End;
+        End;
+  End;
+End;
+
+(**
+
   This method pushes the current token position on to the top of a stack.
 
   @precon  None.
-  @postcon the current token position is pushed ont to the top of a stack.
+  @postcon the current token position is pushed on to the top of a stack.
 
 **)
 Procedure TBaseLanguageModule.PushTokenPosition;

@@ -4,15 +4,15 @@
   (metrics).
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 2.347
+  @Date    06 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,11 +39,12 @@ Uses
   ComCtrls,
   Windows,
   Classes, 
-  BADI.Module.Metrics.EditorView.Frame, 
-  BADI.Base.Module,
   Generics.Collections,
   Themes, 
-  BADI.Types;
+  BADI.Types,
+  BADI.Base.Module,
+  BADI.FileInfo.Manager,
+  BADI.Frame.Manager;
    
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -53,57 +54,12 @@ Type
     INTACustomEditorView150, INTACustomEditorViewStatusPanel)
   Strict Private
     Type
-      (** This class managed a list of file name and their last modified date so that the view only
-          updated modules that have changed. **)
-      TBADIFileInfoManager = Class
-      Strict Private
-        Type
-          (** A record to describe the information stored in the collection. **)
-          TBADIModuleUpdateRecord = Record
-            FFileName    : String;
-            FLastUpdated : TDateTime;
-          End;
-        Strict Private
-          FFileInfo : TList<TBADIModuleUpdateRecord>;
-      Strict Protected
-        Function  Find(Const strFileName : String) : Integer;
-      Public
-        Constructor Create;
-        Destructor Destroy; Override;
-        Procedure Add(Const strFileName : String; Const dtFileDate : TDateTime);
-        Function  ShouldUpdate(Const strFileName : String; Const dtDateTime : TDateTime) : Boolean;
-        Procedure Clear;
-      End;
       (** An enumerate to define the status panels to be shown with the metrics. **)
       TBADIMetricStatusPanel = (mspModules, mspMethods, mspLinesOfCode, mspUnderLimit, mspAtLimit,
         mspOverLimit);
-      (** A class to manage the frames against the editor windows. **)
-      TBADIFrameManager = Class
-      Strict Private
-        Type
-          (** A record to stored information about each view. **)
-          TBADIFrameManagerRecord  = Record
-            FEditWindowName : String;
-            FFrameReference : TframeBADIModuleMetricsEditorView;
-          End;
-      Strict Private
-        FFrames : TList<TBADIFrameManagerRecord>;
-      Strict Protected
-        Function  GetFrame(Const strEditWindowName : String) : TframeBADIModuleMetricsEditorView;
-        Function  Find(Const strEditWindowName :String) : Integer;
-      Public
-        Constructor Create;
-        Destructor Destroy; Override;
-        Procedure Add(Const strEditWindowName : String; Const AFrame : TframeBADIModuleMetricsEditorView);
-        (**
-          A property to returned the frame associated with the given edit window.
-          @precon  None.
-          @postcon Returned the frame associated with the given edit window.
-          @param   strEditWindowName as a String as a constant
-          @return  a TframeBADIModuleMetricsEditorView
-        **)
-        Property Frame[Const strEditWindowName : String] : TframeBADIModuleMetricsEditorView Read GetFrame;
-      End;
+    Const
+      (** A set to define the document options related to metrics. **)
+      setMetricsOptions = [doShowMetrics..doShowMetricMsgsInEditor];
     Class Var
       (** A single class var reference to the editor view. **)
       FEditorViewRef : INTACustomEditorView;
@@ -116,10 +72,11 @@ Type
     FCount            : Integer;
     FSourceStrings    : TStringList;
     FSource           : String;
-    FFileName         : String;
     FModified         : Boolean;
     FFileDate         : TDateTime;
     FLastRenderedList : TBADIModuleMetrics;
+    FLastDocOptions   : TDocOptions;
+    FDocExclusions    : TStringList;
   Strict Protected
     // INTACustomEditorView
     Function  CloneEditorView: INTACustomEditorView;
@@ -143,15 +100,17 @@ Type
     Procedure DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; Const Rect: TRect);
     Function  GetStatusPanelCount: Integer;
     // General Methods
-    Procedure ParseAndRender;
+    Procedure ParseAndRender(Const strFileName : String);
     Procedure UpdateStatusPanels;
     Procedure ExtractSourceFromModule(Const Module : IOTAModule);
-    Procedure ExtractSourceFromFile;
+    Procedure ExtractSourceFromFile(Const strFileName: String);
     Procedure LastModifiedDateFromModule(Const Module: IOTAModule);
-    Procedure LastModifiedDateFromFile(Const ModuleInfo: IOTAModuleInfo);
+    Procedure LastModifiedDateFromFile(Const strFileName: String);
     Function  CurrentEditWindow : String;
-    Procedure ProcesModule(Const ModuleInfo : IOTAModuleInfo);
+    Procedure ProcessModule(Const strFileName: String);
     Function  RenderedList : TBADIModuleMetrics;
+    Function  CheckSettings: Boolean;
+    Procedure UpdateSettings;
   Public
     Class Function CreateEditorView: INTACustomEditorView;
     Constructor Create(Const strViewIdentifier : String);
@@ -164,16 +123,18 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
   SysUtils, 
-  BADI.Module.Dispatcher, 
-  BADI.ToolsAPIUtils,
   Controls, 
   Vcl.Graphics,
-  ProgressForm, 
-  BADI.Options;
+  BADI.Module.Dispatcher,
+  BADI.ToolsAPIUtils,
+  BADI.Module.Metrics.EditorView.Frame,
+  BADI.ProgressForm, 
+  BADI.Options,
+  BADI.Constants, BADI.Interfaces;
 
 Const
   (** A unique name for the editor view. **)
@@ -189,7 +150,7 @@ Const
   so that a view can be created when a desktop is loaded.
 
   @precon  None.
-  @postcon An instance of this custom editoe view is returned.
+  @postcon An instance of this custom editor view is returned.
 
   @return  an INTACustomEditorView
 
@@ -202,7 +163,7 @@ End;
 
 (**
 
-  This method is called from the main wizard constructor to regsiter this custom editor view.
+  This method is called from the main wizard constructor to register this custom editor view.
 
   @precon  None.
   @postcon The custom editor view is registered with the IDE.
@@ -220,7 +181,7 @@ End;
 
 (**
 
-  This method is called from the main wizard destructor to unregsiter this custom editor view.
+  This method is called from the main wizard destructor to un-register this custom editor view.
 
   @precon  None.
   @postcon The custom editor view is unregistered from the IDE.
@@ -236,136 +197,38 @@ Begin
     EVS.UnregisterEditorView(strBADIMetricsEditorView);
 End;
 
-{ TBADIFileUpdateManager }
-
 (**
 
-  This method either adds a new filename / date record to the collection if it does not exists else
-  updated the date of the existing file record.
+  This method checks whether any of the settings that affect spelling has changed.
 
   @precon  None.
-  @postcon Either a new record is added else and existing one is updated.
+  @postcon Returns true if any of the options have changed and the list needs to be completely rebuilt.
 
-  @param   strFileName as a String as a constant
-  @param   dtFileDate  as a TDateTime as a constant
-
-**)
-Procedure TBADIModuleMetricsEditorView.TBADIFileInfoManager.Add(Const strFileName: String;
-  Const dtFileDate: TDateTime);
-
-Var
-  iIndex : Integer;
-  recFileInfo : TBADIModuleUpdateRecord;
-  
-Begin
-  iIndex := Find(strFileName);
-  If iIndex < 0 Then
-    Begin
-      recFileInfo.FFileName := strFileName;
-      recFileInfo.FLastUpdated := dtFileDate;
-      FFileInfo.Add(recFileInfo);
-    End Else
-    Begin
-      recFileInfo := FFileInfo[iIndex];
-      recFileInfo.FLastUpdated := dtFileDate;
-      FFileInfo[iIndex] := recFileInfo;
-    End;
-End;
-
-(**
-
-  This method clears the file collection.
-
-  @precon  None.
-  @postcon The file collection is empty.
-
-**)
-Procedure TBADIModuleMetricsEditorView.TBADIFileInfoManager.Clear;
-
-Begin
-  FFileInfo.Clear;
-End;
-
-(**
-
-  A constructor for the TBADIFileInfoManager class.
-
-  @precon  None.
-  @postcon Creates an empty collection.
-
-**)
-Constructor TBADIModuleMetricsEditorView.TBADIFileInfoManager.Create;
-
-Begin
-  FFileInfo := TList<TBADIModuleUpdateRecord>.Create;
-End;
-
-(**
-
-  A destructor for the TBADIFileInfoManager class.
-
-  @precon  None.
-  @postcon Fress the memory used by the collection.
-
-**)
-Destructor TBADIModuleMetricsEditorView.TBADIFileInfoManager.Destroy;
-
-Begin
-  FFileInfo.Free;
-  Inherited Destroy;
-End;
-
-(**
-
-  This method used a sequential search to find an existing record with the given filename and returns
-  its index if found else return -1.
-
-  @precon  None.
-  @postcon Returns the index of an existing record with the files name else returns -1.
-
-  @param   strFileName as a String as a constant
-  @return  an Integer
-
-**)
-Function TBADIModuleMetricsEditorView.TBADIFileInfoManager.Find(Const strFileName: String): Integer;
-
-Var
-  iFile : Integer;
-  
-Begin
-  Result :=  -1;
-  For iFile := 0 To FFileInfo.Count - 1 Do
-    If CompareText(strFileName, FFileInfo[iFile].FFileName) = 0 Then
-      Begin
-        Result := iFile;
-        Break;
-      End;
-End;
-
-(**
-
-  This method determines whether a module with a given filename needs to be updated.
-
-  @precon  None.
-  @postcon Returns true if the given filename is newer than the one stored against the filename in the
-           collection.
-
-  @param   strFileName as a String as a constant
-  @param   dtDateTime  as a TDateTime as a constant
   @return  a Boolean
 
 **)
-Function TBADIModuleMetricsEditorView.TBADIFileInfoManager.ShouldUpdate(Const strFileName: String;
-  Const dtDateTime: TDateTime): Boolean;
+Function TBADIModuleMetricsEditorView.CheckSettings: Boolean;
 
 Var
-  iIndex : Integer;
-  
+  Exclusions: IBADIExclusions;
+  i: Integer;
+  sl : TStringList;
+
 Begin
-  Result :=  True;
-  iIndex := Find(strFileName);
-  If iIndex >= 0 Then
-    Result := dtDateTime > FFileInfo[iIndex].FLastUpdated;
+  Result := FLastRenderedList <> RenderedList;
+  Result := Result Or (FLastDocOptions <> TBADIOptions.BADIOptions.Options * setMetricsOptions);
+  sl := TStringList.Create;
+  Try
+    sl.Duplicates := dupIgnore;
+    sl.Sorted := True;
+    Exclusions := TBADIOptions.BADIOptions.Exclusions;
+    For i := 0 To Exclusions.Count - 1 Do
+      If etSpelling In Exclusions[i].FExclusions Then
+        sl.Add(Exclusions[i].FExclusionPattern);
+    Result := Result Or (CompareText(sl.Text, FDocExclusions.Text) <> 0);
+  Finally
+    sl.Free;
+  End;
 End;
 
 (**
@@ -388,124 +251,6 @@ Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
     EVS.CloseActiveEditorView;
   Result := RecreateBADIStatisticEditorView;
-End;
-
-{ TBADIModuleMetrics.TBADIViewManager }
-
-(**
-
-  This method adds the given edit window name and frame referencce pair to the collection is it does not 
-  already exists else it updates the existing records frame reference.
-
-  @precon  AFrame must be a valid instance.
-  @postcon Either a new reference is added to the collection if it does not exist else the existing 
-           reference is updated.
-
-  @param   strEditWindowName as a String as a constant
-  @param   AFrame            as a TframeBADIModuleMetricsEditorView as a constant
-
-**)
-Procedure TBADIModuleMetricsEditorView.TBADIFrameManager.Add(Const strEditWindowName: String;
-  Const AFrame: TframeBADIModuleMetricsEditorView);
-
-Var
-  iIndex: Integer;
-  R: TBADIFrameManagerRecord;
-
-Begin
-  iIndex := Find(strEditWindowName);
-  If iIndex = -1 Then
-    Begin // Create new view
-      R.FEditWindowName := strEditWindowName;
-      R.FFrameReference := AFrame;
-      FFrames.Add(R);
-    End Else
-    Begin // Update existing reference
-      R := FFrames[iIndex];
-      R.FFrameReference := AFrame;
-      FFrames[iIndex] := R;
-    End;
-End;
-
-(**
-
-  A constructor for the TBADIViewManager class.
-
-  @precon  None.
-  @postcon Creates an empty collection.
-
-**)
-Constructor TBADIModuleMetricsEditorView.TBADIFrameManager.Create;
-
-Begin
-  FFrames := TList<TBADIFrameManagerRecord>.Create;
-End;
-
-(**
-
-  A destructor for the TBADIViewManager class.
-
-  @precon  None.
-  @postcon Frees the collection.
-
-**)
-Destructor TBADIModuleMetricsEditorView.TBADIFrameManager.Destroy;
-
-Begin
-  FFrames.Free;
-  Inherited Destroy;
-End;
-
-(**
-
-  This method attempts to find the given view name in the collection and if foud returns the index
-  else returns -1 for not found.
-
-  @precon  None.
-  @postcon Returns the index of the named view if found else -1.
-
-  @param   strEditWindowName as a String as a constant
-  @return  an Integer
-
-**)
-Function TBADIModuleMetricsEditorView.TBADIFrameManager.Find(Const strEditWindowName: String): Integer;
-
-Var
-  iView: Integer;
-
-Begin
-  Result := -1;
-  For iView := 0 To FFrames.Count - 1 Do
-    If CompareText(FFrames[iView].FEditWindowName, strEditWindowName) = 0 Then
-      Begin
-        Result := iView;
-        Break;
-      End;
-End;
-
-(**
-
-  This is a getter method for the Frame property.
-
-  @precon  None.
-  @postcon If the named edit window is found in the collection then the associated frame is returned 
-           else nil is returned for not found.
-
-  @param   strEditWindowName as a String as a constant
-  @return  a TframeBADIModuleMetricsEditorView
-
-**)
-Function TBADIModuleMetricsEditorView.TBADIFrameManager.GetFrame(
-  Const strEditWindowName: String): TframeBADIModuleMetricsEditorView;
-
-Var
-  iIndex: Integer;
-  
-Begin
-  Result := Nil;
-  iIndex := Find(strEditWindowName);
-  If iIndex > -1 Then
-    Result := FFrames[iiNdex].FFrameReference;
 End;
 
 (**
@@ -547,7 +292,7 @@ End;
   This method is called when each editor status panel is created.
 
   @precon  None.
-  @postcon References to the panels are storede for later use and each panel is configured.
+  @postcon References to the panels are stored for later use and each panel is configured.
 
   @nocheck MissingCONSTInParam
   @nohint  StatusBar
@@ -571,7 +316,7 @@ End;
 
 (**
 
-  A constructor for the TBADIModuleMetrics class.
+  A constructor for the TBADIModuleMetricsEditorView class.
 
   @precon  None.
   @postcon Adds an image to the editor image list to be displayed against this editor view.
@@ -594,6 +339,9 @@ Begin
   FFrameManager := TBADIFrameManager.Create;
   FFileInfoMgr := TBADIFileInfoManager.Create;
   FSourceStrings := TStringList.Create;
+  FDocExclusions := TStringList.Create;
+  FDocExclusions.Duplicates := dupIgnore;
+  FDocExclusions.Sorted := True;
   FViewIdent := strViewIdentifier;
   FCount := 0;
   If Supports(BorlandIDEServices, INTAEditorViewServices, EVS) Then
@@ -646,7 +394,7 @@ End;
   This method returns the name of the current top editor window.
 
   @precon  None.
-  @postcon The name fo the top editor window is returned.
+  @postcon The name for the top editor window is returned.
 
   @return  a String
 
@@ -680,7 +428,7 @@ End;
 
 (**
 
-  A destructor for the TBADIModuleMetrics class.
+  A destructor for the TBADIModuleMetricsEditorView class.
 
   @precon  None.
   @postcon Frees the memory used by the module (if not nil).
@@ -689,6 +437,7 @@ End;
 Destructor TBADIModuleMetricsEditorView.Destroy;
 
 Begin
+  FDocExclusions.Free;
   FSourceStrings.Free;
   FFileInfoMgr.Free;
   FFrameManager.Free;
@@ -715,7 +464,7 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
 
     This method renders the background of the status bar panel.
 
-    @precon  StyleServices must be a valid instance or Nil.
+    @precon  None.
     @postcon The background of the status panel is rendered.
 
     @param   strNum        as a String as a constant
@@ -723,18 +472,16 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
   **)
   Procedure DrawBackground(Const strNum : String);
 
-  Const
-    iLightYellow = $80FFFF;
-
   Var
     iColour : TColor;
 
   Begin
-    If TBADIMetricStatusPanel(Panel.Index) In [mspModules..mspLinesOfCode] Then
-      Begin
-        iColour := iLightYellow;
-      End Else
-        iColour := iLightGreen;
+    Case TBADIMetricStatusPanel(Panel.Index) Of
+      mspModules..mspLinesOfCode:  iColour := iLightYellow;
+      mspUnderLimit..mspOverLimit: iColour := iLightGreen;
+    Else
+      iColour := StatusBar.Color;
+    End;
     If strNum <> '' Then
       Case TBADIMetricStatusPanel(Panel.Index) Of
         mspAtLimit:
@@ -750,7 +497,7 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
 
   (**
 
-    This width of the text in the status panel is calulated.
+    This width of the text in the status panel is calculated.
 
     @precon  None.
     @postcon The width of the text in the status panel is returned taking into account the font styles.
@@ -775,7 +522,7 @@ Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: T
 
     This method renders the text on the status panel.
 
-    @precon  StyleServeices must be a valid instance of Nil.
+    @precon  None.
     @postcon The text of the status bar is rendered.
 
     @param   strNum        as a String as a reference
@@ -842,7 +589,7 @@ End;
 Function TBADIModuleMetricsEditorView.EditAction(Action: TEditAction): Boolean;
 
 Var
-  AFrame: TframeBADIModuleMetricsEditorView;
+  AFrame: Tframe;
 
 Begin
   Result := False;
@@ -850,8 +597,8 @@ Begin
     eaCopy:
       Begin
         AFrame := FFrameManager.Frame[CurrentEditWindow];
-        If Assigned(AFrame) Then
-          AFrame.CopyToClipboard;
+        If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
+          (AFrame As TframeBADIModuleMetricsEditorView).CopyToClipboard;
         Result := True;
       End;
   End;
@@ -862,16 +609,18 @@ End;
   This method extracts the source code, filename and date information from a disk file.
 
   @precon  ModuleInfo must be a valid instance.
-  @postcon The source code, filename and date information is retreived from the disk file.
+  @postcon The source code, filename and date information is retrieved from the disk file.
+
+  @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ExtractSourceFromFile;
+Procedure TBADIModuleMetricsEditorView.ExtractSourceFromFile(Const strFileName: String);
 
 Begin
   FSource := '';
-  If FileExists(FFileName) Then
+  If FileExists(strFileName) Then
     Begin
-      FSourceStrings.LoadFromFile(FFileName);
+      FSourceStrings.LoadFromFile(strFileName);
       FSource := FSourceStrings.Text;
       FSourceStrings.Clear;
     End;
@@ -882,9 +631,9 @@ End;
   This method extracts the source code, filename and date information from an in memory module.
 
   @precon  Module and ModuleInfo must be a valid instance.
-  @postcon The source code, filename and date information is retreived from the in memory module.
+  @postcon The source code, filename and date information is retrieved from the in memory module.
 
-  @param   Module     as an IOTAModule as a constant
+  @param   Module as an IOTAModule as a constant
 
 **)
 Procedure TBADIModuleMetricsEditorView.ExtractSourceFromModule(Const Module : IOTAModule);
@@ -983,7 +732,7 @@ End;
 
 (**
 
-  This is a getter method for the EditorWindowCaption property.
+  This is a getter method for the Editor Window Caption property.
 
   @precon  None.
   @postcon Returns the text to be displayed in the Editor Window (you can only see this when the editor
@@ -1000,7 +749,7 @@ End;
 
 (**
 
-  This is a getter method for the EditState property.
+  This is a getter method for the Edit State property.
 
   @precon  None.
   @postcon This method is called to tell the IDE what editor state can be invoked on the data in the
@@ -1017,7 +766,7 @@ End;
 
 (**
 
-  This is a getter method for the FrameClass property.
+  This is a getter method for the Frame Class property.
 
   @precon  None.
   @postcon The method returns the frame class that the IDE should create when creating the editor view.
@@ -1033,7 +782,7 @@ End;
 
 (**
 
-  This is a getter method for the ImageIndex property.
+  This is a getter method for the Image Index property.
 
   @precon  None.
   @postcon Returns the image index of the image in the editor image list for this editor view.
@@ -1049,7 +798,7 @@ End;
 
 (**
 
-  This is a getter method for the StatusPanelCount property.
+  This is a getter method for the Status Panel Count property.
 
   @precon  None.
   @postcon Returns the number of status panels to create for the editor view.
@@ -1065,7 +814,7 @@ End;
 
 (**
 
-  This is a getter method for the TabHintText property.
+  This is a getter method for the Tab Hint Text property.
 
   @precon  None.
   @postcon Returns the text to be displayed when the mouse is hovered over the editor tab.
@@ -1081,10 +830,10 @@ End;
 
 (**
 
-  This is a getter method for the ViewIdentifer property.
+  This is a getter method for the View Identifier property.
 
   @precon  None.
-  @postcon Returns a unique identifier for this view (must be unique within the IDE - think singlton
+  @postcon Returns a unique identifier for this view (must be unique within the IDE - think singleton
            instance).
 
   @return  a String
@@ -1101,16 +850,15 @@ End;
   This method retrieves the last modified date of the module from disk.
 
   @precon  ModuleInfo must be a valid instance.
-  @postcon The FFileName, FFileDate and FModified fields are updated.
+  @postcon The FFileDate and FModified fields are updated.
 
-  @param   ModuleInfo as an IOTAModuleInfo as a constant
+  @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.LastModifiedDateFromFile(Const ModuleInfo: IOTAModuleInfo);
+Procedure TBADIModuleMetricsEditorView.LastModifiedDateFromFile(Const strFileName: String);
 
 Begin
-  FFileName := ModuleInfo.FileName;
-  FileAge(FFileName, FFileDate);
+  FileAge(strFileName, FFileDate);
   FModified := False;
 End;
 
@@ -1119,7 +867,7 @@ End;
   This method retrieves the last modified date of the module from the IDE.
 
   @precon  Module must be a valid instance.
-  @postcon The FFileName, FFileDate and FModified fields are updated.
+  @postcon The FFileDate and FModified fields are updated.
 
   @param   Module as an IOTAModule as a constant
 
@@ -1132,9 +880,8 @@ Var
 Begin
   SE := TBADIToolsAPIFunctions.SourceEditor(Module);
   FModified := SE.Modified;
-  FFileName := Module.FileName;
   If Not FModified Then
-    FileAge(FFileName, FFileDate)
+    FileAge(MOdule.FileName, FFileDate)
   Else
     FFileDate := Now();
 End;
@@ -1146,22 +893,27 @@ End;
   @precon  None.
   @postcon The source code is parsed and rendered.
 
+  @param   strFileName as a String as a constant
+
 **)
-Procedure TBADIModuleMetricsEditorView.ParseAndRender;
+Procedure TBADIModuleMetricsEditorView.ParseAndRender(Const strFileName : String);
 
 Var
   Module : TBaseLanguageModule;
-  AFrame: TframeBADIModuleMetricsEditorView;
+  AFrame: Tframe;
 
 Begin
-  FFileInfoMgr.Add(FFileName, FFileDate);
-  If (Length(FSource) > 0) And (Length(FFileName) > 0) Then
+  FFileInfoMgr.Add(strFileName, FFileDate);
+  If (Length(FSource) > 0) And (Length(strFileName) > 0) Then
     Begin
-      Module := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified, [moParse]);
+      Module := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, strFileName, FModified, [moParse]);
       Try
         AFrame := FFrameManager.Frame[CurrentEditWindow];
-        If Assigned(AFrame) Then
-          AFrame.RenderModule(Module, [mroAutoExpand, mroAutoExpandOnError]);
+        If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
+          (AFrame As TframeBADIModuleMetricsEditorView).RenderModule(
+            Module,
+            [roAutoExpand, roAutoExpandOnError]
+          );
       Finally
         Module.Free;
       End;
@@ -1170,42 +922,42 @@ End;
 
 (**
 
-  This method process the module extracting the filename, date time and source code and the pass it
-  for parsing.
+  This method process the module extracting the filename, date time and source code and the pass it for 
+  parsing.
 
   @precon  ModuleInfo must be a valid instance.
-  @postcon Process the module extracting the filename, date time and source code and the pass it
-           for parsing.
+  @postcon Process the module extracting the filename, date time and source code and the pass it for 
+           parsing.
 
-  @param   ModuleInfo as an IOTAModuleInfo as a constant
+  @param   strFileName as a String as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ProcesModule(Const ModuleInfo : IOTAModuleInfo);
+Procedure TBADIModuleMetricsEditorView.ProcessModule(Const strFileName : String);
 
 Var
   Module: IOTAModule;
 
 Begin
   FModified := False;
-  Module := (BorlandIDEServices As IOTAModuleServices).FindModule(ModuleInfo.FileName);
+  Module := (BorlandIDEServices As IOTAModuleServices).FindModule(strFileName);
   If Assigned(Module) Then
     LastModifiedDateFromModule(Module)
   Else
-    LastModifiedDateFromFile(ModuleInfo);
-  If FFileInfoMgr.ShouldUpdate(FFileName, FFileDate) Then
+    LastModifiedDateFromFile(strFileName);
+  If FFileInfoMgr.ShouldUpdate(strFileName, FFileDate) Then
     Begin
       If Assigned(Module) Then
         ExtractSourceFromModule(Module)
       Else
-        ExtractSourceFromFile;
-        ParseAndRender;
+        ExtractSourceFromFile(strFileName);
+        ParseAndRender(strFileName);
     End;
 End;
 
 (**
 
   This method extracts the current module metrics into a set so that we can see if the last render was
-  done with a different set of options and thus we need to force a complete reparsing of the modules.
+  done with a different set of options and thus we need to force a complete re-parsing of the modules.
 
   @precon  None.
   @postcon The current metric options are returned.
@@ -1249,15 +1001,17 @@ Var
   iModule: Integer;
   frmProgress : TfrmProgress;
   ModuleInfo: IOTAModuleInfo;
-  AFrame: TframeBADIModuleMetricsEditorView;
+  AFrame: Tframe;
 
 Begin
   P := TBADIToolsAPIFunctions.ActiveProject;
   If Assigned(P) Then
     Begin
-      If FLastRenderedList <> RenderedList Then
-        FFileInfoMgr.Clear;
-      FLastRenderedList := RenderedList;
+      If CheckSettings Then
+        Begin
+          FFileInfoMgr.Clear;
+          UpdateSettings;
+        End;
       frmProgress := TfrmProgress.Create(Application.MainForm);
       Try
         frmProgress.Init(P.GetModuleCount, strParsingProjectModules, strPleaseWait);
@@ -1265,20 +1019,47 @@ Begin
           Begin
             ModuleInfo := P.GetModule(iModule);
             If ModuleInfo.ModuleType In setModuleTypesToParse Then
-              Begin
-                ProcesModule(ModuleInfo);
-                frmProgress.UpdateProgress(Succ(iModule), Format(strParsing,
-                  [ExtractFileName(FFileName)]));
-              End
+              If ModuleInfo.FileName.Length > 0 Then
+                Begin
+                  ProcessModule(ModuleInfo.FileName);
+
+                  frmProgress.UpdateProgress(Succ(iModule), Format(strParsing,
+                    [ExtractFileName(ModuleInfo.FileName)]));
+                End
           End;
         AFrame := FFrameManager.Frame[CurrentEditWindow];
-        If Assigned(AFrame) Then
-          AFrame.FocusResults;
+        If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
+          (AFrame As TframeBADIModuleMetricsEditorView).FocusResults;
       Finally
         frmProgress.Free;
       End;
       UpdateStatusPanels;
     End;
+End;
+
+(**
+
+  This method updates the internal copy of the settings that are used for rendering the editor view.
+
+  @precon  None.
+  @postcon The internal copy of the settings is updated so later renderings can check whether the
+           settings have changed.
+
+**)
+Procedure TBADIModuleMetricsEditorView.UpdateSettings;
+
+Var
+  Exclusions: IBADIExclusions;
+  i: Integer;
+
+Begin
+  FLastRenderedList := RenderedList;
+  FLastDocOptions := TBADIOptions.BADIOptions.Options * setMetricsOptions;
+  // Build a string list of spelling exclusions
+  Exclusions := TBADIOptions.BADIOptions.Exclusions;
+  For i := 0 To Exclusions.Count - 1 Do
+    If etSpelling In Exclusions[i].FExclusions Then
+      FDocExclusions.Add(Exclusions[i].FExclusionPattern);
 End;
 
 (**
@@ -1300,18 +1081,20 @@ ResourceString
   strOverLimit = '%d > Limit';
 
 Var
-  AFrame: TframeBADIModuleMetricsEditorView;
+  AFrame: Tframe;
+  F: TframeBADIModuleMetricsEditorView;
   
 Begin
   AFrame := FFrameManager.Frame[CurrentEditWindow];
-  If Assigned(AFrame) Then
+  If Assigned(AFrame) And (AFrame Is TframeBADIModuleMetricsEditorView) Then
     Begin
-      FModulePanels[mspModules].Text :=     Format(strModules,     [AFrame.ModuleCount]);
-      FModulePanels[mspMethods].Text :=     Format(strMethods,     [AFrame.MethodCount]);
-      FModulePanels[mspLinesOfCode].Text := Format(strLinesOfCode, [AFrame.LinesOfCode]);
-      FModulePanels[mspUnderLimit].Text :=  Format(strUnderLimit,  [AFrame.UnderLimit]);
-      FModulePanels[mspAtLimit].Text :=     Format(strAtLimit,     [AFrame.AtLimit]);
-      FModulePanels[mspOverLimit].Text :=   Format(strOverLimit,   [AFrame.OverLimit]);
+      F := (AFrame As TframeBADIModuleMetricsEditorView);
+      FModulePanels[mspModules].Text :=     Format(strModules,     [F.ModuleCount]);
+      FModulePanels[mspMethods].Text :=     Format(strMethods,     [F.MethodCount]);
+      FModulePanels[mspLinesOfCode].Text := Format(strLinesOfCode, [F.LinesOfCode]);
+      FModulePanels[mspUnderLimit].Text :=  Format(strUnderLimit,  [F.UnderLimit]);
+      FModulePanels[mspAtLimit].Text :=     Format(strAtLimit,     [F.AtLimit]);
+      FModulePanels[mspOverLimit].Text :=   Format(strOverLimit,   [F.OverLimit]);
     End;
 End;
 

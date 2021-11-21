@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    24 May 2020
 
   @license
 
@@ -83,7 +83,7 @@ Begin
   CheckEquals(1, FField.ElementCount);
   CheckEquals('1) Field ''MyField'' is undocumented.', FField.DocConflict(1));
   FField.DeleteDocumentConflicts;
-  C := TComment.Create('This is a comment for the field.', 0, 0);
+  C := TComment.Create('This is a comment for the field.', 0, 0, 0);
   Try
     FField.Comment := C;
     FField.CheckDocumentation(boolCascade);

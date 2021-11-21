@@ -3,15 +3,15 @@
   This module contains a frame for display the module explorer file extensions for editing.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.007
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ Implementation
 Uses
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  {$ENDIF}
+  {$ENDIF STANDALONEAPP}
   BADI.Module.Dispatcher,
   BADI.Options;
 
@@ -77,7 +77,7 @@ Uses
   A constructor for the TfmBADIModuleExtensionsFrame class.
 
   @precon  None.
-  @postcon Themes the ValueListEditor.
+  @postcon Themes the Value List Editor.
 
   @nocheck MissingCONSTInParam
 
@@ -87,16 +87,16 @@ Uses
 Constructor TfmBADIModuleExtensionsFrame.Create(AOwner: TComponent);
 
 {$IFNDEF STANDALONEAPP}
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
-{$ENDIF}
+{$ENDIF RS102}
+{$ENDIF STANDALONEAPP}
 
 Begin
   Inherited Create(AOwner);
   {$IFNDEF STANDALONEAPP}
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       Begin
@@ -107,8 +107,8 @@ Begin
         vleModuleExtensions.GradientStartColor := ITS.StyleServices.GetSystemColor(clBtnFace);
         vleModuleExtensions.GradientEndColor := ITS.StyleServices.GetSystemColor(clBtnFace);
         vleModuleExtensions.Font.Color := ITS.StyleServices.GetSystemColor(clWindowText);      End;
-  {$ENDIF}
-  {$ENDIF}
+  {$ENDIF RS102}
+  {$ENDIF STANDALONEAPP}
 End;
 
 (**
@@ -116,7 +116,7 @@ End;
   This method loads the frame with the file extensions in the module dispatcher.
 
   @precon  None.
-  @postcon The frame is loaded with the file exteniosn for each module.
+  @postcon The frame is loaded with the file extensions for each module.
 
 **)
 Procedure TfmBADIModuleExtensionsFrame.LoadSettings;
@@ -137,7 +137,7 @@ End;
 
 (**
 
-  This method saves the changes inthe file exnteiosn associate with the modules back to the
+  This method saves the changes in the file extensions associate with the modules back to the
   module dispatcher.
 
   @precon  None.

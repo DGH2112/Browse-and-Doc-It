@@ -4,15 +4,15 @@
   a refactoring.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 6.258
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,15 +51,15 @@ Type
   (** A set of the above refactoring scopes. **)
   TBADIRefactoringScopes = Set Of TBADIRefactoringScope;
 
-  (** An enumerate to define the type of reafctoring insertion - append to existing section or create a
+  (** An enumerate to define the type of refactoring insertion - append to existing section or create a
       new section. **)
   TBADIRefactoringInsertionType = (ritAppend, ritCreate);
 
-  (** Annenumerate to define whether the refactoring should be inserted above or below the given
+  (** An enumerate to define whether the refactoring should be inserted above or below the given
       line. **)
   TBADIRefactoringInsertPosition = (ripAfter, ripBefore);
   
-  (** A record to returns the reactoring information. **)
+  (** A record to returns the refactoring information. **)
   TBADIRefactoringInsertionInfo = Record
     FLine     : Integer;
     FType     : TBADIRefactoringInsertionType;
@@ -90,6 +90,7 @@ Type
       Const setScopes : TScopes): Integer;
     Function  IsInMethod(Const iLine: Integer): Boolean;
     Function  RecurseMethods(Const Container: TElementContainer; Const iLine : Integer): Boolean;
+    Function  FindBeginNotInMethod : TTokenInfo;
   Public
     Constructor Create(Const Module : TBaseLanguageModule);
     Function  FindToken(Const iLine, iColumn: Integer): TTokenIndex;
@@ -198,7 +199,7 @@ End;
   This method extracts the valid identifier characters from the given text for the name of the literal.
 
   @precon  None.
-  @postcon The first 63 valid idenitifer characters are extracted from the given string.
+  @postcon The first 63 valid identifier characters are extracted from the given string.
 
   @param   strText as a String as a constant
   @return  a String
@@ -253,11 +254,40 @@ End;
 
 (**
 
+  This method attempts to find the BEGIN of a program, library or package.
+
+  @precon  None.
+  @postcon The token corresponding to the BEGIN of a program, library or package is returned if found
+           else NIL is returned.
+
+  @return  a TTokenInfo
+
+**)
+Function TBADIRefactoringInfo.FindBeginNotInMethod: TTokenInfo;
+
+Const
+  strBEGIN = 'BEGIN';
+
+Var
+  iToken: Integer;
+
+Begin
+  Result := Nil;
+  For iToken := 0 To FModule.TokenCount - 1 Do
+    If (FModule.Tokens[iToken].UToken = strBEGIN) And Not IsInMethod(FModule.Tokens[iToken].Line) Then
+      Begin
+        Result := FModule.Tokens[iToken];
+        Break;
+      End;
+End;
+
+(**
+
   This method searches for the constant or resource string section in the given container and returns the
   found section container if there are items in the given scope.
 
   @precon  Container must be a valid instance.
-  @postcon Returns the searched for declaration of there are subitems of the correct scope.
+  @postcon Returns the searched for declaration of there are sub items of the correct scope.
 
   @param   Container as a TElementContainer as a constant
   @param   iLine     as an Integer as a reference
@@ -335,8 +365,8 @@ End;
 
   This is a getter method for the Scope property.
 
-  @precon  Converts a TBADIRefactoringScopes set into a TScope based on the first scope found.
-  @postcon Reurns the scope the refactoring is to be inserted into.
+  @precon  Converts a TBADIRefactoringScopes set into a Scope based on the first scope found.
+  @postcon Returns the scope the refactoring is to be inserted into.
 
   @return  a TScope
 
@@ -389,7 +419,7 @@ End;
   after the uses clause).
 
   @precon  Container must be a valid instance.
-  @postcon Returns the line number for the new declartion ele returns zero.
+  @postcon Returns the line number for the new declaration else returns zero.
 
   @param   Container as a TElementContainer as a constant
   @param   setScopes as a TScopes as a constant
@@ -437,7 +467,7 @@ End;
   string section.
 
   @precon  Container must be a valid instance.
-  @postcon Returns the line number of the new declaration else 0 or MaxInt.
+  @postcon Returns the line number of the new declaration else 0 or Max Integer.
 
   @param   Container as a TElementContainer as a constant
   @param   setScopes as a TScopes as a constant
@@ -543,7 +573,7 @@ End;
 
   This method gets the next new line number for the scoped items in the container.
 
-  @precon  Conatiner must be a valid instance.
+  @precon  Container must be a valid instance.
   @postcon Returns the line number for the new refactoring.
 
   @param   Container as a TElementContainer as a constant
@@ -584,7 +614,7 @@ End;
 
   This method gets the previous new line number for the scoped items in the container.
 
-  @precon  Conatiner must be a valid instance.
+  @precon  Container must be a valid instance.
   @postcon Returns the line number for the new refactoring.
 
   @param   Container as a TElementContainer as a constant
@@ -662,7 +692,7 @@ End;
 
 (**
 
-  This method inserts the refactoring into the code either at the end of thr existing declarations or in 
+  This method inserts the refactoring into the code either at the end of the existing declarations or in 
   a new declaration.
 
   @precon  None.
@@ -712,7 +742,7 @@ End;
   This method returns the refactoring type that was returned from the refactoring form in the set.
 
   @precon  None.
-  @postcon The refcatoring type selected is returned.
+  @postcon The refactoring type selected is returned.
 
   @return  a TBADIRefactoringType
 
@@ -755,7 +785,7 @@ Const
   
   (**
 
-    This procedure updates the refactorign types that are available.
+    This procedure updates the refactoring types that are available.
 
     @precon  None.
     @postcon The FTypes field is updated.
@@ -781,7 +811,7 @@ Const
 
   (**
 
-    This procedure updates the refactorign scopes that are available.
+    This procedure updates the refactoring scopes that are available.
 
     @precon  None.
     @postcon The FScopes field is updated.
@@ -798,6 +828,9 @@ Const
             Include(FScopes, rsImplementation);
   End;
   
+ResourceString
+  strInsertionExceptionMsg = 'Cannot find insertion point!';
+
 var
   iToken: Integer;
   strKeyWord: String;
@@ -819,6 +852,10 @@ Begin
         FImplementation := FModule.Tokens[iToken];
         Break;
       End;
+  If Not Assigned(FImplementation) Then
+    FImplementation := FindBeginNotInMethod;
+  If Not Assigned(FImplementation) Then
+    Raise EBADIParserError.Create(strInsertionExceptionMsg);
   UpdateRefactoringScopes;
   FMethod := Nil;
   If IsInMethod(iLine) Then

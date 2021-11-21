@@ -1,17 +1,17 @@
 (**
 
-  This modulel contains a frame for the root node of the BADI Options frame in the IDE.
+  This module contains a frame for the root node of the BADI Options frame in the IDE.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,18 +65,20 @@ Type
 Implementation
 
 uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   {$IFDEF EUREKALOG}
   EBase,
   {$ENDIF EUREKALOG}
-  BADI.Functions;
+  BADI.Functions,
+  BADI.Options;
 
 {$R *.dfm}
 
-{ TfmBADIParentFrame }
-
 (**
 
-  This method intialises the frame with build information.
+  This method initialises the frame with build information.
 
   @precon  None.
   @postcon The frame is initialised.
@@ -109,6 +111,7 @@ Var
   iSize : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadSettings', tmoTiming);{$ENDIF}
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
   lblBADI.Caption := Format(strBrowseAndDocIt, [iMajor, iMinor, strBugFix[Succ(iBugFix)]]);
   {$IFDEF DEBUG}
@@ -146,7 +149,10 @@ End;
 **)
 Procedure TfmBADIParentFrame.SaveSettings;
 
-Begin //FI:W519
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
+  TBADIOptions.BADIOptions.SaveSettings;
 End;
 
 End.
+

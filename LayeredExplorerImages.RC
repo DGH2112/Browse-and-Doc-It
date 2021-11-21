@@ -1,18 +1,18 @@
-/*
+/**
 
   This is a Windows Resource File which generates a list of BitMaps for use
   In the Explorer Tree View.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.453
+  @Date    12 Jul 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
 
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-*/
+**/
 NoneMask                   BITMAP "Images\NoneMask.bmp"
 GlobalMask                 BITMAP "Images\GlobalMask.bmp"
 LocalMask                  BITMAP "Images\LocalMask.bmp"
@@ -50,16 +50,96 @@ DocConflictFolder          BITMAP "Images\DocConflictFolder.bmp"
 DocConflictIncorrect       BITMAP "Images\DocConflictIncorrect.bmp"
 DocConflictItem            BITMAP "Images\DocConflictItem.bmp"
 DocConflictMissing         BITMAP "Images\DocConflictMissing.bmp"
+DocConflict                BITMAP "Images\DocConflict.bmp"
 
 MetricFolder               BITMAP "Images\MetricFolder.bmp"
 MetricIncorrect            BITMAP "Images\MetricIncorrect.bmp"
 MetricItem                 BITMAP "Images\MetricItem.bmp"
 MetricMissing              BITMAP "Images\MetricMissing.bmp"
+Metric                     BITMAP "Images\Metric.bmp"
 
 CheckFolder                BITMAP "Images\CheckFolder.bmp"
 CheckIncorrect             BITMAP "Images\CheckIncorrect.bmp"
 CheckItem                  BITMAP "Images\CheckItem.bmp"
 CheckMissing               BITMAP "Images\CheckMissing.bmp"
+Check                      BITMAP "Images\Check.bmp"
+
+SpellingFolder             BITMAP "Images\SpellingFolder.bmp"
+SpellingItem               BITMAP "Images\SpellingItem.bmp"
+
+RedWarning                 BITMAP "Images\RedWarning.bmp"
+AmberWarning               BITMAP "Images\AmberWarning.bmp"
+YellowWarning              BITMAP "Images\YellowWarning.bmp"
+GreenWarning               BITMAP "Images\GreenWarning.bmp"
+BlueWarning                BITMAP "Images\BlueWarning.bmp"
+
+RedStop                    BITMAP "Images\RedStop.bmp"
+AmberStop                  BITMAP "Images\AmberStop.bmp"
+YellowStop                 BITMAP "Images\YellowStop.bmp"
+GreenStop                  BITMAP "Images\GreenStop.bmp"
+BlueStop                   BITMAP "Images\BlueStop.bmp"
+
+RedProhibited              BITMAP "Images\RedProhibited.bmp"
+AmberProhibited            BITMAP "Images\AmberProhibited.bmp"
+YellowProhibited           BITMAP "Images\YellowProhibited.bmp"
+GreenProhibited            BITMAP "Images\GreenProhibited.bmp"
+BlueProhibited             BITMAP "Images\BlueProhibited.bmp"
+
+RedBug                     BITMAP "Images\RedBug.bmp"
+AmberBug                   BITMAP "Images\AmberBug.bmp"
+YellowBug                  BITMAP "Images\YellowBug.bmp"
+GreenBug                   BITMAP "Images\GreenBug.bmp"
+BlueBug                    BITMAP "Images\BlueBug.bmp"
+
+RedUpArrow                 BITMAP "Images\RedUpArrow.bmp"
+AmberUpArrow               BITMAP "Images\AmberUpArrow.bmp"
+YellowUpArrow              BITMAP "Images\YellowUpArrow.bmp"
+GreenUpArrow               BITMAP "Images\GreenUpArrow.bmp"
+BlueUpArrow                BITMAP "Images\BlueUpArrow.bmp"
+
+RedLeftArrow               BITMAP "Images\RedLeftArrow.bmp"
+AmberLeftArrow             BITMAP "Images\AmberLeftArrow.bmp"
+YellowLeftArrow            BITMAP "Images\YellowLeftArrow.bmp"
+GreenLeftArrow             BITMAP "Images\GreenLeftArrow.bmp"
+BlueLeftArrow              BITMAP "Images\BlueLeftArrow.bmp"
+
+RedRightArrow              BITMAP "Images\RedRightArrow.bmp"
+AmberRightArrow            BITMAP "Images\AmberRightArrow.bmp"
+YellowRightArrow           BITMAP "Images\YellowRightArrow.bmp"
+GreenRightArrow            BITMAP "Images\GreenRightArrow.bmp"
+BlueRightArrow             BITMAP "Images\BlueRightArrow.bmp"
+
+RedDownArrow               BITMAP "Images\RedDownArrow.bmp"
+AmberDownArrow             BITMAP "Images\AmberDownArrow.bmp"
+YellowDownArrow            BITMAP "Images\YellowDownArrow.bmp"
+GreenDownArrow             BITMAP "Images\GreenDownArrow.bmp"
+BlueDownArrow              BITMAP "Images\BlueDownArrow.bmp"
+
+RedBookmark                BITMAP "Images\RedBookmark.bmp"
+AmberBookmark              BITMAP "Images\AmberBookmark.bmp"
+YellowBookmark             BITMAP "Images\YellowBookmark.bmp"
+GreenBookmark              BITMAP "Images\GreenBookmark.bmp"
+BlueBookmark               BITMAP "Images\BlueBookmark.bmp"
+
+RedTick                    BITMAP "Images\RedTick.bmp"
+AmberTick                  BITMAP "Images\AmberTick.bmp"
+YellowTick                 BITMAP "Images\YellowTick.bmp"
+GreenTick                  BITMAP "Images\GreenTick.bmp"
+BlueTick                   BITMAP "Images\BlueTick.bmp"
+
+RedToDoTick                BITMAP "Images\RedToDoTick.bmp"
+AmberToDoTick              BITMAP "Images\AmberToDoTick.bmp"
+YellowToDoTick             BITMAP "Images\YellowToDoTick.bmp"
+GreenToDoTick              BITMAP "Images\GreenToDoTick.bmp"
+BlueToDoTick               BITMAP "Images\BlueToDoTick.bmp"
+
+RedToDoCross               BITMAP "Images\RedToDoCross.bmp"
+AmberToDoCross             BITMAP "Images\AmberToDoCross.bmp"
+YellowToDoCross            BITMAP "Images\YellowToDoCross.bmp"
+GreenToDoCross             BITMAP "Images\GreenToDoCross.bmp"
+BlueToDoCross              BITMAP "Images\BlueToDoCross.bmp"
+
+BadTag                     BITMAP "Images\BadTag.bmp"
 
 UsesLabel                  BITMAP "Images\UsesLabel.bmp"
 UsesItem                   BITMAP "Images\UsesItem.bmp"

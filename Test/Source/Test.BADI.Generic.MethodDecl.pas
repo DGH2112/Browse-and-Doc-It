@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.005
+  @Date    24 May 2020
 
   @license
 
@@ -152,7 +152,7 @@ Begin
     CheckEquals('1) Method ''MyFunction'' has not been documented.',
       FGenericMethodDecl.DocConflict(1));
     FGenericMethodDecl.DeleteDocumentConflicts;
-    C := TComment.Create('', 0, 0);
+    C := TComment.Create('', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -163,7 +163,7 @@ Begin
     End;
     FGenericMethodDecl.DeleteDocumentConflicts;
     C := TComment.Create(
-      'This is a description.', 0, 0);
+      'This is a description.', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -181,7 +181,7 @@ Begin
     FGenericMethodDecl.DeleteDocumentConflicts;
     C := TComment.Create(
       'This is a description.'#13#10 +
-      '@precon', 0, 0);
+      '@precon', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -193,7 +193,7 @@ Begin
     FGenericMethodDecl.DeleteDocumentConflicts;
     C := TComment.Create(
       'This is a description.'#13#10 +
-      '@precon None.', 0, 0);
+      '@precon None.', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -205,7 +205,7 @@ Begin
     FGenericMethodDecl.DeleteDocumentConflicts;
     C := TComment.Create(
       'This is a description.'#13#10'@precon None.'#13#10 +
-      '@precon None.', 0, 0);
+      '@precon None.', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -223,7 +223,7 @@ Begin
       '@param param2 as an Array of Integer as a reference'#13#10 +
       '@param param3 as an Byte as a constant'#13#10 +
       '@param param4 as a Double as an out parameter'#13#10 +
-      '@return a Boolean', 0, 0);
+      '@return a Boolean', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -240,7 +240,7 @@ Begin
       '@param param2 as an Array of Integer as a reference'#13#10 +
       '@param param3 as an Byte as a constant'#13#10 +
       '@param param4 as a Double as an out parameter'#13#10 +
-      '@return a Boolean', 0, 0);
+      '@return a Boolean', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -259,7 +259,7 @@ Begin
       '@param param2 as an Array of Integer as a reference'#13#10 +
       '@param param3 as an Byte as a constant'#13#10 +
       '@param param4 as a Double as an out parameter'#13#10 +
-      '@return a Boolean', 0, 0);
+      '@return a Boolean', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -275,7 +275,7 @@ Begin
       '@param param1 as an Integer'#13#10 +
       '@param param2 as an Array of Integer as a reference'#13#10 +
       '@param param3 as an Byte as a constant'#13#10 +
-      '@param param4 as a Double as an out parameter', 0, 0);
+      '@param param4 as a Double as an out parameter', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -295,7 +295,7 @@ Begin
       '@param param2 as an Array of Integer as a reference'#13#10 +
       '@param param3 as an Byte as a constant'#13#10 +
       '@param param4 as a Double as an out parameter'#13#10 +
-      '@return a Thingy', 0, 0);
+      '@return a Thingy', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -310,7 +310,7 @@ Begin
       C := TComment.Create(
         'This is a description.'#13#10'@precon None.'#13#10 +
         '@postcon None.'#13#10 +
-        '@return a Thingy', 0, 0);
+        '@return a Thingy', 0, 0, 0);
       Try
         M.Comment := C;
         M.CheckDocumentation(boolCascade);
@@ -331,7 +331,7 @@ Begin
       '@param param2 as an Array of Integer as a reference - an array'#13#10 +
       '@param param3 as an Byte as a constant - a constant'#13#10 +
       '@param param4 as a Double as an out parameter - a double'#13#10 +
-      '@return a Boolean - something', 0, 0);
+      '@return a Boolean - something', 0, 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);

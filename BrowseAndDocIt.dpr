@@ -3,16 +3,16 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.0
+  @Version 1.353
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    18 Sep 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,19 +54,9 @@ library BrowseAndDocIt;
 
 uses
   ShareMem,
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  ESendMailMAPI,
-  ESendMailSMAPI,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  EDebugExports,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   SysUtils,
   Classes,
+  Graphics,
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF PROFILECODE}
@@ -226,15 +216,52 @@ uses
   BADI.IDEThemingNotifier in 'Source\BADI.IDEThemingNotifier.pas',
   BADI.Exclusions in 'Source\BADI.Exclusions.pas',
   BADI.EidolonHighlighter in 'Source\BADI.EidolonHighlighter.pas',
-  ProgressForm in 'Externals\ProgressForm.pas' {frmProgress};
+  BADI.IDENotifier in 'Source\BADI.IDENotifier.pas',
+  BADI.ModuleNotifierList in 'Source\BADI.ModuleNotifierList.pas',
+  BADI.ModuleNotifier in 'Source\BADI.ModuleNotifier.pas',
+  BADI.ModuleStats in 'Source\BADI.ModuleStats.pas',
+  BADI.ModuleStatsList in 'Source\BADI.ModuleStatsList.pas',
+  BADI.SourceEditorNotifier in 'Source\BADI.SourceEditorNotifier.pas',
+  BADI.EditViewNotifier in 'Source\BADI.EditViewNotifier.pas',
+  BADI.LineDocIssue in 'Source\BADI.LineDocIssue.pas',
+  BADI.DocIssueTotals in 'Source\BADI.DocIssueTotals.pas',
+  BADI.DocIssuesHintWindow in 'Source\BADI.DocIssuesHintWindow.pas',
+  BADI.ProjectNotifier in 'Source\BADI.ProjectNotifier.pas',
+  BADI.Module.Spelling.EditorView.Frame in 'Source\BADI.Module.Spelling.EditorView.Frame.pas' {frameBADIModuleSpellingEditorView: TFrame},
+  BADI.Spelling.OpsFrame in 'Source\BADI.Spelling.OpsFrame.pas' {frameBADISpellingOpions: TFrame},
+  BADI.SpellingIssue in 'Source\BADI.SpellingIssue.pas',
+  BADI.Spelling.DictionaryEditorForm in 'Source\BADI.Spelling.DictionaryEditorForm.pas' {frmDictionaryEditor},
+  BADI.Module.Spelling in 'Source\BADI.Module.Spelling.pas',
+  BADI.FileInfo.Manager in 'Source\BADI.FileInfo.Manager.pas',
+  BADI.Frame.Manager in 'Source\BADI.Frame.Manager.pas',
+  BADI.ProgressForm in 'Source\BADI.ProgressForm.pas' {frmProgress},
+  BADI.CommentCodeForm in 'Source\BADI.CommentCodeForm.pas' {frmCommentCode},
+  BADI.Thread.Manager in 'Source\BADI.Thread.Manager.pas';
 
 {$R *.res}
 
+{$IFDEF DEBUG}
+Const
+  (** A category label for the CodeSite messages during debugging. **)
+  strBADICodeSiteCategory = 'BADI';
+  (** This is the lowest colour level to randomise from. **)
+  iBaseColour = $C0;
+  (** This is the remaining level to randomise over. **)
+  iAddColour = $FF - iBaseColour;
+{$ENDIF DEBUG} 
+
 begin
-  {$IFDEF EUREKALOG}
-  SetEurekaLogState(True);
-  {$ENDIF EUREKALOG}
+  {$IFDEF DEBUG}
+  ReportMemoryLeaksOnShutdown := True;
+  CodeSite.Category := strBADICodeSiteCategory;
+  Randomize;
+  CodeSite.CategoryColor :=
+    (iBaseColour + Random(iAddColour)) Shl 0 +
+    (iBaseColour + Random(iAddColour)) Shl 8 +
+    (iBaseColour + Random(iAddColour)) Shl 16;
+  {$ENDIF DEBUG} 
 end.
+
 
 
 

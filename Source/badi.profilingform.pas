@@ -3,16 +3,16 @@
   This module contains a class which represents a form for selecting and
   deselecting methods which need profiling.
 
-  @Version 1.0
+  @Version 1.031
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ uses
   Contnrs,
   ExtCtrls,
   UITypes,
-  BADI.ElementContainer, System.ImageList;
+  BADI.ElementContainer;
 
 type
   (** An enumerate to define if the profile job is an insertion or a removal. **)
@@ -109,7 +109,7 @@ type
     Property Indent : Integer Read FIndent;
   End;
 
-  (** This class decsribes a collection of profile jobs. **)
+  (** This class describes a collection of profile jobs. **)
   TProfileJobs = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
     FProfileJobs : TObjectList;
@@ -140,13 +140,14 @@ type
 
   (** A class to represent the form interface. **)
   TfrmProfiling = class(TForm)
-    btnOK: TBitBtn;
-    btnCancel: TBitBtn;
     vstMethods: TVirtualStringTree;
     ilScopeImages: TImageList;
     mmoCode: TMemo;
     pnlPanel: TPanel;
     Splitter: TSplitter;
+    btnOK: TButton;
+    btnCancel: TButton;
+    ilButtons: TImageList;
     procedure btnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     {$IFNDEF D2009}
@@ -289,12 +290,9 @@ Begin
   Result := Nil;
   frm := TfrmProfiling.Create(Application.MainForm);
   Try
+    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmProfiling, frm);
     frm.InitialiseTreeView(Module);
     frm.mmoCode.Lines.Text := TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName];
-    { $IFDEF DXE102
-    TBADIToolsAPIFunctions.RegisterFormClassForTheming(TfrmProfiling);
-    TBADIToolsAPIFunctions.ApplyTheming(frm);
-    {$ENDIF}
     If frm.ShowModal = mrOK Then
       Begin
         Result := TProfileJobs.Create;
@@ -328,7 +326,7 @@ end;
 
 (**
 
-  This is an OnFormDestroy Event Hanlder for the TfrmDUnit class.
+  This is an On Form Destroy Event Handler for the TfrmProfiling class.
 
   @precon  None.
   @postcon Frees the memory used by the Root Element of the tree view.
@@ -394,11 +392,11 @@ end;
 
 (**
 
-  This method recurses the tree looking for TGenericFunctions and building a list of profile jobs to be 
+  This method recurses the tree looking for Generic Functions and building a list of profile jobs to be 
   done.
 
   @precon  Collection must be a valid instance.
-  @postcon Recurses the tree looking for TGenericFunctions and building a list of profile jobs to be 
+  @postcon Recurses the tree looking for Generic Functions and building a list of profile jobs to be 
            done in Collection.
 
   @param   Collection as a TProfileJobs as a constant
@@ -510,7 +508,7 @@ end;
 
 (**
 
-  This is an OnGetImageIndex for the virtual tree view.
+  This is an On Get Image Index for the virtual tree view.
 
   @precon  None.
   @postcon Returns the adjusted image index for scope for the associated module element.
@@ -540,10 +538,10 @@ end;
 
 (**
 
-  This is an OnGetText event handler for the virtual tree view.
+  This is an On Get Text event handler for the virtual tree view.
 
   @precon  None.
-  @postcon Returns the AsString text of the associated module element.
+  @postcon Returns the text of the associated module element.
 
   @param   Sender   as a TBaseVirtualTree
   @param   Node     as a PVirtualNode

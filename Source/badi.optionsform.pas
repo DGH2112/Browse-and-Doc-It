@@ -4,15 +4,15 @@
   a dialogue for setting those options.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.016
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,9 +47,9 @@ Uses
   ExtCtrls,
   CheckLst,
   ImgList,
-  {$IFDEF DXE100}
+  {$IFDEF RS100}
   ImageList,
-  {$ENDIF}
+  {$ENDIF RS100}
   {$WARN UNIT_PLATFORM OFF} // For the FileCtrl unit
   FileCtrl,
   {$WARN UNIT_PLATFORM ON}
@@ -64,7 +64,7 @@ Uses
   BADI.ModuleExtensionsFrame;
 
 Type
-  (** An enumerate to define the visisble tabs in the dialogue. **)
+  (** An enumerate to define the visible tabs in the dialogue. **)
   TVisibleTab = (vtGeneralOptions, vtSpecialTags, vtModuleExplorer,
     vtCodeBrowsing, vtExcludeDocFiles, vtMethodDescriptions);
   (** A set of visible tabs. **)
@@ -113,8 +113,7 @@ Uses
   This method creates an instance of the options dialogue and sets all the controls based on the passed 
   Options parameter. If OK is selected then the Options parameter is updated to suit the new options.
 
-  @precon  iInt is the timer interval to be represented in the dialogue, DocHelpFile is the directory of
-           the modules help file.
+  @precon  None.
   @postcon Returns true if the OK button on the dialogue was pressed.
 
   @param   VisibleTabs as a TVisibleTabs as a constant
@@ -159,7 +158,7 @@ End;
 
 (**
 
-  This is an OnFormCreate Event Handler for the TfrmOptions class.
+  This is an On Form Create Event Handler for the TfrmOptions class.
 
   @precon  None.
   @postcon Creates the frames for insertion into the page control tabs.

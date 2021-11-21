@@ -4,8 +4,8 @@
   and how it can better handle errors.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 14.827
+  @Date    03 May 2021
 
   @license
 
@@ -58,19 +58,20 @@ Uses
   Menus,
   StdActns,
   ActnList,
-  ProgressForm,
+  BADI.ProgressForm,
   Buttons,
   ImgList,
   ToolWin,
   XPMan,
   SynHighlighterXML,
   DGHSynEdit,
-  ZipForge,
   SynHighlighterDfm,
   System.Actions,
   System.ImageList,
   DGHCustomGraphicsControl,
-  DGHMemoryMonitorControl;
+  DGHMemoryMonitorControl,
+  System.Generics.Collections,
+  System.Generics.Defaults;
 
 {$INCLUDE '..\..\Source\CompilerDefinitions.inc'}
 
@@ -148,6 +149,7 @@ Type
     DGHMemoryMonitor: TDGHMemoryMonitor;
     actResurseZipFiles: TAction;
     btnRecurseZipFiles: TToolButton;
+    pmStatusBar: TPopupMenu;
     Procedure FormCreate(Sender: TObject);
     Procedure FormDestroy(Sender: TObject);
     Procedure SynEdit1Change(Sender: TObject);
@@ -174,7 +176,25 @@ Type
     Procedure actToolsSynEditOptionsExecute(Sender: TObject);
     procedure actResurseZipFilesExecute(Sender: TObject);
     procedure actResurseZipFilesUpdate(Sender: TObject);
-  {$IFDEF D2005} Strict {$ENDIF} Private
+    procedure sbrStatusBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y:
+      Integer);
+  Strict Private
+    Type
+      (** A record to describe a name index pairing for use in sorting the Highighters and VCL
+          Themings @nohints **)
+      TNameIndexRec = Record
+        FName  : String;
+        FIndex : Integer;
+        Constructor Create(Const strName : String; Const iIndex : Integer);
+      End;
+    (** An IComparer class to allow for custom sorting of the TList<T> collection. **)
+    TNameIndexComparer = Class(TComparer<TNameIndexRec>)
+    Strict Private
+    Strict Protected
+    Public
+      Function Compare(Const Left, Right : TNameIndexRec) : Integer; Override;
+    End;
+  Strict Private
     { Private declarations }
     FFileName           : String;
     FPathRoot           : String;
@@ -198,27 +218,27 @@ Type
     Function GetFileName: String;
     Procedure SetFileName(Const Value: String);
     Procedure LoadSettings;
+    Procedure LoadThemes;
     Procedure SaveSettings;
     Function GetPathRoot: String;
     Procedure SetPathRoot(Const Value: String);
     Function RecurseDirectories(Const strRoot, strDirectory: String;
       Var iPosition: Integer; Const strExtensions: String;
-      boolScan: Boolean = False): TScanResults;
+      Const boolScan: Boolean = False): TScanResults;
     Procedure RefreshExplorer(Sender: TObject);
     Procedure PopulateListView;
     Function ExcludeFileFromResults(Const strFileName: String): Boolean;
     Procedure GetErrors(Const strFileName, strSource: String; Var iHints, iWarnings,
-      iErrors, iConflicts: Integer; SourceType: TSourceType);
+      iErrors, iConflicts: Integer; Const SourceType: TSourceType);
     Procedure TimerEvent(Sender: TObject);
     Procedure RefreshModuleExplorer;
     Procedure SaveResults;
     Procedure LoadResults;
-    Procedure ProcessFileFailure(Sender: TObject; FileName: String;
-      Operation: TZFProcessOperation; NativeError: Integer; ErrorCode: Integer;
-      ErrorMessage: String; var Action: TZFAction);
     Procedure ExtractFile(Sender: TObject; var FileName: String; var FileAttr: LongWord;
       const Comment: AnsiString);
     Procedure UpdateStatusBar;
+    Procedure ShowVCLThemePopup(Const Pt: TPoint);
+    Procedure VCLThemeClick(Sender : TObject);
     (**
       A property to define the currently selected file.
       @precon  None.
@@ -248,7 +268,7 @@ Type
     FHints    : Integer;
     FConflicts: Integer;
   Public
-    Constructor Create(Const strFileName, strPathRoot: String; iErrors, iWarnings, iHints,
+    Constructor Create(Const strFileName, strPathRoot: String; Const iErrors, iWarnings, iHints,
       iConflicts: Integer);
     (**
       This property returns the file name of the parser record.
@@ -321,36 +341,10 @@ Uses
   UsefulSynEditFunctions,
   SynEditOptionsForm,
   UITypes, BADI.Module.Dispatcher, BADI.Types, BADI.ElementContainer, BADI.ResourceStrings,
-  BADI.Options;
+  BADI.Options, Vcl.Themes;
 
 {$R *.dfm}
 
-
-(**
-
-  This is an on click event handler for the Tokens button.
-
-  @precon  None.
-  @postcon Displays a form showing the tokens from the current file.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.ShowTokensClick(Sender: TObject);
-
-Var
-  M: TBaseLanguageModule;
-
-Begin
-  M := TBADIDispatcher.BADIDispatcher.Dispatcher(FSynEdit.Text, FileName, True,
-    [moParse, moCheckForDocumentConflicts]);
-  If M <> Nil Then
-    Try
-      TfrmTokenForm.Execute(M);
-    Finally
-      M.Free;
-    End;
-End;
 
 (**
 
@@ -375,6 +369,10 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.actFileExcludeFileExecute(Sender: TObject);
 
+ResourceString
+  strExcludeFileFromResult = 'Exclude File from Result';
+  strAreYouSure = 'Are you sure you want to exclude the below file from the results.';
+
 Var
   strFileName: String;
 
@@ -384,8 +382,8 @@ Begin
   strFileName := FileName;
   Delete(strFileName, 1, Length(PathRoot));
   strFileName := '*' + strFileName;
-  If InputQuery('Exclude File from Result',
-    'Are you sure you want to exclude the below file from the results.',
+  If InputQuery(strExcludeFileFromResult,
+    strAreYouSure,
     strFileName) Then
     Begin
       FFileExcludeList.Add(strFileName);
@@ -418,10 +416,13 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.actFileRecurseFoldersExecute(
-  Sender: TObject);
+Procedure TfrmBrowseAndDocItTestForm.actFileRecurseFoldersExecute(Sender: TObject);
+
+ResourceString
+  strWouldYouLikeToReScanCodeFiles = 'Would you like to re-scan the code files?';
+
 Begin
-  If MessageDlg('Would you like to re-scan the code files?', mtConfirmation,
+  If MessageDlg(strWouldYouLikeToReScanCodeFiles, mtConfirmation,
     [mbYes, mbNo, mbCancel], 0) = mrYes Then
     actFileScanExecute(Sender);
 End;
@@ -438,6 +439,11 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.actFileScanExecute(Sender: TObject);
 
+ResourceString
+  strPreparingToScan = 'Preparing to Scan';
+  strPleaseWait = 'Please wait...';
+  strScanningDirectories = 'Scanning Directories';
+
 Var
   i        : Integer;
   R        : TScanResults;
@@ -447,14 +453,14 @@ Begin
   Application.ProcessMessages;
   lvFileList.Items.Clear;
   FParseRecords.Clear;
-  FProgressForm.Init(-1, 'Preparing to Scan', 'Please wait...');
+  FProgressForm.Init(-1, strPreparingToScan, strPleaseWait);
   Try
     iPosition := 0;
     For i     := 0 To FFolders.Count - 1 Do
       If Integer(FFolders.Objects[i]) > 0 Then
         RecurseDirectories(FFolders.Names[i], FFolders.Names[i],
           iPosition, FFolders.ValueFromIndex[i]);
-    FProgressForm.Init(iPosition, 'Scanning Directories', 'Please wait...');
+    FProgressForm.Init(iPosition, strScanningDirectories, strPleaseWait);
     iPosition := 0;
     For i     := 0 To FFolders.Count - 1 Do
       If Integer(FFolders.Objects[i]) > 0 Then
@@ -574,6 +580,23 @@ End;
 
 (**
 
+  This is an on click event handler for the options button.
+
+  @precon  None.
+  @postcon Displays the Options dialogue.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.btnOptionsClick(Sender: TObject);
+
+Begin
+  If TfrmOptions.Execute([Low(TVisibleTab) .. High(TVisibleTab)]) Then
+    SynEdit1Change(Sender);
+End;
+
+(**
+
   This is a on execute event handler for the Doc Conflict, Hint, Warning and
   Error buttons.
 
@@ -586,6 +609,47 @@ End;
 Procedure TfrmBrowseAndDocItTestForm.ChangeVisibleItems(Sender: TObject);
 Begin
   PopulateListView;
+End;
+
+(**
+
+
+  This is an on click event handler for the Documentation Button.
+
+  @precon  None.
+  @postcon Invokes the documentation mechanism.
+
+  @nocheck HardCodedString HardCodedInteger
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.DocumentationClick(Sender: TObject);
+
+Const
+  strTESTDocumentationFolder = '\TEST Documentation\';
+  strTestDocumentationTitle = 'Test Documentation';
+  strOPENVerb = 'OPEN';
+
+Var
+  i       : Integer;
+  ADocType: TDocType;
+  D : TBaseDocumentation;
+
+Begin
+  If TfrmDocumentationOptions.Execute(ADocType) Then
+    Begin
+      D := DocumentDispatcher(ExtractFilePath(ParamStr(0)) + strTESTDocumentationFolder,
+        strTestDocumentationTitle, ADocType);
+      Try
+        For i := 0 To lvFileList.Items.Count - 1 Do
+          D.Add(lvFileList.Items[i].SubItems[4]);
+        D.OutputDocumentation;
+        ShellExecute(hInstance, strOPENVerb, PChar(D.MainDocument), '', PChar(GetCurrentDir), SW_NORMAL);
+      Finally
+        Free;
+      End;
+    End;  
 End;
 
 (**
@@ -635,77 +699,632 @@ End;
 procedure TfrmBrowseAndDocItTestForm.ExtractFile(Sender: TObject;
   var FileName: String; var FileAttr: LongWord; const Comment: AnsiString);
 
+ResourceString
+  strExtractFileFailure = 'Extract File Failure';
+
 begin
-  CodeSite.Send('Extract File Failure', FileName);
+  CodeSite.Send(strExtractFileFailure, FileName);
 end;
 
 (**
 
-  This is an on click event handler for the options button.
+  This is a check button change event handler for all the error, hint, etc
+  checkboxes.
 
   @precon  None.
-  @postcon Displays the Options dialogue.
+  @postcon Populates the list view.
 
   @param   Sender as a TObject
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.btnOptionsClick(Sender: TObject);
-
+Procedure TfrmBrowseAndDocItTestForm.FilterChange(Sender: TObject);
 Begin
-  If TfrmOptions.Execute([Low(TVisibleTab) .. High(TVisibleTab)]) Then
-    SynEdit1Change(Sender);
+  PopulateListView;
 End;
 
 (**
 
-  This is an on click event handler for the Checkbox1 control.
+  This method focuses the editor when the focus event is fired.
 
-  @precon  None
-  @postcon Displays or hides the special character markers in the SynEdit1
-           control.
+  @precon  None.
+  @postcon Focuses the editor when the focus event is fired.
 
   @param   Sender as a TObject
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.SpecialCharactersClick(Sender: TObject);
+Procedure TfrmBrowseAndDocItTestForm.Focus(Sender: TObject);
+
 Begin
-  If actViewSpecialCharacters.Checked Then
-    FSynEdit.Options := FSynEdit.Options + [eoShowSpecialChars]
-  Else
-    FSynEdit.Options := FSynEdit.Options - [eoShowSpecialChars];
+  FSynEdit.SetFocus;
 End;
 
 (**
 
-
-  This is an on click event handler for the Documentation Button.
+  This is the forms on create event handler.
 
   @precon  None.
-  @postcon Invokes the documentation mechanism.
+  @postcon Creates an instance of the Module Explorer Frame within the panel
+           and initialises the SpecialTags global variable.
 
+  @nocheck HardCodedString HardCodedInteger
 
   @param   Sender as a TObject
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.DocumentationClick(Sender: TObject);
+Procedure TfrmBrowseAndDocItTestForm.FormCreate(Sender: TObject);
+
+Const
+  strWIN32 = 'WIN32';
+  {$IFDEF WIN32}
+  strMSWINDOWS = 'MSWINDOWS';
+  {$ELSE}
+  strLINUX = 'LINUX';
+  {$ENDIF}
+
+Begin
+  FINIFileName            := BuildRootKey(Nil, Nil);
+  FParseRecords           := TObjectList.Create(True);
+  FSynEdit                := TDGHSynEdit.Create(Nil);
+  FSynEdit.Parent         := Self;
+  FSynEdit.Align          := alClient;
+  FSynEdit.HideSelection  := False;
+  FSynEdit.PopupMenu      := pmEdit;
+  FSynEdit.OnChange       := SynEdit1Change;
+  FSynEdit.OnStatusChange := SynEdit1StatusChange;
+  FSynEdit.LoadFromINIFile(FINIFileName);
+  FSynPasSyn := TSynPasSyn.Create(Nil);
+  FSynVBSyn  := TSynVBSyn.Create(Nil);
+  FSynCPPSyn := TSynCPPSyn.Create(Nil);
+  FSynXMLSyn := TSynXMLSyn.Create(Nil);
+  FSynDFMSyn := TSynDFMSyn.Create(Nil);
+  FSynINISyn := TSynINISyn.Create(Nil);
+  {$IFDEF WIN32}
+  TBADIOptions.BADIOptions.Defines.Add(strWIN32);
+  TBADIOptions.BADIOptions.Defines.Add(strMSWINDOWS);
+  {$ELSE}
+  TBADIOptions.BADIOptions.Defines.Add(strLINUX);
+  {$ENDIF}
+  FProgressForm                          := TfrmProgress.Create(Nil);
+  FModuleExplorerFrame                   := TframeModuleExplorer.Create(Self);
+  FModuleExplorerFrame.Parent            := pnlModuleExplorer;
+  FModuleExplorerFrame.Align             := alClient;
+  FModuleExplorerFrame.OnSelectionChange := SelectionChange;
+  FModuleExplorerFrame.OnFocus           := Focus;
+  FModuleExplorerFrame.OnRefresh         := RefreshExplorer;
+  ActiveControl                          := lvFileList;
+  FFileExcludeList                       := TStringList.Create;
+  FFolders                               := TStringList.Create;
+  LoadResults;
+  LoadSettings;
+  PopulateListView;
+  FLastEdit       := 0;
+  FTimer          := TTimer.Create(Self);
+  FTimer.Interval := 100;
+  FTimer.OnTimer  := TimerEvent;
+End;
+
+(**
+
+  This is the forms on destroy event handler.
+
+  @precon  None.
+  @postcon Cleans up the created instances from OnCreate.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.FormDestroy(Sender: TObject);
+
+Begin
+  FTimer.Free;
+  SaveResults;
+  SaveSettings;
+  FSynEdit.Highlighter := Nil;
+  FSynEdit.SaveToINIFile(FINIFileName);
+  FSynEdit.Free;
+  FSynINISyn.Free;
+  FSynDFMSyn.Free;
+  FSynXMLSyn.Free;
+  FSynVBSyn.Free;
+  FSynPasSyn.Free;
+  FSynCPPSyn.Free;
+  FFolders.Free;
+  FFileExcludeList.Free;
+  FModuleExplorerFrame.Free;
+  FProgressForm.Free;
+  FParseRecords.Free;
+End;
+
+(**
+
+  This method gets the number of errors for the given files name.
+
+  @precon  None.
+  @postcon Gets the number of errors for the given files name.
+
+  @nocheck ExceptionEating
+
+  @param   strFileName as a String as a constant
+  @param   strSource   as a String as a constant
+  @param   iHints      as an Integer as a reference
+  @param   iWarnings   as an Integer as a reference
+  @param   iErrors     as an Integer as a reference
+  @param   iConflicts  as an Integer as a reference
+  @param   SourceType  as a TSourceType
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.GetErrors(Const strFileName, strSource: String;
+  Var iHints, iWarnings, iErrors, iConflicts: Integer;
+  Const SourceType: TSourceType);
 
 Var
-  i       : Integer;
-  ADocType: TDocType;
+  Source: TStringList;
+  M     : TBaseLanguageModule;
+  i     : Integer;
+  C     : TElementContainer;
 
 Begin
-  If TfrmDocumentationOptions.Execute(ADocType) Then
-    With DocumentDispatcher(ExtractFilePath(ParamStr(0)) + '\TEST Documentation\',
-      'Test Documentation', ADocType) Do
-      Try
-        For i := 0 To lvFileList.Items.Count - 1 Do
-          Add(lvFileList.Items[i].SubItems[4]);
-        OutputDocumentation;
-        ShellExecute(hInstance, 'OPEN', PChar(MainDocument), '',
-          PChar(GetCurrentDir), SW_NORMAL);
-      Finally
-        Free;
+  iHints     := 0;
+  iWarnings  := 0;
+  iErrors    := 0;
+  iConflicts := 0;
+  Source     := TStringList.Create;;
+  Try
+    If SourceType = stFile Then
+      Source.LoadFromFile(strFileName)
+    Else
+      Source.Text := strSource;
+    Try
+      M             := TBADIDispatcher.BADIDispatcher.Dispatcher(Source.Text, strFileName, False,
+        [moParse, moCheckForDocumentConflicts]);
+      If M <> Nil Then
+        Try
+          If M.FindElement(strHints) <> Nil Then
+            iHints := M.FindElement(strHints).ElementCount;
+          If M.FindElement(strWarnings) <> Nil Then
+            iWarnings := M.FindElement(strWarnings).ElementCount;
+          If M.FindElement(strErrors) <> Nil Then
+            iErrors := M.FindElement(strErrors).ElementCount;
+          C         := M.FindElement(strDocumentationConflicts);
+          If C <> Nil Then
+            Begin
+              For i := 1 To C.ElementCount Do
+                Inc(iConflicts, C.Elements[i].ElementCount);
+            End;
+        Finally
+          M.Free;
+        End;
+    Except
+      On E: Exception Do
+        Begin
+          {$IFDEF EUREKALOG_VER7}
+          ExceptionManager.StandardEurekaNotify(ExceptObject, ExceptAddr)
+          {$ELSE}
+          FFileName := E.Message;
+          {$ENDIF}
+        End;
+    End;
+  Finally
+    Source.Free;
+  End;
+End;
+
+(**
+
+  This is a getter method for the FileName property.
+
+  @precon  None.
+  @postcon Sets the returns the file name property based on the file list box
+           selection.
+
+  @return  a String
+
+**)
+Function TfrmBrowseAndDocItTestForm.GetFileName: String;
+Begin
+  Result := FFileName;
+End;
+
+(**
+
+  This is a getter method for the Path Root property.
+
+  @precon  None.
+  @postcon Returns the root path of the selected file.
+
+  @return  a String
+
+**)
+Function TfrmBrowseAndDocItTestForm.GetPathRoot: String;
+Begin
+  Result := FPathRoot;
+End;
+
+(**
+
+  This method loads previous results from a text file.
+
+  @precon  None.
+  @postcon Loads previous results from a text file.
+
+  @nocheck HardCodedString HardCodedInteger
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.LoadResults;
+
+Const
+  strTxtExt = '.txt';
+
+ResourceString
+  strStartingUp = 'Starting Up...';
+  strLoadingScanResults = 'Loading Scan Results...';
+
+Var
+  sl                                    : TStringList;
+  iRecord                               : Integer;
+  iErrors, iWarnings, iHints, iConflicts: Integer;
+  strFileName                           : String;
+  iErrorCode                            : Integer;
+  iRootPath                             : Integer;
+
+Begin
+  sl := TStringList.Create;
+  Try
+    If FileExists(ChangeFileExt(FINIFileName, strTxtExt)) Then
+      sl.LoadFromFile(ChangeFileExt(FINIFileName, strTxtExt));
+    FProgressForm.Init(sl.Count, strStartingUp, strLoadingScanResults);
+    Try
+      For iRecord := 0 To sl.Count - 1 Do
+        Begin
+          strFileName := sl.Names[iRecord];
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 1), iErrors, iErrorCode);
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 2), iWarnings, iErrorCode);
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 3), iHints, iErrorCode);
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 4), iConflicts, iErrorCode);
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 5), iRootPath, iErrorCode);
+          FParseRecords.Add(
+            TParseRecord.Create(
+              strFileName,
+              Copy(strFileName, 1, iRootPath),
+              iErrors,
+              iWarnings,
+              iHints,
+              iConflicts
+            )
+          );
+          If iRecord Mod 10 = 0 Then
+            FProgressForm.UpdateProgress(iRecord, strFileName);
+        End;
+    Finally
+      FProgressForm.Hide;
+    End;
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This method loads the applications settings from an INI file.
+
+  @precon  None.
+  @postcon Loads the applications settings from an INI file.
+
+  @nocheck HardCodedString HardCodedInteger
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.LoadSettings;
+
+Var
+  i      : Integer;
+  sl     : TStringList;
+  iniFile: TMemIniFile;
+
+Begin
+  iniFile := TMemIniFile.Create(FINIFileName);
+  Try
+    Top := iniFile.ReadInteger('Position', 'Top', Top);
+    Left := iniFile.ReadInteger('Position', 'Left', Left);
+    Height := iniFile.ReadInteger('Position', 'Height', Height);
+    Width := iniFile.ReadInteger('Position', 'Width', Width);
+    FRecurseZipFiles := iniFile.ReadBool('ZipFiles', 'Recuse', False);
+    WindowState := TWindowState(iniFile.ReadInteger('Position', 'WindowState',
+      Integer(wsNormal)));
+    lvFileList.Width := iniFile.ReadInteger('Position', 'FileSplitter', lvFileList.Width);
+    lvFileList.Columns[0].Width := iniFile.ReadInteger('Columns', '1',
+      lvFileList.Columns[0].Width);
+    lvFileList.Columns[1].Width := iniFile.ReadInteger('Columns', '2',
+      lvFileList.Columns[1].Width);
+    lvFileList.Columns[2].Width := iniFile.ReadInteger('Columns', '3',
+      lvFileList.Columns[2].Width);
+    lvFileList.Columns[3].Width := iniFile.ReadInteger('Columns', '4',
+      lvFileList.Columns[3].Width);
+    lvFileList.Columns[4].Width := iniFile.ReadInteger('Columns', '5',
+      lvFileList.Columns[4].Width);
+    pnlModuleExplorer.Width := iniFile.ReadInteger('Position', 'Splitter',
+      pnlModuleExplorer.Width);
+    sl := TStringList.Create;
+    Try
+      iniFile.ReadSection('Folders', sl);
+      For i := 0 To sl.Count - 1 Do
+        FFolders.AddObject(Format('%s=%s', [sl[i],
+          iniFile.ReadString('Folders', sl[i], '')]),
+          TObject(iniFile.ReadBool('Folders.Enabled', sl[i], False)));
+      iniFile.ReadSection('ExcludedFiles', sl);
+      For i := 0 To sl.Count - 1 Do
+        FFileExcludeList.Add(iniFile.ReadString('ExcludedFiles', sl[i], ''));
+    Finally
+      sl.Free;
+    End;
+    i := iniFile.ReadInteger('Setup', 'Selection', 0);
+    actFileRecurseFolders.Checked := iniFile.ReadBool('Setup', 'Recurse', False);
+    actViewErrors.Checked := iniFile.ReadBool('Setup', 'Errors', False);
+    actViewWarnings.Checked := iniFile.ReadBool('Setup', 'Warnings', False);
+    actViewHints.Checked := iniFile.ReadBool('Setup', 'Hints', False);
+    actViewDocConflicts.Checked := iniFile.ReadBool('Setup', 'Conflicts', False);
+    If lvFileList.Items.Count > i Then
+      lvFileList.ItemIndex := i;
+    FIndex := iniFile.ReadInteger('Setup', 'SelectedItem', -1);
+    LoadHighlighterFromINIFile(iniFile, FSynPasSyn);
+    LoadHighlighterFromINIFile(iniFile, FSynVBSyn);
+    LoadHighlighterFromINIFile(iniFile, FSynCPPSyn);
+    LoadHighlighterFromINIFile(iniFile, FSynXMLSyn);
+    LoadHighlighterFromINIFile(iniFile, FSynDFMSyn);
+    LoadHighlighterFromINIFile(iniFile, FSynINISyn);
+    LoadThemes;
+    TStyleManager.TrySetStyle(iniFile.ReadString('Setup', 'VCL Style', 'Windows'), False);
+    sbrStatusBar.Panels[4].Text := TStyleManager.ActiveStyle.Name;
+  Finally
+    iniFile.Free;
+  End;
+End;
+
+(**
+
+  This method loads any .VSF theme files from either the EXE location, INI location or the parent to the
+  INI location.
+
+  @precon  None.
+  @postcon Any found .VSF files are loaded if they are valid.
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.LoadThemes;
+
+  (**
+
+    This procedure searches for style files in the given directory.
+
+    @precon  None.
+    @postcon Any style files in the given directory are loaded if they are valid.
+
+    @param   strPath as a String as a constant
+
+  **)
+  Procedure SearchForThemes(Const strPath : String);
+
+  Const
+    strVCLStyleFileExt = '*.vsf';
+
+  Var
+    recSearch: TSearchRec;
+    iResult: Integer;
+  
+  Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadThemes/SearchForThemes', tmoTiming);{$ENDIF}
+    iResult := System.SysUtils.FindFirst(strPath + strVCLStyleFileExt, faAnyFile, recSearch);
+    Try
+      While iResult = 0 Do
+        Begin
+          If TStyleManager.IsValidStyle(strPath + recSearch.Name) Then
+            TStyleManager.LoadFromFile(strPath + recSearch.Name);
+          iResult := FindNext(recSearch);
+        End;
+    Finally
+      System.SysUtils.FindClose(recSearch);
+    End;
+  End;
+
+Var
+  strPath : String;
+
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LoadThemes', tmoTiming);{$ENDIF}
+  // EXE Location
+  strPath := ExtractFilePath(ParamStr(0));
+  SearchForThemes(strPath);
+  // %appdata%\Season's Fall\
+  strPath := ExtractFilePath(FINIFileName);
+  SearchForThemes(strPath);
+End;
+
+(**
+
+  This is a Select item event handler for the list view.
+
+  @precon  None.
+  @postcon Saves any changes and options the new file selected.
+
+  @nocheck HardCodedString HardCodedInteger
+
+  @param   Sender   as a TObject
+  @param   Item     as a TListItem
+  @param   Selected as a Boolean
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.lvFileListSelectItem(Sender: TObject;
+  Item: TListItem; Selected: Boolean);
+
+Begin
+  If lvFileList.Selected <> Nil Then
+    Begin
+      FileName := lvFileList.Selected.SubItems[5];
+      PathRoot := lvFileList.Selected.SubItems[6];
+      RefreshModuleExplorer;
+    End;
+End;
+
+(**
+
+  This is an on custom draw item event handler for the list views.
+
+  @precon  None.
+  @postcon Draws the list view items with colours, path ellipses and alignments.
+
+  @nocheck HardCodedString HardCodedInteger
+
+  @param   Sender      as a TCustomListView
+  @param   Item        as a TListItem
+  @param   State       as a TCustomDrawState
+  @param   DefaultDraw as a Boolean as a reference
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.lvFilesCustomDrawItem(
+  Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+  Var DefaultDraw: Boolean);
+
+Var
+  iLength   : Integer;
+  R         : TRect;
+  i         : Integer;
+  iValue    : Integer;
+  iErrorCode: Integer;
+
+  (**
+
+    This function returns the rectangle for the indexed sub item of the listview.
+
+    @precon  iIndex must be a valid index into the column collection.
+    @postcon Returns the rectangle for the indexed sub item of the listview.
+
+    @nocheck HardCodedString HardCodedInteger
+
+    @param   iIndex as an Integer
+    @return  a TRect
+
+  **)
+  Function GetSubItemRect(Const iIndex: Integer): TRect;
+
+  Var
+    j: Integer;
+
+  Begin
+    Result := Item.DisplayRect(drBounds);
+    For j  := 0 To iIndex Do
+      Begin
+        Inc(Result.Left, Sender.Column[j].Width);
+        Result.Right := Result.Left + Sender.Column[j + 1].Width;
       End;
+  End;
+
+Begin
+  DefaultDraw               := False;
+  R                         := Item.DisplayRect(drSelectBounds);
+  Sender.Canvas.Brush.Color := clWindow;
+  If Item.Selected Then
+    Begin
+      Sender.Canvas.Brush.Color := clHighlight;
+      Sender.Canvas.Font.Color  := clHighlightText;
+    End;
+  Sender.Canvas.FillRect(R);
+  R := Item.DisplayRect(drLabel);
+  Dec(R.Right);
+  iLength := Length(Item.Caption);
+  DrawText(Sender.Canvas.Handle, PChar(Item.Caption), iLength, R,
+    DT_LEFT Or DT_PATH_ELLIPSIS);
+  R := GetSubItemRect(0);
+  iLength := Length(Item.SubItems[0]);
+  DrawText(Sender.Canvas.Handle, PChar(Item.SubItems[0]), iLength, R,
+    DT_LEFT Or DT_PATH_ELLIPSIS);
+  For i := 1 To Min(Item.SubItems.Count - 1, 4) Do
+    Begin
+      R                         := GetSubItemRect(i);
+      Sender.Canvas.Brush.Color := clWindow;
+      Sender.Canvas.Font.Color  := clWindowText;
+      Val(Item.SubItems[i], iValue, iErrorCode);
+      If iValue > 0 Then
+        Begin
+          Case i Of
+            1: Sender.Canvas.Brush.Color := clSkyBlue;
+            2: Sender.Canvas.Brush.Color := clGreen;
+            3: Sender.Canvas.Brush.Color := clYellow;
+            4: Sender.Canvas.Brush.Color := clRed;
+          End;
+          Case i Of
+            1: Sender.Canvas.Font.Color := clBlack;
+            2: Sender.Canvas.Font.Color := clWhite;
+            3: Sender.Canvas.Font.Color := clRed;
+            4: Sender.Canvas.Font.Color := clYellow;
+          End;
+        End;
+      If Item.Selected Then
+        Sender.Canvas.Brush.Color := clHighlight;
+      Sender.Canvas.FillRect(R);
+      Inc(R.Left, 2);
+      Inc(R.Top, 2);
+      Dec(R.Right, 2);
+      Dec(R.Bottom, 2);
+      Sender.Canvas.Refresh;
+      DrawText(Sender.Canvas.Handle, PChar(Item.SubItems[i]),
+        Length(Item.SubItems[i]), R, DT_RIGHT);
+      R.Left := R.Right;
+    End;
+End;
+
+(**
+
+  This method popluates the list view based on the filter checkboxes.
+
+  @precon  None.
+  @postcon Popluates the list view based on the filter checkboxes.
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.PopulateListView;
+
+Var
+  i          : Integer;
+  rec        : TParseRecord;
+  liItem     : TListItem;
+  boolInclude: Boolean;
+
+Begin
+  Try
+    lvFileList.Clear;
+    lvFileList.Items.BeginUpdate;
+    For i := 0 To FParseRecords.Count - 1 Do
+      Begin
+        rec         := FParseRecords[i] As TParseRecord;
+        boolInclude :=
+          Not actViewErrors.Checked And
+          Not actViewWarnings.Checked And
+          Not actViewHints.Checked And
+          Not actViewDocConflicts.Checked;
+        boolInclude := boolInclude Or (actViewErrors.Checked And (rec.Errors > 0));
+        boolInclude := boolInclude Or (actViewWarnings.Checked And (rec.Warnings > 0));
+        boolInclude := boolInclude Or (actViewHints.Checked And (rec.Hints > 0));
+        boolInclude := boolInclude Or
+          (actViewDocConflicts.Checked And (rec.Conflicts > 0));
+        If boolInclude Then
+          Begin
+            liItem         := lvFileList.Items.Add;
+            liItem.Caption := IntToStr(i);
+            liItem.SubItems.Add(ExtractFileName(rec.FileName));
+            liItem.SubItems.Add(Format('%d', [rec.Conflicts]));
+            liItem.SubItems.Add(Format('%d', [rec.Hints]));
+            liItem.SubItems.Add(Format('%d', [rec.Warnings]));
+            liItem.SubItems.Add(Format('%d', [rec.Errors]));
+            liItem.SubItems.Add(rec.FileName);
+            liItem.SubItems.Add(rec.PathRoot);
+          End;
+      End;
+    If FIndex > lvFileList.Items.Count - 1 Then
+      FIndex             := lvFileList.Items.Count - 1;
+    lvFileList.ItemIndex := FIndex;
+    If lvFileList.Selected <> Nil Then
+      lvFileList.Selected.MakeVisible(False);
+  Finally
+    lvFileList.Items.EndUpdate;
+  End;
+  UpdateStatusBar;
 End;
 
 (**
@@ -725,7 +1344,10 @@ End;
 **)
 Function TfrmBrowseAndDocItTestForm.RecurseDirectories(Const strRoot,
   strDirectory: String; Var iPosition: Integer; Const strExtensions: String;
-  boolScan: Boolean = False): TScanResults;
+  Const boolScan: Boolean = False): TScanResults;
+
+ResourceString
+  strScanning = 'Scanning %s %1.0n';
 
 Var
   recFile                   : TSearchRec;
@@ -736,9 +1358,7 @@ Var
   R                         : TScanResults;
   slExts                    : TStringList;
   i                         : Integer;
-  Z                         : TZipForge;
-  recZip                    : TZFArchiveItem;
-  boolResult                : Boolean;
+  {: @debug boolResult                : Boolean; }
   strSource                 : String;
 
 Begin
@@ -777,7 +1397,7 @@ Begin
                     End
                   Else
                     FProgressForm.UpdateProgress(iPosition,
-                      Format('Scanning %s %1.0n', [strDirectory, Int(iPosition)]));
+                      Format(strScanning, [strDirectory, Int(iPosition)]));
                 End;
               iResult := FindNext(recFile);
             End;
@@ -803,7 +1423,7 @@ Begin
             Inc(Result.iWarnings, R.iWarnings);
             Inc(Result.iErrors, R.iErrors);
           End;
-        If FRecurseZipFiles And Like('*.zip', recFile.Name) Then
+        {: @debug If FRecurseZipFiles And Like('*.zip', recFile.Name) Then
           Begin
             Z := TZipForge.Create(Nil);
             Try
@@ -874,7 +1494,7 @@ Begin
             Finally
               Z.Free;
             End;
-          End;
+          End;}
         iResult := FindNext(recFile);
       End;
   Finally
@@ -903,6 +1523,8 @@ End;
 
   @precon  None.
   @postcon Updates the module explorer.
+
+  @nocheck HardCodedString HardCodedInteger
 
 **)
 Procedure TfrmBrowseAndDocItTestForm.RefreshModuleExplorer;
@@ -960,409 +1582,12 @@ End;
 
 (**
 
-  This method gets the number of errors for the given files name.
-
-  @precon  None.
-  @postcon Gets the number of errors for the given files name.
-
-  @param   strFileName as a String as a constant
-  @param   strSource   as a String as a constant
-  @param   iHints      as an Integer as a reference
-  @param   iWarnings   as an Integer as a reference
-  @param   iErrors     as an Integer as a reference
-  @param   iConflicts  as an Integer as a reference
-  @param   SourceType  as a TSourceType
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.GetErrors(Const strFileName, strSource: String;
-  Var iHints, iWarnings, iErrors, iConflicts: Integer;
-  SourceType: TSourceType);
-
-Var
-  Source: TStringList;
-  M     : TBaseLanguageModule;
-  i     : Integer;
-  C     : TElementContainer;
-
-Begin
-  iHints     := 0;
-  iWarnings  := 0;
-  iErrors    := 0;
-  iConflicts := 0;
-  Source     := TStringList.Create;;
-  Try
-    If SourceType = stFile Then
-      Source.LoadFromFile(strFileName)
-    Else
-      Source.Text := strSource;
-    Try
-      M             := TBADIDispatcher.BADIDispatcher.Dispatcher(Source.Text, strFileName, False,
-        [moParse, moCheckForDocumentConflicts]);
-      If M <> Nil Then
-        Try
-          If M.FindElement(strHints) <> Nil Then
-            iHints := M.FindElement(strHints).ElementCount;
-          If M.FindElement(strWarnings) <> Nil Then
-            iWarnings := M.FindElement(strWarnings).ElementCount;
-          If M.FindElement(strErrors) <> Nil Then
-            iErrors := M.FindElement(strErrors).ElementCount;
-          C         := M.FindElement(strDocumentationConflicts);
-          If C <> Nil Then
-            Begin
-              For i := 1 To C.ElementCount Do
-                Inc(iConflicts, C.Elements[i].ElementCount);
-            End;
-        Finally
-          M.Free;
-        End;
-    Except
-      On E: Exception Do
-        Begin
-          {$IFDEF EUREKALOG_VER7}
-          ExceptionManager.StandardEurekaNotify(ExceptObject, ExceptAddr)
-          {$ELSE}
-          FFileName := E.Message;
-          //: @debug Synchronize(ShowException);
-          {$ENDIF}
-        End;
-    End;
-  Finally
-    Source.Free;
-  End;
-End;
-
-(**
-
-  This is the forms on create event handler.
-
-  @precon  None.
-  @postcon Creates an instance of the Module Explorer Frame within the panel
-           and initialises the SpecialTags global variable.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.FormCreate(Sender: TObject);
-
-Begin
-  FINIFileName            := BuildRootKey(Nil, Nil);
-  FParseRecords           := TObjectList.Create(True);
-  FSynEdit                := TDGHSynEdit.Create(Nil);
-  FSynEdit.Parent         := Self;
-  FSynEdit.Align          := alClient;
-  FSynEdit.HideSelection  := False;
-  FSynEdit.PopupMenu      := pmEdit;
-  FSynEdit.OnChange       := SynEdit1Change;
-  FSynEdit.OnStatusChange := SynEdit1StatusChange;
-  FSynEdit.LoadFromINIFile(FINIFileName);
-  FSynPasSyn := TSynPasSyn.Create(Nil);
-  FSynVBSyn  := TSynVBSyn.Create(Nil);
-  FSynCPPSyn := TSynCPPSyn.Create(Nil);
-  FSynXMLSyn := TSynXMLSyn.Create(Nil);
-  FSynDFMSyn := TSynDFMSyn.Create(Nil);
-  FSynINISyn := TSynINISyn.Create(Nil);
-  {$IFDEF WIN32}
-  TBADIOptions.BADIOptions.Defines.Add('WIN32');
-  TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
-  {$ELSE}
-  TBADIOptions.BADIOptions.Defines.Add('LINUX');
-  {$ENDIF}
-  FProgressForm                          := TfrmProgress.Create(Nil);
-  FModuleExplorerFrame                   := TframeModuleExplorer.Create(Self);
-  FModuleExplorerFrame.Parent            := pnlModuleExplorer;
-  FModuleExplorerFrame.Align             := alClient;
-  FModuleExplorerFrame.OnSelectionChange := SelectionChange;
-  FModuleExplorerFrame.OnFocus           := Focus;
-  FModuleExplorerFrame.OnRefresh         := RefreshExplorer;
-  ActiveControl                          := lvFileList;
-  FFileExcludeList                       := TStringList.Create;
-  FFolders                               := TStringList.Create;
-  LoadResults;
-  LoadSettings;
-  PopulateListView;
-  FLastEdit       := 0;
-  FTimer          := TTimer.Create(Self);
-  FTimer.Interval := 100;
-  FTimer.OnTimer  := TimerEvent;
-End;
-
-(**
-
-  This is the forms on destroy event handler.
-
-  @precon  None.
-  @postcon Cleans up the created instances from OnCreate.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.FormDestroy(Sender: TObject);
-
-Begin
-  FTimer.Free;
-  SaveResults;
-  SaveSettings;
-  FSynEdit.Highlighter := Nil;
-  FSynEdit.SaveToINIFile(FINIFileName);
-  FSynEdit.Free;
-  FSynINISyn.Free;
-  FSynDFMSyn.Free;
-  FSynXMLSyn.Free;
-  FSynVBSyn.Free;
-  FSynPasSyn.Free;
-  FSynCPPSyn.Free;
-  FFolders.Free;
-  FFileExcludeList.Free;
-  FModuleExplorerFrame.Free;
-  FProgressForm.Free;
-  FParseRecords.Free;
-End;
-
-(**
-
-  This is a getter method for the FileName property.
-
-  @precon  None.
-  @postcon Sets the returns the file name property based on the file list box
-           selection.
-
-  @return  a String
-
-**)
-Function TfrmBrowseAndDocItTestForm.GetFileName: String;
-Begin
-  Result := FFileName;
-End;
-
-(**
-
-  This is a getter method for the Path Root property.
-
-  @precon  None.
-  @postcon Returns the root path of the selected file.
-
-  @return  a String
-
-**)
-Function TfrmBrowseAndDocItTestForm.GetPathRoot: String;
-Begin
-  Result := FPathRoot;
-End;
-
-(**
-
-  This is an on custom draw item event handler for the list views.
-
-  @precon  None.
-  @postcon Draws the list view items with colours, path ellipses and alignments.
-
-  @param   Sender      as a TCustomListView
-  @param   Item        as a TListItem
-  @param   State       as a TCustomDrawState
-  @param   DefaultDraw as a Boolean as a reference
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.lvFilesCustomDrawItem(
-  Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
-  Var DefaultDraw: Boolean);
-
-Var
-  iLength   : Integer;
-  R         : TRect;
-  i         : Integer;
-  iValue    : Integer;
-  iErrorCode: Integer;
-
-  (**
-
-    This function returns the rectangle for the indexed sub item of the listview.
-
-    @precon  iIndex must be a valid index into the column collection.
-    @postcon Returns the rectangle for the indexed sub item of the listview.
-
-    @param   iIndex as an Integer
-    @return  a TRect
-
-  **)
-  Function GetSubItemRect(iIndex: Integer): TRect;
-
-  Var
-    j: Integer;
-
-  Begin
-    Result := Item.DisplayRect(drBounds);
-    For j  := 0 To iIndex Do
-      Begin
-        Inc(Result.Left, Sender.Column[j].Width);
-        Result.Right := Result.Left + Sender.Column[j + 1].Width;
-      End;
-  End;
-
-Begin
-  DefaultDraw               := False;
-  R                         := Item.DisplayRect(drSelectBounds);
-  Sender.Canvas.Brush.Color := clWindow;
-  If Item.Selected Then
-    Begin
-      Sender.Canvas.Brush.Color := clHighlight;
-      Sender.Canvas.Font.Color  := clHighlightText;
-    End;
-  Sender.Canvas.FillRect(R);
-  R := Item.DisplayRect(drLabel);
-  Dec(R.Right);
-  iLength := Length(Item.Caption);
-  DrawText(Sender.Canvas.Handle, PChar(Item.Caption), iLength, R,
-    DT_LEFT Or DT_PATH_ELLIPSIS);
-  R := GetSubItemRect(0);
-  iLength := Length(Item.SubItems[0]);
-  DrawText(Sender.Canvas.Handle, PChar(Item.SubItems[0]), iLength, R,
-    DT_LEFT Or DT_PATH_ELLIPSIS);
-  For i := 1 To Min(Item.SubItems.Count - 1, 4) Do
-    Begin
-      R                         := GetSubItemRect(i);
-      Sender.Canvas.Brush.Color := clWindow;
-      Sender.Canvas.Font.Color  := clWindowText;
-      Val(Item.SubItems[i], iValue, iErrorCode);
-      If iValue > 0 Then
-        Begin
-          Case i Of
-            1: Sender.Canvas.Brush.Color := clSkyBlue;
-            2: Sender.Canvas.Brush.Color := clGreen;
-            3: Sender.Canvas.Brush.Color := clYellow;
-            4: Sender.Canvas.Brush.Color := clRed;
-          End;
-          Case i Of
-            1: Sender.Canvas.Font.Color := clBlack;
-            2: Sender.Canvas.Font.Color := clWhite;
-            3: Sender.Canvas.Font.Color := clRed;
-            4: Sender.Canvas.Font.Color := clYellow;
-          End;
-        End;
-      If Item.Selected Then
-        Sender.Canvas.Brush.Color := clHighlight;
-      Sender.Canvas.FillRect(R);
-      Inc(R.Left, 2);
-      Inc(R.Top, 2);
-      Dec(R.Right, 2);
-      Dec(R.Bottom, 2);
-      Sender.Canvas.Refresh;
-      DrawText(Sender.Canvas.Handle, PChar(Item.SubItems[i]),
-        Length(Item.SubItems[i]), R, DT_RIGHT);
-      R.Left := R.Right;
-    End;
-End;
-
-(**
-
-  This is a Select item event handler for the list view.
-
-  @precon  None.
-  @postcon Saves any changes and options the new file selected.
-
-  @param   Sender   as a TObject
-  @param   Item     as a TListItem
-  @param   Selected as a Boolean
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.lvFileListSelectItem(Sender: TObject;
-  Item: TListItem; Selected: Boolean);
-
-Begin
-  If lvFileList.Selected <> Nil Then
-    Begin
-      FileName := lvFileList.Selected.SubItems[5];
-      PathRoot := lvFileList.Selected.SubItems[6];
-      RefreshModuleExplorer;
-    End;
-End;
-
-(**
-
-  This method popluates the list view based on the filter checkboxes.
-
-  @precon  None.
-  @postcon Popluates the list view based on the filter checkboxes.
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.PopulateListView;
-
-Var
-  i          : Integer;
-  rec        : TParseRecord;
-  liItem     : TListItem;
-  boolInclude: Boolean;
-
-Begin
-  Try
-    lvFileList.Clear;
-    lvFileList.Items.BeginUpdate;
-    For i := 0 To FParseRecords.Count - 1 Do
-      Begin
-        rec         := FParseRecords[i] As TParseRecord;
-        boolInclude :=
-          Not actViewErrors.Checked And
-          Not actViewWarnings.Checked And
-          Not actViewHints.Checked And
-          Not actViewDocConflicts.Checked;
-        boolInclude := boolInclude Or (actViewErrors.Checked And (rec.Errors > 0));
-        boolInclude := boolInclude Or (actViewWarnings.Checked And (rec.Warnings > 0));
-        boolInclude := boolInclude Or (actViewHints.Checked And (rec.Hints > 0));
-        boolInclude := boolInclude Or
-          (actViewDocConflicts.Checked And (rec.Conflicts > 0));
-        If boolInclude Then
-          Begin
-            liItem         := lvFileList.Items.Add;
-            liItem.Caption := IntToStr(i);
-            liItem.SubItems.Add(ExtractFileName(rec.FileName));
-            liItem.SubItems.Add(Format('%d', [rec.Conflicts]));
-            liItem.SubItems.Add(Format('%d', [rec.Hints]));
-            liItem.SubItems.Add(Format('%d', [rec.Warnings]));
-            liItem.SubItems.Add(Format('%d', [rec.Errors]));
-            liItem.SubItems.Add(rec.FileName);
-            liItem.SubItems.Add(rec.PathRoot);
-          End;
-      End;
-    If FIndex > lvFileList.Items.Count - 1 Then
-      FIndex             := lvFileList.Items.Count - 1;
-    lvFileList.ItemIndex := FIndex;
-    If lvFileList.Selected <> Nil Then
-      lvFileList.Selected.MakeVisible(False);
-  Finally
-    lvFileList.Items.EndUpdate;
-  End;
-  UpdateStatusBar;
-End;
-
-(**
-
-  This is an on Process File Failure event handler for the ZipForge component.
-
-  @precon  None.
-  @postcon Outputs the filename to the codesite viewer.
-
-  @param   Sender       as a TObject
-  @param   FileName     as a String
-  @param   Operation    as a TZFProcessOperation
-  @param   NativeError  as an Integer
-  @param   ErrorCode    as an Integer
-  @param   ErrorMessage as a String
-  @param   Action       as a TZFAction as a reference
-
-**)
-procedure TfrmBrowseAndDocItTestForm.ProcessFileFailure(Sender: TObject; FileName: String;
-  Operation: TZFProcessOperation; NativeError, ErrorCode: Integer; ErrorMessage: String;
-  var Action: TZFAction);
-begin
-  Action := fxaIgnore;
-  CodeSite.Send('Process File Failure', FileName);
-end;
-
-(**
-
   This method saves the results to a text file.
 
   @precon  None.
   @postcon Saves the results to a text file.
+
+  @nocheck HardCodedString HardCodedInteger
 
 **)
 Procedure TfrmBrowseAndDocItTestForm.SaveResults;
@@ -1402,6 +1627,8 @@ End;
   @precon  None.
   @postcon Saves the applications settings to an INI file.
 
+  @nocheck HardCodedString HardCodedInteger
+
 **)
 Procedure TfrmBrowseAndDocItTestForm.SaveSettings;
 
@@ -1412,179 +1639,98 @@ Var
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
-  With iniFile Do
-    Try
-      recWndPlmt.Length := SizeOf(TWindowPlacement);
-      GetWindowPlacement(Handle, @recWndPlmt);
-      WriteInteger('Position', 'Top', recWndPlmt.rcNormalPosition.Top);
-      WriteInteger('Position', 'Left', recWndPlmt.rcNormalPosition.Left);
-      WriteInteger('Position', 'Height',
-        recWndPlmt.rcNormalPosition.Bottom - recWndPlmt.rcNormalPosition.Top);
-      WriteInteger('Position', 'Width',
-        recWndPlmt.rcNormalPosition.Right - recWndPlmt.rcNormalPosition.Left);
-      WriteInteger('Position', 'WindowState', Integer(WindowState));
-      WriteInteger('Position', 'FileSplitter', lvFileList.Width);
-      WriteBool('ZipFiles', 'Recuse', FRecurseZipFiles);
-      WriteInteger('Columns', '1', lvFileList.Columns[0].Width);
-      WriteInteger('Columns', '2', lvFileList.Columns[1].Width);
-      WriteInteger('Columns', '3', lvFileList.Columns[2].Width);
-      WriteInteger('Columns', '4', lvFileList.Columns[3].Width);
-      WriteInteger('Columns', '5', lvFileList.Columns[4].Width);
-      WriteInteger('Position', 'Splitter', pnlModuleExplorer.Width);
-      EraseSection('Folders');
-      EraseSection('Folders.Enabled');
-      For i := 0 To FFolders.Count - 1 Do
-        Begin
-          WriteString('Folders', FFolders.Names[i], FFolders.ValueFromIndex[i]);
-          WriteBool('Folders.Enabled', FFolders.Names[i],
-            Boolean(Integer(FFolders.Objects[i])));
-        End;
-      EraseSection('ExcludedFiles');
-      For i := 0 To FFileExcludeList.Count - 1 Do
-        WriteString('ExcludedFiles', Format('File%d', [i]), FFileExcludeList[i]);
-      WriteInteger('Setup', 'Selection', lvFileList.ItemIndex);
-      WriteBool('Setup', 'Recurse', actFileRecurseFolders.Checked);
-      WriteBool('Setup', 'Errors', actViewErrors.Checked);
-      WriteBool('Setup', 'Warnings', actViewWarnings.Checked);
-      WriteBool('Setup', 'Hints', actViewHints.Checked);
-      WriteBool('Setup', 'Conflicts', actViewDocConflicts.Checked);
-      WriteInteger('Setup', 'SelectedItem', lvFileList.ItemIndex);
-      SaveHighlighterToINIFile(iniFile, FSynPasSyn);
-      SaveHighlighterToINIFile(iniFile, FSynVBSyn);
-      SaveHighlighterToINIFile(iniFile, FSynCPPSyn);
-      SaveHighlighterToINIFile(iniFile, FSynXMLSyn);
-      SaveHighlighterToINIFile(iniFile, FSynDFMSyn);
-      SaveHighlighterToINIFile(iniFile, FSynINISyn);
-      UpdateFile;
-    Finally
-      Free;
-    End;
-End;
-
-(**
-
-  This method loads previous results from a text file.
-
-  @precon  None.
-  @postcon Loads previous results from a text file.
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.LoadResults;
-
-Var
-  sl                                    : TStringList;
-  iRecord                               : Integer;
-  iErrors, iWarnings, iHints, iConflicts: Integer;
-  strFileName                           : String;
-  iErrorCode                            : Integer;
-  iRootPath                             : Integer;
-
-Begin
-  sl := TStringList.Create;
   Try
-    If FileExists(ChangeFileExt(FINIFileName, '.txt')) Then
-      sl.LoadFromFile(ChangeFileExt(FINIFileName, '.txt'));
-    FProgressForm.Init(sl.Count, 'Starting Up...', 'Loading Scan Results...');
-    Try
-      For iRecord := 0 To sl.Count - 1 Do
-        Begin
-          strFileName := sl.Names[iRecord];
-          Val(GetField(sl.ValueFromIndex[iRecord], ',', 1), iErrors, iErrorCode);
-          Val(GetField(sl.ValueFromIndex[iRecord], ',', 2), iWarnings, iErrorCode);
-          Val(GetField(sl.ValueFromIndex[iRecord], ',', 3), iHints, iErrorCode);
-          Val(GetField(sl.ValueFromIndex[iRecord], ',', 4), iConflicts, iErrorCode);
-          Val(GetField(sl.ValueFromIndex[iRecord], ',', 5), iRootPath, iErrorCode);
-          FParseRecords.Add(
-            TParseRecord.Create(
-              strFileName,
-              Copy(strFileName, 1, iRootPath),
-              iErrors,
-              iWarnings,
-              iHints,
-              iConflicts
-            )
-          );
-          If iRecord Mod 10 = 0 Then
-            FProgressForm.UpdateProgress(iRecord, strFileName);
-        End;
-    Finally
-      FProgressForm.Hide;
-    End;
+    recWndPlmt.Length := SizeOf(TWindowPlacement);
+    GetWindowPlacement(Handle, @recWndPlmt);
+    iniFile.WriteInteger('Position', 'Top', recWndPlmt.rcNormalPosition.Top);
+    iniFile.WriteInteger('Position', 'Left', recWndPlmt.rcNormalPosition.Left);
+    iniFile.WriteInteger('Position', 'Height',
+      recWndPlmt.rcNormalPosition.Bottom - recWndPlmt.rcNormalPosition.Top);
+    iniFile.WriteInteger('Position', 'Width',
+      recWndPlmt.rcNormalPosition.Right - recWndPlmt.rcNormalPosition.Left);
+    iniFile.WriteInteger('Position', 'WindowState', Integer(WindowState));
+    iniFile.WriteInteger('Position', 'FileSplitter', lvFileList.Width);
+    iniFile.WriteBool('ZipFiles', 'Recuse', FRecurseZipFiles);
+    iniFile.WriteInteger('Columns', '1', lvFileList.Columns[0].Width);
+    iniFile.WriteInteger('Columns', '2', lvFileList.Columns[1].Width);
+    iniFile.WriteInteger('Columns', '3', lvFileList.Columns[2].Width);
+    iniFile.WriteInteger('Columns', '4', lvFileList.Columns[3].Width);
+    iniFile.WriteInteger('Columns', '5', lvFileList.Columns[4].Width);
+    iniFile.WriteInteger('Position', 'Splitter', pnlModuleExplorer.Width);
+    iniFile.EraseSection('Folders');
+    iniFile.EraseSection('Folders.Enabled');
+    For i := 0 To FFolders.Count - 1 Do
+      Begin
+        iniFile.WriteString('Folders', FFolders.Names[i], FFolders.ValueFromIndex[i]);
+        iniFile.WriteBool('Folders.Enabled', FFolders.Names[i],
+          Boolean(Integer(FFolders.Objects[i])));
+      End;
+    iniFile.EraseSection('ExcludedFiles');
+    For i := 0 To FFileExcludeList.Count - 1 Do
+      iniFile.WriteString('ExcludedFiles', Format('File%d', [i]), FFileExcludeList[i]);
+    iniFile.WriteInteger('Setup', 'Selection', lvFileList.ItemIndex);
+    iniFile.WriteBool('Setup', 'Recurse', actFileRecurseFolders.Checked);
+    iniFile.WriteBool('Setup', 'Errors', actViewErrors.Checked);
+    iniFile.WriteBool('Setup', 'Warnings', actViewWarnings.Checked);
+    iniFile.WriteBool('Setup', 'Hints', actViewHints.Checked);
+    iniFile.WriteBool('Setup', 'Conflicts', actViewDocConflicts.Checked);
+    iniFile.WriteInteger('Setup', 'SelectedItem', lvFileList.ItemIndex);
+    SaveHighlighterToINIFile(iniFile, FSynPasSyn);
+    SaveHighlighterToINIFile(iniFile, FSynVBSyn);
+    SaveHighlighterToINIFile(iniFile, FSynCPPSyn);
+    SaveHighlighterToINIFile(iniFile, FSynXMLSyn);
+    SaveHighlighterToINIFile(iniFile, FSynDFMSyn);
+    SaveHighlighterToINIFile(iniFile, FSynINISyn);
+    iniFile.WriteString('Setup', 'VCL Style', TStyleManager.ActiveStyle.Name);
+    iniFile.UpdateFile;
   Finally
-    sl.Free;
+    iniFile.Free;
   End;
 End;
 
 (**
 
-  This method loads the applications settings from an INI file.
+  This is an on mouse down event handler for the statusbar control.
 
   @precon  None.
-  @postcon Loads the applications settings from an INI file.
+  @postcon Displays a context menu for the VCL Themes that are available.
+
+  @nocheck HardCodedInteger
+
+  @param   Sender as a TObject
+  @param   Button as a TMouseButton
+  @param   Shift  as a TShiftState
+  @param   X      as an Integer
+  @param   Y      as an Integer
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.LoadSettings;
+Procedure TfrmBrowseAndDocItTestForm.sbrStatusBarMouseDown(Sender: TObject; Button: TMouseButton; Shift:
+  TShiftState; X, Y: Integer);
 
 Var
-  i      : Integer;
-  sl     : TStringList;
-  iniFile: TMemIniFile;
+  iPanel: Integer;
+  P: TStatusPanel;
+  iLeft: Integer;
+  Pt: TPoint;
 
 Begin
-  iniFile := TMemIniFile.Create(FINIFileName);
-  With iniFile Do
-    Try
-      Top         := ReadInteger('Position', 'Top', Top);
-      Left        := ReadInteger('Position', 'Left', Left);
-      Height      := ReadInteger('Position', 'Height', Height);
-      Width       := ReadInteger('Position', 'Width', Width);
-      FRecurseZipFiles := ReadBool('ZipFiles', 'Recuse', False);
-      WindowState := TWindowState(ReadInteger('Position', 'WindowState',
-        Integer(wsNormal)));
-      lvFileList.Width := ReadInteger('Position', 'FileSplitter', lvFileList.Width);
-      lvFileList.Columns[0].Width := ReadInteger('Columns', '1',
-        lvFileList.Columns[0].Width);
-      lvFileList.Columns[1].Width := ReadInteger('Columns', '2',
-        lvFileList.Columns[1].Width);
-      lvFileList.Columns[2].Width := ReadInteger('Columns', '3',
-        lvFileList.Columns[2].Width);
-      lvFileList.Columns[3].Width := ReadInteger('Columns', '4',
-        lvFileList.Columns[3].Width);
-      lvFileList.Columns[4].Width := ReadInteger('Columns', '5',
-        lvFileList.Columns[4].Width);
-      pnlModuleExplorer.Width := ReadInteger('Position', 'Splitter',
-        pnlModuleExplorer.Width);
-      sl := TStringList.Create;
-      Try
-        ReadSection('Folders', sl);
-        For i := 0 To sl.Count - 1 Do
-          FFolders.AddObject(Format('%s=%s', [sl[i],
-            ReadString('Folders', sl[i], '')]),
-            TObject(ReadBool('Folders.Enabled', sl[i], False)));
-        ReadSection('ExcludedFiles', sl);
-        For i := 0 To sl.Count - 1 Do
-          FFileExcludeList.Add(ReadString('ExcludedFiles', sl[i], ''));
-      Finally
-        sl.Free;
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'sbrStatusbarMouseDown', tmoTiming); {$ENDIF}
+  iLeft := 0;
+  If (Shift = [ssRight]) And (mbRight = Button) Then
+    For iPanel := 0 To sbrStatusBar.Panels.Count - 1 Do
+      Begin
+        P := sbrStatusBar.Panels[iPanel];
+        Pt := Point(X, Y);
+        Pt := sbrStatusBar.ClientToScreen(Pt);
+        If (X >= iLeft) And (X <= iLeft + P.Width) Then
+          Begin
+            Case iPanel Of
+              4: ShowVCLThemePopup(Pt);
+            End;
+            Break;
+          End;
+        Inc(iLeft, P.Width);
       End;
-      i                             := ReadInteger('Setup', 'Selection', 0);
-      actFileRecurseFolders.Checked := ReadBool('Setup', 'Recurse', False);
-      actViewErrors.Checked         := ReadBool('Setup', 'Errors', False);
-      actViewWarnings.Checked       := ReadBool('Setup', 'Warnings', False);
-      actViewHints.Checked          := ReadBool('Setup', 'Hints', False);
-      actViewDocConflicts.Checked   := ReadBool('Setup', 'Conflicts', False);
-      If lvFileList.Items.Count > i Then
-        lvFileList.ItemIndex := i;
-      FIndex                 := ReadInteger('Setup', 'SelectedItem', -1);
-      LoadHighlighterFromINIFile(iniFile, FSynPasSyn);
-      LoadHighlighterFromINIFile(iniFile, FSynVBSyn);
-      LoadHighlighterFromINIFile(iniFile, FSynCPPSyn);
-      LoadHighlighterFromINIFile(iniFile, FSynXMLSyn);
-      LoadHighlighterFromINIFile(iniFile, FSynDFMSyn);
-      LoadHighlighterFromINIFile(iniFile, FSynINISyn);
-    Finally
-      Free;
-    End;
 End;
 
 (**
@@ -1622,21 +1768,20 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.SetFileName(Const Value: String);
 
-Const
-  strMsg : String = 'The file "%s" has changed.'#13#10'Do you want to save the changes?';
+ResourceString
+  strMsg = 'The file "%s" has changed.'#13#10'Do you want to save the changes?';
+  
 Var
   strExt       : String;
-  Z            : TZipForge;
-  strSource    : String;
+  {: @debug strSource    : String;
   strFileName  : String;
-  iPos         : Integer;
+  iPos         : Integer; }
 
 Begin
   If FSynEdit.Modified Then
     Case MessageDlg(Format(strMsg, [FFilename]), mtConfirmation, [mbYes, mbNo,
       mbCancel], 0) Of
       mrYes: FSynEdit.Lines.SaveToFile(FFileName);
-      mrNo: ;
       mrCancel: Abort;
     End;
   FFileName := Value;
@@ -1645,7 +1790,7 @@ Begin
     Begin
       FSynEdit.Lines.LoadFromFile(FFileName);
       FSynEdit.ReadOnly := (GetFileAttributes(PChar(FFileName)) And FILE_ATTRIBUTE_READONLY > 0)
-    End Else
+    End {: @debug Else
     Begin
       Z := TZipForge.Create(Nil);
       Try
@@ -1663,7 +1808,7 @@ Begin
       Finally
         Z.Free;
       End;
-    End;
+    End};
   FSynEdit.Modified := False;
   strExt            := LowerCase(ExtractFileExt(FFileName));
   If IsKeyWord(strExt, ['.dpk', '.dpr', '.pas']) Then
@@ -1700,6 +1845,82 @@ End;
 
 (**
 
+  This is an on click event handler for the Tokens button.
+
+  @precon  None.
+  @postcon Displays a form showing the tokens from the current file.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.ShowTokensClick(Sender: TObject);
+
+Var
+  M: TBaseLanguageModule;
+
+Begin
+  M := TBADIDispatcher.BADIDispatcher.Dispatcher(FSynEdit.Text, FileName, True,
+    [moParse, moCheckForDocumentConflicts]);
+  If M <> Nil Then
+    Try
+      TfrmTokenForm.Execute(M);
+    Finally
+      M.Free;
+    End;
+End;
+
+Procedure TfrmBrowseAndDocItTestForm.ShowVCLThemePopup(Const Pt: TPoint);
+
+Var
+  astrNames : TArray<String>;
+  iName: Integer;
+  MenuItem : TMenuItem;
+  Names : TList<TNameIndexRec>;
+  
+begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ShowVCLThemePopup', tmoTiming);{$ENDIF}
+  pmStatusbar.Items.Clear;
+  astrNames := TStyleManager.StyleNames;
+  Names := TList<TNameIndexRec>.Create(TNameIndexComparer.Create);
+  Try
+    For iName := Low(astrNames) To High(astrNames) Do
+      Names.Add(TNameIndexRec.Create(astrNames[iName], iName));
+    Names.Sort;
+    For iName := 0 To Names.Count - 1 Do
+      Begin
+        MenuItem := TMenuItem.Create(Self);
+        MenuItem.Caption := Names[iName].FName;
+        MenuItem.Tag := Names[iName].FIndex;
+        MenuItem.OnClick := VCLThemeClick;
+        pmStatusbar.Items.Add(MenuItem);
+      End;
+    pmStatusbar.Popup(Pt.X, Pt.Y);
+  Finally
+    Names.Free;
+  End;
+End;
+
+(**
+
+  This is an on click event handler for the Checkbox1 control.
+
+  @precon  None
+  @postcon Displays or hides the special character markers in the SynEdit1
+           control.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.SpecialCharactersClick(Sender: TObject);
+Begin
+  If actViewSpecialCharacters.Checked Then
+    FSynEdit.Options := FSynEdit.Options + [eoShowSpecialChars]
+  Else
+    FSynEdit.Options := FSynEdit.Options - [eoShowSpecialChars];
+End;
+
+(**
+
   This is an on change event handler for the SynEdit1 control.
 
   @precon  None.
@@ -1721,16 +1942,20 @@ End;
   @precon  None.
   @postcon Updates the top panels with the cursor position.
 
+  @nocheck HardCodedString HardCodedInteger
+
   @param   Sender  as a TObject
   @param   Changes as a TSynStatusChanges
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject;
-  Changes: TSynStatusChanges);
+Procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
+
+ResourceString
+  strLineColumn = 'Line %d, Column %d';
+
 Begin
   FLastEdit               := GetTickCount;
-  sbrStatusBar.Panels[4].Text := Format('Line %d, Column %d',
-    [FSynEdit.CaretY, FSynEdit.CaretX]);
+  sbrStatusBar.Panels[4].Text := Format(strLineColumn, [FSynEdit.CaretY, FSynEdit.CaretX]);
 End;
 
 (**
@@ -1763,42 +1988,12 @@ End;
 
 (**
 
-  This is a check button change event handler for all the error, hint, etc
-  checkboxes.
-
-  @precon  None.
-  @postcon Populates the list view.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.FilterChange(Sender: TObject);
-Begin
-  PopulateListView;
-End;
-
-(**
-
-  This method focuses the editor when the focus event is fired.
-
-  @precon  None.
-  @postcon Focuses the editor when the focus event is fired.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TfrmBrowseAndDocItTestForm.Focus(Sender: TObject);
-
-Begin
-  FSynEdit.SetFocus;
-End;
-
-(**
-
   This method updates the statusbar with the current number of errors, warnings, etc.
 
   @precon  None.
   @postcon Teh status bar is updated.
+
+  @nocheck HardCodedString HardCodedInteger
 
 **)
 Procedure TfrmBrowseAndDocItTestForm.UpdateStatusbar;
@@ -1827,6 +2022,33 @@ Begin
   sbrStatusBar.Panels[3].Text := Format('%1.0n Errors', [Int(iErrors)]);
 End;
 
+(**
+
+  This method applies the select VCL style from the context menu.
+
+  @precon  None.
+  @postcon The VCL style selected is applied.
+
+  @nocheck HardCodedInteger
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.VCLThemeClick(Sender: TObject);
+
+Var
+  MI : TMenuItem;
+  
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'VCLThemeClick', tmoTiming);{$ENDIF}
+  If Sender Is TMenuItem Then
+    Begin
+      MI := Sender As TMenuItem;
+      TStyleManager.TrySetStyle(TStyleManager.StyleNames[MI.Tag]);
+      sbrStatusBar.Panels[4].Text := TStyleManager.ActiveStyle.Name;
+    End;
+End;
+
 { TParseRecord }
 
 (**
@@ -1844,7 +2066,7 @@ End;
   @param   iConflicts  as an Integer
 
 **)
-Constructor TParseRecord.Create(Const strFileName, strPathRoot: String; iErrors,
+Constructor TParseRecord.Create(Const strFileName, strPathRoot: String; Const iErrors,
   iWarnings, iHints, iConflicts: Integer);
 
 Begin
@@ -1854,6 +2076,42 @@ Begin
   FWarnings  := iWarnings;
   FHints     := iHints;
   FConflicts := iConflicts;
+End;
+
+(**
+
+  A constructor for the TGENameIndexRec class.
+
+  @precon  None.
+  @postcon Initialises the record.
+
+  @param   strName as a String as a constant
+  @param   iIndex  as an Integer as a constant
+
+**)
+Constructor TfrmBrowseAndDocItTestForm.TNameIndexRec.Create(Const strName: String; Const iIndex: Integer); //FI:W525
+
+Begin
+  FName := strName;
+  FIndex := iIndex;
+End;
+
+(**
+
+  This is an overridden Ciompare method of the IComparer interface.
+
+  @precon  None.
+  @postcon This method sorts the TGENameIndexRec records by their FName field.
+
+  @param   Left  as a TGENameIndexRec as a constant
+  @param   Right as a TGENameIndexRec as a constant
+  @return  an Integer
+
+**)
+Function TfrmBrowseAndDocItTestForm.TNameIndexComparer.Compare(Const Left, Right: TNameIndexRec): Integer;
+
+Begin
+  Result := CompareText(Left.FName, Right.FName);
 End;
 
 End.

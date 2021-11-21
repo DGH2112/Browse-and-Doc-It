@@ -1,18 +1,18 @@
 (**
 
   This module contains a class which represents the Browse and Doc It general Options as
-  a frame that can be inserted into a form or the IDEs main optiosn dialogue.
+  a frame that can be inserted into a form or the IDEs main options dialogue.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,6 +60,10 @@ Type
     edtManagedNodesLife: TEdit;
     udManagedNodesLife: TUpDown;
     vstGeneralOptions: TVirtualStringTree;
+    lblModsuleDateFmt: TLabel;
+    edtModuleDateFmt: TEdit;
+    lblModuleVersionIncrement: TLabel;
+    edtModuleVerIncrement: TEdit;
     procedure vstGeneralOptionsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure vstGeneralOptionsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
@@ -139,6 +143,8 @@ Begin
   vstGeneralOptions.FullExpand();
   udUpdateInterval.Position := TBADIOptions.BADIOptions.UpdateInterval;
   udManagedNodesLife.Position := TBADIOptions.BADIOptions.ManagedNodesLife;
+  edtModuleDateFmt.Text := TBADIOptions.BADIOptions.ModuleDateFmt;
+  edtModuleVerIncrement.Text := Format('%1.6f', [TBADIOptions.BADIOptions.ModuleVersionIncrement]);
 End;
 
 (**
@@ -154,6 +160,8 @@ Procedure TfmBADIGeneralOptions.SaveSettings;
 Var
   Node: PVirtualNode;
   NodeData : PBADIGeneralOpsRec;
+  dblIncrement : Double;
+  iErrorCode : Integer;
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SaveSettings', tmoTiming);{$ENDIF}
@@ -170,12 +178,16 @@ Begin
     End;
   TBADIOptions.BADIOptions.UpdateInterval := udUpdateInterval.Position;
   TBADIOptions.BADIOptions.ManagedNodesLife := udManagedNodesLife.Position;
+  TBADIOptions.BADIOptions.ModuleDateFmt := edtModuleDateFmt.Text;
+  Val(edtModuleVerIncrement.Text, dblIncrement, iErrorCode);
+  If iErrorCode = 0 Then
+    TBADIOptions.BADIOptions.ModuleVersionIncrement := dblIncrement;
   TBADIOptions.BADIOptions.RequiresIDEEditorColoursUpdate;
 End;
 
 (**
 
-  This is an on free node event handler for the gernal options treeview.
+  This is an on free node event handler for the general options treeview.
 
   @precon  None.
   @postcon Ensures that the strings are freed.
@@ -196,7 +208,7 @@ End;
 
 (**
 
-  This is an on get text event handler for the generla options treeview.
+  This is an on get text event handler for the general options treeview.
 
   @precon  None.
   @postcon Returned the text from the node data.
@@ -221,7 +233,7 @@ End;
 
 (**
 
-  This is an on paint text event handler for the general optins treeview.
+  This is an on paint text event handler for the general option treeview.
 
   @precon  None.
   @postcon Forces the group headings to be bold.

@@ -3,15 +3,15 @@
   This module contains a class to represent a Backus-Naur comment.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.048
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,11 +40,13 @@ Type
   (** A pascal specific implementation of comments. **)
   TBackusNaurComment = Class(TComment)
   Public
-    Class Function CreateComment(Const strComment: String; Const iLine,
-      iCol: Integer): TComment; Override;
+    Class Function CreateComment(Const strComment: String; Const iLine, iCol : Integer): TComment; Override;
   End;
 
 Implementation
+
+Uses
+  BADI.Types;
 
 (**
 
@@ -61,8 +63,7 @@ Implementation
   @return  a TComment
 
 **)
-Class Function TBackusNaurComment.CreateComment(Const strComment: String; Const iLine,
-  iCol: Integer): TComment;
+Class Function TBackusNaurComment.CreateComment(Const strComment: String; Const iLine, iCol : Integer): TComment;
 
 Var
   strText: String;
@@ -88,12 +89,12 @@ Begin
                   If strText[1] = ':' Then
                     Begin;
                       strText := Copy(strText, 2, Length(strText) - 1);
-                      Result := Create(strText, iLine, iCol);
+                      Result := Create(strText, iLine, iCol, 3);
                     End
                   Else If strText[1] = '*' Then
                     Begin;
                       strText := Copy(strText, 2, Length(strText) - 2);
-                      Result := Create(strText, iLine, iCol);
+                      Result := Create(strText, iLine, iCol, 3);
                     End;
                 End;
             End;

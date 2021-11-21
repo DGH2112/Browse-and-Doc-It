@@ -1,18 +1,18 @@
 (**
   
   This module contains a class which implements an INTAIDETHemingServicesNotifier so that the plug-in
-  can react to Them changes in RAD Studio 10.2.2 abd above.
+  can react to Them changes in RAD Studio 10.2.2 and above.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.004
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,9 +38,9 @@ Uses
 
 {$INCLUDE CompilerDefinitions.inc}
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Type
-  (** A class which implements the INRAIDEThemingServicesNotifier interface. **)
+  (** A class which implements the INTAIDEThemingServicesNotifier interface. **)
   TBADIIDEThemeNotifier = Class(TInterfacedObject, IUnknown, IOTANotifier,
     INTAIDEThemingServicesNotifier)
   Strict Private
@@ -58,16 +58,16 @@ Type
     Constructor Create(Const ThemeFormProc : TNotifyEvent);
     Destructor Destroy; Override;
   End;
-{$ENDIF}
+{$ENDIF RS102}
 
 Implementation
 
 {$IFDEF DEBUG}
 Uses
   CodeSiteLogging;
-{$ENDIF}
+{$ENDIF DEBUG}
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 
 (**
 
@@ -105,7 +105,7 @@ End;
   theme.
 
   @precon  None.
-  @postcon Invokes the callback so that the form using this notifier can update its theming.
+  @postcon Invokes the call back so that the form using this notifier can update its theming.
 
 **)
 Procedure TBADIIDEThemeNotifier.ChangedTheme;
@@ -132,10 +132,10 @@ End;
 
 (**
 
-  A constructor for the TBADIDIEThemeNotifier class.
+  A constructor for the TBADIIDEThemeNotifier class.
 
   @precon  None.
-  @postcon Stores a reference to the given callback method to later use.
+  @postcon Stores a reference to the given call back method to later use.
 
   @param   ThemeFormProc as a TNotifyEvent as a constant
 
@@ -191,7 +191,7 @@ Procedure TBADIIDEThemeNotifier.Modified;
 
 Begin
 End;
-{$ENDIF}
+{$ENDIF RS102}
 
 End.
 

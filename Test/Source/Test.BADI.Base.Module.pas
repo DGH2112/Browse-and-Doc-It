@@ -3,8 +3,10 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.053
+  @Date    08 May 2021
+
+  @nochecks
 
   @license
 
@@ -100,7 +102,9 @@ type
       Const iHints : Integer = 0;
       Const iDocConflicts : Integer = 0;
       Const iChecks : Integer = 0;
-      Const iMetrics : Integer = 0);
+      Const iMetrics : Integer = 0;
+      Const strTestName : String = ''
+    );
   Published
   End;
 
@@ -153,7 +157,7 @@ type
     Property CompilerDefines;
     Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
-    procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+    procedure ProcessCompilerDirective; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
   End;
@@ -333,7 +337,7 @@ function TTestBaseLanguageModule.Directives: TKeyWords;
 begin
 end;
 
-procedure TTestBaseLanguageModule.ProcessCompilerDirective(var iSkip: Integer);
+procedure TTestBaseLanguageModule.ProcessCompilerDirective;
 begin
 end;
 
@@ -343,7 +347,9 @@ Procedure TExtendedTestCase.TestGrammarForErrors(Const Parser : TBaseLanguageMod
   Const strTemplate, strInterface, strImplementation: String; Const TestTypes : TTestTypes;
   Const strCheckValues : Array Of String; Const iErrors : Integer = 0; Const iWarnings : Integer = 0;
   Const iHints : Integer = 0; Const iDocConflicts : Integer = 0; Const iChecks : Integer = 0;
-  Const iMetrics : Integer = 0);
+  Const iMetrics : Integer = 0;
+  Const strTestName : String = ''
+);
 
 Const
   cDelimiter : Char = '\';
@@ -389,20 +395,18 @@ Begin
   P := Parser.CreateParser(FSource.Text, 'TestSource.pas', False, [moParse]);
   Try
     If ttErrors In TestTypes Then
-      CheckEquals(iErrors, P.HeadingCount(strErrors), 'ERRORS:'#13#10 + P.FirstError(FSource));
+      CheckEquals(iErrors, P.HeadingCount(strErrors), strTestName + '.ERRORS:'#13#10 + P.FirstError(FSource));
     If ttWarnings In TestTypes Then
-      CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS:'#13#10 + P.FirstWarning(FSource));
+      CheckEquals(iWarnings, P.HeadingCount(strWarnings), strTestName + '.WARNINGS:'#13#10 + P.FirstWarning(FSource));
     If ttHints In TestTypes Then
-      CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS:'#13#10 + P.FirstHint(Fsource));
+      CheckEquals(iHints, P.HeadingCount(strHints), strTestName + '.HINTS:'#13#10 + P.FirstHint(Fsource));
     If ttDocConflicts In TestTypes Then
-      CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS:'#13#10 +
+      CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), strTestName + '.DOCCONFLICTS:'#13#10 +
         P.FirstDocConflict);
     If ttChecks In TestTypes Then
-      CheckEquals(iChecks, P.HeadingCount(strChecks), 'CHECKS:'#13#10 +
-        P.FirstCheck);
+      CheckEquals(iChecks, P.HeadingCount(strChecks), strTestName + '.CHECKS:'#13#10 + P.FirstCheck);
     If ttMetrics In TestTypes Then
-      CheckEquals(iMetrics, P.HeadingCount(strMetrics), 'METRICS:'#1#10 +
-        P.FirstMetric);
+      CheckEquals(iMetrics, P.HeadingCount(strMetrics), strTestName + '.METRICS:'#13#10 + P.FirstMetric);
     For iCheck := Low(strCheckValues) to High(strCheckValues) Do
       If strCheckValues[iCheck] <> '' Then
         Begin
@@ -413,25 +417,25 @@ Begin
               strValue := Copy(strCheckValue, 1, Pos(cDelimiter, strCheckValue) - 1);
               Delete(strCheckValue, 1, Pos(cDelimiter, strCheckValue));
               U := SearchForElement(T, strValue);
-              Check(U <> Nil, Format('%d.2) %s not found (found %s): %s', [Succ(iCheck), strValue, GetElements(U, T), strCheckValues[iCheck]]));
+              Check(U <> Nil, Format('%s.%d.2) %s not found (found %s): %s', [strTestName, Succ(iCheck), strValue, GetElements(U, T), strCheckValues[iCheck]]));
               T := U;
             End;
-          Check(T.ElementCount > 0, Format('%d.3) Element Count: %s', [Succ(iCheck), strCheckValue]));
+          Check(T.ElementCount > 0, Format('%s.%d.3) Element Count: %s', [strTestName, Succ(iCheck), strCheckValue]));
           i := Pos('|', strCheckValue);
-          Check(i > 0, Format('%d.4) Cannot find KEY to search for: %s', [Succ(iCheck), strCheckValue]));
+          Check(i > 0, Format('%s.%d.4) Cannot find KEY to search for: %s', [strTestName, Succ(iCheck), strCheckValue]));
           strKey := Copy(strCheckvalue, 1, i - 1);
           Delete(strCheckValue, 1, i);
           i := Pos('|', strCheckValue);
-          Check(i > 0, Format('%d.5) Cannot get scope: %s', [Succ(iCheck), strCheckvalue]));
+          Check(i > 0, Format('%s.%d.5) Cannot get scope: %s', [strTestName, Succ(iCheck), strCheckvalue]));
           strValueScope := Copy(strCheckValue, i + 1, Length(strCheckValue) - i);
           Delete(strCheckValue, i, Length(strCheckValue) - (i - 1));
 
           U := SearchForElement(T, strKey);
-          Check(U <> Nil, Format('%d.6) Cannot find KEY to check (%s): %s', [Succ(iCheck), GetElements(U, T), strCheckValues[iCheck]]));
-          CheckEquals(strCheckValue, U.AsString(True, False), Format('%d.7) Value check failed (%s, %s): ', [Succ(iCheck), U.ClassName, strCheckValues[iCheck]]));
-          CheckEquals(strValueScope, GetEnumName(TypeInfo(TScope), Ord(U.Scope)), Format('%d.8) Incorrect Scope: %s', [Succ(iCheck), strCheckValues[iCheck]]));
+          Check(U <> Nil, Format('%s.%d.6) Cannot find KEY to check (%s): %s', [strTestName, Succ(iCheck), GetElements(U, T), strCheckValues[iCheck]]));
+          CheckEquals(strCheckValue, U.AsString(True, False), Format('%s.%d.7) Value check failed (%s, %s): ', [strTestName, Succ(iCheck), U.ClassName, strCheckValues[iCheck]]));
+          CheckEquals(strValueScope, GetEnumName(TypeInfo(TScope), Ord(U.Scope)), Format('%s.%d.8) Incorrect Scope: %s', [strTestName, Succ(iCheck), strCheckValues[iCheck]]));
         End Else
-          Check(strCheckValue <> '', Format('%d.1) strCheckValue is NULL!', [Succ(iCheck)]));
+          Check(strCheckValue <> '', Format('%s.%d.1) strCheckValue is NULL!', [strTestName, Succ(iCheck)]));
   Finally
     P.Free;
   End;
@@ -674,14 +678,14 @@ end;
 
 procedure TestTBaseLanguageModule.TestBodyComment;
 begin
-  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0));
+  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0, 0));
   CheckEquals('Hello.', FBaseLanguageModule.BodyComment[0].AsString(99, False));
 end;
 
 procedure TestTBaseLanguageModule.TestBodyCommentCount;
 begin
   CheckEquals(0, FBaseLanguageModule.BodyCommentCount);
-  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0));
+  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0, 0));
   CheckEquals(1, FBaseLanguageModule.BodyCommentCount);
 end;
 
@@ -698,7 +702,7 @@ begin
   FBaseLanguageModule.CheckDocumentation(boolCascade);
   Checkequals('1) This module has no document comment.', FBaseLanguageModule.DocConflict(1));
   FBaseLanguageModule.DeleteDocumentConflicts;
-  C := TComment.Create('This is a description.', 0, 0);
+  C := TComment.Create('This is a description.', 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);
@@ -709,7 +713,7 @@ begin
   End;
   FBaseLanguageModule.DeleteDocumentConflicts;
   C := TComment.Create('This is a description.'#13#10 +
-    '@date ' + FormatDateTime('dd mmm yyyy', Now - 7), 0, 0);
+    '@date ' + FormatDateTime('dd mmm yyyy', Now - 7), 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);
@@ -721,7 +725,7 @@ begin
   End;
   FBaseLanguageModule.DeleteDocumentConflicts;
   C := TComment.Create('This is a description.'#13#10 +
-    '@date ' + FormatDateTime('dd mmm yyyy', Now), 0, 0);
+    '@date ' + FormatDateTime('dd mmm yyyy', Now), 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);
@@ -732,7 +736,7 @@ begin
   FBaseLanguageModule.DeleteDocumentConflicts;
   C := TComment.Create('This is a description.'#13#10 +
     '@date ' + FormatDateTime('dd mmm yyyy', Now) +#13#10+
-    '@version 1.0', 0, 0);
+    '@version 1.0', 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);
@@ -742,7 +746,7 @@ begin
   End;
   FBaseLanguageModule.DeleteDocumentConflicts;
   C := TComment.Create('This is a description.'#13#10 +
-    '@date 32 jan 2008', 0, 0);
+    '@date 32 jan 2008', 0, 0, 0);
   Try
     FBaseLanguageModule.Comment := C;
     FBaseLanguageModule.CheckDocumentation(boolCascade);

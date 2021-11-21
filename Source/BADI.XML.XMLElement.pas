@@ -3,15 +3,15 @@
   This module contains a class to represent an XML Element.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ End;
   This is a constructor for the TXMLElement class.
 
   @precon  None.
-  @postcon Creates an xml element with a unique name derived from the given name, line number and column
+  @postcon Creates an XML element with a unique name derived from the given name, line number and column
            number.
 
   @param   strName     as a String as a constant

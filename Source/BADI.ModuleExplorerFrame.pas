@@ -1,18 +1,18 @@
 ﻿(**
 
   This module contains a frame which holds all the functionality of the
-  module browser so that it can be independant of the application specifics.
+  module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 7.193
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-  @nometric UnsortedModule
 
 **)
 Unit BADI.ModuleExplorerFrame;
@@ -43,27 +41,33 @@ Uses
   Graphics,
   Controls,
   Forms,
+  Menus,
   ImgList,
   ComCtrls,
   Contnrs,
-  BADI.Base.Module,
+  Generics.Collections,
   ActnList,
   ToolWin,
   VirtualTrees,
   StdCtrls,
+  ExtCtrls,
   RegularExpressions,
+  BADI.Base.Module,
   BADI.Interfaces,
   BADI.Comment,
   BADI.ElementContainer,
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types, System.Actions, System.ImageList;
+  BADI.Types;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
       current module. **)
   TSelectionChange = Procedure(Const iIdentLine, iIdentCol, iCommentLine : Integer) Of Object;
+
+  (** This is a method signature for getting IDE errors for the module explorer to display. **)
+  TBADIIDEErrors = Procedure(Const slErrors : TStringList) Of Object;
 
   (** This is a frame class to contain all the functionality of the module
       explorer so that it can be placed inside any container required and
@@ -71,7 +75,6 @@ Type
       application specifics. **)
   TframeModuleExplorer = class(TFrame)
     stbStatusBar: TStatusBar;
-    ilScopeImages: TImageList;
     tbrExplorerScope: TToolBar;
     ilToolbar: TImageList;
     alToolbar: TActionList;
@@ -110,11 +113,22 @@ Type
     actConstants: TAction;
     actVariables: TAction;
     actTypes: TAction;
-    edtExplorerFilter: TEdit;
     btnChecks: TToolButton;
     actChecks: TAction;
     actMetrics: TAction;
     tbtnMetrics: TToolButton;
+    tmFilter: TTimer;
+    pmExplorerContext: TPopupMenu;
+    actAddToLocalDictionary: TAction;
+    actIgnoreSpellingMistake: TAction;
+    AddtoDictionary1: TMenuItem;
+    IgnoreSpellingMistake1: TMenuItem;
+    actAddToProjectDictionary: TAction;
+    AddtoProjectDictionary1: TMenuItem;
+    procedure actAddToLocalDictionaryExecute(Sender: TObject);
+    procedure actAddToProjectDictionaryExecute(Sender: TObject);
+    procedure actSpellingUpdate(Sender: TObject);
+    procedure actIgnoreSpellingMistakeExecute(Sender: TObject);
     Procedure actLocalUpdate(Sender: TObject);
     Procedure actLocalExecute(Sender: TObject);
     Procedure FilterChange;
@@ -123,6 +137,7 @@ Type
     Procedure edtExplorerFilterMouseActivate(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y, HitTest: Integer; Var MouseActivate: TMouseActivate);
     Procedure edtExplorerFilterKeyPress(Sender: TObject; Var Key: Char);
+    procedure tmFilterTimer(Sender: TObject);
   Strict Private
     Type
       (** This record contains information about the special tag nodes. **)
@@ -134,6 +149,7 @@ Type
         FFontStyles    : TFontStyles;
         FFontColour    : TColor;
         FBackColour    : TColor;
+        FImageIndex    : TBADIImageIndex;
       End;
       (** An enumerate to define the position of the found text when filtering. **)
       TMatchType = (mtNone, mtStart, mtFull, mtEnd, mtMiddle);
@@ -143,7 +159,7 @@ Type
         FStart     : Integer;
         FLength    : Integer;
       End;
-      (** An enumerate to define the panels on the status bar. **)
+      (** An enumerate to define the panels on the status bar. @nohints **)
       TStatusPanelIndex = (
         spiBytes,
         spiTokens,
@@ -169,6 +185,7 @@ Type
     FRendering         : Boolean;
     FRefresh           : TNotifyEvent;
     FExplorer          : TBADIVirtualStringTree;
+    FExplorerFilter    : String;
     FFilterRegEx       : TRegEx;
     FMouseEnter        : Boolean;
     FTargetCanvas      : TCanvas;
@@ -176,6 +193,14 @@ Type
     FNodeData          : PBADITreeData;
     FTokenFontInfo     : TBADITokenFontInfoTokenSet;
     FBGColour          : TColor;
+    FFollowNode        : PVirtualNode;
+    FFiltering         : Boolean;
+    FLastFilterUpdate  : Int64;
+    FLineDocIssues     : TDictionary<Integer,IBADILineDocIssues>;
+    FDocIssueTotals    : IBADIDocIssueTotals;
+    FIDEErrors         : TBADIIDEErrors;
+  private
+    procedure DoRefresh(Sender: TObject);
   Strict Protected
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
@@ -198,8 +223,6 @@ Type
       Const Container : TElementContainer; Const iLevel : Integer);
     Procedure UpdateStatusBar(Const Module : TBaseLanguageModule);
     Procedure ManageExpandedNodes;
-    Procedure FilterProc(Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer;
-      Var Abort: Boolean);
     Procedure SetStatusPanel(Const ePanel: TStatusPanelIndex; Const strStatusBarText: String;
       Const iValue: Integer);
     Procedure CMMouseLeave(Var Msg : TMessage); Message CM_MOUSELEAVE;
@@ -237,12 +260,29 @@ Type
       Var CustomDraw: Boolean);
     Procedure tvExplorerMeasureItem(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; Var NodeHeight: Integer);
+    Procedure FocusFollowedNode;
+    Procedure tvExplorerNodeExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    Procedure SetExplorerFilter(Const strValue : String);
+    Procedure tvExplorerChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    Function  MaxLimit(Const Container: TElementContainer) : Integer;
+    Function  GetLineDocIssue(Const iLine : Integer) : IBADILineDocIssues;
+    Function  GetDocIssueTotals : IBADIDocIssueTotals;
+    Procedure LogDocIssueConflict(Const Element : TElementContainer);
+    Function  ExtractSpellingWord : String;
+    Procedure CheckForIDEErrors(Const Container : TElementContainer);
+    Function FollowMethodNodeData(Const iLine : Integer) : PBADITreeData;
+    (**
+      This property gets and set the filter text for the explorer view.
+      @precon  None.
+      @postcon Gets and set the filter text for the explorer view.
+      @return  a String
+    **)
+    Property ExplorerFilter : String Read FExplorerFilter Write SetExplorerFilter;
   Public
-    { Public declarations }
-    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
-    procedure RenderModule(Const Module : TBaseLanguageModule);
+    Procedure RenderModule(Const Module : TBaseLanguageModule);
+    Procedure FollowEditorCursor(Const iLine : Integer);
     (**
       This is an event for the selection change in the browser tree.
       @precon  None.
@@ -265,17 +305,43 @@ Type
     **)
     Property OnRefresh : TNotifyEvent Read FRefresh Write FRefresh;
     (**
-      This property exposes the virtual tree view to ouside sources.
+      This is an event handler for the IDE Errors.
       @precon  None.
-      @postcon Exposes the virtual tree view to ouside sources.
+      @postcon Implement a event handler for add errors to the module explorer.
+      @return  a TBADIIDEErrors
+    **)
+    Property OnIDEErrors : TBADIIDEErrors Read FIDEErrors Write FIDEErrors;
+    (**
+      This property exposes the virtual tree view to outside sources.
+      @precon  None.
+      @postcon Exposes the virtual tree view to outside sources.
       @return  a TBADIVirtualStringTree
     **)
     Property Explorer : TBADIVirtualStringTree Read FExplorer;
+    (**
+      This property returns the limit types associated with the given line number.
+      @precon  None.
+      @postcon Returns the limit types associated with the given line number.
+      @param   iLine as an Integer as a constant
+      @return  a IBADILineDocIssues
+    **)
+    Property LineDocIssues[Const iLine : Integer] : IBADILineDocIssues Read GetLineDocIssue;
+    (**
+      This property returns the document issue totals for the parsed module.
+      @precon  None.
+      @postcon Returns the document issue totals for the parsed module.
+      @return  an IBADIDocIssueTotals
+    **)
+    Property DocIssueTotals : IBADIDocIssueTotals Read GetDocIssueTotals;
   End;
 
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
+  SysUtils,
   Types,
   Math,
   BADI.Generic.Tokenizer,
@@ -288,7 +354,10 @@ Uses
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.ModuleExplorer.TreeNodeInfo,
-  SysUtils;
+  BADI.DocIssue,
+  BADI.LineDocIssue,
+  BADI.DocIssueTotals,
+  BADI.SpellingIssue;
 
 Resourcestring
   (** A format pattern for the bytes statusbar text. **)
@@ -319,6 +388,57 @@ Const
   iDivisor = 2;
 
 {$R *.dfm}
+
+(**
+
+  This is an on execute event handler for the Add to Dictionary action.
+
+  @precon  None.
+  @postcon Adds the selected word to the local dictionary.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actAddToLocalDictionaryExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.LocalDictionary.Add(ExtractSpellingWord);
+  DoRefresh(Sender);
+End;
+
+(**
+
+  This is an on execute event handler for the Add To Project Dictionary action.
+
+  @precon  None.
+  @postcon The selected spelling mistake is added to the project dictionary.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actAddToProjectDictionaryExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.ProjectDictionary.Add(ExtractSpellingWord);
+  DoRefresh(Sender);
+End;
+
+(**
+
+  This is an on execute event handler for the Ignore Spelling Mistake action.
+
+  @precon  None.
+  @postcon Adds the selected word to the ignore dictionary.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actIgnoreSpellingMistakeExecute(Sender: TObject);
+
+Begin
+  TBADIOptions.BADIOptions.IgnoreDictionary.Add(ExtractSpellingWord);
+  DoRefresh(Sender);
+End;
 
 (**
 
@@ -413,13 +533,12 @@ begin
       UpdateOptions(doShowUndocumentedClasses);
       UpdateOptions(doShowUndocumentedInterfaces);
     End;
-  If Assigned(FRefresh) Then
-    FRefresh(Sender);
+  DoRefresh(Sender);
 end;
 
 (**
 
-  This is an on update event handler for the sceop actions.
+  This is an on update event handler for the scope actions.
 
   @precon  None.
   @postcon Checks the action depending on the scopes in ScopesToRender.
@@ -470,6 +589,38 @@ end;
 
 (**
 
+  This is an on update event handler for the Spelling actions.
+
+  @precon  None.
+  @postcon Enables the context menus for spelling actions.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.actSpellingUpdate(Sender: TObject);
+
+Var
+  A: TAction;
+  boolEnabled : Boolean;
+  NodeData : PBADITreeData;
+
+Begin
+  If Sender Is TAction Then
+    Begin
+      A := Sender As TAction;
+      boolEnabled := A.Enabled;
+      If Assigned(FExplorer.FocusedNode) Then
+        Begin
+          NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
+          boolEnabled := (NodeData.FNodeType = ntSpellingIssue)
+        End;
+      If boolEnabled <> A.Enabled Then
+        A.Enabled := boolEnabled;
+    End;
+End;
+
+(**
+
   This method adds a node to the treeview as a child of the give node. It assigns the line, column
   and comment information to the Node.
 
@@ -493,14 +644,15 @@ Var
   NodeData : PBADITreeData;
   N : TBADITreeNodeInfo;
 
-begin
+Begin
   Result := FExplorer.AddChild(Parent);
   FExplorer.MultiLine[Result] := True;
   NodeData := FExplorer.GetNodeData(Result);
   N := TBADITreeNodeInfo.Create(strText, strName, iLevel, iImageIndex, boolTitle);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
-end;
+  FExplorer.InvalidateNode(Result); //: @note Used to recalc node height due to bug in VTV
+End;
 
 (**
 
@@ -527,9 +679,18 @@ begin
   Result := FExplorer.AddChild(Parent);
   FExplorer.MultiLine[Result] := True;
   NodeData := FExplorer.GetNodeData(Result);
+  If Element Is TDocumentConflict Then
+    NodeData.FNodeType := ntDocConflict
+  Else If Element Is TDocIssue Then
+    NodeData.FNodeType := ntDocIssue
+  Else If Element Is TBADISpellingIssue Then
+    NodeData.FNodeType := ntSpellingIssue
+  Else
+    NodeData.FNodeType := ntElement;
   N := TBADITreeNodeInfo.Create(Element, iLevel);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
+  FExplorer.InvalidateNode(Result); //: @note Used to recalc node height due to bug in VTV
 end;
 
 (**
@@ -568,6 +729,63 @@ Begin
     BackColour, Comment);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
+  FExplorer.InvalidateNode(Result); //: @note Used to recalc node height due to bug in VTV
+End;
+
+(**
+
+  This method checks the if the IDE has any error messages for the current module and adds them to the
+  list of errors.
+
+  @precon  Container must be a valid instance.
+  @postcon Any IDE errors are added to the module.
+
+  @param   Container as a TElementContainer as a constant
+
+**)
+Procedure TframeModuleExplorer.CheckForIDEErrors(Const Container: TElementContainer);
+
+Type
+  //: @nohints
+  TBADIErrorFields = (efFilename, efMessage, efLine, efColumn);
+
+ResourceString
+  strMsg = '[DCC32] %s found at line %d column %d.';
+  
+Var
+  Errors: TElementContainer;
+  sl: TStringList;
+  strError: String;
+  astrError: TArray<String>;
+
+Begin
+  Errors := Container.FindElement(strErrors);
+  If Not Assigned(Errors) And (doShowIDEErrors In TBADIOptions.BADIOPtions.Options) Then
+    If Assigned(FIDEErrors) Then
+      Begin
+        sl := TStringList.Create;
+        Try
+          FIDEErrors(sl);
+          For strError In sl Do
+            Begin
+              astrError := strError.Split(['|']);
+              Container.AddIssue(
+                Format(strMsg, [
+                  astrError[Integer(efMessage)], 
+                  astrError[Integer(efLine)].ToInteger,
+                  astrError[Integer(efColumn)].ToInteger + 1
+                ]),
+                scGlobal,
+                astrError[Integer(efLine)].ToInteger,
+                astrError[Integer(efColumn)].ToInteger + 1,
+                etError,
+                Container
+              );
+            End;
+        Finally
+          sl.Free;
+        End;
+      End;
 End;
 
 (**
@@ -624,9 +842,10 @@ begin
   FExplorer.Header.Font.Style := [];
   FExplorer.Header.MainColumn := -1;
   FExplorer.Header.Options := [hoColumnResize, hoDrag];
-  FExplorer.Images := ilScopeImages;
+  FExplorer.Images := TBADIOptions.BADIOptions.ScopeImageList;
   FExplorer.TabOrder := iTabOrder;
   FExplorer.TreeOptions.MiscOptions := FExplorer.TreeOptions.MiscOptions + [toVariableNodeHeight];
+  FExplorer.TreeOptions.SelectionOptions := FExplorer.TreeOptions.SelectionOptions + [toRightClickSelect];
   FExplorer.EmptyListMessage := strBrowseAndDocItCannotParse;
   FExplorer.OnAfterCellPaint := tvExplorerAfterCellPaint;
   FExplorer.OnBeforeItemPaint := tvExplorerBeforeItemPaint;
@@ -635,25 +854,30 @@ begin
   FExplorer.OnKeyPress := tvExplorerKeyPress;
   FExplorer.OnMeasureItem := tvExplorerMeasureItem;
   FExplorer.OnMouseMove := tvExplorerMouseMove;
+  FExplorer.OnExpanded := tvExplorerNodeExpanded;
+  FExplorer.OnCollapsed := tvExplorerNodeExpanded;
+  FExplorer.OnChange := tvExplorerChange;
+  FExplorer.PopupMenu := pmExplorerContext;
   FMouseEnter := False;
+  FFiltering := False;
   FExplorer.NodeDataSize := SizeOf(TBADITreeData);
   FINIFileName := TBADIOptions.BADIOptions.INIFileName;
   FNodeInfo := TObjectList.Create(True);
   FHintWin := TBADICustomHintWindow.Create(Self, FExplorer);
   FHintWin.Color := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours][ttExplorerHighlight].FBackColour;
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
-  edtExplorerFilter.Font.Assign(FExplorer.Font);
-  ilScopeImages.Clear;
-  LoadBADIImages(ilScopeImages);
+  FLastFilterUpdate := 0;
   FExplorer.OnGetText := tvExplorerGetText;
+  FLineDocIssues := TDictionary<Integer,IBADILineDocIssues>.Create;
+  FDocIssueTotals := TBADIDocIssueTotals.Create;
 end;
 
 (**
 
-  This method create both the todo folder node and the document conflict folders in the treeview.
+  This method create the special tags folder nodes and the document conflict folders in the treeview.
 
   @precon  None.
-  @postcon Creates the special tag noNode.
+  @postcon Creates the special tag nodes.
 
 **)
 Procedure TframeModuleExplorer.CreateSpecialTagNodes();
@@ -670,12 +894,13 @@ Begin
       FSpecialTagNodes[i].FFontStyles := TBADIOptions.BADIOptions.SpecialTags[i].FFontStyles;
       FSpecialTagNodes[i].FFontColour := TBADIOptions.BADIOptions.SpecialTags[i].FFontColour;
       FSpecialTagNodes[i].FBackColour := TBADIOptions.BADIOptions.SpecialTags[i].FBackColour;
+      FSpecialTagNodes[i].FImageIndex := TBADIOptions.BADIOptions.SpecialTags[i].FIconImage;
       FSpecialTagNodes[i].Node := AddNode(
         FModule,
         FSpecialTagNodes[i].FTagDesc,
         FSpecialTagNodes[i].FTagName,
         1,
-        BADIImageIndex(iiTodoFolder, scNone),
+        BADIImageIndex(TBADIOptions.BADIOptions.SpecialTags[i].FIconImage, scNone),
         True
       );
     End;
@@ -692,6 +917,7 @@ End;
 Destructor TframeModuleExplorer.Destroy;
 
 begin
+  FLineDocIssues.Free;
   If FModule <> Nil Then
     GetExpandedNodes(FModule);
   FExplorer.Free;
@@ -701,6 +927,23 @@ begin
   FNodeInfo.Free;
   Inherited;
 end;
+
+(**
+
+  This method refreshes the module explorer by asking for the module to be re-parsed.
+
+  @precon  None.
+  @postcon The module is re-parsed.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.DoRefresh(Sender: TObject);
+
+Begin
+  If Assigned(FRefresh) Then
+    FRefresh(Sender);
+End;
 
 (**
 
@@ -725,7 +968,7 @@ End;
 
   This method draws the icon for the current tree node.
 
-  @precon  NodeData must be the TTreeData for the current node.
+  @precon  None.
   @postcon The nodes icon is drawn.
 
   @param   R            as a TRect as a reference
@@ -736,13 +979,17 @@ Procedure TframeModuleExplorer.DrawImage(Var R : TRect);
 Begin
   R.Left := R.Left + Integer(FExplorer.Indent) + FExplorer.Margin;
   Inc(R.Top);
-  ilScopeImages.Draw(FTargetCanvas, R.Left, ((R.Bottom - R.Top) - ilScopeImages.Height) Div iDivisor,
-    FNodeData.FNode.ImageIndex);
+  FExplorer.Images.Draw(
+    FTargetCanvas,
+    R.Left,
+    ((R.Bottom - R.Top) - FExplorer.Images.Height) Div iDivisor,
+    FNodeData.FNode.ImageIndex
+  );
 End;
 
 (**
 
-  This method draws the treenode button containing the + or - signs for expanding and collapsing .
+  This method draws the tree node button containing the + or - signs for expanding and collapsing .
 
   @precon  None.
   @postcon The button is drawn.
@@ -786,8 +1033,7 @@ End;
 
   This method renders a selection rectangle around the selected note.
 
-  @precon  NodeData must be a valid pointer to a TTreeData node fo the node being rendered and sl
-           must contain the string tokens to be rendered.
+  @precon  sl must contain the string tokens to be rendered.
   @postcon The selection rectangle is rendered (accounting for extra width due to font
            preferences).
 
@@ -952,7 +1198,7 @@ End;
   This procedure draws the text on the explorer tree view.
 
   @precon  NodeData and sl must be valid instance.
-  @postcon The treenode text is drawn.
+  @postcon The tree node text is drawn.
 
   @param   sl as a TStringList as a constant
   @param   R  as a TRect as a reference
@@ -972,12 +1218,12 @@ Var
   iColour: TColor;
 
 Begin
-  R.Left := R.Left + ilScopeImages.Width + FExplorer.TextMargin;
+  R.Left := R.Left + FExplorer.Images.Width + FExplorer.TextMargin;
   iTop := R.Top;
   iLeft := R.Left + iPadding;
   iTextPos := 1;
   InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties, FBADIOptions);
-  If edtExplorerFilter.Text <> '' Then
+  If ExplorerFilter <> '' Then
     MC := FFilterRegEx.Matches(FNodeData.FNode.Text);
   For i := 0 To sl.Count - 1 Do
     Begin
@@ -988,7 +1234,7 @@ Begin
         If FTargetCanvas.Brush.Color = FBGColour Then
           FTargetCanvas.Brush.Color :=
             FTokenFontInfo[ttExplorerHighlight].FBackColour;
-      If edtExplorerFilter.Text = '' Then
+      If ExplorerFilter = '' Then
         DrawTextToCanvas(sl[i], R, iTextPos, iTop, iLeft)
       Else
         Begin
@@ -1097,7 +1343,7 @@ Begin
   Case Key Of
     #27:
       Begin
-        edtExplorerFilter.Clear;
+        ExplorerFilter := '';
         Key := #0;
       End;
   End;
@@ -1144,7 +1390,7 @@ procedure TframeModuleExplorer.ExpandNodes;
     children).
 
     @precon  None.
-    @postcon Returns true if the node text matches the requried text.
+    @postcon Returns true if the node text matches the required text.
 
     @param   strNodeText  as a String as a constant
     @param   strMatchText as a String as a constant
@@ -1244,80 +1490,80 @@ end;
 
 (**
 
+  This method extracts the spelling mistake word from the current tree node text.
+
+  @precon  The focused node is a spelling mistake.
+  @postcon The spelling mistake word is returned.
+
+  @return  a String
+
+**)
+Function TframeModuleExplorer.ExtractSpellingWord: String;
+
+Begin
+  Result := FExplorer.Text[FExplorer.FocusedNode, 0];
+  Result := Copy(Result, 1, Pos('(', Result) - 1).Trim;
+End;
+
+(**
+
   This method updates the filtering of the treeview.
 
   @precon  None.
-  @postcon The treeview filter is updated onyl showing node that match the filter text.
+  @postcon The treeview filter is updated only showing node that match the filter text.
 
 **)
 Procedure TframeModuleExplorer.FilterChange;
 
 Var
-  N : PVirtualNode;
+  N, P : PVirtualNode;
+  NodeData : PBADITreeData;
 
 Begin
-  stbStatusBar.SimplePanel := False;
   Try
-    If edtExplorerFilter.Text <> '' Then
-      FFilterRegEx := TRegEx.Create(edtExplorerFilter.Text, [roIgnoreCase, roCompiled,
-        roSingleLine]);
+    If ExplorerFilter <> '' Then
+      FFilterRegEx := TRegEx.Create(ExplorerFilter, [roIgnoreCase, roCompiled, roSingleLine]);
   Except
     On E : ERegularExpressionError Do
       Begin
         stbStatusBar.SimpleText := E.Message;
         stbStatusBar.SimplePanel := True;
+        Exit;
       End;
   End;
+  FFollowNode := Nil;
   FExplorer.BeginUpdate;
   Try
-    N := FExplorer.RootNode.FirstChild;
-    While N <> Nil Do
+    N := FExplorer.GetFirst;
+    While Assigned(N) Do
       Begin
-        FExplorer.IterateSubtree(N, FilterProc, Nil);
-        N := FExplorer.GetNextSibling(N);
+        If ExplorerFilter <> '' Then
+          Begin
+            NodeData := FExplorer.GetNodeData(N);
+            FExplorer.IsVisible[N] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
+            If FExplorer.IsVisible[N] Then
+              Begin
+                If FExplorer.FullyVisible[N] Then // Override Follow Node
+                  FFollowNode := N;
+                P := FExplorer.NodeParent[N];
+                While Assigned(P) Do
+                  Begin
+                    FExplorer.IsVisible[P] := True;
+                    P := FExplorer.NodeParent[P];
+                  End;
+              End;
+          End Else
+            FExplorer.IsVisible[N] := True;
+        N := FExplorer.GetNext(N);
       End;
   Finally
     FExplorer.EndUpdate;
   End;
-End;
-
-(**
-
-  This is a call back mechanism for the tree view in otder to determine whether a node
-  when iterated can be visible.
-
-  @precon  None.
-  @postcon Filters the visible cells in the tree view if they match the filter text.
-
-  @param   Sender as a TBaseVirtualTree
-  @param   Node   as a PVirtualNode
-  @param   Data   as a Pointer
-  @param   Abort  as a Boolean as a reference
-
-**)
-Procedure TframeModuleExplorer.FilterProc(Sender: TBaseVirtualTree; Node: PVirtualNode;
-  Data: Pointer; Var Abort: Boolean);
-
-Var
-  NodeData : PBADITreeData;
-  N : PVirtualNode;
-
-Begin
-  NodeData := Sender.GetNodeData(Node);
-  If edtExplorerFilter.Text <> '' Then
+  If Assigned(FFollowNode) Then
     Begin
-      Sender.IsVisible[Node] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
-      If Sender.IsVisible[Node] Then
-        Begin
-          N := FExplorer.NodeParent[Node];
-          While N <> Nil Do
-            Begin
-              Sender.IsVisible[N] := True;
-              N := FExplorer.NodeParent[N];
-            End;
-        End;
-    End Else
-      Sender.IsVisible[Node] := True;
+      FExplorer.FocusedNode := FFollowNode;
+      FExplorer.ScrollIntoView(FFollowNode, True);
+    End;
 End;
 
 (**
@@ -1377,6 +1623,105 @@ End;
 
 (**
 
+  This method attempts to focus the FFollowNode in the treeview.
+
+  @precon  None.
+  @postcon If the FFollowNode is not visible the first visible parent node is focused.
+
+**)
+Procedure TframeModuleExplorer.FocusFollowedNode;
+
+Var
+  Node: PVirtualNode;
+
+Begin
+  If Assigned(FFollowNode) And
+    ((FFollowNode <> Explorer.FocusedNode) Or Not Explorer.FullyVisible[Explorer.FocusedNode]) Then
+    Begin
+      Node := FFollowNode;
+      While Assigned(Node) And Not Explorer.FullyVisible[Node] Do
+        Node := Explorer.NodeParent[Node];
+      If Assigned(Node) Then
+        Begin
+          Explorer.FocusedNode := Node;
+          Explorer.ScrollIntoView(Node, True);
+        End;
+    End;
+End;
+
+(**
+
+  This method attempts to focus the node (element) which contains the cursor line provided.
+
+  @precon  None.
+  @postcon If found the elements or its first visible parent is focused.
+
+  @param   iLine as an Integer as a constant
+
+**)
+Procedure TframeModuleExplorer.FollowEditorCursor(Const iLine: Integer);
+
+Var
+  Node : PVirtualNode;
+  NodeData : PBADITreeData;
+  iNodeLine, iFollowLine : Integer;
+  
+Begin
+  If FDocIssueTotals.ContainsAny(TBADIOptions.BADIOptions.DoNotFollowEditor) Then
+    Exit;
+  iFollowLine := 0;
+  Node := Explorer.GetFirst();
+  While Assigned(Node) Do
+    Begin
+      NodeData := Explorer.GetNodeData(Node);
+      If NodeData.FNodeType = ntElement Then
+        Begin
+          iNodeLine := NodeData.FNode.Line;
+          If Assigned(NodeData.FNode.Comment) And (NodeData.FNode.Comment.Line > 0) Then
+            iNodeLine := NodeData.FNode.Comment.Line;
+          If (iLine >= iNodeLine) And (iNodeLine > iFollowLine) Then
+            Begin
+              FFollowNode := Node;
+              iFollowLine := iNodeLine;
+            End;
+        End;
+      Node := Explorer.GetNext(Node);
+    End;
+  FocusFollowedNode;
+End;
+
+Function TframeModuleExplorer.FollowMethodNodeData(Const iLine : Integer) : PBADITreeData;
+
+Var
+  iFollowLine: Integer;
+  iNodeLine: Integer;
+  Node: PVirtualNode;
+  NodeData: PBADITreeData;
+
+Begin
+  Result := Nil;
+  iFollowLine := 0;
+  Node := Explorer.GetFirst();
+  While Assigned(Node) Do
+    Begin
+      NodeData := Explorer.GetNodeData(Node);
+      If NodeData.FNodeType = ntElement Then
+        Begin
+          iNodeLine := NodeData.FNode.Line;
+          If Assigned(NodeData.FNode.Comment) And (NodeData.FNode.Comment.Line > 0) Then
+            iNodeLine := NodeData.FNode.Comment.Line;
+          If (iLine >= iNodeLine) And (iNodeLine > iFollowLine) Then
+            Begin
+              Result := NodeData;
+              iFollowLine := iNodeLine;
+            End;
+        End;
+      Node := Explorer.GetNext(Node);
+    End;
+End;
+
+(**
+
   This method sets the explorer frame as the focus when the form is activated.
 
   @precon  None.
@@ -1407,36 +1752,222 @@ end;
 **)
 procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageModule);
 
+  (**
+
+    This function attempts to find the index of the given tag name in the special tags array.
+
+    @precon  None.
+    @postcon Returns the index position of the tag in the special tags array else returns -1 if not
+             found.
+
+    @param   strTagName as a String as a constant
+    @return  an Integer
+
+  **)
+  Function FindTag(Const strTagName : String) : Integer;
+
+  Var
+    iSpecialTag: Integer;
+
+  Begin
+    Result := -1;
+    For iSpecialTag := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
+      If CompareText(strTagName, FSpecialTagNodes[iSpecialTag].FTagName) = 0 Then
+        Begin
+          Result := iSpecialTag;
+          Break;
+        End;
+  End;
+
+  (**
+
+    This procedure adds a doc issue to the module based on a line and tag record.
+
+    @precon  None.
+    @postcon A doc issue is added to the module.
+
+    @param   iLine as an Integer as a constant
+    @param   Tag   as a TSpecialTagNode as a constant
+
+  **)
+  Procedure AddDocIssueInfo(Const iLine : Integer; Const Tag : TSpecialTagNode); OverLoad;
+
+  Var
+    recDocIssueInfo : TBADIDocIssueInfo;
+    DocIssues: IBADILineDocIssues;
+  
+  Begin
+    recDocIssueInfo.FName := Tag.FTagName;
+    recDocIssueInfo.FImageIndex := Tag.FImageIndex;
+    recDocIssueInfo.FForeColour := Tag.FFontColour;
+    recDocIssueInfo.FBackColour := Tag.FBackColour;
+    recDocIssueInfo.FMessage := '';
+    If FLineDocIssues.TryGetValue(iLine, DocIssues) Then
+      DocIssues.AddIssue('@' + Tag.FTagName, recDocIssueInfo)
+    Else
+      FLineDocIssues.Add(iLine, TBADILineDocIssue.Create('@' + Tag.FTagName, recDocIssueInfo));
+  End;
+
+  (**
+
+    This procedure adds a doc issue to the module based on a line and tag name.
+
+    @precon  None.
+    @postcon A doc issue is added to the module.
+
+    @param   iLine      as an Integer as a constant
+    @param   strTagName as a String as a constant
+
+  **)
+  Procedure AddDocIssueInfo(Const iLine : Integer; Const strTagName : String); Overload;
+
+  Var
+    recDocIssueInfo : TBADIDocIssueInfo;
+    DocIssues: IBADILineDocIssues;
+  
+  Begin
+    recDocIssueInfo.FName := strTagName;
+    recDocIssueInfo.FImageIndex := iiBadTag;
+    recDocIssueInfo.FForeColour := clRed;
+    recDocIssueInfo.FBackColour := clNone;
+    recDocIssueInfo.FMessage := '';
+    If FLineDocIssues.TryGetValue(iLine, DocIssues) Then
+      DocIssues.AddIssue('@' + strTagName, recDocIssueInfo)
+    Else
+      FLineDocIssues.Add(iLine, TBADILineDocIssue.Create('@' + strTagName, recDocIssueInfo));
+  End;
+
+  (**
+
+    This procedure outputs adds Total Info record based on a tag record.
+
+    @precon  None.
+    @postcon A Total Info record is added to the module.
+
+    @param   Tag   as a TSpecialTagNode as a constant
+    @param   iLine as an Integer as a constant
+    @param   iCol  as an Integer as a constant
+
+  **)
+  Procedure AddTotalInfo(Const Tag : TSpecialTagNode; Const iLine, iCol : Integer); Overload;
+
+  Var
+    recTotalInfo : TBADITotalInfo;
+
+  Begin
+    recTotalInfo.FImageIndex := Tag.FImageIndex;
+    recTotalInfo.FForeColour := Tag.FFontColour;
+    recTotalInfo.FBackColour := Tag.FBackColour;
+    recTotalInfo.FFontStyles := Tag.FFontStyles;
+    recTotalInfo.FFirstLine := iLine;
+    recTotalInfo.FFirstCol := iCol;
+    FDocIssueTotals.IncDocIssue('@' + Tag.FTagName, recTotalInfo);
+  End;
+
+  (**
+
+    This procedure outputs adds Total Info record based on a tag name.
+
+    @precon  None.
+    @postcon A Total Info record is added to the module.
+
+    @param   strTagName as a String as a constant
+    @param   iLine      as an Integer as a constant
+    @param   iCol       as an Integer as a constant
+
+  **)
+  Procedure AddTotalInfo(Const strTagName : String; Const iLine, iCol : Integer); Overload;
+
+  Var
+    recTotalInfo : TBADITotalInfo;
+
+  Begin
+    recTotalInfo.FImageIndex := iiBadTag;
+    recTotalInfo.FForeColour := clRed;
+    recTotalInfo.FBackColour := clNone;
+    recTotalInfo.FFontStyles := [];
+    recTotalInfo.FFirstLine := iLine;
+    recTotalInfo.FFirstCol := iCol;
+    FDocIssueTotals.IncDocIssue('@' + strTagName, recTotalInfo);
+  End;
+
+ResourceString
+  strBadTagFound = 'Bad Tag "%s" found!';
+
 Const
   iTreeLevel = 2;
+  astrTagsToIgnore : Array[0..9] Of String = (
+    strnocheck,
+    strnochecks,
+    strnodocumentation,
+    strnohint,
+    strnohints,
+    strnometric,
+    strnometrics,
+    strnospelling,
+    strnospellings,
+    strstopdocumentation
+  );
   
 Var
   iComment, iTag, iSpecialTag : Integer;
   Cmt: TComment;
   Tag: TTag;
+  ST: TSpecialTagNode;
 
 Begin
   For iComment := 0 To Module.BodyCommentCount - 1 Do
     Begin
       Cmt := Module.BodyComment[iComment];
       For iTag := 0 To Cmt.TagCount - 1 Do
-        For iSpecialTag := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
-          If tpShowInTree In FSpecialTagNodes[iSpecialTag].FTagProperties Then
-            If CompareText(Cmt.Tag[iTag].TagName, FSpecialTagNodes[iSpecialTag].FTagName) = 0 Then
+        Begin
+          iSpecialTag := FindTag(Cmt.Tag[iTag].TagName);
+          If iSpecialTag >= 0 Then
+            Begin
+              If tpShowInTree In FSpecialTagNodes[iSpecialTag].FTagProperties Then
+                Begin
+                  Tag := Cmt.Tag[iTag];
+                  ST := FSpecialTagNodes[iSpecialTag];
+                  AddNode(FSpecialTagNodes[iSpecialTag].Node, Tag, iTreeLevel,
+                    BADIImageIndex(ST.FImageIndex, scNone), ST.FTagProperties, ST.FFontStyles,
+                    ST.FFontColour, ST.FBackColour, Cmt);
+                  If tpShowInEditor In FSpecialTagNodes[iSpecialTag].FTagProperties Then
+                    Begin
+                      AddDocIssueInfo(Tag.Line, ST);
+                      AddTotalInfo(ST, Tag.Line, Tag.Column);
+                    End;
+                End;
+            End Else
+            If Not IsKeyWord(LowerCase(Cmt.Tag[iTag].TagName), astrTagsToIgnore) Then
               Begin
-                Tag := Cmt.Tag[iTag];
                 AddNode(
-                  FSpecialTagNodes[iSpecialTag].Node,
-                  Tag,
-                  iTreeLevel,
-                  BADIImageIndex(iiToDoItem, scNone),
-                  FSpecialTagNodes[iSpecialTag].FTagProperties,
-                  FSpecialTagNodes[iSpecialTag].FFontStyles,
-                  FSpecialTagNodes[iSpecialTag].FFontColour,
-                  FSpecialTagNodes[iSpecialTag].FBackColour,
-                  Cmt);
+                  FModule,
+                  Format(strBadTagFound, [Cmt.Tag[iTag].TagName]),
+                  Cmt.Tag[iTag].TagName,
+                  1,
+                  BADIImageIndex(iiBadTag, scNone)
+                );
+                AddDocIssueInfo(Cmt.Tag[iTag].Line, Cmt.Tag[iTag].TagName);
+                AddTotalInfo(Cmt.Tag[iTag].TagName, Cmt.Tag[iTag].Line, Cmt.Tag[iTag].Column);
               End;
+        End;
     End;
+End;
+
+(**
+
+  This is a getter method for the DocIssueTotals property.
+
+  @precon  None.
+  @postcon Returns the Document Issues Totals.
+
+  @return  an IBADIDocIssueTotals
+
+**)
+Function TframeModuleExplorer.GetDocIssueTotals: IBADIDocIssueTotals;
+
+Begin
+  Result := FDocIssueTotals;
 End;
 
 (**
@@ -1444,7 +1975,7 @@ End;
   This method gets the tree nodes that are currently expanded and stores them in a string list.
 
   @precon  Node is the tree node to be tested for expansion.
-  @postcon Adds, update or deletes nodes from the expanded node list depending whether thhey are
+  @postcon Adds, update or deletes nodes from the expanded node list depending whether they are
            now expanded.
 
   @param   StartNode as a PVirtualNode as a constant
@@ -1480,9 +2011,26 @@ End;
 
 (**
 
+  This is a getter method for the Line Doc Issue conflicts property.
+
+  @precon  None.
+  @postcon Returns a set of limit types for the given line number to indicate issues on that line.
+
+  @param   iLine as an Integer as a constant
+  @return  an IBADILineDocIssues
+
+**)
+Function TframeModuleExplorer.GetLineDocIssue(Const iLine: Integer): IBADILineDocIssues;
+
+Begin
+  FLineDocIssues.TryGetValue(iLine, Result);
+End;
+
+(**
+
   This method returns the path of the specified tree node.
 
-  @precon  Node is the tree node to be pathed.
+  @precon  Node is the tree node to be calculate the path to.
   @postcon Returns a string representation of the tree nodes path excluding the root item.
 
   @param   Node as a PVirtualNode as a constant
@@ -1513,7 +2061,7 @@ End;
 
 (**
 
-  This method initalises a TMatchResult record as we cannot define constructors for annoymous
+  This method initialises a TMatchResult record as we cannot define constructors for anonymous
   records.
 
   @precon  None.
@@ -1576,6 +2124,155 @@ End;
 
 (**
 
+  This method logs the Doc Issue and Conflicts.
+
+  @precon  None.
+  @postcon If the Element is a Doc Issue or Conflict then it is logged.
+
+  @param   Element as a TElementContainer as a constant
+
+**)
+Procedure TframeModuleExplorer.LogDocIssueConflict(Const Element: TElementContainer);
+
+  (**
+
+    This method converts an error type to a limit type.
+
+    @precon  None.
+    @postcon Returns the limit type corresponding to the given error type.
+
+    @param   eErrorType as a TErrorType as a constant
+    @return  a TLimitType
+
+  **)
+  Function ErrorTypeToLimitType(Const eErrorType : TErrorType) : TLimitType;
+
+  Begin
+    Case eErrorType Of
+      etHint:    Result := ltHints;
+      etWarning: Result := ltWarnings;
+      etError:   Result := ltErrors;
+    Else
+      Result := ltErrors;
+    End;
+  End;
+
+  (**
+
+    This method converts an conflict type to a limit type.
+
+    @precon  None.
+    @postcon Returns the limit type corresponding to the given conflict type.
+
+    @param   eConflictType as a TBADIConflictType as a constant
+    @return  a TLimitType
+
+  **)
+  Function ConflictTypeToLimitType(Const eConflictType : TBADIConflictType) : TLimitType;
+
+  Begin
+    Case eConflictType Of
+      ctDocumentation: Result := ltConflicts;
+      ctMetric:        Result := ltMetrics;
+      ctCheck:         Result := ltChecks;
+      ctSpelling:      Result := ltSpelling;
+    Else
+      Result := ltErrors;
+    End;
+  End;
+
+Const
+  aLimitImageIndex : Array[TlimitType] Of TBADIImageIndex = (
+    iiError,
+    iiWarning,
+    iiHint,
+    iiDocConflictItem,
+    iiCheckItem,
+    iiMetricItem,
+    iiSpellingItem
+  );
+
+Var
+  DI: TDocIssue;
+  eLimitType : TLimitType;
+  LineDocIssues: IBADILineDocIssues;
+  DC: TDocumentConflict;
+  recTotalInfo : TBADITotalInfo;
+  recDocIssueInfo : TBADIDocIssueInfo;
+  SI: TBADISpellingIssue;
+
+Begin
+  If Element Is TDocIssue Then
+    Begin
+      DI := Element As TDocIssue;
+      eLimitType := ErrorTypeToLimitType(DI.ErrorType);
+      recDocIssueInfo.FName := astrLimitType[eLimitType];
+      recDocIssueInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recDocIssueInfo.FForeColour := clNone;
+      recDocIssueInfo.FBackColour := clNone;
+      recDocIssueInfo.FMessage := Element.AsString(False, False);
+      If FLineDocIssues.TryGetValue(DI.Line, LineDocIssues) Then
+        LineDocIssues.AddIssue(astrLimitType[eLimitType], recDocIssueInfo)
+      Else
+        FLineDocIssues.Add(DI.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo));
+      recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recTotalInfo.FForeColour := clNone;
+      recTotalInfo.FBackColour := clNone;
+      recTotalInfo.FFontStyles := [];
+      recTotalInfo.FFirstLine := DI.Line;
+      recTotalInfo.FFirstCol := DI.Column;
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);
+    End
+  Else If Element Is TDocumentConflict Then
+    Begin
+      DC := Element As TDocumentConflict;
+      eLimitType := ConflictTypeToLimitType(DC.ConflictType);
+      recDocIssueInfo.FName := astrLimitType[eLimitType];
+      recDocIssueInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recDocIssueInfo.FForeColour := clNone;
+      recDocIssueInfo.FBackColour := clNone;
+      recDocIssueInfo.FMessage := Element.AsString(False, False);
+      If FLineDocIssues.TryGetValue(DC.Line, LineDocIssues) Then
+        LineDocIssues.AddIssue(astrLimitType[eLimitType], recDocIssueInfo)
+      Else
+        FLineDocIssues.Add(DC.Line, TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo));
+      recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recTotalInfo.FForeColour := clNone;
+      recTotalInfo.FBackColour := clNone;
+      recTotalInfo.FFontStyles := [];
+      recTotalInfo.FFirstLine := DC.Line;
+      recTotalInfo.FFirstCol := DC.Column;
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);    
+    End
+  Else If Element Is TBADISpellingIssue Then
+    Begin
+      SI := Element As TBADISpellingIssue;
+      eLimitType := ConflictTypeToLimitType(ctSpelling);
+      recDocIssueInfo.FName := astrLimitType[eLimitType];
+      recDocIssueInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recDocIssueInfo.FForeColour := clNone;
+      recDocIssueInfo.FBackColour := clNone;
+      recDocIssueInfo.FMessage := '';
+      If FLineDocIssues.TryGetValue(SI.Line, LineDocIssues) Then
+        LineDocIssues.AddSpellingMistake(SI.Identifier, SI.Column)
+      Else
+        Begin
+         LineDocIssues := TBADILineDocIssue.Create(astrLimitType[eLimitType], recDocIssueInfo);
+         LineDocissues.AddSpellingMistake(SI.Identifier, SI.Column);
+         FLineDocIssues.Add(SI.Line, LineDocIssues);
+        End;
+      recTotalInfo.FImageIndex := aLimitImageIndex[eLimitType];
+      recTotalInfo.FForeColour := clNone;
+      recTotalInfo.FBackColour := clNone;
+      recTotalInfo.FFontStyles := [];
+      recTotalInfo.FFirstLine := SI.Line;
+      recTotalInfo.FFirstCol := SI.Column;
+      FDocIssueTotals.IncDocIssue(astrLimitType[eLimitType], recTotalInfo);    
+    End;
+End;
+
+(**
+
   This method removed items from the list their date (TObject data) is more than
   a specific age in days.
 
@@ -1603,6 +2300,42 @@ end;
 
 (**
 
+  This method returns the limit for adding child nodes to a node.
+
+  @precon  Container must be a valid instance.
+  @postcon Returns the limit for adding child nodes to a node.
+
+  @param   Container as a TElementContainer as a constant
+  @return  an Integer
+
+**)
+Function TframeModuleExplorer.MaxLimit(Const Container: TElementContainer) : Integer;
+
+Const
+  iDefaultMaxLimit = 9999;
+  
+Begin
+  Result := iDefaultMaxLimit;
+  If Container.ElementCount > 0 Then
+    If Container.Elements[1] Is TDocumentConflict Then
+      Case TDocumentConflict(Container.Elements[1]).ConflictType Of
+        ctDocumentation: Result := TBADIOptions.BADIOptions.IssueLimits[ltConflicts];
+        ctMetric:        Result := TBADIOptions.BADIOptions.IssueLimits[ltMetrics];
+        ctCheck:         Result := TBADIOptions.BADIOptions.IssueLimits[ltChecks];
+        ctSpelling:      Result := TBADIOptions.BADIOptions.IssueLimits[ltSpelling];
+      End
+    Else If Container.Elements[1] Is TDocIssue Then
+      Case TDocIssue(Container.Elements[1]).ErrorType Of
+        etHint:    Result := TBADIOptions.BADIOptions.IssueLimits[ltHints];
+        etWarning: Result := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];
+        etError:   Result := TBADIOptions.BADIOptions.IssueLimits[ltErrors];  
+      End
+    Else If Container.Elements[1] Is TBADISpellingIssue Then
+      Result := TBADIOptions.BADIOptions.IssueLimits[ltSpelling];
+End;
+
+(**
+
   This method outputs the modules information as items in the treeview.
 
   @precon  M is a valid instance of a TBaseLanguageModule that has been parsed.
@@ -1614,8 +2347,15 @@ end;
 procedure TframeModuleExplorer.OutputModuleInfo(Const Container : TElementContainer);
 
 Const
-  strPromotedLabels : Array[1..6] Of String = (strMetrics, strChecks, strDocumentationConflicts,
-    strHints, strWarnings, strErrors);
+  strPromotedLabels : Array[1..7] Of String = (
+    strSpelling,
+    strMetrics,
+    strChecks,
+    strDocumentationConflicts,
+    strHints,
+    strWarnings,
+    strErrors    
+  );
 
 Var
   i: Integer;
@@ -1650,28 +2390,42 @@ end;
   @param   iLevel    as an Integer as a constant
 
 **)
-procedure TframeModuleExplorer.RenderContainers(Const RootNode : PVirtualNode;
+Procedure TframeModuleExplorer.RenderContainers(Const RootNode : PVirtualNode;
   Const Container: TElementContainer; Const iLevel : Integer);
+
+Const
+  strTooManyConflictsName = 'TooManyConflicts';
 
 Var
   i : Integer;
   NewNode : PVirtualNode;
+  iLimit : Integer;
+  iCount : Integer;
 
-begin
+Begin
+  iLimit := MaxLimit(Container);
+  iCount := 0;
   For i := 1 To Container.ElementCount Do
     If Container.Elements[i].Scope In TBADIOptions.BADIOptions.ScopesToRender + [scNone, scGlobal] Then
       Begin
-        NewNode := AddNode(RootNode, Container.Elements[i], iLevel);
-        RenderContainers(NewNode, Container[i], iLevel + 1);
+        LogDocIssueConflict(Container.Elements[i]);
+        If iCount < iLimit Then
+          Begin
+            NewNode := AddNode(RootNode, Container.Elements[i], iLevel);
+            RenderContainers(NewNode, Container[i], iLevel + 1);
+          End
+        Else If iCount = iLimit Then
+          AddNode(RootNode, Format(strTooManyConflicts, [Container.ElementCount]),
+            strTooManyConflictsName, iLevel, Container.Elements[i].ImageIndexAdjustedForScope);
+        Inc(iCount);
       End;
-end;
+End;
 
 (**
 
   This method displays the specified module in the treeview.
 
-  @precon  M is a valid instance of a TBaseLanguageModule that has been parsed and strStatus is a
-           text string to be displayed in the forms status bar.
+  @precon  Module is a valid instance of a TBaseLanguageModule that has been parsed.
   @postcon Renders the module information for the given module.
 
   @param   Module as a TBaseLanguageModule as a constant
@@ -1703,6 +2457,8 @@ Begin
     Exit;
   FRendering := True;
   Try
+    FLineDocIssues.Clear;
+    FDocIssueTotals.Clear;
     FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
     FExplorer.Font.Name := TBADIOptions.BADIOptions.TreeFontName;
     FExplorer.Font.Size := TBADIOptions.BADIOptions.TreeFontSize;
@@ -1713,7 +2469,8 @@ Begin
     strSelection := GetNodePath(FExplorer.FocusedNode);
     FExplorer.BeginUpdate;
     Try
-      edtExplorerFilter.Text := '';
+      ExplorerFilter := '';
+      FFollowNode := Nil;
       FExplorer.Clear;
       FNodeInfo.Clear;
       If Module = Nil Then
@@ -1721,18 +2478,9 @@ Begin
       Module.AddTickCount(strClear);
       SetLength(FSpecialTagNodes, TBADIOptions.BADIOptions.SpecialTags.Count);
       // Create Root Tree Node
-      FModule := AddNode(
-        Nil,
-        Module, //.AsString(True, False),
-        //Module.Name,
-        0 //,
-        //Module.ImageIndexAdjustedForScope,
-        //Module.ModuleNameLine,
-        //Module.ModuleNameCol,
-        //False,
-        //Module.Comment
-      );
+      FModule := AddNode(Nil, Module, 0);
       CreateSpecialTagNodes();
+      CheckForIDEErrors(Module);
       OutputModuleInfo(Module);
       Module.AddTickCount(strBuild);
       SetExpandedNodes(FModule);
@@ -1765,10 +2513,10 @@ End;
 
 (**
 
-  This method expands the tree view nodes if they are foudn in the list.
+  This method expands the tree view nodes if they are found in the list.
 
   @precon  Node is the tree node to be expanded.
-  @postcon Sets the node as expanded if it was in the edpanded node list.
+  @postcon Sets the node as expanded if it was in the expanded node list.
 
   @param   StartNode as a PVirtualNode as a constant
 
@@ -1793,6 +2541,29 @@ Begin
         End;
       Node := FExplorer.GetNextSibling(Node);
     End;
+End;
+
+(**
+
+  This is a setter method for the ExplorerFilter property.
+
+  @precon  None.
+  @postcon Sets the FExplorerFilter field and determines whether a simple panel is to be displayed for
+           the filter text information.
+
+  @param   strValue as a String as a constant
+
+**)
+Procedure TframeModuleExplorer.SetExplorerFilter(Const strValue: String);
+
+ResourceString
+  strFilteringFor = 'Filtering for "%s"...';
+
+Begin
+  FExplorerFilter := strValue;
+  stbStatusBar.SimplePanel := FExplorerFilter.Length > 0;
+  If stbStatusBar.SimplePanel Then
+    stbStatusBar.SimpleText := Format(strFilteringFor, [FExplorerFilter])
 End;
 
 (**
@@ -1826,6 +2597,35 @@ End;
 
 (**
 
+  This is an on timer event handler for the filter text.
+
+  @precon  None.
+  @postcon Attempts to filter the text in the treeview.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.tmFilterTimer(Sender: TObject);
+
+Const
+  iUpdateInterval = 250;
+
+Begin
+  If (FLastFilterUpdate > 0) And (GetTickCount > FLastFilterUpdate + iUpdateInterval) Then
+    Try
+      tmFilter.Enabled := False;
+      Try
+        edtExplorerFilterChange(Self);
+      Finally
+        tmFilter.Enabled := True;
+      End;
+    Finally
+      FLastFilterUpdate := 0;
+    End;
+End;
+
+(**
+
   This is an on After Cell Paint event handler for the interfaces tree view.
 
   @precon  None.
@@ -1846,13 +2646,14 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     This local method highlights the text matches passed in the given colour.
 
     @precon  None.
-    @postcon If there are matches these are highlighed.
+    @postcon If there are matches these are highlighted.
 
     @param   MC      as a TMatchCollection as a constant
     @param   strText as a String as a constant
+    @param   iColour as a TColor as a constant
 
   **)
-  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String; iColour : TColor);
+  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String; Const iColour : TColor);
 
   Const
     iHighlightTextOffset = 18 + 26;
@@ -1883,8 +2684,7 @@ Var
   strText: String;
 
 Begin
-  If Not (doCustomDrawing In TBADIOptions.BADIOptions.Options) And
-         (edtExplorerFilter.Text <> '') Then
+  If Not (doCustomDrawing In TBADIOptions.BADIOptions.Options) And (ExplorerFilter <> '') Then
     Begin
       strText := (Sender As TVirtualStringTree).Text[Node, 0];
       HighlightText(FFilterRegEx.Matches(strText), strText,
@@ -1928,7 +2728,7 @@ begin
   FNodeData := Sender.GetNodeData(Node);
   sl := FNodeData.FNode.Tokens;
   DrawHighlightSelectedItem(FExplorer.Color, ItemRect);
-  DrawSelectedNode(sl, ItemRect, ilScopeImages.Width, iPos);
+  DrawSelectedNode(sl, ItemRect, FExplorer.Images.Width, iPos);
   R := ItemRect;
   DrawTree(R);
   DrawImage(R);
@@ -1937,38 +2737,68 @@ end;
 
 (**
 
+  This is an on change event handler for the Explorer Module VTV control.
+
+  @precon  None.
+  @postcon Updates the Follow Node.
+
+  @param   Sender as a TBaseVirtualTree
+  @param   Node   as a PVirtualNode
+
+**)
+Procedure TframeModuleExplorer.tvExplorerChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+
+Begin
+  FFollowNode := Node;
+End;
+
+(**
+
   This is an on click event handler for the explorer tree view.
 
   @precon  None.
-  @postcon Fires a SelectionChange event for the specifically selected item.
+  @postcon Fires a Selection Change event for the specifically selected item.
 
   @param   Sender as a TObject
 
  **)
-procedure TframeModuleExplorer.tvExplorerClick(Sender: TObject);
+Procedure TframeModuleExplorer.tvExplorerClick(Sender: TObject);
 
 Var
-  NodeData : PBADITreeData;
+  NodeData, ND: PBADITreeData;
 
-begin
+Begin
   If FSelectionChanging Then
     Exit;
   FSelectionChanging := True;
   Try
-    If FExplorer.FocusedNode <> Nil Then
+    If Assigned(FExplorer.FocusedNode) Then
       If Assigned(FSelectionChange) And Not FRendering Then
         Begin
           NodeData := FExplorer.GetNodeData(FExplorer.FocusedNode);
-          If NodeData.FNode <> Nil Then
-            If NodeData.FNode.Comment = Nil Then
-              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line)
-            Else
-              FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);
+          If Assigned(NodeData.FNode) Then
+            If Not Assigned(NodeData.FNode.Comment) Then
+              Begin
+                ND := FollowMethodNodeData(NodeData.FNode.Line);
+                //: @todo Check for method
+                If Assigned(NodeData) And Assigned(ND) And Assigned(ND.FNode.Comment) Then
+                  FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, ND.FNode.Comment.Line)
+                Else
+                  FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Line);
+              End Else
+              Begin
+                ND := FollowMethodNodeData(NodeData.FNode.Line);
+                //: @todo Check for method
+                If Assigned(NodeData) And Assigned(ND) And Assigned(ND.FNode.Comment) Then
+                  FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, ND.FNode.Comment.Line)
+                Else
+                  FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col, NodeData.FNode.Comment.Line);
+              End;
         End;
   Finally
     FSelectionChanging := False;
   End;
-end;
+End;
 
 (**
 
@@ -2045,34 +2875,44 @@ Var
   ShiftStates: TShiftState;
 
 Begin
-  Case Key Of
-    #08:
-      Begin
-        edtExplorerFilter.Text :=
-          Copy(edtExplorerFilter.Text, 1, Length(edtExplorerFilter.Text) - 1);
-        Key := #0;
+  If Not FFiltering Then
+    Begin
+      FFiltering := True;
+      Try
+        Case Key Of
+          #08:
+            Begin
+              ExplorerFilter := Copy(ExplorerFilter, 1, Length(ExplorerFilter) - 1);
+              FLastFilterUpdate := GetTickCount;
+              Key := #0;
+            End;
+          #13:
+            Begin
+              tvExplorerClick(Sender);
+              GetKeyboardState(KeyStates);
+              ShiftStates := KeyboardStateToShiftState(KeyStates);
+              If ShiftStates = [] Then
+                If Assigned(OnFocus) Then
+                  FFocus(Sender);
+              Key := #0;
+            End;
+          #27:
+            Begin
+              ExplorerFilter := '';
+              FLastFilterUpdate := GetTickCount;
+              Key := #0;
+            End;
+          #32..#128:
+            Begin
+              ExplorerFilter := ExplorerFilter + Key;
+              FLastFilterUpdate := GetTickCount;
+              Key := #0;
+            End;
+        End;
+      Finally
+        FFiltering := False;
       End;
-    #13:
-      Begin
-        tvExplorerClick(Sender);
-        GetKeyboardState(KeyStates);
-        ShiftStates := KeyboardStateToShiftState(KeyStates);
-        If ShiftStates = [] Then
-          If Assigned(OnFocus) Then
-            FFocus(Sender);
-        Key := #0;
-      End;
-    #27:
-      Begin
-        edtExplorerFilter.Clear;
-        Key := #0;
-      End;
-    #32..#128:
-      Begin
-        edtExplorerFilter.Text := edtExplorerFilter.Text + Key;
-        Key := #0;
-      End;
-  End;
+    End;
 End;
 
 (**
@@ -2175,6 +3015,23 @@ end;
 
 (**
 
+  This is an on node expanded / collapsed event handler for the explorer view.
+
+  @precon  None.
+  @postcon Attempts to re-focus the followed node when nodes are expanded or collapsed.
+
+  @param   Sender as a TBaseVirtualTree
+  @param   Node   as a PVirtualNode
+
+**)
+Procedure TframeModuleExplorer.tvExplorerNodeExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
+
+Begin
+  FocusFollowedNode;
+End;
+
+(**
+
   This method update the status of the module explorer statusbar.
 
   @precon  M must be a valid instance of a TBaseLanguageModule.
@@ -2228,6 +3085,4 @@ begin
     End;
 end;
 
-
-//----------------------------------------------------------------------------------------
 End.

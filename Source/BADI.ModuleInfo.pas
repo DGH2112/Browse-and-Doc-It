@@ -3,15 +3,15 @@
   This module contains a class to represent module information stored in the Modules Dispatcher.
 
   @Author  David Hoyle
-  @Version 1.1
-  @Date    21 Jun 2019
+  @Version 1.263
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,15 +43,21 @@ Type
   TModuleInfo = Class
   Strict Private
     FExtensions: String;
-    FCls:        TBaseLanguageModuleClass;
-    FCanDoc:     Boolean;
-    FBlockCmt:   TCommentType;
-    FLineCmt:    TCommentType;
-    FInSituCmt:  TCommentType;
+    FCls:          TBaseLanguageModuleClass;
+    FCanDoc:       Boolean;
+    FBlockCmt:     TCommentType;
+    FLineCmt:      TCommentType;
+    FInSituCmt:    TCommentType;
+    FCommentTypes: TCommentTypes;
   Strict Protected
   Public
-    Constructor Create(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
-      Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+    Constructor Create(
+      Const Cls: TBaseLanguageModuleClass;
+      Const strExtensions: String;
+      Const boolCanDoc: Boolean;
+      Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType;
+      Const setCommentTypes : TCommentTypes
+    );
     Function  CanProcessExt(Const strExt : String) : Boolean;
     (**
       This property returns the extension associated with the registration.
@@ -95,6 +101,13 @@ Type
       @return  a TCommentType
     **)
     Property InSituCmt: TCommentType Read FInSituCmt;
+    (**
+      This property return a set of comment types that are supported by the module.
+      @precon  None.
+      @postcon Return a set of comment types that are supported by the module.
+      @return  a TCommentTypes
+    **)
+    Property CommentTypes : TCommentTypes Read FCommentTypes;
   End;
 
 Implementation
@@ -147,16 +160,22 @@ End;
   @precon  None.
   @postcon Initialises the class with information.
 
-  @param   Cls           as a TBaseLanguageModuleClass as a constant
-  @param   strExtensions as a String as a constant
-  @param   boolCanDoc    as a Boolean as a constant
-  @param   iBlockCmt     as a TCommentType as a constant
-  @param   iLineCmt      as a TCommentType as a constant
-  @param   iInSituCmt    as a TCommentType as a constant
+  @param   Cls             as a TBaseLanguageModuleClass as a constant
+  @param   strExtensions   as a String as a constant
+  @param   boolCanDoc      as a Boolean as a constant
+  @param   iBlockCmt       as a TCommentType as a constant
+  @param   iLineCmt        as a TCommentType as a constant
+  @param   iInSituCmt      as a TCommentType as a constant
+  @param   setCommentTypes as a TCommentTypes as a constant
 
 **)
-Constructor TModuleInfo.Create(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
-  Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+Constructor TModuleInfo.Create(
+              Const Cls: TBaseLanguageModuleClass;
+              Const strExtensions: String;
+              Const boolCanDoc: Boolean;
+              Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType;
+              Const setCommentTypes : TCommentTypes
+            );
 
 Begin
   FExtensions := strExtensions;
@@ -165,6 +184,7 @@ Begin
   FBlockCmt := iBlockCmt;
   FLineCmt := iLineCmt;
   FInSituCmt := iInSituCmt;
+  FCommentTypes := setCommentTypes;
 End;
 
 End.

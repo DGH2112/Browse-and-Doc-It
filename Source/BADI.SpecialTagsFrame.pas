@@ -2,16 +2,16 @@
 
   This module contains a frame for editing the BADI special tags.
 
-  @Version 1.0
+  @Version 1.299
   @Author  David Hoyle
-  @Date    21 Jun 2019
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,14 +47,15 @@ Uses
   Buttons,
   ComCtrls,
   Generics.Collections,
+  UITypes,
   BADI.CustomOptionsFrame,
   BADI.Types,
   VirtualTrees,
   Themes, 
-  BADI.CustomVirtualStringTree, System.ImageList, Vcl.ImgList;
+  BADI.CustomVirtualStringTree;
 
 Type
-  (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)
+  (** A descendent class for the virtual string tree to prevent AVs in the 10.2.2. IDE during theming. **)
   TBADISpecialTagsOptionsVirtualStringTree = Class(TBADICustomVirtualStringTree);
 
   (** This is a class to represent the frame interface. **)
@@ -81,17 +82,18 @@ Type
       Y: Integer);
     Procedure vstSpecialTagsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    Procedure vstSpecialTagsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean; Var ImageIndex: UITypes.TImageIndex);
   Strict Private
     FSpecialTags    : TList<TBADISpecialTag>;
     FVSTSpecialTags : TBADISpecialTagsOptionsVirtualStringTree;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FStyleServices : TCustomStyleServices;
-    {$ENDIF}
+    {$ENDIF RS102}
   Strict Protected
     Procedure PopulateTreeView;
     Procedure CreateVirtualStringTree;
   Public
-    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
     Destructor Destroy; Override;
     Procedure LoadSettings;
@@ -106,26 +108,36 @@ Implementation
 Uses
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  {$ENDIF}
+  {$ENDIF STANDALONEAPP}
   BADI.Base.Module,
   BADI.SpecialTagForm,
   BADI.Constants,
   BADI.OptionsForm,
-  BADI.Options;
+  BADI.Options,
+  BADI.Functions;
 
 Type
-  (** A record to describe the data to be stoed in the treeview. **)
+  (** A record to describe the data to be stored in the treeview. **)
   TSpecialTagsNodeData = Record
     FSpecialTagIndex : Integer;
   End;
   (** A pointer to the above node data. **)
   PSpecialTagNodeData = ^TSpecialTagsNodeData;
   (** A enumerate to define the columns in the report. **)
-  TColumnIndexes = (ciName, ciDescription, ciShowInTree, ciAutoExpand, ciShowInDocs, ciFixed, ciSyntax);
+  TColumnIndexes = (
+    ciName,
+    ciDescription, 
+    ciShowInTree, 
+    ciAutoExpand, 
+    ciShowInDocs, 
+    ciFixed, 
+    ciSyntax,
+    ciEditor
+  );
 
 (**
 
-  This is a TButton on click event. It allows the user to add a new tag.
+  This is a on click event. It allows the user to add a new tag.
 
   @precon  Sender is the control that invoked the event.
   @postcon Adds a tag to the list.
@@ -143,8 +155,8 @@ Var
   ST : TBADISpecialTag;
 
 Begin
-  ST.Create(strTag, strTagDescription, []);
-  If TfrmSpecialTag.Execute(ST) Then
+  ST.Create(strTag, strTagDescription, [], iiNone);
+  If TfrmSpecialTag.Execute(TBADIOptions.BADIOptions.ScopeImageList, ST) Then
     Begin
       FSpecialTags.Add(ST);
       PopulateTreeView;
@@ -153,7 +165,7 @@ End;
 
 (**
 
-  This is a TButton on click event. It allows the user to delete a tag from
+  This is a on click event. It allows the user to delete a tag from
   the list.
 
   @precon  Sender is the control that invoked the event.
@@ -166,19 +178,24 @@ Procedure TfmBADISpecialTagsFrame.btnDeleteClick(Sender: TObject);
 
 Var
   NodeData : PSpecialTagNodeData;
+  Node: PVirtualNode;
 
 Begin
   If Assigned(FVSTSpecialTags.FocusedNode) Then
     Begin
       NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       FSpecialTags.Delete(NodeData.FSpecialTagIndex);
+      Node := FVSTSpecialTags.GetPrevious(FVSTSpecialTags.FocusedNode);
+      If Not Assigned(Node) Then
+        Node := FVSTSpecialTags.GetNext(FVSTSpecialTags.FocusedNode);
+      FVSTSpecialTags.FocusedNode := Node;  
       PopulateTreeView;
     End;
 End;
 
 (**
 
-  This is a TButton on click event. It allows the user to edit a tag in the
+  This is a on click event. It allows the user to edit a tag in the
   list.
 
   @precon  Sender is the control that invoked the event.
@@ -198,7 +215,7 @@ Begin
     Begin
       NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       ST := FSpecialTags[NodeData.FSpecialTagIndex];
-      If TfrmSpecialTag.Execute(ST) Then
+      If TfrmSpecialTag.Execute(TBADIOptions.BADIOptions.ScopeImageList, ST) Then
         Begin
           FSpecialTags[NodeData.FSpecialTagIndex] := ST;
           PopulateTreeView;
@@ -208,7 +225,7 @@ End;
 
 (**
 
-  This is a TButton on click event. It allows the user to move the item down
+  This is a on click event. It allows the user to move the item down
   the list.
 
   @precon  Sender is the control that invoked the event.
@@ -237,7 +254,7 @@ End;
 
 (**
 
-  This is a TButton on click event. It allows the user to move the item up the
+  This is a on click event. It allows the user to move the item up the
   list.
 
   @precon  Sender is the control that invoked the event.
@@ -279,23 +296,23 @@ End;
 Constructor TfmBADISpecialTagsFrame.Create(AOwner: TComponent);
 
 {$IFNDEF STANDALONEAPP}
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
-{$ENDIF}
+{$ENDIF RS102}
+{$ENDIF STANDALONEAPP}
 
 Begin
   Inherited Create(AOwner);
   CreateVirtualStringTree;
   {$IFNDEF STANDALONEAPP}
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       FStyleServices := ITS.StyleServices;
-  {$ENDIF}
-  {$ENDIF}
+  {$ENDIF RS102}
+  {$ENDIF STANDALONEAPP}
   FVSTSpecialTags.NodeDataSize := SizeOf(TSpecialTagsNodeData);
   FSpecialTags := TList<TBADISpecialTag>.Create;
   PopulateTreeView;
@@ -328,54 +345,70 @@ Begin
   FVSTSpecialTags.Anchors := [akLeft, akTop, akRight, akBottom];
   FVSTSpecialTags.Header.Height := 20;
   FVSTSpecialTags.TabOrder := 0;
+  FVSTSpecialTags.TreeOptions.PaintOptions := FVSTSpecialTags.TreeOptions.PaintOptions - [toShowRoot];
+  FVSTSpecialTags.Images := TBADIOptions.BADIOptions.ScopeImageList;
   FVSTSpecialTags.OnBeforeCellPaint := vstSpecialTagsBeforeCellPaint;
   FVSTSpecialTags.OnClick := vstSpecialTagsClick;
   FVSTSpecialTags.OnDblClick := vstSpecialTagsDblClick;
   FVSTSpecialTags.OnGetText := vstSpecialTagsGetText;
   FVSTSpecialTags.OnPaintText := vstSpecialTagsPaintText;
   FVSTSpecialTags.OnMouseDown := vstSpecialTagsMouseDown;
+  FVSTSpecialTags.OnGetImageIndex := vstSpecialTagsGetImageIndex;
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Position := 0;
   C.Style := vsOwnerDraw;
   C.Width := 100;
+  C.MinWidth := 100;
   C.Text := 'Tag Name';
   C := FVSTSpecialTags.Header.Columns.Add;
-  C.MinWidth := 200;
   C.Position := 1;
   C.Style := vsOwnerDraw;
   C.Width := 235;
+  C.MinWidth := 200;
   C.Text := 'Tag Description';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 2;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Tree';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 3;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Expand';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 4;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Docs';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 5;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Fixed';
   C := FVSTSpecialTags.Header.Columns.Add;
   C.Alignment := taCenter;
   C.Position := 6;
   C.Style := vsOwnerDraw;
   C.Width := 60;
+  C.MinWidth := 60;
   C.Text := 'Syntax';
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 7;
+  C.Style := vsOwnerDraw;
+  C.Width := 60;
+  C.Text := 'Editor';
   FVSTSpecialTags.Header.AutoSizeIndex := 1;
+  C.MinWidth := 60;
 End;
 
 (**
@@ -499,17 +532,18 @@ Begin
   NodeData := Sender.GetNodeData(Node);
   ST := FSpecialTags[NodeData.FSpecialTagIndex];
   Case TColumnIndexes(Column) Of
-    ciShowInTree: TargetCanvas.Brush.Color := Colour[tpShowInTree In ST.FTagProperties];
-    ciAutoExpand: TargetCanvas.Brush.Color := Colour[tpAutoExpand In ST.FTagProperties];
-    ciShowInDocs: TargetCanvas.Brush.Color := Colour[tpShowInDoc  In ST.FTagProperties];
-    ciFixed:      TargetCanvas.Brush.Color := Colour[tpFixed      In ST.FTagProperties];
-    ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax     In ST.FTagProperties];
+    ciShowInTree: TargetCanvas.Brush.Color := Colour[tpShowInTree   In ST.FTagProperties];
+    ciAutoExpand: TargetCanvas.Brush.Color := Colour[tpAutoExpand   In ST.FTagProperties];
+    ciShowInDocs: TargetCanvas.Brush.Color := Colour[tpShowInDoc    In ST.FTagProperties];
+    ciFixed:      TargetCanvas.Brush.Color := Colour[tpFixed        In ST.FTagProperties];
+    ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax       In ST.FTagProperties];
+    ciEditor:     TargetCanvas.Brush.Color := Colour[tpShowInEditor In ST.FTagProperties];
   Else
     TargetCanvas.Brush.Color := clWindow;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     If Assigned(FStyleServices) Then
       TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
-    {$ENDIF}
+    {$ENDIF RS102}
     If ST.FBackColour <> clNone Then
       TargetCanvas.Brush.Color := ST.FBackColour;
   End;
@@ -545,7 +579,7 @@ End;
 
 (**
 
-  This is an on double click event handler for the treview.
+  This is an on double click event handler for the tree view.
 
   @precon  None.
   @postcon Edits the double clicked item.
@@ -557,6 +591,38 @@ Procedure TfmBADISpecialTagsFrame.vstSpecialTagsDblClick(Sender: TObject);
 
 Begin
   btnEditClick(Sender);
+End;
+
+(**
+
+  This is an on Get Image Index event handler for the treeview.
+
+  @precon  None.
+  @postcon Returns the image index for the current node.
+
+  @param   Sender     as a TBaseVirtualTree
+  @param   Node       as a PVirtualNode
+  @param   Kind       as a TVTImageKind
+  @param   Column     as a TColumnIndex
+  @param   Ghosted    as a Boolean as a reference
+  @param   ImageIndex as a TImageIndex as a reference
+
+**)
+Procedure TfmBADISpecialTagsFrame.vstSpecialTagsGetImageIndex(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean;
+  Var ImageIndex: UITypes.TImageIndex);
+
+Var
+  NodeData : PSpecialTagNodeData;
+  ST : TBADISpecialTag;
+
+Begin
+  If (Column = 0) And (Kind In [ikNormal, ikSelected]) Then
+    Begin
+      NodeData := Sender.GetNodeData(Node);
+      ST := FSpecialTags[NodeData.FSpecialTagIndex];
+      ImageIndex := BADIImageIndex(ST.FIconImage, scNone);
+    End;
 End;
 
 (**
@@ -589,11 +655,12 @@ Begin
   Case TColumnIndexes(Column) Of
     ciName:        CellText := ST.FName;
     ciDescription: CellText := ST.FDescription;
-    ciShowInTree:  CellText := strBoolean[tpShowInTree In  ST.FTagProperties];
-    ciAutoExpand:  CellText := strBoolean[tpAutoExpand In  ST.FTagProperties];
-    ciShowInDocs:  CellText := strBoolean[tpShowInDoc  In  ST.FTagProperties];
-    ciFixed:       CellText := strBoolean[tpFixed      In  ST.FTagProperties];
-    ciSyntax:      CellText := strBoolean[tpSyntax     In  ST.FTagProperties];  
+    ciShowInTree:  CellText := strBoolean[tpShowInTree   In  ST.FTagProperties];
+    ciAutoExpand:  CellText := strBoolean[tpAutoExpand   In  ST.FTagProperties];
+    ciShowInDocs:  CellText := strBoolean[tpShowInDoc    In  ST.FTagProperties];
+    ciFixed:       CellText := strBoolean[tpFixed        In  ST.FTagProperties];
+    ciSyntax:      CellText := strBoolean[tpSyntax       In  ST.FTagProperties];  
+    ciEditor:      CellText := strBoolean[tpShowInEditor In  ST.FTagProperties];  
   End;
 End;
 
@@ -620,7 +687,7 @@ Procedure TfmBADISpecialTagsFrame.vstSpecialTagsMouseDown(Sender: TObject; Butto
     properties.
 
     @precon  None.
-    @postcon The property is togged with the opposite of the given enumerate.
+    @postcon The property is toggled with the opposite of the given enumerate.
 
     @param   ST                 as a TBADISpecialTag as a reference
     @param   BADISpecialTagProp as a TBADITagProperty as a constant
@@ -652,6 +719,7 @@ Begin
         ciShowInDocs: ToggleSpecialTagProp(ST, tpShowInDoc);
         ciFixed:      ToggleSpecialTagProp(ST, tpFixed);
         ciSyntax:     ToggleSpecialTagProp(ST, tpSyntax);
+        ciEditor:     ToggleSpecialTagProp(ST, tpShowInEditor);
       End;
       FSpecialTags[NodeData.FSpecialTagIndex] := ST;
       FVSTSpecialTags.Invalidate;
@@ -685,12 +753,12 @@ Begin
   TargetCanvas.Font.Style := ST.FFontStyles;
   TargetCanvas.Font.Color := clWindowText;
   Case TColumnIndexes(Column) Of
-    ciShowInTree..ciSyntax: TargetCanvas.Font.Color := clBlack;
+    ciShowInTree..ciEditor: TargetCanvas.Font.Color := clBlack;
   Else
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     If Assigned(FStyleServices) Then
       TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
-    {$ENDIF}
+    {$ENDIF RS102}
     If ST.FFontColour <> clNone Then
       TargetCanvas.Font.Color := ST.FFontColour;
   End;

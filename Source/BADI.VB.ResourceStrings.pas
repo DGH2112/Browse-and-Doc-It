@@ -3,15 +3,15 @@
   This module contains a set of resource strings for use with the VB parser.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.004
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,12 +47,12 @@ ResourceString
 
   (** Exception message when an value is expected but something else is found. **)
   strValueExpected = 'Value expected but ''%s'' found at line %d column %d.';
-  (** An exception messahe for when a line end token is expected. **)
+  (** An exception message for when a line end token is expected. **)
   strLineEndExpected = 'Expected a line end token but ''%s'' found at line %d column %d.';
   (** A message prompt for returns on properties. **)
-  strProperyRequiresReturn = 'Propery ''%s'' requires a return parameter.';
+  strProperyRequiresReturn = 'Property ''%s'' requires a return parameter.';
   (** A message prompt for parameters in properties. **)
-  strProperyRequireParam = 'Propery ''%s'' requires at least 1 parameter.';
+  strProperyRequireParam = 'Property ''%s'' requires at least 1 parameter.';
   (** A warning message for no push method. **)
   strExceptionPush = 'The method ''%s'' has no Exception.Push method.';
   (** A warning message for no push name. **)
@@ -65,11 +65,11 @@ ResourceString
   strExitStatement = 'The method ''%s'' has an Exit statement which may be i' +
     'n conflict with the error handling.';
   (** A warning message for missing push names. **)
-  strExceptionPushNameIncorrect = 'The name passed to the Exception.Push me' +
-  'thod (%s) is incorrect (''%s.%s'').';
+  strExceptionPushNameIncorrect = 'The name passed to the Exception.Push method (%s) is ' +
+    'incorrect (''%s.%s'').';
   (** A warning message for missing push parameters. **)
-  strExceptionPushParameter = 'The parameter ''%s'' in ''%s.%s'' does not ha' +
-  've a corresponding parameter in the Exception.Push statement.';
+  strExceptionPushParameter = 'The parameter ''%s'' in ''%s.%s'' does not have a corresponding ' +
+    'parameter in the Exception.Push statement.';
   (** A warning message for push parameter out of order. **)
   strExceptionPushParamPos = 'The parameter ''%s'' in ''%s.%s'' is not in the ' +
     'the correct position (%d not %d) in the Exception.Push statement.';
@@ -77,9 +77,8 @@ ResourceString
   strExceptionPushParamCount = 'The function ''%s.%s'' has the wrong number of ' +
     'Exception.Push parameters (%d not %d).';
   (** A hint message for keyword GOTO found in the code. **)
-  strKeywordGOTOFound = 'Keyword GOTO found in function ''%s'' at line %d co' +
-  'lumn %d.';
-  (** A label mesaage for VB events. **)
+  strKeywordGOTOFound = 'Keyword GOTO found in function ''%s'' at line %d column %d.';
+  (** A label message for VB events. **)
   strEventsLabel = 'Events';
 
 Implementation

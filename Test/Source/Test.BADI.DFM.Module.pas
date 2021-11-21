@@ -3,8 +3,10 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.010
+  @Date    09 May 2021
+
+  @nochecks
 
   @license
 
@@ -79,8 +81,14 @@ Uses
 // Test Methods for Class TDFMModule.
 //
 Procedure TestTDFMModule.Setup;
+
+Const
+  strBasicDFM =
+    'object Identifier : TMyClass'#13#10 +
+    'end';
+
 Begin
-  FDFMModule := TDFMModule.CreateParser('', 'D:\Path\DFMFile.dfm', True, [moParse]);
+  FDFMModule := TDFMModule.CreateParser(strBasicDFM, 'D:\Path\DFMFile.dfm', True, [moParse]);
 End;
 
 Procedure TestTDFMModule.TearDown;

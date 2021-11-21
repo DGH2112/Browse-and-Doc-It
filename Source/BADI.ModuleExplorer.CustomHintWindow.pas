@@ -4,15 +4,15 @@
   tree nodes.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.034
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ Type
     Const
       (** A constant to define the padding between text elements of the hint. **)
       iPadding = 2;
-      (** This is the size of the bullett in the special tags list. **)
+      (** This is the size of the bullet in the special tags list. **)
       iBulletSize = 8;
   Strict Private
     FComment     : TComment;
@@ -75,15 +75,13 @@ Type
     Procedure PaintRenderComment(Var iBottom : Integer); InLine;
     Procedure PaintRenderSpecialTags(Const iBottom : Integer); InLine;
   Public
-    //: @nometric MissingCONSTInParam
-    Constructor Create(Const AOwner : TComponent; Const ATreeView : TVirtualStringTree); ReIntroduce;
+    Constructor Create(Const AOwner : TComponent; Const ATreeView : TVirtualStringTree); Reintroduce;
+      Overload; Virtual;
     Procedure Paint; Override;
-    //: @nometric MissingCONSTInParam
     Function CalcHintRect(MinWidth, MaxWidth : Integer; Node : PVirtualNode;
-      SyntaxHighlight : Boolean; Comment : TComment) : TRect; Reintroduce; Overload;
-    //: @nometric MissingCONSTInParam
+      SyntaxHighlight : Boolean; Comment : TComment) : TRect; Reintroduce; Overload; Virtual;
     Procedure ActivateHint(Rect : TRect; Node : PVirtualNode;
-      SyntaxHighlight : Boolean; Comment : TComment); Reintroduce; Overload;
+      SyntaxHighlight : Boolean; Comment : TComment); Reintroduce; Overload; Virtual;
     Function CanDrawSpecialTag(Const Comment : TComment; Const strSpecialTag : String) : Boolean;
   End;
 
@@ -108,7 +106,7 @@ Uses
   @precon  Rect is the rectangle to display the hint in, Node is the tree node
            to create a hint for, SyntaxHighlight tells the routine to print
            either a plain text representation of the information or one with
-           syntax highlighing and Comment is the comment associated with the
+           syntax highlighting and Comment is the comment associated with the
            tree node.
   @postcon Activates the hint window.
 
@@ -138,7 +136,7 @@ End;
 
 (**
 
-  This method calcalates the size of the hint window based on the tree node
+  This method calculates the size of the hint window based on the tree node
   display window, a max and min width , whether to display syntax highlighting
   and a comment.
 
@@ -146,7 +144,7 @@ End;
            MaxWidth is the minimum width of the hint window to be displayed,
            Node is the tree node to calculate the hint window for,
            SyntaxHighlight tells the routine to print either a plain text
-           representation of the information or one with syntax highlighing,
+           representation of the information or one with syntax highlighting,
            and Comment is the comment associated with the tree node and
   @postcon Returns the newly calculated rectangle of the hint window.
 
@@ -272,7 +270,7 @@ End;
 
 (**
 
-  This method calculates the width of the hint window to acommodate the tree nodes text and comments
+  This method calculates the width of the hint window to accommodate the tree nodes text and comments
   .
 
   @precon  None.
@@ -374,9 +372,7 @@ End;
   This is the constructor method for the TBADICustomHintWindow class.
 
   @precon  ATreeView must be a valid instance of the explorer treeview.
-  @postcon Ensures the hint can get the treeviews font information.
-
-  @nometricMissingCONSTInParam
+  @postcon Ensures the hint can get the tree views font information.
 
   @param   AOwner    as a TComponent as a constant
   @param   ATreeView as a TVirtualStringTree as a constant
@@ -423,7 +419,7 @@ End;
   This method renders the comment associated with the tree node.
 
   @precon  None.
-  @postcon The comment is rendered belwo the tree node text.
+  @postcon The comment is rendered below the tree node text.
 
   @param   iBottom as an Integer as a reference
 
@@ -528,10 +524,10 @@ End;
 
 (**
 
-  This method rennders the text associated with the tree node in the hint window.
+  This method renders the text associated with the tree node in the hint window.
 
   @precon  NodeData must be a valid pointer to tree node data.
-  @postcon The treenode text is rendered.
+  @postcon The tree node text is rendered.
 
   @param   NodeData as a PBADITreeData as a constant
   @param   iBottom  as an Integer as a reference
@@ -599,7 +595,7 @@ End;
 
   This method sets the font of the give canvas based on the token required.
 
-  @precon  Canvas must be a valid TCanvas instance.
+  @precon  Canvas must be a valid instance.
   @postcon The canvas font is configure for the given token.
 
   @param   Canvas     as a TCanvas as a constant

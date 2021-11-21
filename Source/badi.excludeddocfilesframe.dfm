@@ -10,6 +10,7 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
   Font.Style = []
   ParentFont = False
   TabOrder = 0
+  PixelsPerInch = 96
   object pnlFugePanel: TPanel
     Left = 0
     Top = 0
@@ -27,6 +28,21 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
       Width = 409
       Height = 250
       Anchors = [akLeft, akTop, akRight, akBottom]
+      Colors.BorderColor = 15987699
+      Colors.DisabledColor = clGray
+      Colors.DropMarkColor = 15385233
+      Colors.DropTargetColor = 15385233
+      Colors.DropTargetBorderColor = 15385233
+      Colors.FocusedSelectionColor = 15385233
+      Colors.FocusedSelectionBorderColor = 15385233
+      Colors.GridLineColor = 15987699
+      Colors.HeaderHotColor = clBlack
+      Colors.HotColor = clBlack
+      Colors.SelectionRectangleBlendColor = 15385233
+      Colors.SelectionRectangleBorderColor = 15385233
+      Colors.SelectionTextColor = clBlack
+      Colors.TreeLineColor = 9471874
+      Colors.UnfocusedColor = 15987699
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoShowSortGlyphs, hoVisible]
       TabOrder = 0
@@ -39,29 +55,37 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
       OnGetText = vstExclusionsGetText
       OnPaintText = vstExclusionsPaintText
       OnMouseDown = vstExclusionsMouseDown
+      Touch.InteractiveGestures = [igPan, igPressAndTap]
+      Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
       Columns = <
         item
           Position = 0
-          Width = 180
-          WideText = 'RegEx Pattern'
+          Text = 'RegEx Pattern'
+          Width = 109
         end
         item
           Alignment = taCenter
           Position = 1
+          Text = 'Doc Conflicts'
           Width = 75
-          WideText = 'Doc Conflicts'
         end
         item
           Alignment = taCenter
           Position = 2
+          Text = 'Metrics'
           Width = 75
-          WideText = 'Metrics'
         end
         item
           Alignment = taCenter
           Position = 3
+          Text = 'Checks'
           Width = 75
-          WideText = 'Checks'
+        end
+        item
+          Alignment = taCenter
+          Position = 4
+          Text = 'Spelling'
+          Width = 75
         end>
     end
     object btnAdd: TButton

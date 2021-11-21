@@ -1,17 +1,19 @@
 (**
   
-  This module contains a frame which represents a subview to display the modules checks.
+  A module which contains a descendant class from the checks frame so that the frame name can be changed
+  so there are no component classes in the IDE between the Custom Edit View and the Custom Editor Sub
+  View when using the same frame.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.024
+  @Date    28 Aug 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,15 +50,14 @@ Uses
   PlatformDefaultStyleActnCtrls,
   ActnPopup,
   ExtCtrls,
-  ImgList, System.ImageList;
+  ImgList;
 
 Type
-  (** A frame to display the module checks in a subview. **)
+  (** A frame to display the module checks in a sub-view. **)
   TframeBADIModuleChecksSubView = Class(TframeBADIModuleChecksEditorView)
-  Private
-    { Private declarations }
+  Strict Private
+  Strict Protected
   Public
-    { Public declarations }
   End;
 
 Implementation

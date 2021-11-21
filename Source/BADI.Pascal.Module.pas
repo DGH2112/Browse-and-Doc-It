@@ -1,17 +1,17 @@
 ﻿(**
 
-  ObjectPascalModule : A unit to tokenize Pascal source code.
+  Object Pascal Module : A unit to tokenise Pascal source code.
 
-  @Author     David Hoyle
-  @Version    2.0
-  @Date    21 Jun 2019
+  @Author  David Hoyle
+  @Version 4.231
+  @Date    09 May 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
-    
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,9 +29,6 @@
   @todo       Implement an expression parser for the above compiler defines.
               Needs to be able to evaluate constants in the code and use the
               two functions Defined() and Declared().
-  @todo       There are some metrics and checks whihc are overridden.
-  @todo       Make the Interface and Implementation uses sections go to those areas of the code on click
-  @nometric   UnsortedModule Toxicity
 
 **)
 Unit BADI.Pascal.Module;
@@ -73,14 +70,7 @@ Type
   Strict Private
     FSource                  : String;
     FMethodStack             : TObjectList;
-    FTypesLabel              : TLabelContainer;
-    FConstantsLabel          : TLabelContainer;
-    FResourceStringsLabel    : TLabelContainer;
-    FVariablesLabel          : TLabelContainer;
-    FThreadVarsLabel         : TLabelContainer;
-    FExportedHeadingsLabel   : TLabelContainer;
-    FExportsHeadingsLabel    : TLabelContainer;
-    FImplementedMethodsLabel : TLabelContainer;
+    FASTLabels               : Array[TBADIASTLabel] Of TLabelContainer;
     FExternalSyms            : TStringList;
     FModuleType              : TModuleType;
     FSourceCodeForProfiling  : TStringList;
@@ -287,7 +277,7 @@ Type
     procedure FindUnresolvedImplementedClassMethods(Const StartLabel : TLabelContainer);
     Function  FindRecObjClsInt(Const slClassNames : TStringList) : TRecordDecl;
     Function  IsIdentifier(Const AToken : TTokenInfo) : Boolean;
-    Procedure ProcessIncludeDirective(Const strToken : String);
+    Procedure ProcessIncludeDirective(Const strToken, strIncludeType: String);
     Procedure MetricsUnsortedMethods;
     Procedure MetricsHardCodedStrings(Const Container : TElementContainer);
     Procedure MetricsHardCodedNumbers(Const Container : TElementContainer);
@@ -299,12 +289,15 @@ Type
     Procedure MetricsEmptyBlockAtToken(Const eCheck : TBADIModuleCheck);
     Procedure MetricsCyclometricComplexity(Const Method : TGenericFunction);
     Procedure MetricsMethodToxicity(Const Method : TGenericFunction);
-    Function  GetVariablesLabel : TLabelContainer;
+    Function  GetASTLabel(Const eLabel : TBADIASTLabel) : TLabelContainer;
     function  GetCurrentMethod: TPascalMethod;
     Function  GetModuleName : String; Override;
     Function  GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     Procedure CheckFunctionReturn(Const Func : TPascalMethod);
+    Procedure CheckResourceStringSpelling(Const Element : TElementContainer);
+    Procedure CheckConstantStringSpelling(Const Element : TElementContainer);
+    Function  QualifiedIdentifier : String;
     (**
       This property returns the method on top of the method stack.
       @precon  None.
@@ -313,19 +306,20 @@ Type
     **)
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
     (**
-      This property returns the modules variables label.
+      This property returns the module labels.
       @precon  None.
-      @postcon Returns the modules variables label.
+      @postcon Returns the module labels.
+      @param   eLabel as a TBADIASTLabel as a constant
       @return  a TLabelContainer
     **)
-    Property VariablesLabel : TLabelContainer Read GetVariablesLabel;
+    Property ASTLabel[Const eLabel : TBADIASTLabel] : TLabelContainer Read GetASTLabel;
   Public
     Constructor CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
       Const ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
-    Procedure ProcessCompilerDirective(Var iSkip : Integer); Override;
+    Procedure ProcessCompilerDirective; Override;
     Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Class Function DefaultProfilingTemplate : String; Override;
@@ -347,6 +341,8 @@ Uses
   {$IFDEF PROFILECODE}
   Profiler,
   {$ENDIF}
+  System.Generics.Collections,
+  System.Character,
   BADI.Functions,
   BADI.Options,
   BADI.Constants,
@@ -372,8 +368,8 @@ Uses
   BADI.Pascal.ThreadVariableDecl,
   BADI.Pascal.UsesList,
   BADI.Generic.Parameter,
-  Generics.Collections,
-  System.Character;
+  BADI.Generic.Tokenizer,
+  BADI.Interfaces;
 
 Const
   (** Constant for the keyword ABSTRACT. **)
@@ -431,14 +427,16 @@ Const
   (** Constant for the keyword TYPE. **)
   strVAR = 'VAR';
   (** Constant for the keyword VAR. **)
-  strCDINCLUDE = '{$INCLUDE';
+  strCDINCLUDELong = '{$INCLUDE';
+  (** Constant for the keyword VAR. **)
+  strCDINCLUDEShort = '{$I';
   
   (** A lower case keyword else. **)
   strLCElse = 'else';
   (** A lower case keyword end. **)
   strLCEnd = 'end';
   
-  (** A list of cyclo metric complexity oerators which increase the complexity. **)
+  (** A list of cyclometric complexity operators which increase the complexity. **)
   strCycloMetricComplexityOperators : Array[0..2] Of String = ('and', 'or', 'xor');
 
 (**
@@ -466,7 +464,7 @@ End;
 
   This method adds a pascal method is the given container. If Nil adds to the implemented methods.
 
-  @precon  Method must be a valid TPascalMethod.
+  @precon  Method must be a valid Pascal Method.
   @postcon Adds a pascal method is the given container. If Nil adds to the implemented methods.
 
   @nometrics
@@ -496,25 +494,21 @@ begin
       If C = Nil Then
         Begin
           If Method.Identifier <> '' Then
-            Begin
-              If FImplementedMethodsLabel = Nil Then
-                FImplementedMethodsLabel := Add(strImplementedMethodsLabel,
-                  iiImplementedMethods, scNone, Nil) As TLabelContainer;
-              C := FImplementedMethodsLabel;
-            End Else
+            C := ASTLabel[alImplementedMethodsLabel]
+          Else
             Begin
               If Assigned(CurrentMethod) Then
                 Begin
                   E := CurrentMethod.FindElement(strAnonymousMethods);
                   If E = Nil Then
-                    E := CurrentMethod.Add(strAnonymousMethods, iiMethodsLabel, scNone, Nil);
+                    E := CurrentMethod.Add(strAnonymousMethods, iiMethodsLabel, scNone);
                   C := E;
                 End;
             End;
           iIcon := iiUnknownClsObj;
           AScope := scNone;
-          E := FTypesLabel;
-          If E <> Nil Then
+          E := FASTLabels[alTypesLabel];
+          If Assigned(E) Then
             For iCls := 0 To Method.ClassNames.Count - 1 Do
               If E <> Nil Then
                 Begin
@@ -537,7 +531,7 @@ begin
           MethodsLabel := (C As TRecordDecl).FindElement(strMethodsLabel) As TLabelContainer;
           If MethodsLabel = Nil Then
             MethodsLabel := C.Add(
-              strMethodsLabel, iiMethodsLabel, scNone, Nil) As TLabelContainer;
+              strMethodsLabel, iiMethodsLabel, scNone) As TLabelContainer;
           C := MethodsLabel;
         End;
       tmpMethod := Method;
@@ -548,6 +542,7 @@ begin
             AddIssue(Format(strDuplicateIdentifierFound, [Method.Identifier,
               Method.Line, Method.Column]), scNone, tmpMethod.Line, tmpMethod.Column, etError, Self);
         End;
+      AddIdentifier(Method.Identifier);
     End;
 end;
 
@@ -758,8 +753,7 @@ Begin
             Repeat
               Result.AddDimension;
               T := OrdinalType(TypeToken(Nil, scNone, Nil,
-                FTemporaryElements.Add(Format('%d', [Result.Dimensions]), iiNone,
-                scNone, Nil)));
+                FTemporaryElements.Add(Format('%d', [Result.Dimensions]), iiNone, scNone)));
               If T <> Nil Then
                 Result.AddTokens(T);
             Until Not IsToken(',', Result);
@@ -807,17 +801,17 @@ Begin
     Begin
       Repeat
         NextNonCommentToken;
-      Until (Token.UToken = strEND) And (PrevToken.Token <> '@@');
+      Until (Token.UToken = strEND) And (PrevToken.Token <> '@');
       NextNonCommentToken;
     End;
 End;
 
 (**
 
-  This function returns a string repreentation of the unit.
+  This function returns a string representation of the unit.
 
   @precon  None .
-  @postcon Returns a string repreentation of the unit.
+  @postcon Returns a string representation of the unit.
 
   @nohints
 
@@ -839,7 +833,7 @@ end;
   This method parses a single RTTI Attribute declaration at the current token position.
 
   @precon  None.
-  @postcon The current RTTI Attribute at the current token postiion is parsed else an error is raised.
+  @postcon The current RTTI Attribute at the current token position is parsed else an error is raised.
 
 **)
 Procedure TPascalModule.AttributeDeclaration;
@@ -875,7 +869,7 @@ End;
   grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon Parses a block section from the current token position
@@ -1009,7 +1003,7 @@ End;
 
   This method checks the alias (if one exists) of the procedure / function.
 
-  @precon  Method must be a valid TPascalMethod instance.
+  @precon  Method must be a valid Pascal Method instance.
   @postcon Checks the alias (if one exists) of the procedure / function.
 
   @param   Method as a TPascalMethod as a constant
@@ -1038,6 +1032,33 @@ Begin
             End;
         End Else
           ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+    End;
+End;
+
+(**
+
+  This method iterates the given element and all its child elements recursively checking the spelling of
+  constant string declarations.
+
+  @precon  Element must be a valid instance.
+  @postcon All spelling mistakes in the string constants in the element hierarchy are output.
+
+  @param   Element as a TElementContainer as a constant
+
+**)
+Procedure TPascalModule.CheckConstantStringSpelling(Const Element: TElementContainer);
+
+Var
+  iElement: Integer;
+  E: TElementContainer;
+
+Begin
+  For iElement := 1 To Element.ElementCount Do
+    Begin
+      E := Element.Elements[iElement];
+      If (E Is TConstant) And Not (E Is TResourceString) Then
+        ProcessLiteralsForSpelling(E, sitConstant);
+      CheckConstantStringSpelling(Element.Elements[iElement]);
     End;
 End;
 
@@ -1072,11 +1093,11 @@ end;
 (**
 
   This method checks the type of number in the expression to make sure Integers and Floating point number
-  aren`t mixed.
+  are not mixed.
 
   @precon  None.
   @postcon Checks the type of number in the expression to make sure Integers and Floating point number 
-           aren`t mixed.
+           are not mixed.
 
   @note    This may have problems with expression that allow integers and floats to be added, etc.
 
@@ -1095,9 +1116,36 @@ End;
 
 (**
 
+  This method iterates the given element and all its child elements recursively checking the spelling of
+  resource string declarations.
+
+  @precon  Element must be a valid instance.
+  @postcon All spelling mistakes in the resource strings in the element hierarchy are output.
+
+  @param   Element as a TElementContainer as a constant
+
+**)
+Procedure TPascalModule.CheckResourceStringSpelling(Const Element : TElementContainer);
+
+Var
+  iElement: Integer;
+  E: TElementContainer;
+
+Begin
+  For iElement := 1 To Element.ElementCount Do
+    Begin
+      E := Element.Elements[iElement];
+      If E Is TResourceString Then
+        ProcessLiteralsForSpelling(E, sitResourceString);
+      CheckResourceStringSpelling(Element.Elements[iElement]);
+    End;
+End;
+
+(**
+
   This method checks the returns value of the function.
 
-  @precon  Method must be a valid TPascalMethod instance .
+  @precon  Method must be a valid Generic Method instance .
   @postcon Checks the returns value of the function .
 
   @param   Method as a TGenericFunction as a constant
@@ -1118,11 +1166,11 @@ End;
 
 (**
 
-  This method cross reference the methods in class, exported and implemented and marsk the as resolved 
+  This method cross reference the methods in class, exported and implemented and marks the as resolved 
   and output error messages for those that are still unresolved.
 
   @precon  None.
-  @postcon Cross reference the methods in class, exported and implemented and marsk the as resolved and 
+  @postcon Cross reference the methods in class, exported and implemented and marks the as resolved and 
            output error messages for those that are still unresolved.
 
 **)
@@ -1134,17 +1182,17 @@ Var
 begin
   ResolveScopeOfImplementedExportedMethods;
   ResolveScopeOfImplementedExportsMethods;
-  ResolveScopeOfImplementedMethods(FImplementedMethodsLabel);
+  ResolveScopeOfImplementedMethods(FASTLabels[alImplementedMethodsLabel]);
   ResolveForwardImplementedMethods;
   // Only resolved methods IF there are no other errors.
   Errors := FindElement(strErrors) As TLabelContainer;
   If Errors <> Nil Then
     If Errors.ElementCount > 0 Then
       Exit;
-  FindUnresolvedRecordObjectAndClassMethods(FTypesLabel);
+  FindUnresolvedRecordObjectAndClassMethods(FASTLabels[alTypesLabel]);
   FindUnresolvedExportedMethods;
   {FindUnresolvedExportsMethods;}
-  FindUnresolvedImplementedClassMethods(FImplementedMethodsLabel);
+  FindUnresolvedImplementedClassMethods(FASTLabels[alImplementedMethodsLabel]);
 end;
 
 (**
@@ -1153,7 +1201,7 @@ end;
   following object pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -1186,8 +1234,7 @@ Begin
           ClassVarsLabel := Cls.FindElement(strClassVarsLabel) As TLabelContainer;
           If ClassVarsLabel = Nil Then
             ClassVarsLabel := Cls.Add(strClassVarsLabel,
-              iiPublicClassVariablesLabel, LabelScope,
-              GetComment) As TLabelContainer;
+              iiPublicClassVariablesLabel, LabelScope, 0, 0, GetComment) As TLabelContainer;
           V := ClassVarsLabel;
           NextNonCommentToken;
           While VarDecl(AScope, V, iiPublicClassVariable) Do
@@ -1271,7 +1318,7 @@ End;
 
 (**
 
-  This method parses a class property list frmo the current token position using the following object 
+  This method parses a class property list from the current token position using the following object 
   pascal grammar.
 
   @precon  Cls is a valid class declaration to get method for and Scope is the current scope of the 
@@ -1343,7 +1390,7 @@ End;
 
 (**
 
-  This method parse a class declaration from the current token position deligating field, property and 
+  This method parse a class declaration from the current token position delegating field, property and 
   method declarations using the following object pascal grammar.
 
   @precon  None.
@@ -1403,11 +1450,7 @@ begin
               Begin
                 NextNonCommentToken;
                 If IsIdentifier(Token) Then
-                  Begin
-                    Result.HelperClassName := Token.Token;
-                    NextNonCommentToken;
-                  End Else
-                    ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
+                  Result.HelperClassName := QualifiedIdentifier;
               End Else
                 ErrorAndSeekToken(strReservedWordExpected, strFOR, strSeekableOnErrorTokens, stActual, Self);
           // If this class has no body then return
@@ -1614,7 +1657,7 @@ End;
   pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -1836,7 +1879,7 @@ end;
   object pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -1868,16 +1911,10 @@ Begin
           ConstantsLabel := (Container As TRecordDecl).FindElement(strConstantsLabel) As TLabelContainer;
           If ConstantsLabel = Nil Then
             ConstantsLabel := Container.Add(
-              strConstantsLabel, iiPublicConstantsLabel, LabelScope,
-              GetComment) As TLabelContainer;
+              strConstantsLabel, iiPublicConstantsLabel, LabelScope, 0, 0, GetComment) As TLabelContainer;
           C := ConstantsLabel;
         End Else
-        Begin
-          If FConstantsLabel = Nil Then
-            FConstantsLabel := Add(strConstantsLabel, iiPublicConstantsLabel,
-              LabelScope, GetComment) As TLabelContainer;
-          C := FConstantsLabel;
-        End;
+          C := ASTLabel[alConstantsLabel];
       NextNonCommentToken;
       RTTIAttributes;
       While ConstantDecl(AScope, C) Do
@@ -1892,11 +1929,11 @@ End;
 
 (**
 
-  This method parses a contains clause fro the cutrrent token position using the following object pascal 
+  This method parses a contains clause fro the current token position using the following object pascal 
   grammar.
 
   @precon  None.
-  @postcon Parses a contains clause fro the cutrrent token position
+  @postcon Parses a contains clause fro the current token position
 
 **)
 Procedure TPascalModule.ContainsClause;
@@ -1910,7 +1947,7 @@ Var
 Begin
   If Token.UToken = strCONTAINS Then
     Begin
-      C := Add(strContainsLabel, iiUsesLabel, scNone, GetComment);
+      C := Add(strContainsLabel, iiUsesLabel, scNone, Token.Line, Token.Column, GetComment);
       NextNonCommentToken;
       IdentList(C, scNone, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -1921,14 +1958,12 @@ End;
 
 (**
 
-  This is the constructor method for the TPascalDocModule class.
+  This is the constructor method for the Pascal Module class.
 
   @precon  Source is a valid TStream descendant containing as stream of text, that is the contents of a 
            source code module and Filename is the file name of the module being parsed and IsModified 
            determines if the source code module has been modified since the last save to disk.
   @postcon Creates an instance of the module parser.
-
-  @nometricHardString
 
   @param   Source        as a String as a constant
   @param   strFileName   as a String as a constant
@@ -1939,27 +1974,29 @@ End;
 Constructor TPascalModule.CreateParser(Const Source, strFileName : String;
   Const IsModified : Boolean; Const ModuleOptions : TModuleOptions);
 
-Const
+ResourceString
   strStart = 'Start';
-  strTokenize = 'Tokenize';
+  strTokenize = 'Tokenise';
   strParse = 'Parse';
   strResolve = 'Resolve';
   strRefs = 'Refs';
-  strChecks = 'Check';
+  strChecks = 'Checks';
+  strMetrics = 'Metrics';
+  strSpelling = 'Spelling';
   
 Var
   boolCascade: Boolean;
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
-  FTypesLabel              := Nil;
-  FConstantsLabel          := Nil;
-  FResourceStringsLabel    := Nil;
-  FVariablesLabel          := Nil;
-  FThreadVarsLabel         := Nil;
-  FExportedHeadingsLabel   := Nil;
-  FExportsHeadingsLabel    := Nil;
-  FImplementedMethodsLabel := Nil;
+  FASTLabels[alTypesLabel]              := Nil;
+  FASTLabels[alConstantsLabel]          := Nil;
+  FASTLabels[alResourceStringsLabel]    := Nil;
+  FASTLabels[alVariablesLabel]          := Nil;
+  FASTLabels[alThreadVarsLabel]         := Nil;
+  FASTLabels[alExportedHeadingsLabel]   := Nil;
+  FASTLabels[alExportsHeadingsLabel]    := Nil;
+  FASTLabels[alImplementedMethodsLabel] := Nil;
   FModuleType := mtUnit;
   FExternalSyms := TStringList.Create;
   FExternalSyms.Sorted := True;
@@ -1982,10 +2019,10 @@ Begin
       AddTickCount(strParse);
       CheckUnResolvedMethods;
       AddTickCount(strResolve);
-      Add(strErrors, iiErrorFolder, scNone, Nil);
-      Add(strWarnings, iiWarningFolder, scNone, Nil);
-      Add(strHints, iiHintFolder, scNone, Nil);
-      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      Add(strErrors, iiErrorFolder, scNone);
+      Add(strWarnings, iiWarningFolder, scNone);
+      Add(strHints, iiHintFolder, scNone);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone);
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
       AddTickCount(strRefs);
@@ -1995,6 +2032,17 @@ Begin
       AddTickCount(strChecks);
       TidyUpEmptyElements;
       MetricsUnsortedMethods;
+      AddTickCount(strMetrics);
+      If doShowSpelling In BADIOptions.Options Then
+        Begin
+          CheckCommentSpelling;
+          If doSpellCheckResourceStrings In TBADIOptions.BADIOptions.Options Then
+            CheckResourceStringSpelling(Self);
+          If doSpellCheckConstants In TBADIOptions.BADIOptions.Options Then
+            CheckConstantStringSpelling(Self);
+          CheckStringSpelling;
+          AddTickCount(strSpelling);
+        End;
     End;
 End;
 
@@ -2004,7 +2052,7 @@ End;
   pascal grammar.
 
   @precon  On entry to this method , Scope defines the current scope of the block i . e . private in in 
-           the implemenation section or public if in the interface section and The Method parameter is
+           the implementation section or public if in the interface section and The Method parameter is
            nil for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method .
   @postcon Parses a declaration section from the current token position .
@@ -2230,7 +2278,7 @@ End;
   This is a destructor for the TPascalModule class.
 
   @precon  None.
-  @postcon Fress the memory fo this instance.
+  @postcon Frees the memory for this instance.
 
 
 **)
@@ -2322,11 +2370,11 @@ end;
 
 (**
 
-  This method retrives the method directives after the method declaration from the current token position
-  using the followong object pascal grammar.
+  This method retrieves the method directives after the method declaration from the current token position
+  using the following object pascal grammar.
 
   @precon  M is a valid method declaration to add directives too.
-  @postcon Retrives the method directives after the method declaration from the current token position
+  @postcon Retrieves the method directives after the method declaration from the current token position
 
   @param   M              as a TPascalMethod as a constant
   @param   boolGrammarFix as a Boolean as a constant
@@ -2357,7 +2405,7 @@ Begin
         M.ForwardDecl := True;
       If Token.UToken = strABSTRACT THEN
         M.ForwardDecl := True;
-      C := TIdentList.Create('', scLocal, 0, 0, iiNone, Nil);
+      C := TConstant.Create('', scLocal, 0, 0, iiNone, Nil);
       Try
         If Token.UToken = strMESSAGE Then
           Begin
@@ -2681,12 +2729,9 @@ Begin
   Result := Token.UToken = strEXPORTS;
   If Result Then
     Begin
-      If FExportsHeadingsLabel = Nil Then
-        FExportsHeadingsLabel := Add(strExportsLabel,
-          iiExportedFunctionsLabel, scNone, Nil) As TLabelContainer;
       NextNonCommentToken;
       Repeat
-        ExportsItem(FExportsHeadingsLabel);
+        ExportsItem(ASTLabel[alExportsHeadingsLabel]);
       Until Not IsToken(',', Nil);
       If Token.Token = ';' Then
         NextNonCommentToken
@@ -2701,8 +2746,6 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the next series of tokens as an expression.
-
-  @grammer Expression -> SimpleExpression [RelOp SimpleExpression]
 
   @param   C        as a TElementContainer as a constant
   @param   ExprType as a TPascalExprTypes as a reference
@@ -2956,7 +2999,7 @@ End;
   This method parses a classes / interfaces field list from the current token position using the 
   following object pascal grammar.
 
-  @precon  Cls is an ibject delcaration to add fields too and Scope is the current internal scope of the
+  @precon  Cls is an object declaration to add fields too and Scope is the current internal scope of the
            object.
   @postcon Returns true is a field was parsed.
 
@@ -2992,8 +3035,7 @@ begin
               tmpP := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
                 iiPublicField, I[j].Comment);
               If Cls.FieldsLabel = Nil Then
-                Cls.FieldsLabel := Cls.Add(strFieldsLabel, iiFieldsLabel, scNone,
-                  Nil) As TLabelContainer;
+                Cls.FieldsLabel := Cls.Add(strFieldsLabel, iiFieldsLabel, scNone) As TLabelContainer;
               P := Cls.FieldsLabel.Add(tmpP) As TField;
               If P <> tmpP Then
                 AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name,
@@ -3133,11 +3175,11 @@ var
   iIndex : Integer;
 
 begin
-  If FExportedHeadingsLabel <> Nil Then
-    For k := 1 To FExportedHeadingsLabel.ElementCount Do
-      If FExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
+  If Assigned(FASTLabels[alExportedHeadingsLabel]) Then
+    For k := 1 To FASTLabels[alExportedHeadingsLabel].ElementCount Do
+      If FASTLabels[alExportedHeadingsLabel].Elements[k] Is TPascalMethod Then
         Begin
-          Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
+          Method := FASTLabels[alExportedHeadingsLabel].Elements[k] As TPascalMethod;
           If Not Method.Resolved And Not FExternalSyms.Find(Method.Identifier, iIndex) Then
             AddIssue(Format(strUnSatisfiedForwardReference, [Method.Identifier]),
               scNone, Method.Line, Method.Column, etWarning, Method);
@@ -3217,10 +3259,10 @@ procedure TPascalModule.FindUnresolvedRecordObjectAndClassMethods(Const TypeLabe
 
   (**
 
-    This function walks backwards through the heirarchy to find all the qualifying objects and classes.
+    This function walks backwards through the hierarchy to find all the qualifying objects and classes.
 
     @precon  None.
-    @postcon Walks backwards through the heirarchy to find all the qualifying objects and classes.
+    @postcon Walks backwards through the hierarchy to find all the qualifying objects and classes.
 
     @param   RecObjOrCls as a TRecordDecl as a constant
     @return  a String
@@ -3246,7 +3288,7 @@ procedure TPascalModule.FindUnresolvedRecordObjectAndClassMethods(Const TypeLabe
 
     This method determines if the method should have an implementation.
 
-    @precon  Method must be a valid TPascalMethod instance.
+    @precon  Method must be a valid Pascal Method instance.
     @postcon Determines if the method should have an implementation.
 
     @param   Method as a TPascalMethod as a constant
@@ -3331,7 +3373,7 @@ End;
 (**
 
   This method parses a methods formal parameters from the current token position using the following 
-  object psacal grammar.
+  object pascal grammar.
 
   @precon  Method is a valid method to which the formal parameters are to be added.
   @postcon Parses a methods formal parameters from the current token position
@@ -3542,6 +3584,55 @@ End;
 
 (**
 
+  This is a getter methods for the Variables Label property.
+
+  @precon  None.
+  @postcon Returns the modules variable label (creating it if required).
+
+  @refactor Move this up to the TBaseModule class.
+
+  @param   eLabel as a TBADIASTLabel as a constant
+  @return  a TLabelContainer
+
+**)
+Function TPascalModule.GetASTLabel(Const eLabel : TBADIASTLabel): TLabelContainer;
+
+Var
+  strLabel : String;
+  eImageLabel : TBADIImageIndex;
+  
+Begin
+  If Not Assigned(FASTLabels[eLabel]) Then
+    Begin
+      Case eLabel Of
+        alTypesLabel:              strLabel := strTypesLabel;
+        alConstantsLabel:          strLabel := strConstantsLabel;
+        alResourceStringsLabel:    strLabel := strResourceStringsLabel;
+        alVariablesLabel:          strLabel := strVarsLabel;
+        alThreadVarsLabel:         strLabel := strThreadVarsLabel;
+        alExportedHeadingsLabel:   strLabel := strExportedHeadingsLabel;
+        alExportsHeadingsLabel:    strLabel := strExportsLabel;
+        alImplementedMethodsLabel: strLabel := strImplementedMethodsLabel;
+      End;
+      Case eLabel Of
+        alTypesLabel:              eImageLabel := iiPublicTypesLabel;
+        alConstantsLabel:          eImageLabel := iiPublicConstantsLabel;
+        alResourceStringsLabel:    eImageLabel := iiPublicResourceStringsLabel;
+        alVariablesLabel:          eImageLabel := iiPublicVariablesLabel;
+        alThreadVarsLabel:         eImageLabel := iiPublicThreadVarsLabel;
+        alExportedHeadingsLabel:   eImageLabel := iiExportedHeadingsLabel;
+        alExportsHeadingsLabel:    eImageLabel := iiExportedFunctionsLabel;
+        alImplementedMethodsLabel: eImageLabel := iiImplementedMethods;
+      Else
+        eImageLabel := iiNone;
+      End;
+      FASTLabels[eLabel] := Add(strLabel, eImageLabel, scNone, 0, 0, GetComment) As TLabelContainer;
+    End;
+  Result := FASTLabels[eLabel];
+End;
+
+(**
+
   This method tries to get a document comment from the previous token and return a TComment class to the 
   calling routine.
 
@@ -3654,37 +3745,20 @@ Begin
   Result := RestrictedType(AToken);
   If Result = Nil Then
     Result := OPType(AToken);
+  If Assigned(Result) And (Result.TokenCount = 1) Then
+    Self.ReferenceSymbol(Result.Tokens[0]);
   PortabilityDirective;
-End;
-
-(**
-
-  This is a getter methods for the VariablesLabel propertry.
-
-  @precon  None.
-  @postcon Returns the modules variable label (creating it if required).
-
-  @return  a TLabelContainer
-
-**)
-Function TPascalModule.GetVariablesLabel: TLabelContainer;
-
-Begin
-  If FVariablesLabel = Nil Then
-    FVariablesLabel := Add(strVarsLabel, iiPublicVariablesLabel, scPrivate,
-      GetComment) As TLabelContainer;
-  Result := FVariablesLabel;
 End;
 
 (**
 
   This method is the starting position for the parsing of an object pascal
   module. It finds the first non comment token and begins the grammar checking
-  from their by deligating to the program, library, unit and package methods.
+  from their by delegating to the program, library, unit and package methods.
 
   @precon  None.
   @postcon It finds the first non comment token and begins the grammar checking
-           from their by deligating to the program, library, unit and package
+           from their by delegating to the program, library, unit and package
            methods.
 
 **)
@@ -3730,10 +3804,10 @@ end;
 (**
 
   This method creates a identifier list starting at the current token and return the list to the calling 
-  function. If OwnList is true then the identlist is added to the classes owned items list for automatic 
-  disposal, else it the responsibliity of the calling function to disposal of the class.
+  function. If Own List is true then the identlist is added to the classes owned items list for automatic 
+  disposal, else it the responsibility of the calling function to disposal of the class.
 
-  @precon  OwnList determines if the identlist should be disposed of be the parser or be the caller . 
+  @precon  Own List determines if the identlist should be disposed of be the parser or be the caller . 
            SeekTokens is a sorted lowercase list of token to find if an error is found.
   @postcon Returns an ident list.
 
@@ -3763,6 +3837,7 @@ Begin
     Repeat
       If IsIdentifier(Token) Then
         Begin
+          AddIdentifier(Token.Token);
           C := GetComment;
           If C <> Nil then
             Begin
@@ -3989,7 +4064,7 @@ Var
   Tmp : TElementContainer;
   AToken: TTokenInfo;
   ExprType: TPascalExprTypes;
-  Expr: TTempCntr;
+  Expr: TConstant;
   tmpC: TConstant;
   C: TElementContainer;
   Cmt: TComment;
@@ -4005,7 +4080,10 @@ Begin
           Cmt := GetComment();
           tmpC := TConstant.Create(AToken.Token, scLocal, AToken.Line, AToken.Column, iiPublicConstant,
             Cmt);
-          C := CurrentMethod.ConstantsLabel.Add(tmpC);
+          If Assigned(CurrentMethod) Then
+            C := CurrentMethod.ConstantsLabel.Add(tmpC)
+          Else
+            C := ASTLabel[alConstantsLabel].Add(tmpC);
           If tmpC <> C Then
             AddIssue(Format(strDuplicateIdentifierFound, [AToken.Token, AToken.Line, AToken.Column]),
               scNone, AToken.Line, AToken.Column, etError, Self);
@@ -4013,7 +4091,8 @@ Begin
           If Token.Token = ':' Then
             Begin
               NextNonCommentToken;
-              CurrentMethod.ConstantsLabel.ReferenceSymbol(AToken);
+              If Assigned(CurrentMethod) Then
+                CurrentMethod.ConstantsLabel.ReferenceSymbol(AToken);
               Tmp := TTempCntr.Create('', scLocal, 0, 0, iiNone, Nil);
               Try
                 GetTypeDecl(TypeToken(Nil, scNone, Nil, Tmp));
@@ -4030,7 +4109,7 @@ Begin
             Begin
               NextNonCommentToken;
               ExprType := [petUnknown];
-              Expr := TTempCntr.Create('', scNone, 0 ,0, iiNone, Nil);
+              Expr := TConstant.Create('', scNone, 0 ,0, iiNone, Nil);
               Try
                 Expression(Expr, ExprType);
                 C.AddTokens(Expr);
@@ -4045,10 +4124,10 @@ End;
 
 (**
 
-  This method checks for inline variable or constant declarations and if neither processes a statement.
+  This method checks for in-line variable or constant declarations and if neither processes a statement.
 
   @precon  None.
-  @postcon Processes an inline varaible or constant or if not found processes a statement.
+  @postcon Processes an in-line variable or constant or if not found processes a statement.
 
 **)
 Procedure TPascalModule.InLineStatement;
@@ -4075,7 +4154,7 @@ Function TPascalModule.InLineVarDecl: Boolean;
 
     this procedure creates a variable based on the given element and type.
 
-    @precon  Ident and T must be avalid instances.
+    @precon  Ident and T must be a valid instances.
     @postcon A variable of type T is created in the methods variables collection.
 
     @param   Ident as a TElementContainer as a constant
@@ -4095,7 +4174,7 @@ Function TPascalModule.InLineVarDecl: Boolean;
     If Assigned(CurrentMethod) Then
       L := CurrentMethod.VariablesLabel
     Else
-      L := VariablesLabel;
+      L := ASTLabel[alVariablesLabel];
     V := L.Add(tmpV);
     If tmpV <> V Then
       AddIssue(Format(strDuplicateIdentifierFound, [Ident.Identifier, Ident.Line, Ident.Column]),
@@ -4133,7 +4212,7 @@ Begin
           If Assigned(CurrentMethod) Then
             L := CurrentMethod.VariablesLabel
           Else
-            L := VariablesLabel;
+            L := ASTLabel[alVariablesLabel];
             L.ReferenceSymbol(AToken);
             Tmp := TTempCntr.Create('', scLocal, 0, 0, iiNone, Nil);
             Try
@@ -4176,9 +4255,6 @@ End;
 Procedure TPascalModule.InterfaceDecl;
 
 Begin
-  If FExportedHeadingsLabel = Nil Then
-    FExportedHeadingsLabel := Add(strExportedHeadingsLabel,
-      iiExportedHeadingslabel, scNone, Nil) As TLabelContainer;
   Repeat
     {Loop doing nothing};
   Until Not (
@@ -4187,7 +4263,7 @@ Begin
     TypeSection(scPublic, Self) Or
     VarSection(scPublic, Self) Or
     ThreadVarSection(scPublic, Self) Or
-    ExportedHeading(FExportedHeadingsLabel) Or
+    ExportedHeading(ASTLabel[alExportedHeadingsLabel]) Or
     ExportsStmt
   );
 End;
@@ -4210,7 +4286,7 @@ End;
 
 (**
 
-  This method parses the gramar for the method list of an interface.
+  This method parses the grammar for the method list of an interface.
 
   @precon  Cls must be a valid instance.
   @postcon The grammar element is parsed.
@@ -4230,7 +4306,7 @@ End;
 
 (**
 
-  This method parses the grammar for an interace property by delegating the process to the 
+  This method parses the grammar for an interface property by delegating the process to the 
   ClassPropertyList method.
 
   @precon  Cls must be a valid reference.
@@ -4391,7 +4467,7 @@ End;
 
 (**
 
-  This method parses a var declaration in a for statemwnt and returned true else returns false.
+  This method parses a var declaration in a for statement and returned true else returns false.
 
   @precon  None.
   @postcon A var statement in a form look is parsed and true is returned else false is returned.
@@ -4422,7 +4498,7 @@ Begin
           If Assigned(CurrentMethod) Then
             L := CurrentMethod.VariablesLabel
           Else
-            L := VariablesLabel;
+            L := ASTLabel[alVariablesLabel];
           V := L.Add(tmpV);
           If tmpV <> V Then
             AddIssue(Format(strDuplicateIdentifierFound, [AToken.Token, AToken.Line, AToken.Column]),
@@ -4484,7 +4560,7 @@ End;
   object pascal grammar.
 
   @precon  None .
-  @postcon This method dicards the labels found and returns True if this method handles a label 
+  @postcon This method discards the labels found and returns True if this method handles a label 
            declaration section .
 
   @param   Container as a TElementContainer as a constant
@@ -4646,7 +4722,7 @@ end;
   This method parse a method list from the current token position using the following object pascal 
   grammar.
 
-  @precon  Cls is an object declaration to add methods too and Scopeis the current internal scope of the
+  @precon  Cls is an object declaration to add methods too and Scope is the current internal scope of the
            object.
   @postcon Returns true is a method declaration was parsed.
 
@@ -4666,7 +4742,7 @@ End;
 
 (**
 
-  This method parses the quantified record / object / class names that preceed an implemented method.
+  This method parses the quantified record / object / class names that precedes an implemented method.
 
   @precon  None.
   @postcon The method builds a list of the record / object / class hierarchy that qualifies the 
@@ -4740,11 +4816,11 @@ End;
 (**
 
   This method checks the given method for missing CONST key words for each parameter and outputs a
-  modue metric message if not found.
+  module metric message if not found.
 
   @precon  None.
   @postcon Checks the given method for missing CONST key words for each parameter and outputs a
-           modue metric message if not found.
+           module metric message if not found.
 
   @param   Method as a TGenericFunction as a constant
 
@@ -4780,11 +4856,11 @@ End;
 
 (**
 
-  This method checks the given metyhod cyclometric complexity and if found to be above the limit a module
+  This method checks the given method cyclometric complexity and if found to be above the limit a module
   metric message is output.
 
   @precon  None.
-  @postcon Checks the given metyhod cyclometric complexity and if found to be above the limit a module
+  @postcon Checks the given method cyclometric complexity and if found to be above the limit a module
            metric message is output.
 
   @param   Method as a TGenericFunction as a constant
@@ -4813,7 +4889,7 @@ End;
   This method outputs a metric message for a missing block.
 
   @precon  None.
-  @postcon A metric messsage is output for an empty block.
+  @postcon A metric message is output for an empty block.
 
   @param   eCheck as a TBADIModuleCheck as a constant
 
@@ -4839,10 +4915,10 @@ End;
 
 (**
 
-  This method outputs a module metric message for an On Exceptino clause thst will eat all exceptions.
+  This method outputs a module metric message for an On Exception clause that will eat all exceptions.
 
   @precon  Container must be a valid container.
-  @postcon Outputs a module metric message for an On Exceptino clause thst will eat all exceptions.
+  @postcon Outputs a module metric message for an On Exception clause that will eat all exceptions.
 
   @param   Container as a TElementContainer as a constant
 
@@ -4869,11 +4945,11 @@ End;
 
 (**
 
-  This method checks the current token for a hard coded number (Int or Dec) and adds a metric message of 
+  This method checks the current token for a hard coded number (INT or DEC) and adds a metric message of 
   a magic number is in use.
 
   @precon  Container must be a valid instance.
-  @postcon A metrci message is raised if the current token is a magic number.
+  @postcon A metric message is raised if the current token is a magic number.
 
   @param   Container as a TElementContainer as a constant
 
@@ -5032,12 +5108,12 @@ End;
 
 (**
 
-  This method checks the given method for a long parmaeter list and if found outputs a module metric
-  messge accordingly.
+  This method checks the given method for a long parameter list and if found outputs a module metric
+  message accordingly.
 
   @precon  Method must be a valid instance.
-  @postcon Checks the given method for a long parmaeter list and if found outputs a module metric
-           messge accordingly.
+  @postcon Checks the given method for a long parameter list and if found outputs a module metric
+           message accordingly.
 
   @param   Method as a TGenericFunction as a constant
 
@@ -5087,10 +5163,10 @@ End;
 
 (**
 
-  This method outputs the NestedIFDepth of a method if it exceeds a specific limit.
+  This method outputs the Nested IF Depth of a method if it exceeds a specific limit.
 
   @precon  None.
-  @postcon Outputs a NestedIFDepth message for the method if it exceeds a specific limit.
+  @postcon Outputs a Nested IF Depth message for the method if it exceeds a specific limit.
 
   @param   Method as a TGenericFunction as a constant
 
@@ -5118,7 +5194,7 @@ End;
   is not in the correct position.
 
   @precon  None.
-  @postcon A message is otput for each method that is not in the correct position.
+  @postcon A message is output for each method that is not in the correct position.
 
 **)
 Procedure TPascalModule.MetricsUnsortedMethods;
@@ -5129,7 +5205,7 @@ Procedure TPascalModule.MetricsUnsortedMethods;
     the method sort order is correct and if not outputs a message.
 
     @precon  Container must be a valid instance
-    @postcon Methods that are nnot in the correct sort order generate messages.
+    @postcon Methods that are not in the correct sort order generate messages.
 
     @param   Container as a TElementContainer as a constant
 
@@ -5197,14 +5273,14 @@ Var
   iContainer: Integer;
 
 Begin
-  If BADIOptions.ModuleCheck[mcUnsortedMethod].FEnabled And Assigned(FImplementedMethodsLabel) Then
+  If BADIOptions.ModuleCheck[mcUnsortedMethod].FEnabled And Assigned(FASTLabels[alImplementedMethodsLabel]) Then
     Begin
-      CheckForUnsortedMethods(FImplementedMethodsLabel);
-      For iContainer := 1 To FImplementedMethodsLabel.ElementCount Do
-        If Not (FImplementedMethodsLabel.Elements[iContainer] Is TGenericFunction) Then
-          CheckForUnsortedMethods(FImplementedMethodsLabel.Elements[iContainer])
+      CheckForUnsortedMethods(FASTLabels[alImplementedMethodsLabel]);
+      For iContainer := 1 To FASTLabels[alImplementedMethodsLabel].ElementCount Do
+        If Not (FASTLabels[alImplementedMethodsLabel].Elements[iContainer] Is TGenericFunction) Then
+          CheckForUnsortedMethods(FASTLabels[alImplementedMethodsLabel].Elements[iContainer])
         Else
-          CheckForUnsortedMethods(FImplementedMethodsLabel.Elements[iContainer]);
+          CheckForUnsortedMethods(FASTLabels[alImplementedMethodsLabel].Elements[iContainer]);
     End;
 End;
 
@@ -5241,7 +5317,7 @@ End;
   ClassClassVarSection.
 
   @precon  Cls must be a valid instance
-  @postcon Parses a class var section defined within an object delcaration.
+  @postcon Parses a class var section defined within an object declaration.
 
   @param   AScope as a TScope as a constant
   @param   Cls    as a TRecordDecl as a constant
@@ -5256,7 +5332,7 @@ End;
 
 (**
 
-  This method parses a constant section defined in an object delcaration by delegating this to the 
+  This method parses a constant section defined in an object declaration by delegating this to the 
   ConstSection method.
 
   @precon  None.
@@ -5276,7 +5352,7 @@ End;
 
 (**
 
-  This method parses an Object type declaration from the current token position using the followong 
+  This method parses an Object type declaration from the current token position using the following 
   object pascal grammar.
 
   @precon  None.
@@ -5398,7 +5474,7 @@ End;
   This method parses a list of methods defined in an object by delegating this to the MethodList method.
 
   @precon  Cls must be a valid instance
-  @postcon Method within the oject declarations are parsed.
+  @postcon Method within the object declarations are parsed.
 
   @param   Cls                as a TRecordDecl as a constant
   @param   AScope             as a TScope as a constant
@@ -5473,10 +5549,10 @@ End;
 
 (**
 
-  This method parses the visibility elements of an object definiton.
+  This method parses the visibility elements of an object definition.
 
   @precon  None.
-  @postcon Parses an visibility elements of the object definiton return the visibility in the var 
+  @postcon Parses an visibility elements of the object definition return the visibility in the var 
            parameter.
 
   @param   AScope as a TScope as a reference
@@ -5651,15 +5727,13 @@ begin
       Comment := GetComment;
       ModuleType := mtLibrary;
       NextNonCommentToken;
-      If Not IsIdentifier(Token) Then
-        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-      Else
+      If IsIdentifier(Token) Then
         Begin
-          ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
-          NextNonCommentToken;
-        End;
+          ModuleName := QualifiedIdentifier;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self)
@@ -5698,15 +5772,13 @@ begin
       Comment := GetComment;
       ModuleType := mtPackage;
       NextNonCommentToken;
-      If Not IsIdentifier(Token) Then
-        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-      Else
+      If IsIdentifier(Token) Then
         Begin
-          ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
-          NextNonCommentToken;
-        End;
+          ModuleName := QualifiedIdentifier;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self)
@@ -5749,10 +5821,9 @@ begin
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         Begin
-          ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
-          NextNonCommentToken;
+          ModuleName := QualifiedIdentifier;
           // In the Program module we need to check for '(' Ident List ')' but
           // discard
           If Token.Token = '(' Then
@@ -5833,26 +5904,13 @@ Begin
       Comment := GetComment;
       ModuleType := mtUnit;
       NextNonCommentToken;
-      If Not IsIdentifier(Token) Then
-        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-      Else
+      If IsIdentifier(Token) Then
         Begin;
-          ModuleName := Token.Token;
           Line := Token.Line;
           Column := Token.Column;
-          NextNonCommentToken;
-        End;
-      While Token.Token = '.' Do
-        Begin
-          ModuleName := ModuleName + '.';
-          NextNonCommentToken;
-          If IsIdentifier(Token) Then
-            Begin
-              ModuleName := ModuleName + '.';
-              NextNonCommentToken;
-            End Else
-              ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
-        End;
+          ModuleName := QualifiedIdentifier;;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       PortabilityDirective;
       // Check for ';'
       If Token.Token <> ';' Then
@@ -5901,7 +5959,7 @@ End;
 
 (**
 
-  This method determines if the type is an ordinal type using the folowing object pascal grammar.
+  This method determines if the type is an ordinal type using the following object pascal grammar.
 
   @precon  None.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -5926,7 +5984,7 @@ End;
   object pascal grammar.
 
   @precon  Method is a valid method to add a parameter too and ParamMod is a parameter modifier for the 
-           parameter to signify a const, var or out paramemter.
+           parameter to signify a CONST, VAR or OUT parameter.
   @postcon Parses a parameter list for a method from the current token position
 
   @param   Method   as a TPascalMethod as a constant
@@ -6013,7 +6071,7 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
+           Errors while providing declaration elements for browsing.
 
 **)
 Procedure TPascalModule.ParseTokens;
@@ -6297,12 +6355,8 @@ end;
   @precon  None.
   @postcon Processes a compiler directive looking for conditional statements.
 
-  @nometrics
-
-  @param   iSkip as an Integer as a reference
-
 **)
-procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
+procedure TPascalModule.ProcessCompilerDirective;
 
   (**
 
@@ -6348,31 +6402,11 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
 
   (**
 
-    This method adds the number to the stack and increments the iSkip variable by the value passed.
+    This function removes the number from the stack. Note this also added the removed value to the UNDO
+    stack.
 
     @precon  None.
-    @postcon Adds the number to the stack and increments the iSkip variable by the value passed.
-
-    @param   iCompilerDefType   as a TCompilerDefType as a constant
-    @param   iCompilerCondition as a TCompilerCondition as a constant
-
-  **)
-  Procedure IncSkip(Const iCompilerDefType : TCompilerDefType;
-    Const iCompilerCondition : TCompilerCondition);
-
-  Begin
-    CompilerConditionStack.Push(iCompilerDefType, iCompilerCondition, TokenIndex);
-    If iCompilerCondition = ccIncludeCode Then
-      Inc(iSkip);
-  End;
-
-  (**
-
-    This function removes the number from the stack and decrements the iSkip variable by 1. Note this 
-    also added the removed value to the UNDO stack.
-
-    @precon  None.
-    @postcon Removes the number from the stack and decrements the iSkip variable by 1.
+    @postcon Removes the number from the stack.
 
     @return  a Boolean
 
@@ -6380,7 +6414,7 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
   Function DecSkip : Boolean;
 
   Var
-    CompilerCondition: TCompilerConditionData;
+    CompilerCondition: IBADICompilerConditionData;
 
   Begin
     Result := False;
@@ -6388,8 +6422,6 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
       Begin
         CompilerCondition := CompilerConditionStack.Peek;
         CompilerConditionUndoStack.Push(CompilerCondition);
-        If CompilerCondition.CompilerCondition = ccIncludeCode Then
-          Dec(iSkip);
         CompilerConditionStack.Pop;
       End Else
         Result := True;
@@ -6408,50 +6440,51 @@ Const
   strCDEXTERNALSYM = '{$EXTERNALSYM';
 
 Var
-  CompilerCondition : TCompilerConditionData;
+  CompilerConditionData : IBADICompilerConditionData;
 
 begin
   If Like(Token.Token, strCDDEFINE) Then
-    AddDef(GetDef)
+    Begin
+      If CompilerConditionStack.CanParse Then
+        AddDef(GetDef);
+    End
   Else If Like(Token.Token, strCDUNDEF) Then
-    DeleteDef(GetDef)
+    Begin
+      If CompilerConditionStack.CanParse Then
+        DeleteDef(GetDef);
+    End
   Else If Like(Token.Token, strCDIFDEF) Then
     Begin
-      If Not IfDef(GetDef) Then
-        IncSkip(cdtIFDEF, ccIncludeCode)
+      If IfDef(GetDef) Then
+        CompilerConditionStack.Push(cdtIFDEF, ccIncludeCode, TokenIndex)
       Else
-        IncSkip(cdtIFDEF, ccExcludeCode);
+        CompilerConditionStack.Push(cdtIFDEF, ccExcludeCode, TokenIndex);
     End
   Else If Like(Token.Token, strCDIFOPT) Then
     Begin
       If Not IfDef(GetDef) Then
-        IncSkip(cdtIFDEF, ccIncludeCode)
+        CompilerConditionStack.Push(cdtIFDEF, ccIncludeCode, TokenIndex)
       Else
-        IncSkip(cdtIFDEF, ccExcludeCode);
+        CompilerConditionStack.Push(cdtIFDEF, ccExcludeCode, TokenIndex);
     End
   Else If Like(Token.Token, strCDIF) Then
-    IncSkip(cdtIFDEF, ccExcludeCode) // FAKE $IF by defaulting to TRUE
+    CompilerConditionStack.Push(cdtIFDEF, ccExcludeCode, TokenIndex) // FAKE $IF by defaulting to TRUE
   Else If Like(Token.Token, strCDIFNDEF) Then
     Begin
-      If Not IfNotDef(GetDef) Then
-        IncSkip(cdtIFNDEF, ccIncludeCode)
+      If IfNotDef(GetDef) Then
+        CompilerConditionStack.Push(cdtIFNDEF, ccIncludeCode, TokenIndex)
       Else
-        IncSkip(cdtIFNDEF, ccExcludeCode);
+        CompilerConditionStack.Push(cdtIFNDEF, ccExcludeCode, TokenIndex);
     End
   Else If Like(Token.Token, strCDELSE) Then
     Begin
       If CompilerConditionStack.CanPop Then
         Begin
-          CompilerCondition := CompilerConditionStack.Peek;
-          If CompilerCondition.CompilerCondition = ccIncludeCode Then
-            Begin
-              CompilerConditionStack.Push(cdtELSE, ccExcludeCode, CompilerCondition.TokenIndex);
-              Dec(iSkip);
-            End Else
-            Begin
-              CompilerConditionStack.Push(cdtELSE, ccIncludeCode, CompilerCondition.TokenIndex);
-              Inc(iSkip);
-            End;
+          CompilerConditionData := CompilerConditionStack.Pop;
+          If CompilerConditionData.CompilerCondition = ccIncludeCode Then
+            CompilerConditionStack.Push(cdtELSE, ccExcludeCode, CompilerConditionData.TokenIndex)
+          Else
+            CompilerConditionStack.Push(cdtELSE, ccIncludeCode, CompilerConditionData.TokenIndex);
         End Else
           AddIssue(Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
               scGlobal, Token.Line, Token.Column, etError, Self);
@@ -6459,13 +6492,11 @@ begin
   Else If Like(Token.Token, strCDENDIF) Then
     Begin
       If TokenStackTop > 0 Then
-        Begin
-          CompilerConditionStack.Push(cdtENDIF, ccIncludeCode, TokenIndex);
-          Dec(iSkip);
-        End Else
-          If DecSkip Then
-            AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
-              scGlobal, Token.Line, Token.Column, etError, Self);
+        CompilerConditionStack.Pop()
+      Else
+        If DecSkip Then
+          AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
+            scGlobal, Token.Line, Token.Column, etError, Self);
 
     End
   Else If Like(Token.Token, strCDIFEND) Then
@@ -6474,12 +6505,16 @@ begin
         AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
             scGlobal, Token.Line, Token.Column, etError, Self);
     End
-  Else If Like(Token.Token, strCDINCLUDE) Then
-    ProcessIncludeDirective(Token.Token)
+  Else If Like(Token.Token, strCDINCLUDELong) Then
+    ProcessIncludeDirective(Token.Token, strCDINCLUDELong)
+  Else If Like(Token.Token, strCDINCLUDEShort) Then
+    ProcessIncludeDirective(Token.Token, strCDINCLUDEShort)
   Else If Like(Token.Token, strCDEXTERNALSYM) Then
     FExternalSyms.Add(GetDef);
-  If iSkip < 0 Then
-    iSkip := 0;
+  {: @debug CodeSite.SendFmtMsg(csmNote, '%s: %s', [
+    Token.Token,
+    BoolToStr(CompilerConditionStack.CanParse, True)]
+  );}
 end;
 
 (**
@@ -6490,10 +6525,11 @@ end;
   @precon  None.
   @postcon The parser tokens from the include file are inserted after the current token.
 
-  @param   strToken as a String as a constant
+  @param   strToken       as a String as a constant
+  @param   strIncludeType as a String as a constant
 
 **)
-Procedure TPascalModule.ProcessIncludeDirective(Const strToken: String);
+Procedure TPascalModule.ProcessIncludeDirective(Const strToken, strIncludeType: String);
 
 ResourceString
   strINCLUDEFileDoesNotExist = 'The INCLUDE file "%s" does not exist!';
@@ -6510,7 +6546,11 @@ Var
 
 Begin
   strFileName := strToken;
-  Delete(strFileName, 1, Length(strCDINCLUDE));
+  If strFileName.Length <= strIncludeType.Length Then
+    Exit;
+  If Not CharInSet(strFileName[strIncludeType.Length + 1], [#9, #32]) Then
+    Exit;
+  Delete(strFileName, 1, strIncludeType.Length);
   strFileName := Trim(strFileName);
   If (Length(strFileName) > 0) And (strFileName[Length(strFileName)] = '}') Then
     strFileName := Copy(strFileName, 1, Length(strFileName) - 1);
@@ -6520,7 +6560,7 @@ Begin
     strFileName := ExpandFileName(ExtractFilePath(FileName) + strFileName);
   If Not FileExists(strFileName) Then
     AddIssue(Format(strINCLUDEFileDoesNotExist, [strFileName]), scNone,
-      Token.Line, Token.Column, etError, Self)
+      Token.Line, Token.Column, etWarning, Self)
   Else
     Begin
       sl := TStringList.Create;
@@ -6617,10 +6657,10 @@ begin
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         Begin
+          AddIdentifier(Token.Token);
           PropertiesLabel := Cls.FindElement(strPropertiesLabel) As TLabelContainer;
           If PropertiesLabel = Nil Then
-            PropertiesLabel := Cls.Add(strPropertiesLabel, iiPropertiesLabel,
-              scNone, Nil) As TLabelContainer;
+            PropertiesLabel := Cls.Add(strPropertiesLabel, iiPropertiesLabel, scNone) As TLabelContainer;
           tmpP := TPascalProperty.Create(Token.Token, AScope, Token.Line,
             Token.Column, iiPublicProperty, C);
           P := PropertiesLabel.Add(tmpP) As TPascalProperty;
@@ -6844,8 +6884,38 @@ begin
           NextNonCommentToken;
         End Else
           PopTokenPosition;
+          //: @debug RollBackToken;
     End;
 end;
+
+(**
+
+  This method returns a string representing a fully qualified identifier.
+
+  @precon  None.
+  @postcon The fully qualified identifier is returned and the token position in the parsing is moved to
+           the first token after the identified.
+
+  @return  a String
+
+**)
+Function TPascalModule.QualifiedIdentifier: String;
+
+Begin
+  Result := Token.Token;
+  NextNonCommentToken;
+  While Token.Token = '.' Do
+    Begin
+      Result := Result + '.';
+      NextNonCommentToken;
+      If IsIdentifier(Token) Then
+        Begin
+          Result := Result + Token.Token;
+          NextNonCommentToken;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self)
+    End;
+End;
 
 (**
 
@@ -6914,11 +6984,11 @@ End;
 
 (**
 
-  This method parses a class heriage ist from the current token position using the following object 
+  This method parses a class heritage list from the current token position using the following object 
   pascal grammar.
 
   @precon  Cls is a valid object declaration to get a heritage for.
-  @postcon Parses a class heriage ist from the current token position
+  @postcon Parses a class heritage list from the current token position
 
   @param   RecObjClsInt as a TRecordDecl as a constant
 
@@ -6942,7 +7012,7 @@ end;
   This method parses a class var section within a record definition.
 
   @precon  Cls must be a valid instance.
-  @postcon A class var sectino is parsed if found and true returned.
+  @postcon A class var section is parsed if found and true returned.
 
   @param   AScope as a TScope as a constant
   @param   Cls    as a TRecordDecl as a constant
@@ -6972,33 +7042,78 @@ Function TPascalModule.RecordConstant(Const C : TElementContainer;
 
 Var
   ExprType : TPascalExprTypes;
+  iStartDimension: Integer;
+  AT: TArrayType;
 
 Begin
   Result := Token.Token = '(';
   If Result Then
     Begin
       AddToExpression(C);
-      Repeat
-        If Not RecordFieldConstant(C, T) Then
-          If Token.Token <> ')' Then
-            Begin // If not handled treat as ConstExpr
-              ExprType := [petUnknown, petConstExpr];
-              ConstExpr(C, ExprType);
-            End;
-      Until Not IsToken(';', C) And Not IsToken(',', C);
-      If Token.Token = ')' Then
-        AddToExpression(C)
-      Else
-        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+      If Token.Token = '(' Then // Constant Array
+        Begin
+          iStartDimension := 1;
+          AT := TArrayType.Create('', scLocal, Token.Line, Token.Column, iiPublicType, Nil);
+          Try
+            AT.AddDimension;
+            Repeat
+              If iStartDimension < AT.Dimensions Then
+                ArrayElement(C, iStartDimension + 1, AT)
+              Else
+                TypedConstant(C, Nil)
+            Until Not IsToken(',', C);
+            If Token.Token = ')' Then
+              AddToExpression(C)
+            Else
+              ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+          Finally
+            AT.Free;
+          End;
+        End Else
+        Begin
+          Repeat
+            If Not RecordFieldConstant(C, T) Then
+              If Token.Token <> ')' Then
+                Begin // If not handled treat as ConstExpr
+                  ExprType := [petUnknown, petConstExpr];
+                  ConstExpr(C, ExprType);
+                End;
+          Until Not IsToken(';', C) And Not IsToken(',', C);
+          If Token.Token = ')' Then
+            AddToExpression(C)
+          Else
+            ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+        End;
     End;
+  {
+  If iStartDimension <= AT.Dimensions Then
+    If Token.Token = '(' Then
+      Begin
+        AddToExpression(C);
+        Repeat
+          If iStartDimension < AT.Dimensions Then
+            ArrayElement(C, iStartDimension + 1, AT)
+          Else
+            TypedConstant(C, Nil)
+        Until Not IsToken(',', C);
+        If Token.Token = ')' Then
+          AddToExpression(C)
+        Else
+          ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
+      End Else
+      Begin // If not '(' handle as ConstExpr
+        ExprType := [petUnknown, petConstExpr];
+        ConstExpr(C, ExprType);
+      End;
+  }
 End;
 
 (**
 
-  This method parses a const section within a record definition.
+  This method parses a CONST section within a record definition.
 
   @precon  Container must be a valid container.
-  @postcon Parses a const section of it exists and returns true.
+  @postcon Parses a CONST section of it exists and returns true.
 
   @param   AScope    as a TScope as a constant
   @param   Container as a TElementContainer as a constant
@@ -7053,7 +7168,7 @@ End;
   This method parses the field list element of the record definition.
 
   @precon  Rec must be a valid instance.
-  @postcon Parses a field list if at the current token and returnd true if so.
+  @postcon Parses a field list if at the current token and returns true if so.
 
   @param   Rec           as a TRecordDecl as a constant
   @param   InternalScope as a TScope as a constant
@@ -7261,7 +7376,7 @@ End;
 
   This method parses a record type declaration from the current token position.
 
-  @precon  boolPacked detmerines if the record is packed for not.
+  @precon  boolPacked determines if the record is packed for not.
   @postcon This method returns True if this method handles a constant declaration section.
 
   @nometrics
@@ -7310,12 +7425,7 @@ begin
           Begin
             NextNonCommentToken;
             If IsIdentifier(Token) Then
-              Begin
-                Result.HelperClassName := Token.Token;
-                NextNonCommentToken;
-              End Else
-                ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual,
-                  Self);
+              Result.HelperClassName := QualifiedIdentifier;
           End Else
             ErrorAndSeekToken(strReservedWordExpected, strFOR, strSeekableOnErrorTokens, stActual, Self);
 
@@ -7404,25 +7514,25 @@ Var
   boolFound: Boolean;
 
 begin
-  Result := ReferenceSection(AToken, FVariablesLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alVariablesLabel]);
   If Result Then
     Exit;
-  Result := ReferenceSection(AToken, FConstantsLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alConstantsLabel]);
   If Result Then
     Exit;
-  Result := ReferenceSection(AToken, FResourceStringsLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alResourceStringsLabel]);
   If Result Then
     Exit;
-  Result := ReferenceSection(AToken, FTypesLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alTypesLabel]);
   If Result Then
     Exit;
-  Result := ReferenceSection(AToken, FThreadVarsLabel);
+  Result := ReferenceSection(AToken, FASTLabels[alThreadVarsLabel]);
   If Result Then
     Exit;
   // Check Module Local Methods
   boolFound := False;
-  E := FImplementedMethodsLabel;
-  If E <> Nil Then
+  E := FASTLabels[alImplementedMethodsLabel];
+  If Assigned(E) Then
     For i := 1 To E.ElementCount Do
       If CompareText(E[i].Identifier, AToken.Token) = 0 Then
         Begin
@@ -7532,11 +7642,11 @@ End;
 
 (**
 
-  This method parses a requires clause from the current token position usnig the following object pascal 
+  This method parses a requires clause from the current token position using the following object pascal 
   grammar.
 
   @precon  None.
-  @postcon Parses a requires clause from the current token position usnig
+  @postcon Parses a requires clause from the current token position using
 
 **)
 Procedure TPascalModule.RequiresClause;
@@ -7550,7 +7660,7 @@ Var
 Begin
   If Token.UToken = strREQUIRES Then
     Begin
-      R := Add(strRequiresLabel, iiUsesLabel, scNone, GetComment);
+      R := Add(strRequiresLabel, iiUsesLabel, scNone, Token.Line, Token.Column, GetComment);
       NextNonCommentToken;
       IdentList(R, scNone, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -7585,7 +7695,7 @@ end;
   This method resolved method and procedures that have been forward referenced.
 
   @precon  None.
-  @postcon The implementation of a forward referenced method is updates wih the refernece information
+  @postcon The implementation of a forward referenced method is updates with the reference information
            for the forward declaration.
 
   @nometrics
@@ -7600,16 +7710,16 @@ Var
   ImplementedMethod: TPascalMethod;
 
 Begin
-  If Assigned(FImplementedMethodsLabel) Then
-    For iElement := 1 To FImplementedMethodsLabel.ElementCount Do
-      If FImplementedMethodsLabel.Elements[iElement] Is TPascalMethod Then
+  If Assigned(FASTLabels[alImplementedMethodsLabel]) Then
+    For iElement := 1 To FASTLabels[alImplementedMethodsLabel].ElementCount Do
+      If FASTLabels[alImplementedMethodsLabel].Elements[iElement] Is TPascalMethod Then
         Begin
-          ForwardMethod := FImplementedMethodsLabel.Elements[iElement] As TPascalMethod;
+          ForwardMethod := FASTLabels[alImplementedMethodsLabel].Elements[iElement] As TPascalMethod;
           If ForwardMethod.ForwardDecl Then
-            For iImplementation := 1 To FImplementedMethodsLabel.ElementCount Do
-              If FImplementedMethodsLabel.Elements[iImplementation] Is TPascalMethod Then
+            For iImplementation := 1 To FASTLabels[alImplementedMethodsLabel].ElementCount Do
+              If FASTLabels[alImplementedMethodsLabel].Elements[iImplementation] Is TPascalMethod Then
                 Begin
-                  ImplementedMethod := FImplementedMethodsLabel.Elements[iImplementation] As TPascalMethod;
+                  ImplementedMethod := FASTLabels[alImplementedMethodsLabel].Elements[iImplementation] As TPascalMethod;
                   If ForwardMethod <> ImplementedMethod Then
                     If CompareText(Copy(ForwardMethod.Name, 1, Length(ImplementedMethod.Name)),
                       ImplementedMethod.Name) = 0 Then
@@ -7637,12 +7747,12 @@ var
   k: Integer;
 
 begin
-  If (FExportedHeadingsLabel <> Nil) And (FImplementedMethodsLabel <> Nil) Then
-    For k := 1 To FExportedHeadingsLabel.ElementCount Do
-      If FExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
+  If Assigned(FASTLabels[alExportedHeadingsLabel]) And Assigned(FASTLabels[alImplementedMethodsLabel]) Then
+    For k := 1 To FASTLabels[alExportedHeadingsLabel].ElementCount Do
+      If FASTLabels[alExportedHeadingsLabel].Elements[k] Is TPascalMethod Then
         Begin
-          Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
-          ImplementedMethod := FImplementedMethodsLabel.FindElement(Method.Name);
+          Method := FASTLabels[alExportedHeadingsLabel].Elements[k] As TPascalMethod;
+          ImplementedMethod := FASTLabels[alImplementedMethodsLabel].FindElement(Method.Name);
           If (ImplementedMethod <> Nil) And (ImplementedMethod Is TPascalMethod) Then
             Begin
               Method.Resolved := True;
@@ -7655,11 +7765,11 @@ end;
 (**
 
   This method resolved the references between the exports methods and implemented methods marking each as
-  resovled where a match is found.
+  resolved where a match is found.
 
   @precon  None.
   @postcon Resolved the references between the exports methods and implemented methods marking each as 
-           resovled where a match is found.
+           resolved where a match is found.
 
 **)
 procedure TPascalModule.ResolveScopeOfImplementedExportsMethods;
@@ -7670,12 +7780,12 @@ var
   k: Integer;
 
 begin
-  If (FExportsHeadingsLabel <> Nil) And (FImplementedMethodsLabel <> Nil) Then
-    For k := 1 To FExportsHeadingsLabel.ElementCount Do
-      If FExportsHeadingsLabel.Elements[k] Is TExportsItem Then
+  If Assigned(FASTLabels[alExportsHeadingsLabel]) And Assigned(FASTLabels[alImplementedMethodsLabel]) Then
+    For k := 1 To FASTLabels[alExportsHeadingsLabel].ElementCount Do
+      If FASTLabels[alExportsHeadingsLabel].Elements[k] Is TExportsItem Then
         Begin
-          Method := FExportsHeadingsLabel.Elements[k] As TExportsItem;
-          ImplementedMethod := FImplementedMethodsLabel.FindElement(
+          Method := FASTLabels[alExportsHeadingsLabel].Elements[k] As TExportsItem;
+          ImplementedMethod := FASTLabels[alImplementedMethodsLabel].FindElement(
             Method.Identifier, ftIdentifier);
           If (ImplementedMethod <> Nil) And (ImplementedMethod Is TPascalMethod) Then
             Begin
@@ -7741,7 +7851,7 @@ end;
   This method parses a resource string declaration section from the current token position.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -7789,7 +7899,7 @@ End;
   This method parses a resource string declaration section from the current token position.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -7815,12 +7925,7 @@ Begin
       If CurrentMethod <> Nil Then
         R := CurrentMethod.ResourceStringsLabel
       Else
-        Begin
-          If FResourceStringsLabel = Nil Then
-            FResourceStringsLabel := Add(strResourceStringsLabel,
-              iiPublicResourceStringsLabel, scPublic, GetComment) As TLabelContainer;
-          R := FResourceStringsLabel;
-        End;
+        R := ASTLabel[alResourceStringsLabel];
       NextNonCommentToken;
       Repeat
         {Loop do nothing}
@@ -8164,7 +8269,7 @@ End;
 
 (**
 
-  This method parses a sring type declaration from the current token position using the following object 
+  This method parses a string type declaration from the current token position using the following object 
   pascal grammar.
 
   @precon  None.
@@ -8424,13 +8529,11 @@ End;
 
 (**
 
-  This method parses a Thread var section declatation from the current token position.
+  This method parses a Thread var section declaration from the current token position.
 
   @precon  On entry to this method , Scope defines the current scope of the block i . e . private in in 
-           the implemenation section or public if in the interface section .
+           the implementation section or public if in the interface section .
   @postcon This method returns True if this method handles a constant declaration section .
-
-  @see     For object pascal grammar see {@link TPascalDocModule.VarSection} .
 
   @param   AScope    as a TScope as a constant
   @param   Container as a TElementContainer as a constant
@@ -8450,11 +8553,8 @@ Begin
       Result := Token.UToken = strTHREADVAR;
       If Result Then
         Begin
-          If FThreadVarsLabel = Nil Then
-            FThreadVarsLabel := Add(strThreadVarsLabel, iiPublicThreadVarsLabel,
-              scNone, GetComment) As TLabelContainer;
           NextNonCommentToken;
-          While ThreadVarDecl(AScope, FThreadVarsLabel) Do
+          While ThreadVarDecl(AScope, ASTLabel[alThreadVarsLabel]) Do
             Begin
               If Token.Token <> ';' Then
                 ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stFirst, Self)
@@ -8515,7 +8615,7 @@ Const
   (** Growth size of the token buffer. **)
   iTokenCapacity = 100;
   strSingleSymbols : Set Of AnsiChar = ['(', ')', ';', ',', '[', ']', '^',
-    '-', '+', '/', '*', '<', '>'];
+    '-', '+', '/', '*', '<', '>', '@'];
   iCommentPadding = 2;
   iDirectiveSignPos = 2;
 
@@ -8529,7 +8629,7 @@ Var
   iLine : Integer;
   (** Current column number **)
   iColumn : Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
+  (** Token stream position. Fast to increment this than read the stream position. **)
   iStreamPos : Integer;
   (** Token line **)
   iTokenLine : Integer;
@@ -8778,10 +8878,10 @@ End;
 
 (**
 
-  This method parses the TypeArgs element of the grammar for handling generics on type arguments.
+  This method parses the TypeArgs element of the grammar for handling generic on type arguments.
 
   @precon  None.
-  @postcon Parses the TypeArgs element of the grammar for handling generics on type arguments.
+  @postcon Parses the TypeArgs element of the grammar for handling generic on type arguments.
 
   @param   Container as a TElementContainer as a constant
   @return  a Boolean
@@ -8812,6 +8912,8 @@ Begin
           End;
         If (Token.Token = ',') And Assigned(Container) Then
           Container.AddToken(Token.Token, Token.TokenType);
+        If Token.Token = '<' Then
+          TypeArgs(Container);
       Until Token.Token <> ',';
       If Token.Token = '>' Then
         Begin
@@ -8878,6 +8980,7 @@ Begin
       TypeParams(AToken.FIdentifier);
       If Token.Token = '=' Then
         Begin
+          AddIdentifier(AToken.FIdentifier);
           NextNonCommentToken;
           boolIsType := False;
           If Token.UToken = strTYPE Then
@@ -8951,7 +9054,7 @@ End;
   This method parses the TypeParamDeclList element of the grammar.
 
   @precon  None.
-  @postcon The type param declaration list is parses and the identifier modified.
+  @postcon The type parameter declaration list is parses and the identifier modified.
 
   @param   strIdentifier as a String as a reference
 
@@ -8969,7 +9072,7 @@ End;
 
 (**
 
-  This method parses the TypeParamList element of the generics grammar.
+  This method parses the TypeParamList element of the generic grammar.
 
   @precon  None.
   @postcon the updated identifier is returned.
@@ -9007,7 +9110,7 @@ End;
 
 (**
 
-  This method parses the TypeParam element of the grammar.
+  This method parses the Type Parameter element of the grammar.
 
   @precon  None.
   @postcon The updated identifier is returned if it contains a generic definition.
@@ -9037,7 +9140,7 @@ End;
   grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -9069,15 +9172,10 @@ Begin
           TypesLabel := (Container As TRecordDecl).FindElement(strTypesLabel) As TLabelContainer;
           If TypesLabel = Nil Then
             TypesLabel := Container.Add(strTypesLabel,
-              iiPublicTypesLabel, LabelScope, GetComment) As TLabelContainer;
+              iiPublicTypesLabel, LabelScope, 0, 0, GetComment) As TLabelContainer;
           TL := TypesLabel;
         End Else
-        Begin
-          If FTypesLabel = Nil Then
-            FTypesLabel := Add(strTypesLabel, iiPublicTypesLabel, LabelScope,
-              GetComment) As TLabelContainer;
-          TL := FTypesLabel;
-        End;
+          TL := ASTLabel[alTypesLabel];
       NextNonCommentToken;
       While TypeDecl(AScope, TL) Do
         If Token.Token = ';' Then
@@ -9140,12 +9238,12 @@ Begin
   If Token.UToken = strUCUSES Then
     Begin
       AComment := GetComment;
-      U := Add(strUses, iiUsesLabel, scNone, AComment);
+      U := Add(strUses, iiUsesLabel, scNone, 0, 0, AComment);
       If ModuleType = mtUnit Then
         If eScope = scPublic Then
-          U := U.Add(strInterfaceLabel, iiUsesLabel, scNone, Nil)
+          U := U.Add(strInterfaceLabel, iiUsesLabel, scNone, Token.Line, Token.Column, Nil)
         Else
-          U := U.Add(strImplementationLabel, iiUsesLabel, scNone, Nil);
+          U := U.Add(strImplementationLabel, iiUsesLabel, scNone, Token.Line, Token.Column, Nil);
       NextNonCommentToken;
       IdentList(U, eScope, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       // Stop Implementation units from being hinted
@@ -9309,7 +9407,7 @@ end;
   following object pascal grammar.
 
   @precon  On entry to this method, Scope defines the current scope of the block i.e. private in in the 
-           implemenation section or public if in the interface section and The Method parameter is nil
+           implementation section or public if in the interface section and The Method parameter is nil
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
@@ -9341,11 +9439,10 @@ Begin
           VarsLabel := (Container As TRecordDecl).FindElement(strVarsLabel) As TLabelContainer;
           If VarsLabel = Nil Then
             VarsLabel := Container.Add(
-              strVarsLabel, iiPublicVariablesLabel, LabelScope,
-              GetComment) As TLabelContainer;
+              strVarsLabel, iiPublicVariablesLabel, LabelScope, 0, 0, GetComment) As TLabelContainer;
           V := VarsLabel;
         End Else
-          V := VariablesLabel;
+          V := ASTLabel[alVariablesLabel];
       NextNonCommentToken;
       While VarDecl(AScope, V, iiPublicVariable) Do
         Begin

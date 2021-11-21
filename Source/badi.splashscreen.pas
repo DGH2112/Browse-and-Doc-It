@@ -3,15 +3,15 @@
   This module contains code to add an entry to the RAD Studio splash screen.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.098
+  @Date    21 Nov 2021
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,11 @@ Implementation
 Uses
   ToolsAPI,
   SysUtils,
+  {$IFDEF RS110}
+  Graphics,
+  {$ELSE}
   Windows,
+  {$ENDIF}
   Forms,
   BADI.Functions,
   BADI.Constants;
@@ -50,7 +54,7 @@ Uses
   This method adds an entry to the RAD Studio IDE splash screen.
 
   @precon  None.
-  @postcon An entry is added to the RAD Studio IDE slplash screen if the version of RAD
+  @postcon An entry is added to the RAD Studio IDE splash screen if the version of RAD
            Studio is 2005 and above.
 
 **)
@@ -68,20 +72,40 @@ Var
   iMinor : Integer;
   iBugFix : Integer;
   iBuild : Integer;
+  {$IFDEF RS110}
+  SplashScreenBitMap : TBitMap;
+  {$ELSE}
   bmSplashScreen : HBITMAP;
+  {$ENDIF RS110}
 
 Begin
   {$IFDEF D2005}
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
+  {$IFDEF RS110}
+  SplashScreenBitMap := TBitMap.Create();
+  Try
+    SplashScreenBitMap.LoadFromResourceName(hInstance, strBrowseAndDocItSplashScreenBitMap);
+    (SplashScreenServices As IOTASplashScreenServices).AddPluginBitmap(
+      Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1), Application.Title]),
+      [SplashScreenBitMap],
+      {$IFDEF DEBUG} True {$ELSE} False {$ENDIF},
+      Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]),
+      ''
+    );
+  Finally
+    SplashScreenBitMap.Free;
+  End;
+  {$ELSE}
   bmSplashScreen := LoadBitmap(hInstance, strBrowseAndDocItSplashScreenBitMap);
   (SplashScreenServices As IOTASplashScreenServices).AddPluginBitmap(
-    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1),
-      Application.Title]),
+    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1), Application.Title]),
     bmSplashScreen,
     {$IFDEF DEBUG} True {$ELSE} False {$ENDIF},
-    Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]), ''
-    );
-  {$ENDIF}
+    Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]),
+    ''
+  );
+  {$ENDIF RS110}
+  {$ENDIF D2005}
 End;
 
 End.

@@ -3,15 +3,15 @@
   This module contains a set of constants for use with the VB parser.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.001
+  @Date    19 Sep 2020
 
   @license
 
     Browse and Doc It is a RAD Studio plug-in for browsing, checking and
     documenting your code.
     
-    Copyright (C) 2019  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
+    Copyright (C) 2020  David Hoyle (https://github.com/DGH2112/Browse-and-Doc-It/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ Uses
   BADI.VB.Types;
 
 Const
-  (** A set of characters for alpha characaters **)
+  (** A set of characters for alpha characters **)
   strTokenChars : Set Of AnsiChar = ['_', 'a'..'z', 'A'..'Z'];
   (** A set of numbers **)
   strNumbers : Set Of AnsiChar = ['&', '0'..'9'];

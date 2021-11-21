@@ -10,6 +10,7 @@ object fmBADIModuleExtensionsFrame: TfmBADIModuleExtensionsFrame
   Font.Style = []
   ParentFont = False
   TabOrder = 0
+  PixelsPerInch = 96
   DesignSize = (
     583
     325)

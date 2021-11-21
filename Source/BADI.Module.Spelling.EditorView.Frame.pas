@@ -3,8 +3,8 @@
   This module contains a frame for displaying modules spelling mistakes.
 
   @Author  David Hoyle
-  @Version 5.938
-  @Date    05 Sep 2020
+  @Version 5.946
+  @Date    21 Nov 2021
 
   @license
 
@@ -127,10 +127,10 @@ Type
     FModuleCount    : Integer;
     FSpellingIssues : Array[TBADISpellingIssueType] of Integer;
     FVSTSpelling    : TBADIEditorViewVirtualStringTree;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FThemingServicesNotifierIndex : Integer;
     FStyleServices : TCustomStyleServices;
-    {$ENDIF}
+    {$ENDIF RS102}
   Strict Protected
     function CreateModule(const Module: TBaseLanguageModule): TNodeResultRecord;
     Procedure vstStatisticsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -188,7 +188,7 @@ Implementation
 Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF DEBUG}
   Vcl.ClipBrd, 
   BADI.ResourceStrings,
   BADI.Options,
@@ -533,10 +533,10 @@ End;
 **)
 Constructor TframeBADIModuleSpellingEditorView.Create(AOwner: TComponent);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
 
 Begin
   Inherited Create(AOwner);
@@ -544,11 +544,11 @@ Begin
   FVSTSpelling.NodeDataSize := SizeOf(TBADISpellingRecord);
   LoadBADIImages(ilScopeImages);
   HookStyleServices(Nil);
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(HookStyleServices));
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 (**
@@ -677,17 +677,17 @@ End;
 **)
 Destructor TframeBADIModuleSpellingEditorView.Destroy;
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
 
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If FThemingServicesNotifierIndex > -1 Then
       ITS.RemoveNotifier(FThemingServicesNotifierIndex);
-  {$ENDIF}
+  {$ENDIF RS102}
   Inherited Destroy;
 End;
 
@@ -845,13 +845,13 @@ End;
 **)
 Procedure TframeBADIModuleSpellingEditorView.HookStyleServices(Sender : TObject);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
 
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
@@ -859,7 +859,7 @@ Begin
         FStyleServices := ITS.StyleServices;
         ITS.ApplyTheme(Self);
       End;
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 (**
@@ -1056,10 +1056,10 @@ Var
 Begin
   NodeData := FVSTSpelling.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Assigned(FStyleServices) Then
     TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
-  {$ENDIF}
+  {$ENDIF RS102}
   Case TBADISpellingColumn(Column) Of
     scComments:
       If NodeData.FSpellingCount[sitComment] > 0 Then
@@ -1258,10 +1258,10 @@ Var
 Begin
   TargetCanvas.Font.Style := [];
   TargetCanvas.Font.Color := clWindowText;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Assigned(FStyleServices) Then
     TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
-  {$ENDIF}
+  {$ENDIF RS102}
   NodeData := FVSTSpelling.GetNodeData(Node);
   Case TBADISpellingColumn(Column) Of
     scComments:

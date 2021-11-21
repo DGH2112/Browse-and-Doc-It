@@ -4,8 +4,8 @@
   refactoring.
 
   @Author  David Hoyle
-  @Version 1.035
-  @Date    19 Sep 2020
+  @Version 1.037
+  @Date    21 Nov 2021
 
   @license
 
@@ -79,9 +79,9 @@ Type
 Implementation
 
 Uses
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   ToolsAPI,
-  {$ENDIF}
+  {$ENDIF RS102}
   BADI.ResourceStrings, 
   BADI.ElementContainer, BADI.ToolsAPIUtils;
 

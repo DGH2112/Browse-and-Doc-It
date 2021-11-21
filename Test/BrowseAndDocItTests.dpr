@@ -199,6 +199,7 @@ begin
   TBADIOptions.BADIOptions.ToxicityPower := 3;
   TBADIOptions.BADIOptions.ToxicitySummartion := tsAddBeforePower;
   TBADIOptions.BADIOptions.TokenLimit := 50;
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options - [doShowSpelling];
   RunRegisteredTests();
 end.
 

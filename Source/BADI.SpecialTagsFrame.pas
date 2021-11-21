@@ -2,9 +2,9 @@
 
   This module contains a frame for editing the BADI special tags.
 
-  @Version 1.291
+  @Version 1.299
   @Author  David Hoyle
-  @Date    19 Sep 2020
+  @Date    21 Nov 2021
 
   @license
 
@@ -87,9 +87,9 @@ Type
   Strict Private
     FSpecialTags    : TList<TBADISpecialTag>;
     FVSTSpecialTags : TBADISpecialTagsOptionsVirtualStringTree;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FStyleServices : TCustomStyleServices;
-    {$ENDIF}
+    {$ENDIF RS102}
   Strict Protected
     Procedure PopulateTreeView;
     Procedure CreateVirtualStringTree;
@@ -108,7 +108,7 @@ Implementation
 Uses
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  {$ENDIF}
+  {$ENDIF STANDALONEAPP}
   BADI.Base.Module,
   BADI.SpecialTagForm,
   BADI.Constants,
@@ -296,23 +296,23 @@ End;
 Constructor TfmBADISpecialTagsFrame.Create(AOwner: TComponent);
 
 {$IFNDEF STANDALONEAPP}
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
-{$ENDIF}
+{$ENDIF RS102}
+{$ENDIF STANDALONEAPP}
 
 Begin
   Inherited Create(AOwner);
   CreateVirtualStringTree;
   {$IFNDEF STANDALONEAPP}
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       FStyleServices := ITS.StyleServices;
-  {$ENDIF}
-  {$ENDIF}
+  {$ENDIF RS102}
+  {$ENDIF STANDALONEAPP}
   FVSTSpecialTags.NodeDataSize := SizeOf(TSpecialTagsNodeData);
   FSpecialTags := TList<TBADISpecialTag>.Create;
   PopulateTreeView;
@@ -540,10 +540,10 @@ Begin
     ciEditor:     TargetCanvas.Brush.Color := Colour[tpShowInEditor In ST.FTagProperties];
   Else
     TargetCanvas.Brush.Color := clWindow;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     If Assigned(FStyleServices) Then
       TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
-    {$ENDIF}
+    {$ENDIF RS102}
     If ST.FBackColour <> clNone Then
       TargetCanvas.Brush.Color := ST.FBackColour;
   End;
@@ -755,10 +755,10 @@ Begin
   Case TColumnIndexes(Column) Of
     ciShowInTree..ciEditor: TargetCanvas.Font.Color := clBlack;
   Else
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     If Assigned(FStyleServices) Then
       TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
-    {$ENDIF}
+    {$ENDIF RS102}
     If ST.FFontColour <> clNone Then
       TargetCanvas.Font.Color := ST.FFontColour;
   End;

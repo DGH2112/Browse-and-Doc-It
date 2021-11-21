@@ -3,8 +3,8 @@
   This module contains a frame for displaying module methods and their checks.
 
   @Author  David Hoyle
-  @Version 1.210
-  @Date    06 Sep 2020
+  @Version 1.218
+  @Date    21 Nov 2021
 
   @license
 
@@ -131,10 +131,10 @@ Type
     FUnderLimit    : Integer;
     FOverLimit     : Integer;
     FVSTChecks     : TBADIEditorViewVirtualStringTree;
-    {$IFDEF DXE102}
+    {$IFDEF RS102}
     FThemingServicesNotifierIndex : Integer;
     FStyleServices : TCustomStyleServices;
-    {$ENDIF}
+    {$ENDIF RS102}
   Strict Protected
     Procedure vstChecksGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       TextType: TVSTTextType; Var CellText: String);
@@ -207,7 +207,7 @@ Implementation
 Uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF CODESITE}
   BADI.ResourceStrings,
   BADI.Options,
   BADI.Functions,
@@ -584,10 +584,10 @@ End;
 **)
 Constructor TframeBADIModuleChecksEditorView.Create(AOwner: TComponent);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
   
 Begin
   Inherited Create(AOwner);
@@ -595,11 +595,11 @@ Begin
   FVSTChecks.NodeDataSize := SizeOf(TBADICheckRecord);
   LoadBADIImages(ilScopeImages);
   HookThemingServices(Nil);
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     FThemingServicesNotifierIndex := ITS.AddNotifier(TBADIIDEThemeNotifier.Create(HookThemingServices));
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 (**
@@ -728,18 +728,18 @@ End;
 **)
 Destructor TframeBADIModuleChecksEditorView.Destroy;
   
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
   
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FThemingServicesNotifierIndex := -1;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If FThemingServicesNotifierIndex > -1 Then
       ITS.RemoveNotifier(FThemingServicesNotifierIndex);
-  {$ENDIF}
+  {$ENDIF RS102}
   Inherited Destroy;
 End;
 
@@ -926,13 +926,13 @@ End;
 **)
 Procedure TframeBADIModuleChecksEditorView.HookThemingServices(Sender : TObject);
 
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
+{$ENDIF RS102}
   
 Begin
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   FStyleServices := Nil;
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
@@ -940,7 +940,7 @@ Begin
         FStyleServices := ITS.StyleServices;
         ITS.ApplyTheme(Self);
       End;
-  {$ENDIF}
+  {$ENDIF RS102}
 End;
 
 (**
@@ -1237,10 +1237,10 @@ Var
 Begin
   NodeData := FVSTChecks.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Assigned(FStyleServices) Then
     TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
-  {$ENDIF}
+  {$ENDIF RS102}
   Case TBADICheckColumn(Column) Of
     ccHardCodedIntegers..ccMissingCONSTInParemterList:
       Begin
@@ -1430,10 +1430,10 @@ Var
 Begin
   TargetCanvas.Font.Style := [];
   TargetCanvas.Font.Color := clWindowText;
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Assigned(FStyleServices) Then
     TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
-  {$ENDIF}
+  {$ENDIF RS102}
   Case TBADICheckColumn(Column) Of
     ccHardCodedIntegers..ccTotal: TargetCanvas.Font.Color := clBlack;
   End;

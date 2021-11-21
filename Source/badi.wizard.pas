@@ -3,8 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.898
-  @Date    20 Feb 2021
+  @Version 1.922
+  @Date    21 Nov 2021
 
   @license
 
@@ -40,7 +40,7 @@ Uses
   {$IFNDEF D2005}
   ExtCtrls,
   Contnrs,
-  {$ENDIF}
+  {$ENDIF D2005}
   BADI.Interfaces,
   BADI.EditorNotifier,
   BADI.IDEOptionsInstaller,
@@ -86,7 +86,7 @@ Implementation
 Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF}
+  {$ENDIF DEBUG}
   System.SysUtils,
   BADI.DockableModuleExplorer,
   BADI.Constants, 
@@ -115,7 +115,7 @@ Uses
 Constructor TBrowseAndDocItWizard.Create;
 
 Begin
-  CodeSite.TraceMethod(Self, 'Create', tmoTiming);
+  {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF DEBUG}
   Inherited Create;
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange, IDEErrors);
@@ -149,7 +149,7 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
-  CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);
+  {$IFDEF DEBUG}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF DEBUG}
   TBADIIDENotifier.UninstallIDENotifier;
   UnregisterEditorChecksSubView;
   UnregisterEditorMetricsSubView;
@@ -297,16 +297,22 @@ Var
   iError: Integer;
 
 Begin
+  {$IFDEF DEBUG}
   CodeSite.TraceMethod(Self, 'IDEErrors', tmoTiming);
+  {$ENDIF DEBUG}
   If Supports(BorlandIDEServices, IOTAModuleServices, MS) Then
     Begin
       Module := MS.CurrentModule;
       If Assigned(Module) Then BEGIN
         If Supports(Module, IOTAModuleErrors, ModuleErrors) Then
           Begin
+            {$IFDEF DEBUG}
             CodeSite.Send(csmCheckPoint, 'Errors := ModuleErrors.GetErrors;');
+            {$ENDIF DEBUG}
             Errors := ModuleErrors.GetErrors; //: @bug Locks the IDE here under unknown circumstances.
+            {$IFDEF DEBUG}
             CodeSite.Send(csmCheckPoint, 'For iError := Low(Errors) To High(Errors) Do');
+            {$ENDIF DEBUG}
             For iError := Low(Errors) To High(Errors) Do
               slIDEErrors.Add(Format(strErrorRecord, [
                 Module.FileName,

@@ -10,6 +10,7 @@ object frameBADIModuleSpellingEditorView: TframeBADIModuleSpellingEditorView
   Font.Style = []
   ParentFont = False
   TabOrder = 0
+  PixelsPerInch = 96
   object ilScopeImages: TImageList
     Left = 40
     Top = 64

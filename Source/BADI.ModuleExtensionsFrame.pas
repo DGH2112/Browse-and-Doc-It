@@ -3,8 +3,8 @@
   This module contains a frame for display the module explorer file extensions for editing.
 
   @Author  David Hoyle
-  @Version 1.001
-  @Date    19 Sep 2020
+  @Version 1.007
+  @Date    21 Nov 2021
 
   @license
 
@@ -66,7 +66,7 @@ Implementation
 Uses
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
-  {$ENDIF}
+  {$ENDIF STANDALONEAPP}
   BADI.Module.Dispatcher,
   BADI.Options;
 
@@ -87,16 +87,16 @@ Uses
 Constructor TfmBADIModuleExtensionsFrame.Create(AOwner: TComponent);
 
 {$IFNDEF STANDALONEAPP}
-{$IFDEF DXE102}
+{$IFDEF RS102}
 Var
   ITS : IOTAIDEThemingServices;
-{$ENDIF}
-{$ENDIF}
+{$ENDIF RS102}
+{$ENDIF STANDALONEAPP}
 
 Begin
   Inherited Create(AOwner);
   {$IFNDEF STANDALONEAPP}
-  {$IFDEF DXE102}
+  {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
       Begin
@@ -107,8 +107,8 @@ Begin
         vleModuleExtensions.GradientStartColor := ITS.StyleServices.GetSystemColor(clBtnFace);
         vleModuleExtensions.GradientEndColor := ITS.StyleServices.GetSystemColor(clBtnFace);
         vleModuleExtensions.Font.Color := ITS.StyleServices.GetSystemColor(clWindowText);      End;
-  {$ENDIF}
-  {$ENDIF}
+  {$ENDIF RS102}
+  {$ENDIF STANDALONEAPP}
 End;
 
 (**

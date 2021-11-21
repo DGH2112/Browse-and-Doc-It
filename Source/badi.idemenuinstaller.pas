@@ -2,9 +2,9 @@
 
   This module encapsulates the creation of menus in the IDE.
 
-  @Version 23.667
+  @Version 23.735
   @Author  David Hoyle
-  @Date    19 Sep 2020
+  @Date    21 Nov 2021
 
   @license
 
@@ -147,7 +147,9 @@ ResourceString
   strThereIsSelectedText = 'There is selected text in the editor. Do you want to move this text ' +
     'within the new comment';
 
-{ TBADIIDEMenuInstaller }
+Const
+  (** A constant name suffix tag for images names in the new IDE virtual image list. **)
+  strImage = 'Image';
 
 (**
 
@@ -164,34 +166,42 @@ ResourceString
 **)
 Function TBADIIDEMenuInstaller.AddImagesToIDE : Integer;
 
-Const
-  strImage = 'Image';
-
 Var
   NTAS : INTAServices;
+  {$IFNDEF RS110}
   ilImages : TImageList;
+  {$ENDIF RS110}
   BM : TBitMap;
   iMenu: TBADIMenu;
 
 begin
+  Result := -1;
   NTAS := (BorlandIDEServices As INTAServices);
+  {$IFNDEF RS110}
   ilImages := TImageList.Create(Nil);
   Try
+  {$ENDIF RS110}
     For iMenu := Low(TBADIMenu) To High(TBADIMenu) Do
       If FindResource(hInstance, PChar(BADIMenus[iMenu].FName + strImage), RT_BITMAP) > 0 Then
         Begin
           BM := TBitMap.Create;
           Try
             BM.LoadFromResourceName(hInstance, BADIMenus[iMenu].FName + strImage);
+            {$IFDEF RS110}
+            NTAS.AddImage(BADIMenus[iMenu].FName + strImage, [BM]);
+            {$ELSE}
             ilImages.AddMasked(BM, BADIMenus[iMenu].FMaskColor);
+            {$ENDIF RS110}
           Finally
             BM.Free;
           End;
         End;
+  {$IFNDEF RS110}
     Result := NTAS.AddImages(ilImages);
   Finally
     ilImages.Free;
   End;
+  {$ENDIF RS110}
 end;
 
 (**
@@ -391,7 +401,11 @@ Begin
       Actn.OnExecute := ClickProc;
       Actn.OnUpdate := UpdateProc;
       Actn.ShortCut := TextToShortCut(TBADIOptions.BADIOptions.MenuShortcut[eBADIMenu]);
+      {$IFDEF RS110}
+      Actn.ImageName := BADIMenus[eBADIMenu].FName + strImage;
+      {$ELSE}
       Actn.ImageIndex := iImageIndex;
+      {$ENDIF RS110}
       Actn.Category := strCategory;
       FBADIActions[eBADIMenu] := Actn;
     End Else
@@ -767,7 +781,9 @@ Var
 Begin
   sl := TStringList.Create;
   Try
+    {$IFDEF RS101}
     sl.TrailingLineBreak := False;
+    {$ENDIF RS101}
     iIndent := iCol - 1;
     sl.text := strComment;
     For iLine := 1 To sl.Count - 1 Do //: @note Starting at 1 is deliberate

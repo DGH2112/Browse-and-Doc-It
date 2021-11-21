@@ -50,7 +50,7 @@ Uses
   Generics.Collections,
   BADI.Types,
   BADI.Exclusions,
-  BADI.CustomOptionsFrame, System.ImageList;
+  BADI.CustomOptionsFrame;
 
 {$INCLUDE CompilerDefinitions.inc}
 

@@ -52,7 +52,7 @@ uses
   ImgList,
   ExtCtrls,
   UITypes,
-  BADI.ElementContainer, System.ImageList;
+  BADI.ElementContainer;
 
 type
   (** A class to represent the form interface. **)

@@ -52,7 +52,7 @@ uses
   Contnrs,
   ExtCtrls,
   UITypes,
-  BADI.ElementContainer, System.ImageList;
+  BADI.ElementContainer;
 
 type
   (** An enumerate to define if the profile job is an insertion or a removal. **)

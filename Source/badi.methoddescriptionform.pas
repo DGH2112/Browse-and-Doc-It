@@ -43,7 +43,7 @@ Uses
   Dialogs,
   StdCtrls,
   Buttons,
-  Vcl.ExtCtrls, System.ImageList, Vcl.ImgList;
+  Vcl.ExtCtrls;
 
 {$INCLUDE CompilerDefinitions.inc}
 

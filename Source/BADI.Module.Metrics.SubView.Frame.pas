@@ -51,7 +51,7 @@ Uses
   ActnList,
   Menus,
   PlatformDefaultStyleActnCtrls,
-  ActnPopup, System.ImageList;
+  ActnPopup;
 
 Type
   (** A descendant class for the sub-view frame. **)

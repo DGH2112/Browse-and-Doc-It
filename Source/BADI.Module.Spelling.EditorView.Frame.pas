@@ -58,8 +58,7 @@ Uses
   BADI.Types,
   BADI.CustomVirtualStringTree,
   BADI.SpellingIssue,
-  UITypes,
-  System.ImageList;
+  UITypes;
 
 {$INCLUDE CompilerDefinitions.inc}
 

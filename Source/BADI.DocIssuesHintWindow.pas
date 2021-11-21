@@ -3,8 +3,8 @@
   This module contains a custom hint window to display the module metric totals.
 
   @Author  David Hoyle
-  @Version 3.987
-  @Date    19 Sep 2020
+  @Version 4.008
+  @Date    21 Nov 2021
   
   @license
 
@@ -409,7 +409,7 @@ Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Paint', tmoTiming);{$ENDIF}
   DoubleBuffered := True;
   UpdateBaseFontInfo(R);
-  Canvas.Pen.Color := ColorBlendRGB(Canvas.Brush.Color, clBlack, dblBlendFactor);
+  Canvas.Pen.Color := BlendColour(Canvas.Brush.Color, clBlack, dblBlendFactor);
   Canvas.Rectangle(0, 0, Width, Height);
   R := Rect(0, 0, Width, Height);
   R.Inflate(-1, -1);

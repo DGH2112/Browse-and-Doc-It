@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 7.189
-  @Date    29 Apr 2021
+  @Version 7.193
+  @Date    21 Nov 2021
 
   @license
 
@@ -41,6 +41,7 @@ Uses
   Graphics,
   Controls,
   Forms,
+  Menus,
   ImgList,
   ComCtrls,
   Contnrs,
@@ -58,7 +59,7 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types, System.Actions, System.ImageList, Vcl.Menus;
+  BADI.Types;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
@@ -1895,7 +1896,7 @@ ResourceString
 
 Const
   iTreeLevel = 2;
-  astrTagsToIgnore : TArray<String> = [
+  astrTagsToIgnore : Array[0..9] Of String = (
     strnocheck,
     strnochecks,
     strnodocumentation,
@@ -1906,7 +1907,7 @@ Const
     strnospelling,
     strnospellings,
     strstopdocumentation
-  ];
+  );
   
 Var
   iComment, iTag, iSpecialTag : Integer;

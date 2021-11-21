@@ -2,7 +2,7 @@
 
   An include unit to defines library suffixes for versions of Delphi.
 
-  @Version 1.104
+  @Version 1.105
   @Date    21 Nov 2021
   @Author  David Hoyle
 
@@ -24,7 +24,7 @@
           {$LIBSUFFIX 'RS101'}
         {$ELSE}
           {$IFDEF RS100}
-            {$LIBSUFFIX 'RS10'}
+            {$LIBSUFFIX 'RS100'}
           {$ELSE}
             {$IFDEF DXE80}
               {$LIBSUFFIX 'XE8'}

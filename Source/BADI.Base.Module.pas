@@ -4,8 +4,8 @@
   and all standard constants across which all language modules have in common.
 
   @Author  David Hoyle
-  @Version 2.688
-  @Date    06 May 2021
+  @Version 2.735
+  @Date    21 Nov 2021
 
   @license
 
@@ -692,6 +692,7 @@ Var
   Token : TTokenInfo;
   sl : TStringList;
   i : Integer;
+  EmptyKeyWordList : TKeyWords;
 
 Begin
   If doSpellCheckLiterals In TBADIOptions.BADIOptions.Options Then
@@ -700,7 +701,7 @@ Begin
         Token := Tokens[iToken];
         If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
           Begin
-            sl := Tokenize(Token.Token.DeQuotedString, [], []);
+            sl := Tokenize(Token.Token.DeQuotedString, EmptyKeyWordList, EmptyKeyWordList);
             Try
               For i := 0 To sl.Count - 1 Do
                 If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
@@ -1385,6 +1386,7 @@ Var
   sl: TStringList;
   i: Integer;
   strToken: String;
+  EmptyKeyWordList : TKeyWords;
 
 Begin
   Begin
@@ -1394,7 +1396,7 @@ Begin
           T := E.Tokens[iToken];
           strToken := T.Token.DeQuotedString;
           strToken := FReplaceAmpersandRegEx.Replace(strToken, '\1');
-          sl := Tokenize(strToken, [], []);
+          sl := Tokenize(strToken, EmptyKeyWordList, EmptyKeyWordList);
           Try
             For i := 0 To sl.Count - 1 Do
               If (sl[i].Length > 1) And (sl[i][1] <> '#') Then

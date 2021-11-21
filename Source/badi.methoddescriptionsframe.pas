@@ -46,7 +46,7 @@ Uses
   ComCtrls,
   BADI.CustomOptionsFrame,
   VirtualTrees,
-  System.Generics.Collections, System.ImageList, Vcl.ImgList;
+  System.Generics.Collections;
 
 Type
   (** This class represents the frame interface. **)

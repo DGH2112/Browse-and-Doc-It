@@ -45,7 +45,8 @@ Uses
   Buttons,
   CheckLst,
   BADI.Types,
-  Vcl.ExtCtrls, System.ImageList, Vcl.ImgList, Vcl.ComCtrls;
+  Vcl.ExtCtrls,
+  Vcl.ComCtrls;
 
 {$INCLUDE CompilerDefinitions.inc}
 

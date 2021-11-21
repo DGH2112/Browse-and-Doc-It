@@ -4,7 +4,7 @@
   opened and closed.
 
   @Author  David Hoyle
-  @Version 2.176
+  @Version 2.184
   @Date    21 Nov 2021
   
   @license
@@ -131,11 +131,13 @@ Procedure TBADISourceEditorNotifier.InstallEditViewNotifier(Const View: IOTAEdit
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InstallEditViewNotifier', tmoTiming);{$ENDIF}
+  {$IFDEF RS100}
   If FEditViewNotifierIndex = - 1 Then
     Begin
       FView := View;
       FEditViewNotifierIndex := View.AddNotifier(TBADIEditViewNotifier.Create(FFileName));
     End;
+  {$ENDIF RS100}
 End;
 
 (**
@@ -152,11 +154,13 @@ Procedure TBADISourceEditorNotifier.UninstallEditViewNotifier(Const View: IOTAEd
 
 Begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UninstallEditViewNotifier', tmoTiming);{$ENDIF}
+  {$IFDEF RS100}
   If FEditViewNotifierIndex > - 1 Then
     Begin
       View.RemoveNotifier(FEditViewNotifierIndex);
       FEditViewNotifierIndex := - 1;
     End;
+  {$ENDIF RS100}
 End;
 
 (**

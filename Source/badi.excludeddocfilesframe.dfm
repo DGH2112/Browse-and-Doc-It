@@ -10,7 +10,6 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
   Font.Style = []
   ParentFont = False
   TabOrder = 0
-  PixelsPerInch = 96
   object pnlFugePanel: TPanel
     Left = 0
     Top = 0

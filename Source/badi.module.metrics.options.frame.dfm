@@ -10,7 +10,6 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
   Font.Style = []
   ParentFont = False
   TabOrder = 0
-  PixelsPerInch = 96
   object pnlBottom: TPanel
     Left = 0
     Top = 259

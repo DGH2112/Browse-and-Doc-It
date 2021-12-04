@@ -2,9 +2,9 @@
 
 Author:   David Hoyle
 
-Version:  1.4
+Version:  1.4a
 
-Date:     21 Nov 2021
+Date:     04 Dec 2021
 
 Web Page: [Browse and Doc It](http://www.davidghoyle.co.uk/WordPress/?page_id=872)
 

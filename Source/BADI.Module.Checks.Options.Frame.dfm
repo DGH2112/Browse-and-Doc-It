@@ -10,5 +10,4 @@ object frameBADIModuleChecksOptions: TframeBADIModuleChecksOptions
   Font.Style = []
   ParentFont = False
   TabOrder = 0
-  PixelsPerInch = 96
 end

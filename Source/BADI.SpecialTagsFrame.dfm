@@ -10,7 +10,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
   Font.Style = []
   ParentFont = False
   TabOrder = 0
-  PixelsPerInch = 96
   DesignSize = (
     645
     423)

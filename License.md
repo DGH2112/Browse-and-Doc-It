@@ -2,9 +2,9 @@
 
 Author:   David Hoyle (davidghoyle@gmail.com/[https://github.com/DGH2112](https://github.com/DGH2112))
 
-Version:  1.3a
+Version:  1.4a
 
-Date:     21 Jun 2019
+Date:     04 Dec 2021
 
 Web Site: [http://www.davidghoyle.co.uk/WordPress/?page_id=872](http://www.davidghoyle.co.uk/WordPress/?page_id=872)
 

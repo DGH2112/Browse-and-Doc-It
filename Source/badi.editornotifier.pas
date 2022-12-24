@@ -4,8 +4,8 @@
   and in turn refreshes the module explorer.
 
   @Author  David Hoyle
-  @Version 2.528
-  @Date    21 Nov 2021
+  @Version 2.924
+  @Date    05 Nov 2022
 
   @license
 
@@ -57,16 +57,8 @@ Type
     FBADIThreadMgr       : TBADIThreadManager;
     FModuleStatsList     : IBADIModuleStatsList;
     FSource              : String;
+    FLastDesigner        : String;
   Strict Protected
-    Procedure EnableTimer(Const boolSuccessfulParse : Boolean);
-    Procedure TimerEventHandler(Sender : TObject);
-    Function  EditorInfo(var strFileName : String; var boolModified : Boolean) : String;
-    Procedure RenderDocument(Const Module: TBaseLanguageModule);
-    Procedure ExceptionMsg(Const strExceptionMsg : String);
-    Function CheckForCursorMovement(Const Editor : IOTASourceEditor) : TOTAEditPos;
-    Procedure CheckFileNameAndSize(Const Editor : IOTASourceEditor);
-    procedure CheckForChange(const iUpdateInterval: Cardinal);
-    procedure CheckForMovement(const iUpdateInterval: Cardinal; const CP: TOTAEditPos);
     // INTAEditServicesNotifier
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
@@ -77,7 +69,18 @@ Type
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+    // General Methods
+    Procedure EnableTimer(Const boolSuccessfulParse : Boolean);
+    Procedure TimerEventHandler(Sender : TObject);
+    Function  EditorInfo(var strFileName : String; var boolModified : Boolean) : String;
+    Procedure RenderDocument(Const Module: TBaseLanguageModule);
+    Procedure ExceptionMsg(Const strExceptionMsg : String);
+    Function CheckForCursorMovement(Const Editor : IOTASourceEditor) : TOTAEditPos;
+    Procedure CheckFileNameAndSize(Const Editor : IOTASourceEditor);
+    procedure CheckForChange(const iUpdateInterval: Cardinal);
+    procedure CheckForMovement(const iUpdateInterval: Cardinal; const CP: TOTAEditPos);
     procedure UpdateProjectDictionary;
+    Procedure CheckForEditorDesignerChanges(Const strDesigner : String);
   Public
     Constructor Create(Const ModuleStatsList : IBADIModuleStatsList);
     Destructor Destroy; Override;
@@ -190,6 +193,23 @@ Begin
             FLastUpdateTickCount := GetTickCount;
           FLastMoveTickCount := GetTickCount;
         End;
+    End;
+End;
+
+Procedure TEditorNotifier.CheckForEditorDesignerChanges(Const strDesigner : String);
+
+Begin
+  If strDesigner <> FLastDesigner Then
+    Begin
+      Case strDesigner.Length > 0 Of
+        False:
+          Begin
+            TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
+            TBADIToolsAPIFunctions.FocusActiveEditor;
+          End;
+        True: ;
+      End;
+      FLastDesigner := strDesigner;
     End;
 End;
 
@@ -471,9 +491,11 @@ Const
   End;
   
 Var
-  SE : IOTASourceEditor;
+  SE, SEDFM : IOTASourceEditor;
   Options : IOTAProjectOptions;
   Project : IOTAProject;
+  M: IOTAModule;
+  i : Integer;
 
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EditorInfo', tmoTiming);{$ENDIF}
@@ -485,7 +507,19 @@ begin
     Begin
       strFileName := SE.FileName;
       boolModified := SE.Modified;
-      Result := TBADIToolsAPIFunctions.EditorAsString(SE);
+      If Supports(SE.Module.CurrentEditor, IOTASourceEditor, SEDFM) Then
+        Result := TBADIToolsAPIFunctions.EditorAsString(SEDFM.Module.CurrentEditor As IOTASourceEditor)
+      Else
+        Begin
+          M := SE.Module;
+          For i := 0 To M.ModuleFileCount - 1 Do
+            If CompareText(SE.Module.CurrentEditor.FileName, M.ModuleFileEditors[i].FileName) = 0 Then
+              Begin
+                If Supports(M.ModuleFileEditors[i], IOTASourceEditor, SEDFM) Then
+                  Result := TBADIToolsAPIFunctions.EditorAsString(SEDFM);
+                Break;
+              End;
+        End;
       FSource := Result;
       Project := TBADIToolsAPIFunctions.ActiveProject;
       If Assigned(Project) Then
@@ -496,7 +530,7 @@ begin
             [rfReplaceAll]);
           SetStandardCompilerDefs(Project);
         End;
-    End;
+      End;
 end;
 
 (**
@@ -662,6 +696,7 @@ begin
       TBADIDocIssueHintWindow.Disappear
     Else
       TBADIDocIssueHintWindow.Display(TfrmDockableModuleExplorer.DocIssueTotals);
+  CheckForEditorDesignerChanges((BorlandIDEServices as IOTAServices).GetActiveDesignerType);
 End;
 
 (**
@@ -776,4 +811,3 @@ begin
 end;
 
 End.
-

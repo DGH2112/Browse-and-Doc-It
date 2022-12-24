@@ -4,8 +4,8 @@
   the Browse and Doc It system.
 
   @Author  David Hoyle
-  @Version 1.076
-  @Date    19 Sep 2020
+  @Version 1.114
+  @Date    16 Oct 2022
 
   @license
 
@@ -140,6 +140,9 @@ Type
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   SysUtils,
   BADI.Functions;
 

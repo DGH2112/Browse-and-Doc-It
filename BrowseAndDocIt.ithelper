@@ -10,7 +10,7 @@ CompileWithBRCC32=0
 MajorVer=1
 MinorVer=4
 ReleaseVer=1
-BuildVer=9850
+BuildVer=9918
 ResourceName=BADIVerInfo
 SaveModifiedFilesBeforeZipping=0
 IncBuild.Make.Base=1
@@ -39,7 +39,7 @@ ExclusionFiles=
 [VersionInfo]
 CompanyName=Season's Fall Music Limited (c) 1989
 FileDescription=A Delphi IDE adding for browsing and documenting code
-FileVersion=1.4.1.9850
+FileVersion=1.4.1.9918
 InternalName=Season's Fall Music Limited (c) 1989
 LegalCopyright=Season's Fall Music Limited (c) 1989
 LegalTrademarks=Season's Fall Music Limited (c) 1989

@@ -5,8 +5,8 @@
   implemented.
 
   @Author  David Hoyle
-  @Version 1.239
-  @Date    06 May 2021
+  @Version 21.553
+  @Date    16 Oct 2022
 
   @license
 
@@ -34,6 +34,9 @@ Unit BADI.XML.Module;
 Interface
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   SysUtils,
   Windows,
   Contnrs,
@@ -135,6 +138,7 @@ Type
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
+    Procedure CheckForSpellingMistakes(Const E : TElementContainer);
   Strict Protected
     Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
@@ -167,7 +171,8 @@ Uses
   BADI.XML.XMLDecl,
   BADI.XML.XMLPERef,
   BADI.XML.XMLIgnoreElement,
-  BADI.XML.XMLIncludeElement;
+  BADI.XML.XMLIncludeElement,
+  BADI.Generic.Tokenizer;
 
 Const
 
@@ -203,6 +208,7 @@ var
   T : TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AttDef', tmoTiming);{$ENDIF}
   Result := False;
   If Whitespace(Nil) Then
     Begin
@@ -240,6 +246,7 @@ var
   A: TXMLElemDecl;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AttListDecl', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<!' Then
     Begin
@@ -282,6 +289,7 @@ Var
   strName : String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Attribute', tmoTiming);{$ENDIF}
   Result := False;
   strName := XMLName;
   If strName <> '' Then
@@ -309,6 +317,7 @@ end;
 **)
 procedure TXMLModule.AttType(Const xmlParent: TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AttType', tmoTiming);{$ENDIF}
   If Not StringType(xmlParent) Then
     If Not TokenizedType(xmlParent) Then
       EnumerateType(xmlParent);
@@ -326,6 +335,7 @@ end;
 **)
 procedure TXMLModule.AttValue(Const xmlParent: TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AttValue', tmoTiming);{$ENDIF}
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     AddToExpression(xmlParent)
   Else
@@ -342,6 +352,7 @@ end;
 **)
 procedure TXMLModule.CDData;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CDData', tmoTiming);{$ENDIF}
   While Token.Token <> ']]' Do
     NextNonCommentToken;
 end;
@@ -356,6 +367,7 @@ end;
 **)
 procedure TXMLModule.CDEnd;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CDEnd', tmoTiming);{$ENDIF}
   If Token.Token = ']]' Then
     Begin
       NextNonCommentToken;
@@ -379,6 +391,7 @@ end;
 **)
 function TXMLModule.CDSect: Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CDSect', tmoTiming);{$ENDIF}
   Result := False;
   If CDStart Then
     Begin
@@ -400,6 +413,7 @@ end;
 **)
 function TXMLModule.CDStart: Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CDStart', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<![' Then
     Begin
@@ -431,6 +445,7 @@ end;
 function TXMLModule.CharData(Const E : TXMLElement): Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CharData', tmoTiming);{$ENDIF}
   Result := Whitespace(E) Or EatCharData(E);
 end;
 
@@ -447,6 +462,7 @@ end;
 **)
 Function TXMLModule.CharRef(Const xmlParent: TElementContainer) : Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CharRef', tmoTiming);{$ENDIF}
   Result := False;
   If IsKeyWord(Token.Token, ['&#', '&#x']) Then
     Begin
@@ -495,6 +511,7 @@ procedure TXMLModule.CheckDocumentation(var boolCascade: Boolean);
     i: Integer;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckDocumentation/FindMatch', tmoTiming);{$ENDIF}
     Result := False;
     For i := 1 To ElementCount Do
       If Like(strName, Elements[i].Name) Then
@@ -508,6 +525,7 @@ Var
   recDocCon : TDocConflictTable;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckDocumentation', tmoTiming);{$ENDIF}
   recDocCon.FMessage := 'Module ''%s'' is missing a ''!DOCTYPE'' element.';
   recDocCon.FDescription := 'XHTML files should have a !DOCTYPE element as ' +
     'the first element.';
@@ -524,6 +542,47 @@ begin
       AddDocumentConflict([ModuleName], 1, 1, Nil, strModuleDocumentation, recDocCon);
 end;
 
+Procedure TXMLModule.CheckForSpellingMistakes(Const E: TElementContainer);
+
+Var
+  i : Integer;
+  iElement : Integer;
+  iToken: Integer;
+  sl: TStringList;
+  strToken: String;
+  T : TTokenInfo;
+  EmptyKeyWordList : TKeyWords;
+  boolInTag : Boolean;
+  
+Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckForSpellingMistakes', tmoTiming);{$ENDIF}
+  boolInTag := False;
+  For iToken := 0 To E.TokenCount - 1 Do
+    Begin
+      T := E.Tokens[iToken];
+      If (T.Token = '<') Or (T.Token = '</') Or (T.Token = '<!') Then
+        boolInTag := True;
+      If (T.Token = '>') Or (T.Token = '/>') Then
+        boolInTag := False;
+      If (T.Line <> 0) And (T.Column <> 0) And Not boolInTag Then
+        Begin
+          strToken := T.Token.DeQuotedString;
+          //strToken := FReplaceAmpersandRegEx.Replace(strToken, '\1');
+          sl := Tokenize(strToken, EmptyKeyWordList, EmptyKeyWordList);
+          Try
+            For i := 0 To sl.Count - 1 Do
+              If (sl[i].Length > 1) And (sl[i][1] <> '#') Then
+                If TBADITokenType(sl.Objects[i]) In [ttIdentifier] Then
+                  CheckSpelling(sl[i], E.Scope, sitTag, T.Line, T.Column, Nil);
+          Finally
+            sl.Free;
+          End;
+        End;
+    End;
+  For iElement := 1 To E.ElementCount Do
+    CheckForSpellingMistakes(E.Elements[iElement]);
+End;
+
 (**
 
   This method parses the Children element of the grammar.
@@ -538,6 +597,7 @@ end;
 function TXMLModule.Children(Const xmlParent : TElementContainer): Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Children', tmoTiming);{$ENDIF}
   Result := ChoiceSeq(xmlParent);
 end;
 
@@ -574,6 +634,7 @@ var
     T: TTokenInfo;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ChoiceSeq/ProcessNames', tmoTiming);{$ENDIF}
     If Token.Token = '(' Then
       ChoiceSeq(xmlParent)
     Else
@@ -592,6 +653,7 @@ var
   End;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ChoiceSeq', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '(' Then
     Begin
@@ -629,6 +691,7 @@ end;
 **)
 function TXMLModule.CombiningChar: Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CombiningChar', tmoTiming);{$ENDIF}
   Result := False;
 end;
 
@@ -645,6 +708,7 @@ end;
 **)
 function TXMLModule.ConditionalSect(Const xmlParent: TElementContainer): Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ConditionalSect', tmoTiming);{$ENDIF}
   Result := IncludeSect(xmlParent) or IgnoreSect(xmlParent);
 end;
 
@@ -662,6 +726,7 @@ end;
 **)
 procedure TXMLModule.Content(Const xmlParent : TXMLElement);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Content', tmoTiming);{$ENDIF}
   Repeat
     // Do nothing
   Until Not (
@@ -686,6 +751,7 @@ end;
 procedure TXMLModule.ContentSpec(Const xmlParent : TElementContainer);
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ContentSpec', tmoTiming);{$ENDIF}
   If CompareText(Token.Token, 'EMPTY') = 0 Then
     AddToExpression(xmlParent)
   Else If CompareText(Token.Token, 'ANY') = 0 Then
@@ -717,6 +783,7 @@ Var
   boolCascade : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CreateParser', tmoTiming);{$ENDIF}
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   Sorted := False;
   If IsKeyWord(ExtractFileExt(strFileName), ['.htm', '.html']) Then
@@ -761,6 +828,7 @@ End;
 **)
 Function TXMLModule.DeclSep(Const xmlParent : TElementContainer) : Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DeclSep', tmoTiming);{$ENDIF}
   Result := PEReference(xmlParent);
   If Not Result Then
     Whitespace(Nil);
@@ -778,6 +846,7 @@ end;
 **)
 procedure TXMLModule.DefaultDecl(Const xmlParent: TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DefaultDecl', tmoTiming);{$ENDIF}
   If CompareText(Token.Token, '#REQUIRED')= 0  Then
     AddToExpression(xmlParent)
   Else If CompareText(Token.Token, '#IMPLIED')= 0  Then
@@ -806,6 +875,7 @@ end;
 **)
 Destructor TXMLModule.Destroy;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   Inherited Destroy;
 end;
 
@@ -828,6 +898,7 @@ Var
   D : TXMLDocType;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DocTypeDecl', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<!' Then
     Begin
@@ -879,6 +950,7 @@ var
   iElements : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Document', tmoTiming);{$ENDIF}
   iElements := 0;
   Prolog(Self, iElements);
   Repeat
@@ -910,6 +982,7 @@ end;
 function TXMLModule.EatCharData(Const E : TXMLElement): Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EatCharData', tmoTiming);{$ENDIF}
   Result := (Token.Token[1] <> '<');
   If Result Then
     Begin
@@ -935,6 +1008,7 @@ Var
   xmlChild : TXMLElement;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Element', tmoTiming);{$ENDIF}
   xmlChild := STag(xmlParent);
   Result := xmlChild <> Nil;
   If Result And (xmlChild <> Nil) And Not xmlChild.Referenced Then
@@ -963,6 +1037,7 @@ var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ElementDecl', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<!' Then
     Begin
@@ -1019,6 +1094,7 @@ var
   iValidchars: Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EncName', tmoTiming);{$ENDIF}
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     Begin
       strToken := Token.Token;
@@ -1051,6 +1127,7 @@ end;
 **)
 procedure TXMLModule.EncodingDecl(Const xmlParent : TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EncodingDecl', tmoTiming);{$ENDIF}
   If CompareText(Token.Token, 'encoding') = 0 Then
     Begin
       AddToExpression(xmlParent);
@@ -1072,6 +1149,7 @@ end;
 **)
 function TXMLModule.EntityDecl(Const xmlParent : TElementContainer): Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EntityDecl', tmoTiming);{$ENDIF}
   Result := GEDecl(xmlParent);
 end;
 
@@ -1087,6 +1165,7 @@ end;
 **)
 procedure TXMLModule.EntityDef(Const xmlParent: TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EntityDef', tmoTiming);{$ENDIF}
   If ExternalID(xmlParent) Then
     NDataDecl(xmlParent)
   Else
@@ -1111,6 +1190,7 @@ Var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EntityRef', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '&' Then
     Begin
@@ -1147,6 +1227,7 @@ var
   strValue: String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EntityValue', tmoTiming);{$ENDIF}
   Result := False;
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     Begin
@@ -1180,6 +1261,7 @@ end;
 **)
 procedure TXMLModule.EnumerateType(Const xmlParent: TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'EnumerateType', tmoTiming);{$ENDIF}
   If Not NotationType(xmlParent) Then
     Enumeration(xmlParent);
 end;
@@ -1196,6 +1278,7 @@ end;
 **)
 procedure TXMLModule.Enumeration(Const xmlParent: TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Enumeration', tmoTiming);{$ENDIF}
   If Token.Token = '(' Then
     Begin
       AddToExpression(xmlParent);
@@ -1230,6 +1313,7 @@ end;
 **)
 procedure TXMLModule.Eq(Const xmlParent : TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Eq', tmoTiming);{$ENDIF}
   WhiteSpace(Nil);
   If Token.Token = '=' Then
     AddToExpression(xmlParent)
@@ -1255,6 +1339,7 @@ Var
   iLine, iColumn : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ETag', tmoTiming);{$ENDIF}
   If Token.Token = '</' Then
     Begin
       NextNonCommentToken;
@@ -1285,6 +1370,7 @@ end;
 **)
 function TXMLModule.Extender: Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Extender', tmoTiming);{$ENDIF}
   Result := False;
 end;
 
@@ -1301,6 +1387,7 @@ end;
 **)
 Function TXMLModule.ExternalID(Const xmlParent : TElementContainer) : Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ExternalID', tmoTiming);{$ENDIF}
   Result := False;
   If CompareText(Token.Token, 'SYSTEM') = 0 Then
     Begin
@@ -1336,6 +1423,7 @@ end;
 function TXMLModule.ExtSubSet(Const xmlParent: TElementContainer): Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ExtSubSet', tmoTiming);{$ENDIF}
   DocTypeDecl(xmlParent);
   Result := TextDecl(xmlParent);
   Result := Result Or ExtSubSetDecl(xmlParent);
@@ -1355,6 +1443,7 @@ end;
 **)
 Function TXMLModule.ExtSubSetDecl(Const xmlParent: TElementContainer) : Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ExtSubSetDecl', tmoTiming);{$ENDIF}
   Result := False;
   While (MarkupDecl(xmlParent) Or ConditionalSect(xmlParent) or DeclSep(xmlParent)) Do
     Begin
@@ -1376,6 +1465,7 @@ end;
 **)
 function TXMLModule.TokenizedType(Const xmlParent: TElementContainer): Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'TokenizedType', tmoTiming);{$ENDIF}
   Result := IskeyWord(Token.Token, ['entities', 'entity', 'id', 'idref',
     'idrefs', 'nmtoken', 'nmtokens']);
   If Result Then
@@ -1467,6 +1557,7 @@ Var
   End;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'TokenizeStream', tmoTiming);{$ENDIF}
   BlockType := btNoBlock;
   iStreamPos := 0;
   iTokenLine := 1;
@@ -1629,6 +1720,7 @@ End;
 **)
 Function TXMLModule.VersionInfo(Const xmlParent : TElementContainer) : Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'VersionInfo', tmoTiming);{$ENDIF}
   Result := False;
   WhiteSpace(Nil);
   If CompareText(Token.Token, 'version') = 0 Then
@@ -1659,6 +1751,7 @@ var
   strQuote: String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'VersionNum', tmoTiming);{$ENDIF}
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     Begin
       strNum := Copy(Token.Token, 2, Token.Length - 2);
@@ -1698,6 +1791,7 @@ end;
 function TXMLModule.Whitespace(Const E : TXMLElement): Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Whitespace', tmoTiming);{$ENDIF}
   Result := False;
   While Token.TokenType In [ttWhiteSpace, ttLineEnd] Do
     Begin
@@ -1720,6 +1814,7 @@ end;
 **)
 function TXMLModule.XMLComment: Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'XMLComment', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<!--' Then
     Begin
@@ -1751,6 +1846,7 @@ Var
   xml: TElementContainer;
   
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'XMLDecl', tmoTiming);{$ENDIF}
   If Token.Token = '<?' Then
     Begin
       PushTokenPosition;
@@ -1798,6 +1894,7 @@ Var
   boolPRRef : Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'XMLName', tmoTiming);{$ENDIF}
   Result := '';
   boolPRRef := False;
   If Token.Token = '%' Then
@@ -1842,6 +1939,7 @@ Var
   pit : TXMLPI;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'XMLPI', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<?' Then
     Begin
@@ -1877,6 +1975,7 @@ end;
 **)
 procedure TXMLModule.ParseTokens;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ParseTokens', tmoTiming);{$ENDIF}
   Goal;
 end;
 
@@ -1898,6 +1997,7 @@ Var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PEDecl', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '%' Then
     Begin
@@ -1942,6 +2042,7 @@ Var
   PERef: TXMLPERef;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PEReference', tmoTiming);{$ENDIF}
   Result := Token.Token = '%';
   If Result Then
     Begin
@@ -1977,6 +2078,7 @@ Var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PITarget', tmoTiming);{$ENDIF}
   Result := Nil;
   T := Token;
   strName := XMLName;
@@ -2004,6 +2106,7 @@ Var
   i : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ReservedWords', tmoTiming);{$ENDIF}
   SetLength(Result, Succ(High(strReservedWords)));
   For i := Low(strReservedWords) To High(strReservedWords) Do
     Result[i] := strReservedWords[i];
@@ -2022,6 +2125,7 @@ end;
 function TXMLModule.Directives: TKeyWords;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Directives', tmoTiming);{$ENDIF}
   Result := Nil;
 end;
 
@@ -2038,6 +2142,7 @@ end;
 **)
 function TXMLModule.MarkupDecl(Const xmlParent : TElementContainer) : Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MarkupDecl', tmoTiming);{$ENDIF}
   Result :=
     ElementDecl(xmlParent) Or
     AttListDecl(xmlParent) Or
@@ -2062,6 +2167,7 @@ end;
 Function TXMLModule.Misc(Const xmlParent : TElementContainer; var iElements : Integer) : Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Misc', tmoTiming);{$ENDIF}
   Result := XMLComment;
   If Not Result Then
     Result := XMLPI(xmlParent);
@@ -2090,6 +2196,7 @@ var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Mixed', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '(' Then
     Begin
@@ -2146,6 +2253,7 @@ end;
 **)
 function TXMLModule.NameChar(Const xmlParent: TElementContainer): Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'NameChar', tmoTiming);{$ENDIF}
   Result := False;
   If Token.TokenType In [ttIdentifier, ttNumber] Then
     Result := True;
@@ -2174,6 +2282,7 @@ var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'NDataDecl', tmoTiming);{$ENDIF}
   If Whitespace(Nil) Then
     Begin
       If CompareText(Token.Token, 'NDATA') = 0 Then
@@ -2205,6 +2314,7 @@ end;
 **)
 function TXMLModule.NmToken(Const xmlParent: TElementContainer): Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'NmToken', tmoTiming);{$ENDIF}
   Result := False;
   While NameChar(xmlParent) Do
     Begin
@@ -2232,6 +2342,7 @@ var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'NotationDecl', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<!' Then
     Begin
@@ -2282,6 +2393,7 @@ var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'NotationType', tmoTiming);{$ENDIF}
   Result := False;
   If CompareText(Token.Token, 'NOTATION') = 0 Then
     Begin
@@ -2346,6 +2458,7 @@ var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GEDecl', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<!' Then
     Begin
@@ -2408,6 +2521,7 @@ Var
   iToken: TTokenIndex;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetComment', tmoTiming);{$ENDIF}
   Result := Nil;
   If CommentPosition = cpBeforeCurrentToken Then
     iOffset := -1
@@ -2442,6 +2556,7 @@ End;
 **)
 function TXMLModule.GetModuleName: String;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetModuleName', tmoTiming);{$ENDIF}
   Result := ExtractFilename(FileName);
 end;
 
@@ -2458,6 +2573,7 @@ end;
 Procedure TXMLModule.ProcessCompilerDirective;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ProcessCompilerDirective', tmoTiming);{$ENDIF}
   // Do nothing, i.e. Conditional Compilation is NOT supported.
 End;
 
@@ -2477,6 +2593,7 @@ End;
 procedure TXMLModule.Prolog(Const xmlParent : TElementContainer; var iElements : Integer);
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Prolog', tmoTiming);{$ENDIF}
   XMLDecl(xmlParent);
   Repeat
     // Do nothing
@@ -2506,6 +2623,7 @@ var
   strValue: String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PubIDLiteral', tmoTiming);{$ENDIF}
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     Begin
       strValue := Token.Token;
@@ -2536,6 +2654,7 @@ end;
 **)
 procedure TXMLModule.PublicID(Const xmlParent: TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PublicID', tmoTiming);{$ENDIF}
   If CompareText(Token.Token, 'PUBLIC') = 0 Then
     AddToExpression(xmlParent)
   Else
@@ -2558,6 +2677,7 @@ end;
 **)
 function TXMLModule.Reference(Const xmlParent: TElementContainer): Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Reference', tmoTiming);{$ENDIF}
   Result := False;
   If Not EntityRef(xmlParent) Then
     Result := CharRef(xmlParent);
@@ -2579,6 +2699,7 @@ end;
 Function TXMLModule.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ReferenceSymbol', tmoTiming);{$ENDIF}
   Result := False;
 End;
 
@@ -2598,6 +2719,7 @@ Var
   strAnswer : String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SDDecl', tmoTiming);{$ENDIF}
   If CompareText(Token.Token, 'standalone') = 0 Then
     Begin
       AddToExpression(xmlParent);
@@ -2634,6 +2756,7 @@ Var
   T: TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'STag', tmoTiming);{$ENDIF}
   Result := Nil;
   If Token.Token = '<' Then
     Begin
@@ -2677,6 +2800,7 @@ end;
 **)
 function TXMLModule.StringType(Const xmlParent: TElementContainer): Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'StringType', tmoTiming);{$ENDIF}
   Result := False;
   If CompareText(Token.Token, 'CDATA') = 0 Then
     Begin
@@ -2697,6 +2821,7 @@ end;
 **)
 procedure TXMLModule.SystemLiteral(Const xmlParent : TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SystemLiteral', tmoTiming);{$ENDIF}
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     AddToExpression(xmlParent)
   Else
@@ -2720,6 +2845,7 @@ Var
   xml : TElementContainer;
   
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'TextDecl', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<?' Then
     Begin
@@ -2763,6 +2889,7 @@ Var
   iElement : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'TidyUpEmptyElements', tmoTiming);{$ENDIF}
   For iElement := ElementCount DownTo 1 Do
     If Elements[iElement].ElementCount = 0 Then
       If Elements[iElement] Is TLabelContainer Then
@@ -2784,6 +2911,7 @@ end;
 Function TXMLModule.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AsString', tmoTiming);{$ENDIF}
   Result := ChangeFileExt(Inherited AsString(boolShowIdentifier,
     boolForDocumentation), '');
 End;
@@ -2805,6 +2933,7 @@ var
   C: TComment;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Goal', tmoTiming);{$ENDIF}
   Line := 1;
   Column := 1;
   Try
@@ -2831,6 +2960,8 @@ begin
           Else
             Document;
       End;
+    If doSpellCheckTags in TBADIOptions.BADIOptions.Options Then
+      CheckForSpellingMistakes(Self);
   Except
     On E : EBADIParserAbort Do
       AddIssue(E.Message, scNone, 0, 0, etError, Self);
@@ -2847,6 +2978,7 @@ end;
 **)
 procedure TXMLModule.Ignore;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Ignore', tmoTiming);{$ENDIF}
   While (Token.Token <> '<![') And (Token.Token <> ']]') Do
     NextNonCommentToken;
 end;
@@ -2868,6 +3000,7 @@ Var
   I : TXMLIgnoreElement;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'IgnoreSect', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<![' Then
     Begin
@@ -2910,6 +3043,7 @@ end;
 **)
 procedure TXMLModule.IgnoreSectContents;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'IgnoreSectContents', tmoTiming);{$ENDIF}
   Ignore;
   While Token.Token = '<![' Do
     Begin
@@ -2946,6 +3080,7 @@ Var
   I : TXMLIncludeElement;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'IncludeSect', tmoTiming);{$ENDIF}
   Result := False;
   If Token.Token = '<![' Then
     Begin
@@ -2991,8 +3126,11 @@ end;
 **)
 procedure TXMLModule.IntSubSet(Const xmlParent : TElementContainer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'IntSubSet', tmoTiming);{$ENDIF}
   If Not MarkupDecl(xmlParent) Then
     DeclSep(xmlParent);
 end;
 
 End.
+
+

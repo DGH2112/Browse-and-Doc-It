@@ -3,8 +3,8 @@
   This module defines the VBE IDE Tools interface between the IDE and the
   available tools.
 
-  @Version 1.0
-  @Date    12 Mar 2017
+  @Version 1.277
+  @Date    02 Sep 2023
   @Author  David Hoyle
 
 **)
@@ -12,10 +12,27 @@ Unit BADI.IDETools;
 
 Interface
 
-Uses
-  Office2000_TLB, VBIDE_TLB, SysUtils, Windows, EventSink, ComObj,
-  IniFiles, ExtCtrls, Dialogs, Classes, Forms, DocumentationDispatcher,
-  BaseLanguageModule, Contnrs, ActnList, Messages, CommonIDEFunctions;
+uses
+  System.SysUtils,
+  System.IniFiles,
+  System.Classes,
+  System.Contnrs,
+  System.Win.ComObj,
+  Winapi.Windows,
+  Winapi.Messages,
+  Vcl.ExtCtrls,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Vcl.ActnList,
+  Office2000_TLB,
+  VBIDE_TLB,
+  EventSink,
+  BADI.Documentation.Dispatcher,
+  BADI.Base.Module,
+  BADI.CommonIDEFunctions,
+  BADI.Thread.Manager;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** This is a record to keep together the menu item and the event sink. **)
@@ -73,7 +90,7 @@ Type
     //FOldWndProc : TFarProc;
     //FNewWndProc : TFarProc;
     FLastCodePane: CodePane;
-    FBADIThreadMgr : TBrowseAndDocItThreadManager;
+    FBADIThreadMgr : TBADIThreadManager;
     procedure CreateMenu;
     function GetProjectPath(strName: String): String;
     procedure SetProjectPath(strName: String; strValue: String);
@@ -99,9 +116,7 @@ Type
     Procedure InsertCodeFragmentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure ShowTokensClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure OptionsClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
-    Procedure CheckForUpdatesClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
-    Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol : Integer);
+    Procedure SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
     Procedure Focus(Sender : TObject);
     Procedure ScopeChange(Sender : TObject);
     Procedure TimerEvent(Sender : TObject);
@@ -110,10 +125,10 @@ Type
     Procedure Save;
     Function GetFileName(strProject, strModule : String; iType : Integer) : String;
     procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine: Integer; iIndent: Integer; strComment: string);
-    Procedure SuccessfulParse(boolSuccessfulParse : Boolean);
+    Procedure SuccessfulParse(Const boolSuccessfulParse : Boolean);
     Function  EditorInfo(var strFileName : String; var boolModified : Boolean) : String;
-    Procedure RenderDocument(Module : TBaseLanguageModule);
-    Procedure ExceptionMsg(strExceptionMsg : String);
+    Procedure RenderDocument(Const Module : TBaseLanguageModule);
+    Procedure ExceptionMsg(Const strExceptionMsg : String);
     Procedure IdleTimerEvent(Sender : TObject);
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -231,11 +246,31 @@ ResourceString
 
 Implementation
 
-Uses
-  ExportForm, ProgressForm, Controls, FileCtrl, Functions, TokenForm,
-  OptionsForm, DocumentationOptionsForm, ShellAPI,
-  CodeFragmentsForm, Variants, VBEIDEModuleExplorer,
-  DGHLibrary, Math, VBModule, checkforupdates, Menus;
+uses
+  System.Variants,
+  System.Math,
+  Winapi.ShellAPI,
+  Vcl.Controls,
+  Vcl.FileCtrl,
+  Vcl.Menus,
+  ExportForm,
+  BADI.ProgressForm,
+  BADI.Functions,
+  BADI.TokenForm,
+  BADI.OptionsForm,
+  BADI.DocumentationOptionsForm,
+  CodeFragmentsForm,
+  VBEIDEModuleExplorer,
+  BADI.VB.Module,
+  BADI.Options,
+  BADI.Module.Dispatcher,
+  BADI.Types,
+  BADI.ElementContainer,
+  BADI.Generic.FunctionDecl,
+  BADI.ResourceStrings,
+  BADI.Generic.MethodDecl,
+  BADI.Generic.PropertyDecl,
+  BADI.VB.ResourceStrings;
 
 
 { TIDEMenuItem }
@@ -292,19 +327,16 @@ begin
   Try
     FOldHandle := Application.Handle;
     Application.Handle := VBEIDERef.MainWindow.HWnd;
-    TCheckForUpdates.Execute('BrowseAndDocIt2006',
-      BrowseAndDocItOptions.INIFileName, False);
-    FPath := ExtractFilePath(BrowseAndDocItOptions.INIFileName) + 'Code Fragments\';
-    SysUtils.ForceDirectories(FPath);
+    FPath := ExtractFilePath(TBADIOptions.BADIOptions.INIFileName) + 'Code Fragments\';
+    System.SysUtils.ForceDirectories(FPath);
     FVBEIDE := VBEIDERef;
     TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-    TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus,
-      ScopeChange, MEFormClose);
+    TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, ScopeChange, MEFormClose);
     TfrmDockableModuleExplorer.SetModuleExplorerPosition(WindowPosition['ModuleExplorer']);
     FVBProject := Nil;
     FSinks := TObjectList.Create(True);
     CreateMenu;
-    FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
+    FBADIThreadMgr := TBADIThreadManager.Create(SuccessfulParse, RenderDocument, ExceptionMsg);
     FTimer := TTimer.Create(Nil);
     FTimer.Interval := 100;
     FTimer.OnTimer := TimerEvent;
@@ -360,7 +392,7 @@ end;
 **)
 procedure TIDETools.SaveSettings;
 begin
-  with TIniFile.Create(BrowseAndDocItOptions.INIFileName) do
+  with TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
     try
       WriteBool('ModuleExplorer', 'Visible', FMEVisible);
       WriteInteger('Documentation options', 'LastOption', Byte(FDocType));
@@ -393,7 +425,7 @@ Var
   CP: CodePane;
 
 begin
-  SelectionChange(iInsertLine + CharCount(#13, strComment) + 1, 1, iInsertLine, 1);
+  SelectionChange(iInsertLine + CharCount(#13, strComment) + 1, 1, iInsertLine);
   Pt.Y := iInsertLine;
   Pt.X := iIndent + 3;
   Inc(Pt.Y, CursorDelta.Y);
@@ -474,7 +506,6 @@ Begin
       CreateMenuItem(strSaveCodeFragment, SaveCodeFragmentClick, True, 'S');
       CreateMenuItem(strInsertCodeFragment,InsertCodeFragmentClick, False, 'N');
       CreateMenuItem(strOptions, OptionsClick, True, 'O');
-      CreateMenuItem(strCheckForUpdates, CheckForUpdatesClick, True, 'O');
     End;
 End;
 
@@ -518,8 +549,8 @@ begin
         CodePaneChangeEvent(CP, FVBProject);
       End;
     Inc(FCounter, 100);
-    boolRefresh := (FCounter >= BrowseAndDocItOptions.UpdateInterval) And
-      (FCounter <= BrowseAndDocItOptions.UpdateInterval + 100);
+    boolRefresh := (FCounter >= TBADIOPtions.BADIOptions.UpdateInterval) And
+      (FCounter <= TBADIOPtions.BADIOptions.UpdateInterval + 100);
     i := Length(ModuleCode);
     If i <> FOldLength Then
       Begin
@@ -529,8 +560,7 @@ begin
     If boolRefresh Then
       Begin
         FTimer.Enabled := False;
-        FBADIThreadMgr.Parse(SuccessfulParse, EditorInfo, RenderDocument,
-          ExceptionMsg);
+        FBADIThreadMgr.Parse(EditorInfo);
         FOldLength := Length(ModuleCode);
       End;
   Except
@@ -551,7 +581,7 @@ end;
 **)
 function TIDETools.GetProjectPath(strName: String): String;
 begin
-  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+  With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) Do
     Try
       Result := ReadString('ProjectPaths', strName, '');
     Finally
@@ -574,7 +604,7 @@ procedure TIDETools.SetProjectPath(strName : String; strValue: String);
 begin
   If strValue[Length(strValue)] <> '\' Then
     strValue := strValue + '\';
-  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+  With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) Do
     Try
       WriteString('ProjectPaths', strName, strValue);
     Finally
@@ -698,7 +728,7 @@ end;
 function TIDETools.GetWindowPosition(strName: String): TRect;
 
 begin
-  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) do
+  With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
     Try
       Result.Left := ReadInteger(strName, 'Left', 0);
       Result.Top := ReadInteger(strName, 'Top', 0);
@@ -722,7 +752,7 @@ end;
 **)
 procedure TIDETools.SetWindowPosition(strName: String; const Value: TRect);
 begin
-  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) do
+  With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
     Try
       WriteInteger(strName, 'Left', Value.Left);
       WriteInteger(strName, 'Top', Value.Top);
@@ -761,8 +791,12 @@ begin
     strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
       CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
     strTemp := ModuleCode;
-    doc := ModuleDispatcher.Dispatcher(strTemp, strFileName, Not CP.CodeModule.Parent.Saved,
-      [moParse]);
+    doc := TBADIDispatcher.BADIDispatcher.Dispatcher(
+      strTemp,
+      strFileName,
+      Not CP.CodeModule.Parent.Saved,
+      [moParse]
+    );
     Try
       TfrmTokenForm.Execute(doc);
     Finally
@@ -786,7 +820,7 @@ end;
   @param   boolSuccessfulParse as a Boolean
 
 **)
-procedure TIDETools.SuccessfulParse(boolSuccessfulParse: Boolean);
+procedure TIDETools.SuccessfulParse(Const boolSuccessfulParse: Boolean);
 begin
   FTimer.Enabled := True;
 end;
@@ -801,7 +835,7 @@ end;
   @param   strExceptionMsg as a String
 
 **)
-procedure TIDETools.ExceptionMsg(strExceptionMsg: String);
+procedure TIDETools.ExceptionMsg(Const strExceptionMsg: String);
 begin
   ShowMessage(strExceptionMsg);
 end;
@@ -940,7 +974,7 @@ End;
 **)
 procedure TIDETools.ScopeChange(Sender: TObject);
 begin
-  FCounter := BrowseAndDocItOptions.UpdateInterval;
+  FCounter := TBADIOPtions.BADIOptions.UpdateInterval;
 end;
 
 (**
@@ -994,24 +1028,6 @@ end;
 
 (**
 
-  This is an on click event handler for the Check for Updates menu item.
-
-  @precon  None.
-  @postcon Invokes the checking for updates system.
-
-  @param   Ctrl          as a CommandBarButton as a constant
-  @param   CancelDefault as a WordBool as a reference
-
-**)
-procedure TIDETools.CheckForUpdatesClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
-begin
-  TCheckForUpdates.Execute('BrowseAndDocIt2006',
-    BrowseAndDocItOptions.INIFileName, True);
-end;
-
-(**
-
   This is an event handler that is fired when ever the current code pane changes.
 
   @precon  None.
@@ -1028,7 +1044,7 @@ Var
   CP: CodePane;
 
 begin
-  FCounter := BrowseAndDocItOptions.UpdateInterval;
+  FCounter := TBADIOPtions.BADIOptions.UpdateInterval;
   If Pane = Nil Then
     Exit;
   CP := CurrentCodePane;
@@ -1142,7 +1158,7 @@ begin
   If TfrmOptions.Execute([Low(TVisibleTab)..High(TVisibleTab)]) Then
     Begin
       FOldLength := 0;
-      FCounter := BrowseAndDocItOptions.UpdateInterval;
+      FCounter := TBADIOPtions.BADIOptions.UpdateInterval;
     End;
 end;
 
@@ -1199,8 +1215,7 @@ end;
   @param   iCommentCol  as an Integer
 
 **)
-procedure TIDETools.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-    iCommentCol : Integer);
+procedure TIDETools.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
 
 Var
   C : TEditPos;
@@ -1217,19 +1232,11 @@ begin
         C.Col := iIdentCol;
         C.Line := iIdentLine;
         CP.SetSelection(C.Line, C.Col, C.Line, C.Col);
-        Case BrowseAndDocItOptions.BrowsePosition Of
+        Case TBADIOPtions.BADIOptions.BrowsePosition Of
           bpCommentTop:
-            Begin
-              If iCommentLine > 0 Then
-                iIdentLine := iCommentLine;
-              CP.TopLine := iIdentLine;
-            End;
+            CP.TopLine := iIdentLine;
           bpCommentCentre:
-            Begin
-              If iCommentLine > 0 Then
-                iIdentLine := iCommentLine;
-              CP.TopLine := Max(iIdentLine - iLineInView, 1);
-            End;
+            CP.TopLine := Max(iIdentLine - iLineInView, 1);
           bpIdentifierTop:
             CP.TopLine := iIdentLine;
           bpIdentifierCentre:
@@ -1277,7 +1284,7 @@ procedure TIDETools.ModuleExplorerClick(const Ctrl: CommandBarButton;
 begin
   TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
   FMEVisible := True;
-  FCounter := BrowseAndDocItOptions.UpdateInterval;
+  FCounter := TBADIOPtions.BADIOptions.UpdateInterval;
 end;
 
 (**
@@ -1290,7 +1297,7 @@ end;
   @param   Module as a TBaseLanguageModule
 
 **)
-procedure TIDETools.RenderDocument(Module: TBaseLanguageModule);
+procedure TIDETools.RenderDocument(Const Module: TBaseLanguageModule);
 begin
   TfrmDockableModuleExplorer.RenderDocumentTree(Module);
 end;
@@ -1426,7 +1433,7 @@ begin
         StringOfChar(#32, iSC - 1) + ''':'#13#10 +
         StringOfChar(#32, iSC - 1) + ''':';
       CP.CodeModule.InsertLines(iSL, strLine);
-      SelectionChange(iSL + 1, iSC + 2, iSL + 1, iSC + 2);
+      SelectionChange(iSL + 1, iSC + 2, iSL + 1);
     End Else
       MessageDlg('There is no active Code Pane.', mtError, [mbOK], 0);
 end;
@@ -1503,7 +1510,7 @@ begin
       strLine := Copy(strLine, 1, iSC - 1) + ''': ' +
         Copy(strLine, iSC, Length(strLine) - iSC + 1);
       CP.CodeModule.ReplaceLine(iSL, strLine);
-      SelectionChange(iSL, iSC + 2, iSL, iSC + 2);
+      SelectionChange(iSL, iSC + 2, iSL);
     End Else
       MessageDlg('There is no active Code Pane.', mtError, [mbOK], 0);
 end;
@@ -1535,7 +1542,7 @@ begin
       CP.GetSelection(iSL, iSC, iEL, iEC);
       strLine := StringOfChar(#32, iSC - 1) + ''': ';
       CP.CodeModule.InsertLines(iSL, strLine);
-      SelectionChange(iSL, iSC + 2, iSL, iSC + 2);
+      SelectionChange(iSL, iSC + 2, iSL);
     End Else
       MessageDlg('There is no active Code Pane.', mtError, [mbOK], 0);
 end;
@@ -1579,7 +1586,7 @@ begin
   strCode := ModuleCode;
   strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
     CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
-  Module := ModuleDispatcher.Dispatcher(strCode, strFileName,
+  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(strCode, strFileName,
     Not CP.CodeModule.Parent.Saved, [moParse]);
   If Module <> Nil Then
     Try
@@ -1654,7 +1661,7 @@ begin
   strCode := ModuleCode;
   strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
     CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
-  Module := ModuleDispatcher.Dispatcher(strCode, strFileName,
+  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(strCode, strFileName,
     Not CP.CodeModule.Parent.Saved, [moParse]);
   If Module <> Nil Then
     Try
@@ -1700,7 +1707,7 @@ end;
 **)
 procedure TIDETools.LoadSettings;
 begin
-  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+  With TIniFile.Create(TBADIOptions.BADIOptions.INIFileName) Do
     Try
       FMEVisible := ReadBool('ModuleExplorer', 'Visible', True);
       FDocType := TDocType(ReadInteger('Documentation options', 'LastOption',

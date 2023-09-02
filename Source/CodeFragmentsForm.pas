@@ -3,9 +3,9 @@
   This module contains a class which represents a form for viewing, editing and
   inserts code fragments.
 
-  @Version 1.0
+  @Version 1.024
   @Author  David Hoyle
-  @Date    09 Oct 2009
+  @Date    02 Sep 2023
 
 **)
 unit CodeFragmentsForm;
@@ -15,7 +15,8 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, SynEditHighlighter, SynHighlighterVB, SynEdit,
-  Buttons, ComCtrls, ImgList, StdActns, ActnList, Menus, IniFiles;
+  Buttons, ComCtrls, ImgList, StdActns, ActnList, Menus, IniFiles, System.Actions, System.ImageList,
+  SynEditCodeFolding;
 
 type
   (** A class to represent the form interface. **)
@@ -97,8 +98,12 @@ implementation
 
 {$R *.DFM}
 
-Uses
-  FileCtrl, ShellAPI, IDETools, BaseLanguageModule;
+uses
+  Winapi.ShellAPI,
+  Vcl.FileCtrl,
+  BADI.IDETools,
+  BADI.Base.Module,
+  BADI.Options;
 
 ResourceString
   (** A resource string to signify the code has changed. **)
@@ -131,7 +136,7 @@ Var
 
 Begin
   For i := 1 To Length(strText) Do
-    If IsInSet(strText[i], strValidChars) Then
+    If CharInSet(strText[i], strValidChars) Then
       Result := Result + strText[i];
 End;
 
@@ -709,7 +714,7 @@ begin
   ExpandedNodes.Sorted := True;
   sl := TStringList.Create;
   Try
-    With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+    With TIniFile.Create(TBADIOptions.BADIOptions.INIFileName) Do
       Try
         ReadSection('ExpandedNodes', sl);
         For i := 0 To sl.Count - 1 Do
@@ -738,7 +743,7 @@ Var
 begin
   For i := 0 To tvCodeFragments.Items.Count - 1 Do
     GetExpandedNodes(tvCodeFragments.Items[i]);
-  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+  With TIniFile.Create(TBADIOptions.BADIOptions.INIFileName) Do
     Try
       EraseSection('ExpandedNodes');
       For i := 0 To ExpandedNodes.Count - 1 Do

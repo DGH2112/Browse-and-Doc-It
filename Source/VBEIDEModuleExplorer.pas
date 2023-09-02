@@ -3,8 +3,8 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    12 Jun 2010
-  @Version 1.0
+  @Date    02 Sep 2023
+  @Version 1.002
 
 **)
 unit VBEIDEModuleExplorer;
@@ -13,7 +13,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ModuleExplorerFrame, BaseLanguageModule;
+  Dialogs, BADI.ModuleExplorerFrame, BADI.Base.Module;
 
 type
   (** This class represents a dockable form that displays the heirarchical

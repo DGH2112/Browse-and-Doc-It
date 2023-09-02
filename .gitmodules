@@ -13,3 +13,6 @@
 [submodule "Test/VirtualTrees"]
 	path = Test/VirtualTrees
 	url = https://github.com/JAM-Software/Virtual-TreeView.git
+[submodule "SynEdit"]
+	path = SynEdit
+	url = https://www.GitHub.com/SynEdit/SynEdit

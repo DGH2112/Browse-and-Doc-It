@@ -4,8 +4,8 @@
   handling the COM interfaces required.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Mar 2010
+  @Version 1.026
+  @Date    02 Sep 2023
 
 **)
 unit BrowseAndDocItAddin;
@@ -13,8 +13,14 @@ unit BrowseAndDocItAddin;
 interface
 
 uses
-  Windows, ComObj, ActiveX, BrowseAndDocItVBEIDE_TLB, AddInDesignerObjects_TLB,
-  Office2000_TLB, StdVcl, IDETools;
+  System.Win.ComObj,
+  System.Win.StdVCL,
+  Winapi.Windows,
+  Winapi.ActiveX,
+  BrowseAndDocItVBEIDE_TLB,
+  AddInDesignerObjects_TLB,
+  Office2000_TLB,
+  BADI.IDETools;
 
 type
   (** A the addin automation object **)
@@ -51,8 +57,14 @@ type
 
 implementation
 
-Uses
-  SysUtils, ComServ, Registry, Classes, VBIDE_TLB, Dialogs, Functions;
+uses
+  System.SysUtils,
+  System.Classes,
+  System.Win.Registry,
+  Vcl.Dialogs,
+  ComServ,
+  VBIDE_TLB,
+  BADI.Functions;
 
 { TTDGHVBEIDEToosl50Addin }
 
@@ -214,6 +226,7 @@ begin
   Try
     R := TRegistry.Create;
     Try
+      R.RootKey := HKEY_LOCAL_MACHINE;
       If R.OpenKey(KeyName, False) Then
         Begin
           R.GetValueNames(Values);
@@ -248,6 +261,7 @@ Var
 begin
   R := TRegistry.Create;
   Try
+    R.RootKey := HKEY_LOCAL_MACHINE;
     If Not R.OpenKey(KeyName, True) Then
       Begin
         DisplayException('Exception in RegisterAddIn');

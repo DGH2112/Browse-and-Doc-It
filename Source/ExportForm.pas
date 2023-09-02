@@ -3,9 +3,9 @@
   This module defines a dialogue for exporting modules from the current VB
   project to disk.
 
-  @Version 1.0
+  @Version 1.002
   @Author  David Hoyle
-  @Date    15 Mar 2009
+  @Date    02 Sep 2023
 
 **)
 unit ExportForm;
@@ -14,7 +14,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, FileCtrl, CheckLst, Buttons, ComCtrls, ImgList, Functions;
+  StdCtrls, FileCtrl, CheckLst, Buttons, ComCtrls, ImgList, BADI.Functions, System.ImageList;
 
 type
   (** This class represents a form for exporting modules to disk. **)

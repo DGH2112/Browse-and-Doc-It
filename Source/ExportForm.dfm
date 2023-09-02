@@ -37,12 +37,10 @@ object frmExport: TfrmExport
     0003FC000011FC000011FC000011FC000011FC000011FC00001FFC00001FFC00
     001FFC00001F8C00001F8C00001F8C00001F8C00001F8C00001FC400001FC400
     001FE000001FF000001FF800001FFC00003FFF03FFFFFFE7FFFFFFEFFFFF}
-  OldCreateOrder = False
   Position = poMainFormCenter
   DesignSize = (
     342
     366)
-  PixelsPerInch = 96
   TextHeight = 13
   object lblProject: TLabel
     Left = 4
@@ -65,7 +63,6 @@ object frmExport: TfrmExport
     Width = 336
     Height = 145
     Anchors = [akLeft, akTop, akRight]
-    ItemHeight = 16
     TabOrder = 0
   end
   object cmbDrive: TDriveComboBox
@@ -83,8 +80,9 @@ object frmExport: TfrmExport
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 2
     Kind = bkOK
+    NumGlyphs = 2
+    TabOrder = 2
   end
   object btnCancel: TBitBtn
     Left = 186
@@ -92,8 +90,9 @@ object frmExport: TfrmExport
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 3
     Kind = bkCancel
+    NumGlyphs = 2
+    TabOrder = 3
   end
   object btnNewDir: TBitBtn
     Left = 4

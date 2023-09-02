@@ -38,10 +38,8 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
     000180000001800000018000000191111111BBBBBBB9FFFFFFFDEEEEEEEDC444
     4445800000018000000180000001800000018000000180000003FFFFFFFF}
   KeyPreview = True
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnKeyDown = FormKeyDown
-  PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 209
@@ -65,7 +63,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Cancel'
-      DoubleBuffered = True
       Glyph.Data = {
         DE010000424DDE01000000000000760000002800000024000000120000000100
         0400000000006801000000000000000000001000000000000000000000000000
@@ -85,7 +82,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
         0000}
       ModalResult = 2
       NumGlyphs = 2
-      ParentDoubleBuffered = False
       TabOrder = 0
     end
     object btnInsert: TBitBtn
@@ -95,7 +91,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = '&Insert'
-      DoubleBuffered = True
       Glyph.Data = {
         76010000424D7601000000000000760000002800000020000000100000000100
         04000000000000010000130B0000130B00001000000000000000000000000000
@@ -111,7 +106,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
         3000333333333333377733333333333333333333333333333333}
       ModalResult = 5
       NumGlyphs = 2
-      ParentDoubleBuffered = False
       TabOrder = 2
     end
     object btnOK: TBitBtn
@@ -121,7 +115,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'OK'
-      DoubleBuffered = True
       Glyph.Data = {
         DE010000424DDE01000000000000760000002800000024000000120000000100
         0400000000006801000000000000000000001000000000000000000000000000
@@ -141,7 +134,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
         0000}
       ModalResult = 1
       NumGlyphs = 2
-      ParentDoubleBuffered = False
       TabOrder = 1
     end
     object btnDelete: TBitBtn
@@ -151,7 +143,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = '&Delete'
-      DoubleBuffered = True
       Glyph.Data = {
         76010000424D7601000000000000760000002800000020000000100000000100
         04000000000000010000130B0000130B00001000000000000000000000000000
@@ -166,7 +157,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
         333333377F33333333FF3333C333333330003333733333333777333333333333
         3000333333333333377733333333333333333333333333333333}
       NumGlyphs = 2
-      ParentDoubleBuffered = False
       TabOrder = 3
       OnClick = btnDeleteClick
     end
@@ -177,8 +167,6 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = '&Create Dir'
-      DoubleBuffered = True
-      ParentDoubleBuffered = False
       TabOrder = 4
       OnClick = btnCreateClick
     end
@@ -194,15 +182,37 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
     Font.Height = -12
     Font.Name = 'Courier New'
     Font.Style = []
+    Font.Quality = fqClearTypeNatural
     PopupMenu = pmEdit
     TabOrder = 1
+    UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
     Gutter.Font.Height = -11
-    Gutter.Font.Name = 'Terminal'
+    Gutter.Font.Name = 'Consolas'
     Gutter.Font.Style = []
+    Gutter.Font.Quality = fqClearTypeNatural
+    Gutter.Bands = <
+      item
+        Kind = gbkMarks
+        Width = 13
+      end
+      item
+        Kind = gbkLineNumbers
+      end
+      item
+        Kind = gbkFold
+      end
+      item
+        Kind = gbkTrackChanges
+      end
+      item
+        Kind = gbkMargin
+        Width = 3
+      end>
     HideSelection = True
     Highlighter = SynVBSyn1
+    SelectedColor.Alpha = 0.400000005960464500
     RemovedKeystrokes = <
       item
         Command = ecContextHelp

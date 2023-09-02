@@ -14,8 +14,6 @@ object frmDockableModuleExplorer: TfrmDockableModuleExplorer
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   ShowHint = True
-  PixelsPerInch = 96
   TextHeight = 13
 end

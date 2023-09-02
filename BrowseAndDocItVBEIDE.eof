@@ -1,0 +1,28 @@
+﻿
+[Exception Log]
+EurekaLog Version=8000
+934A8C7448044071A3F7A237F4461A0E="550380536C252F77E203EEAB035C135D100248A883155A6873473E356A20B2821E264CE8C89490C4CFAA0133DE785461"
+Activate=1
+atFixSafeCallException=1
+atVCL=1
+atWin32=1
+dpJCL=1
+Encrypt Password=""
+GUID="{CAF941A6-C3CA-40B0-B6CA-1584F0B2564C}"
+idEurekaLog=1
+idEurekaLogDetailed=1
+idMSClassic=1
+idStepsToReproduce=1
+InjectCode=1
+InjectInfo=1
+InjectOptions=1
+loEnableMMDebugMode=1
+ProjectID="{9E7D972F-AC4D-4383-BBDA-A8B4D879EDA5}"
+sndScreenshot=0
+sndSendInSeparatedThread=0
+sndShowFailureMsg=0
+sndShowSendDialog=0
+sndShowSuccessMsg=0
+_CustomProfile="Standalone DLL with VCL forms"
+
+

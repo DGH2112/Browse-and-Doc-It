@@ -4,8 +4,8 @@
   to parser VB.NET code later).
 
   @Author     David Hoyle
-  @Version    1.685
-  @Date    06 May 2021
+  @Version    1.821
+  @Date    09 Sep 2023
 
   @license
 
@@ -1173,7 +1173,7 @@ Function TVBModule.Subs(Const Scope : TScope; Const C : TComment; Const boolStat
   Const DeclareLabel : TLabelContainer) : Boolean;
 
 Var
-  M : TVBMethod;
+  M, tmpM : TVBMethod;
 
 Begin
   Result := False;
@@ -1189,9 +1189,16 @@ Begin
             FImplementedMethodsLabel := Add(TLabelContainer.Create(
               strImplementedMethodsLabel, scNone, 0, 0, iiImplementedMethods, Nil)
               ) As TLabelContainer;
+          tmpM := M;
           M := FImplementedMethodsLabel.Add(M) As TVBMethod;
         End Else
+        Begin
+          tmpM := M;
           M := DeclareLabel.Add(M) As TVBMethod;
+        End;
+      If tmpM <> M Then
+        AddIssue(Format(strDuplicateIdentifierFound, [M.Identifier, M.Line, M.Column]), scNone,
+          M.Line, M.Column, etError, Self);
       MethodDecl(M, C);
       If M.Ext = '' Then
         FindMethodEnd(M, 'SUB');
@@ -1218,7 +1225,7 @@ Function TVBModule.Functions(Const Scope : TScope; Const C : TComment; Const boo
   Const DeclareLabel : TLabelContainer) : Boolean;
 
 Var
-  M : TVBMethod;
+  M, tmpM : TVBMethod;
 
 Begin
   Result := False;
@@ -1234,9 +1241,16 @@ Begin
             FImplementedMethodsLabel := Add(TLabelContainer.Create(
               strImplementedMethodsLabel, scNone, 0, 0, iiImplementedMethods, Nil)
               ) As TLabelContainer;
+          tmpM := M;
           M := FImplementedMethodsLabel.Add(M) As TVBMethod;
         End Else
+        Begin
+          tmpM := M;
           M := DeclareLabel.Add(M) As TVBMethod;
+        End;
+      If tmpM <> M Then
+        AddIssue(Format(strDuplicateIdentifierFound, [M.Identifier, M.Line, M.Column]), scNone,
+          M.Line, M.Column, etError, Self);
       MethodDecl(M, C);
       If M.Ext = '' Then
         FindMethodEnd(M, 'FUNCTION');
@@ -1708,8 +1722,8 @@ Function TVBModule.Props(Const Scope : TScope; Const C : TComment; Const boolSta
 
 Var
   pt : TVBPropertyType;
-  P : TVBProperty;
-  T : TVBTypeDecl;
+  P, tmpP : TVBProperty;
+  T, T2 : TVBTypeDecl;
 
 Begin
   Result := False;
@@ -1734,7 +1748,11 @@ Begin
           If FImplementedPropertiesLabel = Nil Then
             FImplementedPropertiesLabel := Add(TLabelContainer.Create(strImplementedPropertiesLabel,
               scNone, 0, 0, iiPropertiesLabel, Nil)) As TLabelContainer;
+          tmpP := P;
           P := FImplementedPropertiesLabel.Add(P) As TVBProperty;
+          If tmpP <> P Then
+            AddIssue(Format(strDuplicateIdentifierFound, [P.Identifier, P.Line, P.Column]), scNone,
+              P.Line, P.Column, etError, Self);
           NextNonCommentToken;
           If Token.Token = '(' Then
             Begin
@@ -1751,8 +1769,9 @@ Begin
                   If Token.TokenType In [ttIdentifier, ttReservedWord] Then
                     Begin
                       T := TVBTypeDecl.Create(Token.Token, scNone, 0, 0, iiNone, Nil);
-                      P.ReturnType.Add(T);
-                      AddToExpression(T);
+                      T2 := P.ReturnType.Add(T) As TVBTypeDecl;
+                      If T = T2 Then
+                        AddToExpression(T);
                     End;
                 End;
               FindMethodEnd(P, 'PROPERTY');

@@ -451,6 +451,9 @@ Const
   {$IFDEF VER350} // Delphi 11.0 Alexandria
   strCompilerVersion = 'VER350';
   {$ENDIF}
+  {$IFDEF VER360} // Delphi 12.0 Xxxxxxxx
+  strCompilerVersion = 'VER350';
+  {$ENDIF}
   {$IFNDEF D0001}
     {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
   {$ENDIF}

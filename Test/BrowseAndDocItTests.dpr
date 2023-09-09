@@ -8,6 +8,19 @@ Program BrowseAndDocItTests;
 
 uses
   FastMM4,
+  {$IFDEF EurekaLog}
+  EMemLeaks,
+  EResLeaks,
+  EDebugJCL,
+  EDebugExports,
+  EFixSafeCallException,
+  EMapWin32,
+  EAppVCL,
+  EDialogWinAPIMSClassic,
+  EDialogWinAPIEurekaLogDetailed,
+  EDialogWinAPIStepsToReproduce,
+  ExceptionLog7,
+  {$ENDIF EurekaLog}
   TestInsight.DUnit,
   //: @debug GUITestRunner,
   //: @debug TextTestRunner,
@@ -202,6 +215,7 @@ begin
   TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options - [doShowSpelling];
   RunRegisteredTests();
 end.
+
 
 
 

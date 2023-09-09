@@ -3,7 +3,7 @@
   This module contains a class which represents a form for viewing, editing and
   inserts code fragments.
 
-  @Version 1.024
+  @Version 1.025
   @Author  David Hoyle
   @Date    02 Sep 2023
 
@@ -517,7 +517,7 @@ begin
       If InputQuery('Create a Folder', 'Please enter the folder name', strFolder) Then
         Begin
           strFolder := CleanFileName(strFolder);
-          If Not ForceDirectories(NodePath(N) + strFolder) Then
+          If Not SysUtils.ForceDirectories(NodePath(N) + strFolder) Then
             MessageDlg(Format('Could not create folder "%s".', [NodePath(N) + strFolder]),
               mtError, [mbOK], 0);
           PopulateTree;

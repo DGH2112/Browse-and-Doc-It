@@ -4,8 +4,8 @@
   creating the thread.
 
   @Author  David Hoyle
-  @Version 1.217
-  @Date    04 May 2021
+  @Version 1.265
+  @Date    09 Sep 2023
 
   @license
 
@@ -33,6 +33,7 @@ Unit BADI.Thread.Manager;
 Interface
 
 uses
+  System.SysUtils,
   System.Classes,
   {$IFDEF EUREKALOG}
   EBase,
@@ -115,7 +116,6 @@ Type
 Implementation
 
 uses
-  System.SysUtils,
   Vcl.Forms,
   BADI.Module.Dispatcher;
 
@@ -306,6 +306,7 @@ Begin
     NameThread(strBrowseAndDocItParsingThread);
     SetEurekaLogStateInThread(0, True);
     {$ENDIF EUREKALOG}
+    FSuccessfulParse := False;
     If FFileName <> '' Then
       FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified,
         [moParse, moCheckForDocumentConflicts])

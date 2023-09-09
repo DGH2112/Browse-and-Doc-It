@@ -4,8 +4,8 @@
   that should be produced.
 
   @Author  David Hoyle
-  @Version 1.001
-  @Date    19 Sep 2020
+  @Version 1.002
+  @Date    02 Sep 2023
 
   @license
 
@@ -61,14 +61,19 @@ Uses
 
 (**
 
-  This function returns a documentation instance for the type of documentation
+
+  This function returns a documentation instance for the type of documentation
   requested.
 
-  @precon  None.
-  @postcon Returns a documentation instance for the type of documentation
-           requested.
 
-  @param   strOutputDirectory as a String as a Constant
+  @precon  None.
+
+  @postcon Returns a documentation instance for the type of documentation
+
+           requested.
+
+
+  @param   strOutputDirectory as a String as a Constant
   @param   strTitle           as a String as a Constant
   @param   ADocType           as a TDocType
   @return  a TBaseDocumentation

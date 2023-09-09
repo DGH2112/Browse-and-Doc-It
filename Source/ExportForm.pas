@@ -3,7 +3,7 @@
   This module defines a dialogue for exporting modules from the current VB
   project to disk.
 
-  @Version 1.002
+  @Version 1.004
   @Author  David Hoyle
   @Date    02 Sep 2023
 
@@ -67,7 +67,7 @@ begin
   If InputQuery('New Directory', 'Please enter the new directory name:',
     strDir) Then
     Begin
-      If Not ForceDirectories(lbDirectory.Directory + '\' + strDir) Then
+      If Not SysUtils.ForceDirectories(lbDirectory.Directory + '\' + strDir) Then
         MessageDlg('There was a problem creatig the directory.', mtError,
           [mbOK], 0)
       Else
@@ -108,7 +108,7 @@ begin
       Result := False;
       Caption := strTitle;
       lblProject.Caption := 'Project: ' + strProject;
-      If DirectoryExists(strPath) Then lbDirectory.Directory := strPath;
+      If SysUtils.DirectoryExists(strPath) Then lbDirectory.Directory := strPath;
       For i := 0 To Modules.Count - 1 Do
         Begin
           State := TStatuses(Byte(Modules.Objects[i]));

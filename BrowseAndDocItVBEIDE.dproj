@@ -71,7 +71,7 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
         <DCC_E>false</DCC_E>
-        <DCC_DcuOutput>..\2010DCUs\</DCC_DcuOutput>
+        <DCC_DcuOutput>$(Platform)\$(Config)</DCC_DcuOutput>
         <SanitizedProjectName>BrowseAndDocItVBEIDE</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
@@ -126,6 +126,7 @@
         <DCCReference Include="Source\VBEIDEModuleExplorer.pas">
             <Form>frmDockableModuleExplorer</Form>
         </DCCReference>
+        <DCCReference Include="Source\BADI.VBEIDE.Initialisation.pas"/>
         <DCCReference Include="Source\BADI.IDETools.pas"/>
         <DCCReference Include="Source\BADI.Functions.pas"/>
         <DCCReference Include="Source\BADI.ProgressForm.pas">
@@ -220,9 +221,6 @@
         <DCCReference Include="Source\BADI.VB.ExceptionHandling.pas"/>
         <DCCReference Include="Source\BADI.Generic.PropertyDecl.pas"/>
         <DCCReference Include="Source\BADI.Generic.Constant.pas"/>
-        <RcCompile Include="ITHVerInfoBADIVBEIDE.RC">
-            <Form>ITHVerInfoBADIVBEIDE.res</Form>
-        </RcCompile>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -307,7 +305,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\BrowseAndDocItVBEIDE.dll" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="BrowseAndDocItVBEIDE.dll" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>BrowseAndDocItVBEIDE.dll</RemoteName>
                         <Overwrite>true</Overwrite>

@@ -3,8 +3,8 @@
   This module defines the VBE IDE Tools interface between the IDE and the
   available tools.
 
-  @Version 1.277
-  @Date    02 Sep 2023
+  @Version 1.297
+  @Date    09 Sep 2023
   @Author  David Hoyle
 
 **)
@@ -249,6 +249,7 @@ Implementation
 uses
   System.Variants,
   System.Math,
+  System.UITypes,
   Winapi.ShellAPI,
   Vcl.Controls,
   Vcl.FileCtrl,
@@ -270,7 +271,8 @@ uses
   BADI.ResourceStrings,
   BADI.Generic.MethodDecl,
   BADI.Generic.PropertyDecl,
-  BADI.VB.ResourceStrings;
+  BADI.VB.ResourceStrings,
+  CodeSiteLogging;
 
 
 { TIDEMenuItem }
@@ -324,6 +326,7 @@ end;
 constructor TIDETools.Create(VBEIDERef : VBE);
 
 begin
+  CodeSite.TraceMethod('TIDETools.Create', tmoTiming);
   Try
     FOldHandle := Application.Handle;
     Application.Handle := VBEIDERef.MainWindow.HWnd;
@@ -364,6 +367,7 @@ end;
 **)
 destructor TIDETools.Destroy;
 begin
+  CodeSite.TraceMethod('TIDETools.Destroy', tmoTiming);
   SaveSettings;
   // Check that our WndProc is the current WndProc before removing.
   //If TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC)) = FNewWndProc Then
@@ -564,7 +568,8 @@ begin
         FOldLength := Length(ModuleCode);
       End;
   Except
-    On E: Exception Do DisplayException(E.Message);
+    On E: Exception Do
+      DisplayException(E.Message);
   End;
 end;
 
@@ -1829,5 +1834,6 @@ begin
 end;**)
 
 End.
+
 
 

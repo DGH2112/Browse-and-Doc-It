@@ -8,61 +8,65 @@
 
 **)
 
-{$IFDEF RS110}
-  {$LIBSUFFIX 'RS110'}
+{$IFDEF RS120}
+  {$LIBSUFFIX 'RS120'}
 {$ELSE}
-  {$IFDEF RS104}
-    {$LIBSUFFIX 'RS104'}
+  {$IFDEF RS110}
+    {$LIBSUFFIX 'RS110'}
   {$ELSE}
-    {$IFDEF RS103}
-      {$LIBSUFFIX 'RS103'}
+    {$IFDEF RS104}
+      {$LIBSUFFIX 'RS104'}
     {$ELSE}
-      {$IFDEF RS102}
-        {$LIBSUFFIX 'RS102'}
+      {$IFDEF RS103}
+        {$LIBSUFFIX 'RS103'}
       {$ELSE}
-        {$IFDEF RS101}
-          {$LIBSUFFIX 'RS101'}
+        {$IFDEF RS102}
+          {$LIBSUFFIX 'RS102'}
         {$ELSE}
-          {$IFDEF RS100}
-            {$LIBSUFFIX 'RS100'}
+          {$IFDEF RS101}
+            {$LIBSUFFIX 'RS101'}
           {$ELSE}
-            {$IFDEF DXE80}
-              {$LIBSUFFIX 'XE8'}
+            {$IFDEF RS100}
+              {$LIBSUFFIX 'RS100'}
             {$ELSE}
-              {$IFDEF DXE70}
-                {$LIBSUFFIX 'XE7'}
+              {$IFDEF DXE80}
+                {$LIBSUFFIX 'XE8'}
               {$ELSE}
-                {$IFDEF DXE60}
-                  {$LIBSUFFIX 'XE6'}
+                {$IFDEF DXE70}
+                  {$LIBSUFFIX 'XE7'}
                 {$ELSE}
-                  {$IFDEF DXE50}
-                    {$LIBSUFFIX 'XE5'}
+                  {$IFDEF DXE60}
+                    {$LIBSUFFIX 'XE6'}
                   {$ELSE}
-                    {$IFDEF DXE40}
-                      {$LIBSUFFIX 'XE4'}
+                    {$IFDEF DXE50}
+                      {$LIBSUFFIX 'XE5'}
                     {$ELSE}
-                      {$IFDEF DXE30}
-                        {$LIBSUFFIX 'XE3'}
+                      {$IFDEF DXE40}
+                        {$LIBSUFFIX 'XE4'}
                       {$ELSE}
-                        {$IFDEF DXE20}
-                          {$LIBSUFFIX 'XE2'}
+                        {$IFDEF DXE30}
+                          {$LIBSUFFIX 'XE3'}
                         {$ELSE}
-                          {$IFDEF DXE00}
-                            {$LIBSUFFIX 'XE'}
+                          {$IFDEF DXE20}
+                            {$LIBSUFFIX 'XE2'}
                           {$ELSE}
-                            {$IFDEF D2010}
-                              {$LIBSUFFIX '2010'}
+                            {$IFDEF DXE00}
+                              {$LIBSUFFIX 'XE'}
                             {$ELSE}
-                              {$IFDEF D2009}
-                                {$LIBSUFFIX '2009'}
+                              {$IFDEF D2010}
+                                {$LIBSUFFIX '2010'}
                               {$ELSE}
-                                {$IFDEF D2007}
-                                  {$LIBSUFFIX '2007'}
+                                {$IFDEF D2009}
+                                  {$LIBSUFFIX '2009'}
                                 {$ELSE}
-                                  {$IFDEF D2006}
-                                    {$LIBSUFFIX '2006'}
+                                  {$IFDEF D2007}
+                                    {$LIBSUFFIX '2007'}
                                   {$ELSE}
-                                    {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
+                                    {$IFDEF D2006}
+                                      {$LIBSUFFIX '2006'}
+                                    {$ELSE}
+                                      {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
+                                    {$ENDIF}
                                   {$ENDIF}
                                 {$ENDIF}
                               {$ENDIF}
@@ -81,4 +85,3 @@
     {$ENDIF}
   {$ENDIF}
 {$ENDIF}
-

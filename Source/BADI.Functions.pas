@@ -2,9 +2,9 @@
 
   This method contains functions that are used global through out the application.
 
-  @Version 1.093
+  @Version 1.108
   @Author  David Hoyle.
-  @Date    21 Nov 2021
+  @Date    03 Sep 2023
 
   @license
 
@@ -81,10 +81,11 @@ Type
 
 Implementation
 
-Uses
+uses
+  System.UITypes,
+  Winapi.SHFolder,
   BADI.Constants,
-  SHFolder,
-  UITypes;
+  CodeSiteLogging;
 
 Function ComputerName : String; Forward;
 Function PosOfNthChar(Const strText : String; Const Ch : Char; Const iIndex : Integer;

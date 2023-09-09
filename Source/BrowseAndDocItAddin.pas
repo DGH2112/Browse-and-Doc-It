@@ -4,8 +4,8 @@
   handling the COM interfaces required.
 
   @Author  David Hoyle
-  @Version 1.026
-  @Date    02 Sep 2023
+  @Version 1.591
+  @Date    09 Sep 2023
 
 **)
 unit BrowseAndDocItAddin;
@@ -20,13 +20,15 @@ uses
   BrowseAndDocItVBEIDE_TLB,
   AddInDesignerObjects_TLB,
   Office2000_TLB,
-  BADI.IDETools;
+  BADI.IDETools,
+  BADI.VBEIDE.ActviveForm;
 
 type
-  (** A the addin automation object **)
+  (** A the add-in automation object **)
   TTVBDoc50Addin = class(TAutoObject, IBrowseAndDocItVBEIDETypeLib, IDTExtensibility2)
   Private
     FVBEIDE : TIDETools;
+    FDocObj : TTBADIActiveXToolWndForm;
   protected
     { Protected declarations }
     procedure OnConnection(const Application_: IDispatch;
@@ -39,7 +41,7 @@ type
     procedure OnBeginShutdown(var custom: PSafeArray); safecall;
   end;
 
-  (** A factory for creating the addin. **)
+  (** A factory for creating the add-in. **)
   TOfficeAddInFactory = Class(TAutoObjectFactory)
   Private
     FFriendlyName : String;
@@ -61,30 +63,45 @@ uses
   System.SysUtils,
   System.Classes,
   System.Win.Registry,
+  Vcl.Forms,
   Vcl.Dialogs,
   ComServ,
   VBIDE_TLB,
-  BADI.Functions;
+  BADI.Functions,
+  CodeSiteLogging;
 
-{ TTDGHVBEIDEToosl50Addin }
+Const
+  (** A constant to define the load behaviour of the Add-in. **)
+  iLoadBehaviour = 3;
+
+ResourceString
+  (** A resource string to provide a name/title for the add-in. **)
+  strBrowseAndDocItVBEIDETools = 'Browse and Doc It VBE IDE Tools';
 
 (**
 
-  This is an on addin insert update event handler for the com interface.
+  This is an on add-in insert update event handler for the com interface.
 
   @precon  None.
   @postcon This needs to be implemented for the COM DLL to work but is not
            handled in this application.
 
+  @nocheck ExceptionEating
+  @nohint  custom
+
   @param   custom as a PSafeArray as a reference
 
 **)
 procedure TTVBDoc50Addin.OnAddInsUpdate(var custom: PSafeArray);
+
+Const
+  strOnAddInsUpdate = 'OnAddInsUpdate: ';
+
 begin
   Try
     // Do Nothing;
   Except
-    On E : Exception Do DisplayException('OnAddInsUpdate: ' + E.Message);
+    On E : Exception Do DisplayException(strOnAddInsUpdate + E.Message);
   End;
 end;
 
@@ -96,15 +113,22 @@ end;
   @postcon This needs to be implemented for the COM DLL to work but is not
            handled in this application.
 
+  @nocheck ExceptionEating
+  @nohint  custom
+
   @param   custom as a PSafeArray as a reference
 
 **)
 procedure TTVBDoc50Addin.OnBeginShutdown(var custom: PSafeArray);
+
+Const
+  strOnBeginShutDown = 'OnBeginShutDown: ';
+
 begin
   Try
     // Do nothing;
   Except
-    On E : Exception Do DisplayException('OnBeginShutDown: ' + E.Message);
+    On E : Exception Do DisplayException(strOnBeginShutDown + E.Message);
   End;
 end;
 
@@ -114,6 +138,9 @@ end;
 
   @precon  None.
   @postcon This event creates an instance of the Browse And Doc It IDE Interface.
+
+  @nocheck MissingCONSTInParam ExceptionEating
+  @nohint  ConnectMode custom AddInInst
 
   @param   Application_ as an IDispatch as a constant
   @param   ConnectMode  as an ext_ConnectMode
@@ -125,11 +152,34 @@ procedure TTVBDoc50Addin.OnConnection(
   const Application_: IDispatch; ConnectMode: ext_ConnectMode;
   const AddInInst: IDispatch; var custom: PSafeArray);
 
+Var
+  Wnd : VBIDE_TLB.Window_ ;
+  DocObj : IDispatch;
+  
+Const
+  strOnConnection = 'OnConnection: ';
+
 begin
   Try
-    FVBEIDE := TIDETools.Create(Application_ As VBIDE_TLB.VBE)
+    FVBEIDE := TIDETools.Create(Application_ As VBIDE_TLB.VBE);
+    {: @debug If Supports(FDocObj, IDispatch, DocObj) Then
+      Begin
+        Wnd := (Application_ As VBIDE_TLB.VBE).Windows.CreateToolWindow(
+          AddInInst As AddIn,
+          'TBADIActiveXToolWndForm',
+          'Browse and Doc It',
+          'BrowseAndDocIt.GuidPosition',
+          DocObj
+        );
+        FDocObj := DocObj As IDispatch;
+        Wnd.Visible := True;
+      End; }
   Except
-    On E : Exception Do DisplayException('OnConnection: ' + E.Message);
+    On E : Exception Do
+      Begin
+        DisplayException(strOnConnection + E.Message);
+        CodeSite.SendException(E);
+      End;
   End;
 end;
 
@@ -141,38 +191,52 @@ end;
   @postcon This method frees the memory used by the Browse and Doc It IDE
            interface.
 
+  @nocheck MissingCONSTInParam ExceptionEating
+  @nohint  RemoveMode custom
+
   @param   RemoveMode as an ext_DisconnectMode
   @param   custom     as a PSafeArray as a reference
 
 **)
-procedure TTVBDoc50Addin.OnDisconnection(
-  RemoveMode: ext_DisconnectMode; var custom: PSafeArray);
+procedure TTVBDoc50Addin.OnDisconnection(RemoveMode: ext_DisconnectMode; var custom: PSafeArray);
+
+Const
+  strOnDisconnection = 'OnDisconnection: ';
+
 begin
   Try
+    //: @note THIS SHOULD NOT BE REQUIRED ON AN INTERFACED OBJECT BUT IS REQUIRED HERE
+    //: @debug FDocObj.Free;
     FVBEIDE.Free;
   Except
-    On E : Exception Do DisplayException('OnDisconnection: ' + E.Message);
+    On E : Exception Do DisplayException(strOnDisconnection + E.Message);
   End;
 end;
 
 (**
 
-  This is an on Startup Complete event handler for the com interface.
+  This is an on Start-up Complete event handler for the com interface.
 
   @precon  None.
   @postcon This needs to be implemented for the COM DLL to work but is not
            handled in this application.
 
+  @nocheck ExceptionEating
+  @nohint  custom
+
   @param   custom as a PSafeArray as a reference
 
 **)
-procedure TTVBDoc50Addin.OnStartupComplete(
-  var custom: PSafeArray);
+procedure TTVBDoc50Addin.OnStartupComplete(var custom: PSafeArray);
+
+Const
+  strOnStartupComplete = 'OnStartupComplete: ';
+
 begin
   Try
     // Do Nothing;
   Except
-    On E : Exception Do DisplayException('OnStartupComplete: ' + E.Message);
+    On E : Exception Do DisplayException(strOnStartupComplete + E.Message);
   End;
 end;
 
@@ -184,6 +248,8 @@ end;
 
   @precon  None.
   @postcon Initialises the COM DLL interface.
+
+  @nocheck MissingCONSTInParam
 
   @param   ComServer      as a TComServerObject
   @param   AutoClass      as a TAutoClass
@@ -226,7 +292,7 @@ begin
   Try
     R := TRegistry.Create;
     Try
-      R.RootKey := HKEY_LOCAL_MACHINE;
+      R.RootKey := HKEY_CURRENT_USER;
       If R.OpenKey(KeyName, False) Then
         Begin
           R.GetValueNames(Values);
@@ -245,15 +311,22 @@ end;
 
 (**
 
-  This method registers the COM DLL addin.
+  This method registers the COM DLL add-in.
 
   @precon  None.
-  @postcon Registers the COM DLL addin.
+  @postcon Registers the COM DLL add-in.
 
   @param   KeyName as a String as a constant
 
 **)
 procedure TOfficeAddInFactory.RegisterAddIn(const KeyName: String);
+
+Const
+  strExceptionInRegisterAddIn = 'Exception in RegisterAddIn';
+  strFriendlyName = 'FriendlyName';
+  strDescription = 'Description';
+  strLoadBehavior = 'LoadBehavior';
+  strCommandLineSafe = 'CommandLineSafe';
 
 Var
   R : TRegistry;
@@ -261,16 +334,16 @@ Var
 begin
   R := TRegistry.Create;
   Try
-    R.RootKey := HKEY_LOCAL_MACHINE;
+    R.RootKey := HKEY_CURRENT_USER;
     If Not R.OpenKey(KeyName, True) Then
       Begin
-        DisplayException('Exception in RegisterAddIn');
+        DisplayException(strExceptionInRegisterAddIn);
         Exit;
       End;
-    R.WriteString('FriendlyName', FFriendlyName);
-    R.WriteString('Description', Description);
-    R.WriteInteger('LoadBehavior', FLoadBehaviour);
-    R.WriteInteger('CommandLineSafe', 0);
+    R.WriteString(strFriendlyName, FFriendlyName);
+    R.WriteString(strDescription, Description);
+    R.WriteInteger(strLoadBehavior, FLoadBehaviour);
+    R.WriteInteger(strCommandLineSafe, 0);
   Finally
     R.Free;
   End;
@@ -282,7 +355,9 @@ end;
   passed to REGSVR32.
 
   @precon  None.
-  @postcon This registers or unregisters this COM DLL.
+  @postcon This registers or un-registers this COM DLL.
+
+  @nocheck MissingCONSTInParam
 
   @param   Register as a Boolean
 
@@ -290,7 +365,14 @@ end;
 procedure TOfficeAddInFactory.UpdateRegistry(Register: Boolean);
 
 Const
+  {$IFDEF WIN32}
   AddInKey = '\Software\Microsoft\VBA\VBE\%d.0\AddIns\%s';
+  {$ENDIF}
+  {$IFDEF WIN64}
+  AddInKey = '\Software\Microsoft\VBA\VBE\%d.0\AddIns64\%s';
+  {$ENDIF}
+  iLowVBEVerNo = 5;
+  iHighVBEVerNo = 6;
 
 Var
   i : Integer;
@@ -298,7 +380,7 @@ Var
 
 begin
   Inherited UpdateRegistry(Register);
-  For i := 5 To 6 Do // Version of the VBE IDE
+  For i := iLowVBEVerNo To iHighVBEVerNo Do // Version of the VBE IDE
     Begin
       CurrentAddInKey := Format(AddInKey, [i, ProgID]);
       If Register Then
@@ -308,9 +390,7 @@ begin
     End;
 end;
 
-(** This code initialises the COM DLL. **)
 initialization
-  TOfficeAddinFactory.Create(ComServer, TTVBDoc50Addin,
-    Class_BrowseAndDocItVBEIDETypeLib, ciMultiInstance, tmApartment,
-    'Browse and Doc It VBE IDE Tools', 3);
+  TOfficeAddinFactory.Create(ComServer, TTVBDoc50Addin, Class_BrowseAndDocItVBEIDETypeLib,
+    ciMultiInstance, tmApartment, strBrowseAndDocItVBEIDETools, iLoadBehaviour);
 end.

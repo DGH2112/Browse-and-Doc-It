@@ -3,12 +3,12 @@
   This module contains a definition of a COM DLL that can be loaded by the
   VBE IDE.
 
-  @Version 1.830
-  @Date    02 Sep 2023
+  @Version 1.865
+  @Date    09 Sep 2023
   @Author  David Hoyle
 
 **)
-library BrowseAndDocItVBEIDE;
+library BrowseAndDocItVBEIDE64;
 
 uses
   {$IFDEF EurekaLog}
@@ -25,7 +25,6 @@ uses
   ExceptionLog7,
   {$ENDIF EurekaLog}
   ComServ,
-  BrowseAndDocItVBEIDE_TLB in 'BrowseAndDocItVBEIDE_TLB.pas',
   VBIDE_TLB in '..\..\LIBRARY\VBIDE_TLB.pas',
   AddInDesignerObjects_TLB in '..\..\LIBRARY\AddInDesignerObjects_TLB.pas',
   CodeFragmentsForm in 'Source\CodeFragmentsForm.pas' {frmInsertCodeFragments},
@@ -113,7 +112,12 @@ uses
   BADI.VB.EnumIdent in 'Source\BADI.VB.EnumIdent.pas',
   BADI.VB.ExceptionHandling in 'Source\BADI.VB.ExceptionHandling.pas',
   BADI.Generic.PropertyDecl in 'Source\BADI.Generic.PropertyDecl.pas',
-  BADI.Generic.Constant in 'Source\BADI.Generic.Constant.pas';
+  BADI.Generic.Constant in 'Source\BADI.Generic.Constant.pas',
+  ToolWindowTestForm in 'Source\ToolWindowTestForm.pas' {frmMyTestForm},
+  BrowseAndDocItVBEIDE64_TLB in 'BrowseAndDocItVBEIDE64_TLB.pas',
+  BADI.VBEIDE.ActiveForm in 'Source\BADI.VBEIDE.ActiveForm.pas' {TBADIActiveXToolWndForm: TActiveForm} {TBADIActiveXToolWndForm: CoClass};
+
+{$E DLL}
 
 exports
   DllGetClassObject,

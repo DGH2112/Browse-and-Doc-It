@@ -3,8 +3,8 @@
   This module contains a set of resource strings for use with the VB parser.
 
   @Author  David Hoyle
-  @Version 1.004
-  @Date    19 Sep 2020
+  @Version 1.020
+  @Date    09 Sep 2023
 
   @license
 
@@ -80,6 +80,8 @@ ResourceString
   strKeywordGOTOFound = 'Keyword GOTO found in function ''%s'' at line %d column %d.';
   (** A label message for VB events. **)
   strEventsLabel = 'Events';
+  (** This is an error message for duplicate identifiers. **)
+  strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
 
 Implementation
 

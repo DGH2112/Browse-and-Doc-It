@@ -18,6 +18,9 @@
         <Projects Include="BrowseAndDocItVBEIDE.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="BrowseAndDocItVBEIDE64.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -71,14 +74,23 @@
     <Target Name="BrowseAndDocItVBEIDE:Make">
         <MSBuild Projects="BrowseAndDocItVBEIDE.dproj" Targets="Make"/>
     </Target>
+    <Target Name="BrowseAndDocItVBEIDE64">
+        <MSBuild Projects="BrowseAndDocItVBEIDE64.dproj"/>
+    </Target>
+    <Target Name="BrowseAndDocItVBEIDE64:Clean">
+        <MSBuild Projects="BrowseAndDocItVBEIDE64.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BrowseAndDocItVBEIDE64:Make">
+        <MSBuild Projects="BrowseAndDocItVBEIDE64.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="BADIDUnitXTests;BrowseAndDocItTests;BrowseAndDocItTestApp;BrowseAndDocIt;BrowseAndDocItVBEIDE"/>
+        <CallTarget Targets="BADIDUnitXTests;BrowseAndDocItTests;BrowseAndDocItTestApp;BrowseAndDocIt;BrowseAndDocItVBEIDE;BrowseAndDocItVBEIDE64"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="BADIDUnitXTests:Clean;BrowseAndDocItTests:Clean;BrowseAndDocItTestApp:Clean;BrowseAndDocIt:Clean;BrowseAndDocItVBEIDE:Clean"/>
+        <CallTarget Targets="BADIDUnitXTests:Clean;BrowseAndDocItTests:Clean;BrowseAndDocItTestApp:Clean;BrowseAndDocIt:Clean;BrowseAndDocItVBEIDE:Clean;BrowseAndDocItVBEIDE64:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="BADIDUnitXTests:Make;BrowseAndDocItTests:Make;BrowseAndDocItTestApp:Make;BrowseAndDocIt:Make;BrowseAndDocItVBEIDE:Make"/>
+        <CallTarget Targets="BADIDUnitXTests:Make;BrowseAndDocItTests:Make;BrowseAndDocItTestApp:Make;BrowseAndDocIt:Make;BrowseAndDocItVBEIDE:Make;BrowseAndDocItVBEIDE64:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
     <ItemGroup Condition="'$(BuildGroup)'=='Debug'">
@@ -87,6 +99,12 @@
             <Configurations>Debug</Configurations>
             <Platforms>Win32</Platforms>
             <Enabled>False</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="BrowseAndDocIt.dproj">
+            <ProjectGuid>{AD4C15A1-5A9C-4C71-B023-C105C0474BA9}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
         </BuildGroupProject>
         <BuildGroupProject Include="Test\BrowseAndDocItTestApp.dproj">
             <ProjectGuid>{F4BAF5D6-57AA-4EF2-BE38-381774DA4AD1}</ProjectGuid>
@@ -100,11 +118,11 @@
             <Platforms>Win32</Platforms>
             <Enabled>False</Enabled>
         </BuildGroupProject>
-        <BuildGroupProject Include="BrowseAndDocIt.dproj">
-            <ProjectGuid>{AD4C15A1-5A9C-4C71-B023-C105C0474BA9}</ProjectGuid>
+        <BuildGroupProject Include="BrowseAndDocItVBEIDE64.dproj">
+            <ProjectGuid>{6D973946-0717-4125-BDC3-048251AC130F}</ProjectGuid>
             <Configurations>Debug</Configurations>
-            <Platforms>Win32</Platforms>
-            <Enabled>True</Enabled>
+            <Platforms>Win64</Platforms>
+            <Enabled>False</Enabled>
         </BuildGroupProject>
         <BuildGroupProject Include="Test\BrowseAndDocItTests.dproj">
             <ProjectGuid>{77CE066E-3A47-45D3-9A15-E1CE209D5008}</ProjectGuid>

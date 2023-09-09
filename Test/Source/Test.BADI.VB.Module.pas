@@ -3,8 +3,8 @@
   This module contains DUnit test for the Browse and Doc It code.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    21 Jun 2019
+  @Version 1.243
+  @Date    09 Sep 2023
 
   @license
 
@@ -76,6 +76,7 @@ type
     Procedure TestFailure12;
     Procedure TestFailure13;
     Procedure Testfailure14;
+    Procedure TestFailure15;
   End;
 
 implementation
@@ -1789,6 +1790,42 @@ Begin
   End;
 end;
 
+Procedure TestTVBModule.TestFailure15;
+
+Var
+  M : TBaseLanguageModule;
+  strCode : String;
+  
+Begin
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options +
+    [doShowMissingVBExceptionWarnings];
+  Try
+    strCode :=
+      'Option Explicit'#13#10 +
+      'Option Compare Text'#13#10 +
+      ''#13#10 +
+      'Public Property Get Selected() As Boolean'#13#10 +
+      'End Property'#13#10 +
+      #13#10 +
+      'Public Property Get Selected() As Boolean'#13#10 +
+      'End Property'#13#10 +
+      #13#10;
+    M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(1, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(5, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      //: @debug CheckEquals('  [The function ''VBFile.GetPredecessor'' has the wrong number of Exception.Push parameters (0 not 2).]', M.FirstWarning)
+    Finally
+      M.Free;
+    End;
+  Finally
+    TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options -
+      [doShowMissingVBExceptionWarnings];
+  End;
+End;
+
 procedure TestTVBModule.TestFunctions;
 
 Var
@@ -2504,4 +2541,3 @@ initialization
   // Register any test cases with the test runner
   RegisterTest('VB Module Tests', TestTVBModule.Suite);
 End.
-

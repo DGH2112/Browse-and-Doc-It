@@ -645,6 +645,7 @@ Var
   N : TBADITreeNodeInfo;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AddNode', tmoTiming);{$ENDIF}
   Result := FExplorer.AddChild(Parent);
   FExplorer.MultiLine[Result] := True;
   NodeData := FExplorer.GetNodeData(Result);
@@ -676,6 +677,7 @@ Var
   N : TBADITreeNodeInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AddNode', tmoTiming);{$ENDIF}
   Result := FExplorer.AddChild(Parent);
   FExplorer.MultiLine[Result] := True;
   NodeData := FExplorer.GetNodeData(Result);
@@ -722,6 +724,7 @@ Var
   N : TBADITreeNodeInfo;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'AddNode', tmoTiming);{$ENDIF}
   Result := FExplorer.AddChild(Parent);
   FExplorer.MultiLine[Result] := True;
   NodeData := FExplorer.GetNodeData(Result);
@@ -759,6 +762,7 @@ Var
   astrError: TArray<String>;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckForIDEErrors', tmoTiming);{$ENDIF}
   Errors := Container.FindElement(strErrors);
   If Not Assigned(Errors) And (doShowIDEErrors In TBADIOptions.BADIOPtions.Options) Then
     If Assigned(FIDEErrors) Then
@@ -826,6 +830,7 @@ Const
   iTabOrder = 3;
   
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(AOwner);
   {$IFDEF D2009}
   DoubleBuffered := True;
@@ -886,6 +891,7 @@ Var
   i : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CreateSpecialTagNodes', tmoTiming);{$ENDIF}
   For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
     Begin
       FSpecialTagNodes[i].FTagName := TBADIOptions.BADIOptions.SpecialTags[i].FName;
@@ -917,6 +923,7 @@ End;
 Destructor TframeModuleExplorer.Destroy;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   FLineDocIssues.Free;
   If FModule <> Nil Then
     GetExpandedNodes(FModule);
@@ -941,6 +948,7 @@ end;
 Procedure TframeModuleExplorer.DoRefresh(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'DoRefresh', tmoTiming);{$ENDIF}
   If Assigned(FRefresh) Then
     FRefresh(Sender);
 End;
@@ -1323,6 +1331,7 @@ End;
 Procedure TframeModuleExplorer.edtExplorerFilterChange(Sender: TObject);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'edtExplorerFilterChange', tmoTiming);{$ENDIF}
   FilterChange;
 End;
 
@@ -1451,6 +1460,7 @@ Var
   NodeData: PBADITreeData;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ExpandNodes', tmoTiming);{$ENDIF}
   FExplorer.Expanded[FModule] := True;
   For iPromotedLabel := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
     If FSpecialTagNodes[iPromotedLabel].Node.ChildCount = 0 Then
@@ -1501,6 +1511,7 @@ end;
 Function TframeModuleExplorer.ExtractSpellingWord: String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ExtractSpellingWord', tmoTiming);{$ENDIF}
   Result := FExplorer.Text[FExplorer.FocusedNode, 0];
   Result := Copy(Result, 1, Pos('(', Result) - 1).Trim;
 End;
@@ -1520,6 +1531,7 @@ Var
   NodeData : PBADITreeData;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FilterChange', tmoTiming);{$ENDIF}
   Try
     If ExplorerFilter <> '' Then
       FFilterRegEx := TRegEx.Create(ExplorerFilter, [roIgnoreCase, roCompiled, roSingleLine]);
@@ -1616,6 +1628,7 @@ Function TframeModuleExplorer.FindTreeItem(Const strText : String) : PVirtualNod
   End;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FindTreeItem', tmoTiming);{$ENDIF}
   Result := Nil;
   If strText <> '' Then
     Result := FindNode(FModule);
@@ -1635,6 +1648,7 @@ Var
   Node: PVirtualNode;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FocusFollowedNode', tmoTiming);{$ENDIF}
   If Assigned(FFollowNode) And
     ((FFollowNode <> Explorer.FocusedNode) Or Not Explorer.FullyVisible[Explorer.FocusedNode]) Then
     Begin
@@ -1667,6 +1681,7 @@ Var
   iNodeLine, iFollowLine : Integer;
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FollowEditorCursor', tmoTiming);{$ENDIF}
   If FDocIssueTotals.ContainsAny(TBADIOptions.BADIOptions.DoNotFollowEditor) Then
     Exit;
   iFollowLine := 0;
@@ -1699,6 +1714,7 @@ Var
   NodeData: PBADITreeData;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FollowMethodNodeData', tmoTiming);{$ENDIF}
   Result := Nil;
   iFollowLine := 0;
   Node := Explorer.GetFirst();
@@ -1770,6 +1786,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     iSpecialTag: Integer;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetBodyCommentTags/FindTag', tmoTiming);{$ENDIF}
     Result := -1;
     For iSpecialTag := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
       If CompareText(strTagName, FSpecialTagNodes[iSpecialTag].FTagName) = 0 Then
@@ -1797,6 +1814,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     DocIssues: IBADILineDocIssues;
   
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetBodyCommentTags/AddDocIssueInfo', tmoTiming);{$ENDIF}
     recDocIssueInfo.FName := Tag.FTagName;
     recDocIssueInfo.FImageIndex := Tag.FImageIndex;
     recDocIssueInfo.FForeColour := Tag.FFontColour;
@@ -1826,6 +1844,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     DocIssues: IBADILineDocIssues;
   
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetBodyCommentTags/AddDocIssueInfo', tmoTiming);{$ENDIF}
     recDocIssueInfo.FName := strTagName;
     recDocIssueInfo.FImageIndex := iiBadTag;
     recDocIssueInfo.FForeColour := clRed;
@@ -1855,6 +1874,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     recTotalInfo : TBADITotalInfo;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetBodyCommentTags/AddTotalInfo', tmoTiming);{$ENDIF}
     recTotalInfo.FImageIndex := Tag.FImageIndex;
     recTotalInfo.FForeColour := Tag.FFontColour;
     recTotalInfo.FBackColour := Tag.FBackColour;
@@ -1882,6 +1902,7 @@ procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageMo
     recTotalInfo : TBADITotalInfo;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetBodyCommentTags/AddTotalInfo', tmoTiming);{$ENDIF}
     recTotalInfo.FImageIndex := iiBadTag;
     recTotalInfo.FForeColour := clRed;
     recTotalInfo.FBackColour := clNone;
@@ -1916,6 +1937,7 @@ Var
   ST: TSpecialTagNode;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetBodyCommentTags', tmoTiming);{$ENDIF}
   For iComment := 0 To Module.BodyCommentCount - 1 Do
     Begin
       Cmt := Module.BodyComment[iComment];
@@ -1967,6 +1989,7 @@ End;
 Function TframeModuleExplorer.GetDocIssueTotals: IBADIDocIssueTotals;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetDocIssueTotals', tmoTiming);{$ENDIF}
   Result := FDocIssueTotals;
 End;
 
@@ -1989,6 +2012,7 @@ Var
   Node : PVirtualNode;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetExpandedNodes', tmoTiming);{$ENDIF}
   Node := FExplorer.GetFirstChild(StartNode);
   While Node <> Nil Do
     Begin
@@ -2023,6 +2047,7 @@ End;
 Function TframeModuleExplorer.GetLineDocIssue(Const iLine: Integer): IBADILineDocIssues;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetLineDocIssue', tmoTiming);{$ENDIF}
   FLineDocIssues.TryGetValue(iLine, Result);
 End;
 
@@ -2045,6 +2070,7 @@ Var
   NodeData : PBADITreeData;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetNodePath', tmoTiming);{$ENDIF}
   str := '';
   P := Node;
   While P <> Nil Do
@@ -2077,6 +2103,7 @@ Function TframeModuleExplorer.InitMatchResult(Const eMatchType : TMatchType; Con
   iLength: Integer) : TMatchResult;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'InitMatchResult', tmoTiming);{$ENDIF}
   Result.FMatchType := eMatchType;
   Result.FStart := iStart;
   Result.FLength := iLength;
@@ -2103,6 +2130,7 @@ Var
   M: TMatch;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'IsMatched', tmoTiming);{$ENDIF}
   Result.FMatchType := mtNone;
   For iMatch := 0 To MC.Count - 1 Do
     Begin
@@ -2148,6 +2176,7 @@ Procedure TframeModuleExplorer.LogDocIssueConflict(Const Element: TElementContai
   Function ErrorTypeToLimitType(Const eErrorType : TErrorType) : TLimitType;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LogDocIssueConflict/ErrorTypeToLimitType', tmoTiming);{$ENDIF}
     Case eErrorType Of
       etHint:    Result := ltHints;
       etWarning: Result := ltWarnings;
@@ -2171,6 +2200,7 @@ Procedure TframeModuleExplorer.LogDocIssueConflict(Const Element: TElementContai
   Function ConflictTypeToLimitType(Const eConflictType : TBADIConflictType) : TLimitType;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LogDocIssueConflict/ConflictTypeToLimitType', tmoTiming);{$ENDIF}
     Case eConflictType Of
       ctDocumentation: Result := ltConflicts;
       ctMetric:        Result := ltMetrics;
@@ -2202,6 +2232,7 @@ Var
   SI: TBADISpellingIssue;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'LogDocIssueConflict', tmoTiming);{$ENDIF}
   If Element Is TDocIssue Then
     Begin
       DI := Element As TDocIssue;
@@ -2289,6 +2320,7 @@ Var
   EN: TStringList;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ManageExpandedNodes', tmoTiming);{$ENDIF}
   EN := TBADIOptions.BADIOptions.ExpandedNodes;
   For i := EN.Count - 1 DownTo 0 Do
     Begin
@@ -2315,6 +2347,7 @@ Const
   iDefaultMaxLimit = 9999;
   
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MaxLimit', tmoTiming);{$ENDIF}
   Result := iDefaultMaxLimit;
   If Container.ElementCount > 0 Then
     If Container.Elements[1] Is TDocumentConflict Then
@@ -2403,6 +2436,7 @@ Var
   iCount : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RenderContainers', tmoTiming);{$ENDIF}
   iLimit := MaxLimit(Container);
   iCount := 0;
   For i := 1 To Container.ElementCount Do
@@ -2439,6 +2473,7 @@ Var
   N : PVirtualNode;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RenderModule', tmoTiming);{$ENDIF}
   FTokenFontInfo := FBADIOptions.TokenFontInfo[FBADIOptions.UseIDEEditorColours];
   FBGColour := FBADIOptions.BGColour[FBADIOptions.UseIDEEditorColours];
   If FBGColour = clNone Then
@@ -2529,6 +2564,7 @@ Var
   Node : PVirtualNode;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SetExpandedNodes', tmoTiming);{$ENDIF}
   Node := FExplorer.GetFirstChild(StartNode);
   While Node <> Nil Do
     Begin
@@ -2560,6 +2596,7 @@ ResourceString
   strFilteringFor = 'Filtering for "%s"...';
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SetExplorerFilter', tmoTiming);{$ENDIF}
   FExplorerFilter := strValue;
   stbStatusBar.SimplePanel := FExplorerFilter.Length > 0;
   If stbStatusBar.SimplePanel Then
@@ -2589,6 +2626,7 @@ Var
   strText : String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'SetStatusPanel', tmoTiming);{$ENDIF}
   strText := Format(strStatusbarText, [Int(iValue)]);
   stbStatusBar.Panels[Byte(ePanel)].Text := strText;
   stbStatusBar.Panels[Byte(ePanel)].Width :=
@@ -3054,6 +3092,7 @@ Var
   strText : String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateStatusBar', tmoTiming);{$ENDIF}
   SetStatusPanel(spiBytes, strStatusbarBytesText, Module.Bytes);
   SetStatusPanel(spiTokens, strStatusbarTokensText, Module.TokenCount);
   SetStatusPanel(spiLines, strStatusbarLinesText, Module.Lines);
@@ -3086,3 +3125,4 @@ begin
 end;
 
 End.
+

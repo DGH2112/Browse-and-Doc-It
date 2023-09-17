@@ -152,6 +152,7 @@ Function BlendColour(Const iBaseColour, iHighlightColour : TColor; Const dblBlen
   Function ProRataColor(Const iBase, iHigh : TColor) : TColor;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod('ProRataColor', tmoTiming);{$ENDIF}
     Result := iBase + Trunc(Int(iHigh - iBase) * dblBlend);
   End;
 
@@ -167,6 +168,7 @@ Var
   BC, HC : TColor;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('BlendColour', tmoTiming);{$ENDIF}
   HC := ColorToRGB(iHighlightColour);
   BC := ColorToRGB(iBaseColour);
   R := ProRataColor(BC And iRed, HC And iRed);
@@ -195,6 +197,7 @@ ResourceString
   strAsOutParameter = ' as an out parameter';
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('BuildLangIndepRep', tmoTiming);{$ENDIF}
   Result := '';
   If Param.ParamType = Nil Then
     Exit;
@@ -238,6 +241,7 @@ Var
   strBuffer : Array[0..MAX_PATH] Of Char;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('BuildNumber', tmoTiming);{$ENDIF}
   { Build Number }
   GetModuleFilename(hInstance, strBuffer, MAX_PATH);
   VerInfoSize := GetFileVersionInfoSize(strBuffer, Dummy);
@@ -289,6 +293,7 @@ Const
 {$ENDIF D0007}
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('BuildRootKey', tmoTiming);{$ENDIF}
   SetLength(strBuffer, MAX_PATH);
   iSize := GetModuleFileName(hInstance, PChar(strBuffer), MAX_PATH);
   SetLength(strBuffer, iSize);
@@ -329,6 +334,7 @@ Var
   boolInQuotes : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('CharCount', tmoTiming);{$ENDIF}
   Result := 0;
   boolInQuotes := False;
   For iCount := 1 to Length(strText) Do
@@ -361,6 +367,7 @@ Var
   i : Cardinal;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('ComputerName', tmoTiming);{$ENDIF}
   i := iMaxBuf;
   SetLength(Result, i);
   GetComputerName(@Result[1], i);
@@ -459,6 +466,7 @@ Var
   Procedure AddToken(Const StringList : TStringList; Var strToken  : String);
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod('AddToken', tmoTiming);{$ENDIF}
     If strToken <> '' Then
       Begin
         StringList.Add(strToken);
@@ -485,6 +493,7 @@ Var
     j : Integer;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod('AssignIndexes', tmoTiming);{$ENDIF}
     iIndex0 := 0; // Default Day / Month / Year
     iIndex1 := 1;
     iIndex2 := 2;
@@ -554,6 +563,7 @@ Var
   Procedure ProcessValue(Const iIndex : Integer; Var iValue : Word; Const Delete : Boolean);
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod('ProcessValue', tmoTiming);{$ENDIF}
     If iIndex > sl.Count - 1 Then Exit;
     Val(sl[iIndex], iValue, i);
     If i <> 0 Then
@@ -563,6 +573,7 @@ Var
   End;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('ConvertDate', tmoTiming);{$ENDIF}
   sl := TStringList.Create;
   Try
     strToken := '';
@@ -697,6 +708,7 @@ ResourceString
   strException = 'Exception:'#13#10#13#10;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('DisplayException', tmoTiming);{$ENDIF}
   ShowMessage(Format(strException + StrMsg, Params));
 End;
 
@@ -730,6 +742,7 @@ Var
   B : Vcl.Graphics.TBitMap;
     
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('DrawIcon', tmoTiming);{$ENDIF}
   B := Vcl.Graphics.TBitMap.Create;
   Try
     B.LoadFromResourceName(hInstance, astrIconResNames[eLimitType]);
@@ -767,6 +780,7 @@ Var
   boolFound : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('EpilogCode', tmoTiming);{$ENDIF}
   Result := TStringList.Create;
   Result.Text := StringReplace(strTemplate, strMethodName, strMethod, [rfReplaceAll]);
   If Not Like('*' + strMethodCode + '*', strTemplate) Then
@@ -805,6 +819,7 @@ Var
   iStart, iEnd : Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('GetField', tmoTiming);{$ENDIF}
   Result := '';
   iNumOfFields := CharCount(Ch, strText, boolIgnoreQuotes) + 1;
   If iIndex = 1 Then
@@ -998,6 +1013,7 @@ Var
   strModPattern : String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('Like', tmoTiming);{$ENDIF}
   Result := False;
   MatchTypes := [];
   strModPattern := strPattern;
@@ -1075,6 +1091,7 @@ Var
   iScope: TScope;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('LoadBADIImages', tmoTiming);{$ENDIF}
   R := Rect(0, 0, iBitMapSize, iBitMapSize);
   MainImage := Vcl.Graphics.TBitMap.Create;
   Try
@@ -1122,6 +1139,7 @@ Var
   strToken: String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('OutputCommentAndTag', tmoTiming);{$ENDIF}
   Result := '';
   iLength := 0;
   For iToken := 0 To C.TokenCount - 1 Do
@@ -1175,6 +1193,7 @@ Var
   boolInQuotes : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('PosOfNthChar', tmoTiming);{$ENDIF}
   Result := 0;
   iCount := 0;
   boolInQuotes := False;
@@ -1217,6 +1236,7 @@ Var
   boolFound : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('PrologCode', tmoTiming);{$ENDIF}
   Result := TStringList.Create;
   Result.Text := StringReplace(strTemplate, strMethodName, strMethod, [rfReplaceAll]);
   //If Not Like('*' + strMethodCode + '*', strTemplate) Then
@@ -1252,6 +1272,7 @@ Var
   i : Cardinal;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('UserName', tmoTiming);{$ENDIF}
   i := iMaxBuf;
   SetLength(Result, i);
   GetUserName(@Result[1], i);

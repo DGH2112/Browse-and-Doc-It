@@ -342,6 +342,7 @@ constructor TIDETools.Create(VBEIDERef : VBE);
 
 begin
   CodeSite.TraceMethod('TIDETools.Create', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.Create', tmoTiming);{$ENDIF}
   Try
     FOldHandle := Application.Handle;
     Application.Handle := VBEIDERef.MainWindow.HWnd;
@@ -383,6 +384,7 @@ end;
 destructor TIDETools.Destroy;
 begin
   CodeSite.TraceMethod('TIDETools.Destroy', tmoTiming);
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.Destroy', tmoTiming);{$ENDIF}
   SaveSettings;
   // Check that our WndProc is the current WndProc before removing.
   //If TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC)) = FNewWndProc Then
@@ -417,6 +419,7 @@ End;
 **)
 procedure TIDETools.SaveSettings;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SaveSettings', tmoTiming);{$ENDIF}
   with TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
     try
       WriteBool('ModuleExplorer', 'Visible', FMEVisible);
@@ -451,6 +454,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.PositionCursorInFunction', tmoTiming);{$ENDIF}
   SelectionChange(iInsertLine + CharCount(#13, strComment) + 1, 1, iInsertLine);
   Pt.Y := iInsertLine;
   Pt.X := iIndent + 3;
@@ -513,6 +517,7 @@ Var
   MainMenu : CommandBar;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.CreateMenu', tmoTiming);{$ENDIF}
   If FVBEIDE <> Nil Then
     Begin
       MainMenu := FVBEIDE.CommandBars.Item['Menu Bar'];
@@ -625,6 +630,7 @@ end;
 **)
 function TIDETools.GetProjectPath(strName: String): String;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.GetProjectPath', tmoTiming);{$ENDIF}
   With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) Do
     Try
       Result := ReadString('ProjectPaths', strName, '');
@@ -649,6 +655,7 @@ begin
   If strValue[Length(strValue)] <> '\' Then
     strValue := strValue + '\';
   With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) Do
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SetProjectPath', tmoTiming);{$ENDIF}
     Try
       WriteString('ProjectPaths', strName, strValue);
     Finally
@@ -676,6 +683,7 @@ Var
   Project : VBProject;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.GetModule', tmoTiming);{$ENDIF}
   Result := Nil;
   For i := 1 To FVBEIDE.VBProjects.Count Do
     If CompareText(FVBEIDE.VBProjects.Item(i).Name, strProject) = 0 Then
@@ -727,6 +735,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.GetCursorPosition', tmoTiming);{$ENDIF}
   CP := CurrentCodePane;
   If CP <> Nil Then
     CP.GetSelection(Result.Line, Result.Col, i, j);
@@ -747,6 +756,7 @@ end;
 **)
 function TIDETools.GetFileName(strProject, strModule: String; iType: Integer): String;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.GetFileName', tmoTiming);{$ENDIF}
   Result := ProjectPath[strProject] + strModule;
   Case iType Of
     1 :   Result := Format('%s.bas', [Result]);
@@ -773,6 +783,7 @@ end;
 function TIDETools.GetWindowPosition(strName: String): TRect;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.GetWindowPosition', tmoTiming);{$ENDIF}
   With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
     Try
       Result.Left := ReadInteger(strName, 'Left', 0);
@@ -797,6 +808,7 @@ end;
 **)
 procedure TIDETools.SetWindowPosition(strName: String; const Value: TRect);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SetWindowPosition', tmoTiming);{$ENDIF}
   With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
     Try
       WriteInteger(strName, 'Left', Value.Left);
@@ -829,6 +841,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.ShowTokensClick', tmoTiming);{$ENDIF}
   Try
     CP := CurrentCodePane;
     If CP = Nil Then
@@ -868,6 +881,7 @@ end;
 **)
 procedure TIDETools.SuccessfulParse(Const boolSuccessfulParse: Boolean);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SuccessfulParse', tmoTiming);{$ENDIF}
   FTimer.Enabled := True;
 end;
 
@@ -883,6 +897,7 @@ end;
 **)
 procedure TIDETools.ExceptionMsg(Const strExceptionMsg: String);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.ExceptionMsg', tmoTiming);{$ENDIF}
   ShowMessage(strExceptionMsg);
 end;
 
@@ -913,6 +928,7 @@ Var
   R : TRect;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.ExportClick', tmoTiming);{$ENDIF}
   Try
     vbp := FVBEIDE.ActiveVBProject;
     If vbp <> Nil Then
@@ -981,6 +997,7 @@ Var
   strFileName : String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SaveModules', tmoTiming);{$ENDIF}
   With TfrmProgress.Create(Nil) Do
     Try
       Init(slModules.Count, 'Saving Modules', 'Exporting Modules');
@@ -1021,6 +1038,7 @@ End;
 **)
 procedure TIDETools.ScopeChange(Sender: TObject);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.ScopeChange', tmoTiming);{$ENDIF}
   FCounter := TBADIOPtions.BADIOptions.UpdateInterval;
 end;
 
@@ -1044,6 +1062,7 @@ Var
   vbc: VBComponent;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.ImportClick', tmoTiming);{$ENDIF}
   If FVBEIDE.ActiveVBProject = Nil Then
     Exit;
   FVBProject := FVBEIDE.ActiveVBProject;
@@ -1091,6 +1110,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.CodePaneChangeEvent', tmoTiming);{$ENDIF}
   FCounter := TBADIOPtions.BADIOptions.UpdateInterval;
   If Pane = Nil Then
     Exit;
@@ -1125,6 +1145,7 @@ Var
   strVBCName : String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.VBFileExists', tmoTiming);{$ENDIF}
   Result := Nil;
   If FVBProject = Nil Then
     Exit;
@@ -1153,6 +1174,7 @@ end;
 procedure TIDETools.VBProjectChangeEvent(Project: VBProject);
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.VBProjectChangeEvent', tmoTiming);{$ENDIF}
   If Project = Nil Then Exit;
   If IgnoreVBAProject And (Project.Name = 'VBAProject') Then
     Exit;
@@ -1176,6 +1198,7 @@ Var
   i, j : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.Save', tmoTiming);{$ENDIF}
   MainMenu := FVBEIDE.CommandBars.Item['Menu Bar'];
   For i := 1 To MainMenu.Controls_.Count Do
     If MainMenu.Controls_.Item[i].Caption = '&File' Then
@@ -1202,6 +1225,7 @@ procedure TIDETools.OptionsClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.OptionsClick', tmoTiming);{$ENDIF}
   If TfrmOptions.Execute([Low(TVisibleTab)..High(TVisibleTab)]) Then
     Begin
       FOldLength := 0;
@@ -1225,6 +1249,7 @@ var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.Focus', tmoTiming);{$ENDIF}
   CP := CurrentCodePane;
   If CP = Nil Then
     Exit;
@@ -1245,6 +1270,7 @@ end;
 procedure TIDETools.FocusEditorClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.FocusEditorClick', tmoTiming);{$ENDIF}
   Focus(Self);
 end;
 
@@ -1270,6 +1296,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SelectionChange', tmoTiming);{$ENDIF}
   Focus(Self);
   CP := CurrentCodePane;
   If CP <> Nil Then
@@ -1312,6 +1339,7 @@ end;
 **)
 procedure TIDETools.MEFormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.MEFormClose', tmoTiming);{$ENDIF}
   FMEVisible := False;
 end;
 
@@ -1350,6 +1378,7 @@ end;
 procedure TIDETools.RenderDocument(Const Module: TBaseLanguageModule);
 begin
   TfrmDockableModuleExplorer.RenderDocumentTree(Module);
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.RenderDocument', tmoTiming);{$ENDIF}
 end;
 
 (**
@@ -1369,6 +1398,7 @@ var
   i: Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.DocumentationClick', tmoTiming);{$ENDIF}
   Try
     If FVBProject <> Nil Then
       With TfrmDocumentationOptions.Create(Nil) Do
@@ -1475,6 +1505,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.InsertBlockCommentClick', tmoTiming);{$ENDIF}
   CP := CurrentCodePane;
   If CP <> Nil Then
     Begin
@@ -1511,6 +1542,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.InsertCodeFragmentClick', tmoTiming);{$ENDIF}
   Try
     CP := CurrentCodePane;
     If CP <> Nil Then
@@ -1554,6 +1586,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.InsertInSituCommentClick', tmoTiming);{$ENDIF}
   CP := CurrentCodePane;
   If CP <> Nil Then
     Begin
@@ -1588,6 +1621,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.InsertLineCommentClick', tmoTiming);{$ENDIF}
   CP := CurrentCodePane;
   If CP <> Nil Then
     Begin
@@ -1631,6 +1665,7 @@ Var
   strCode : String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.InsertMethodCommentClick', tmoTiming);{$ENDIF}
   iInsertLine := 0;
   CP := CurrentCodePane;
     If CP = Nil Then
@@ -1706,6 +1741,7 @@ Var
   strCode : String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.InsertPropertyCommentClick', tmoTiming);{$ENDIF}
   iInsertLine := 0;
   CP := CurrentCodePane;
   If CP = Nil Then
@@ -1759,6 +1795,7 @@ end;
 **)
 procedure TIDETools.LoadSettings;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.LoadSettings', tmoTiming);{$ENDIF}
   With TIniFile.Create(TBADIOptions.BADIOptions.INIFileName) Do
     Try
       FMEVisible := ReadBool('ModuleExplorer', 'Visible', True);
@@ -1791,6 +1828,7 @@ Var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SaveCodeFragmentClick', tmoTiming);{$ENDIF}
   Try
     sl := TStringList.Create;
     Try
@@ -1846,6 +1884,7 @@ var
   CP: CodePane;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.EditorInfo', tmoTiming);{$ENDIF}
   Result := '';
   strFileName := '';
   boolModified := False;

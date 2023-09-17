@@ -93,7 +93,6 @@ Type
     FActions : TActionList;
     FIdleTimer : TTimer;
     FMEVisible: Boolean;
-    FVisible: Boolean;
     //FOldWndProc : TFarProc;
     //FNewWndProc : TFarProc;
     FLastCodePane: CodePane;
@@ -103,16 +102,15 @@ Type
     FToolWindowForm : TTBADIActiveXToolWndForm;
   Strict Protected
     procedure CreateMenu;
-    function GetProjectPath(strName: String): String;
-    procedure SetProjectPath(strName: String; strValue: String);
-    procedure SaveModules(Project: VBPRoject; slModules: TStringList);
-    function GetModule(strProject, strModule: String): VBComponent;
-    function GetWindowPosition(strName: String): TRect;
-    procedure SetWindowPosition(strName: String; const Value: TRect);
+    function  GetProjectPath(Const strName: String): String;
+    procedure SetProjectPath(Const strName: String; Const strValue: String);
+    procedure SaveModules(Const Project: VBPRoject; Const slModules: TStringList);
+    function  GetModule(Const strProject, strModule: String): VBComponent;
+    function  GetWindowPosition(Const strName: String): TRect;
+    procedure SetWindowPosition(Const strName: String; Const Value: TRect);
     function GetModuleCode: String;
     function GetCursorPosition: TEditPos;
     Function GetCodePane : CodePane;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure ModuleExplorerClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure DocumentationClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure FocusEditorClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
@@ -131,30 +129,31 @@ Type
     Procedure Focus(Sender : TObject);
     Procedure ScopeChange(Sender : TObject);
     Procedure TimerEvent(Sender : TObject);
-    Procedure VBProjectChangeEvent(Project : VBProject);
-    Procedure CodePaneChangeEvent(Pane : CodePane; Project : VBProject);
+    procedure VBProjectChangeEvent(Const Project: VBProject);
+    procedure CodePaneChangeEvent(Const Pane : CodePane; Const Project : VBProject);
     Procedure Save;
-    Function GetFileName(strProject, strModule : String; iType : Integer) : String;
-    procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine: Integer; iIndent: Integer; strComment: string);
+    Function  GetFileName(Const strProject, strModule : String; Const iType : Integer) : String;
+    procedure PositionCursorInFunction(Const CursorDelta: TPoint; Const iInsertLine: Integer;
+      Const iIndent: Integer; Const strComment: string);
     Procedure SuccessfulParse(Const boolSuccessfulParse : Boolean);
-    Function  EditorInfo(var strFileName : String; var boolModified : Boolean) : String;
+    Function  EditorInfo(Var strFileName : String; var boolModified : Boolean) : String;
     Procedure RenderDocument(Const Module : TBaseLanguageModule);
     Procedure ExceptionMsg(Const strExceptionMsg : String);
     Procedure IdleTimerEvent(Sender : TObject);
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure MEFormClose(Sender : TObject; var CloseAction : TCloseAction);
-    Function  VBFileExists(strFileName : String) : VBComponent;
-    //Procedure WndProc(var Msg : TMessage);
+    Function  VBFileExists(Const strFileName : String) : VBComponent;
+    Procedure ResizeEvent(Sender : TObject);
+    //: @debug Procedure WndProc(var Msg : TMessage);
     (**
       This property reads and write the project paths to and from the registry.
       @precon  None.
       @postcon Reads and write the project paths to and from the registry.
-      @param   strName as       a String
+      @param   strName as a String as a constant
       @return  a String
     **)
-    Property ProjectPath[strName : String] : String Read GetProjectPath
-      Write SetProjectPath;
+    Property ProjectPath[Const strName : String] : String Read GetProjectPath Write SetProjectPath;
     (**
       This property determines if the standard VBAProject should be ignored.
       @precon  None.
@@ -163,26 +162,24 @@ Type
     **)
     Property IgnoreVBAProject : Boolean Read FIgnoreVBAProject Write FIgnoreVBAProject;
     (**
-      This property attempts to get the specified module interface from the specified
-      project.
+      This property attempts to get the specified module interface from the specified project.
       @precon  None.
-      @postcon Attempts to get the specified module interface from the specified
-               project.
-      @param   strProject as       a String
-      @param   strModule  as       a String
+      @postcon Attempts to get the specified module interface from the specified project.
+      @param   strModule  as a String as a constant
+      @param   strProject as a String as a constant
       @return  a VBComponent
     **)
-    Property Modules[strProject, strModule : String] : VBComponent Read GetModule;
+    Property Modules[Const strProject, strModule : String] : VBComponent Read GetModule;
     (**
       This property allows a windows bounding rectangle to be read and written to the
       registry.
       @precon  None.
       @postcon Allows a windows bounding rectangle to be read and written to the
                registry.
-      @param   strName as       a String
+      @param   strName as a String as a constant
       @return  a TRect
     **)
-    Property WindowPosition[strName : String] : TRect Read GetWindowPosition
+    Property WindowPosition[Const strName : String] : TRect Read GetWindowPosition
       Write SetWindowPosition;
     (**
       This property returns the modules code as a string.
@@ -206,7 +203,6 @@ Type
     **)
     Property CurrentCodePane : CodePane Read GetCodePane;
   Public
-    Constructor Create(VBEIDERef : VBE);
     Constructor Create(Const VBEIDERef : VBE);
     Destructor Destroy; Override;
     Procedure CreateModuleExplorer(Const ToolWindowForm : ITBADIActiveXToolWndForm;
@@ -245,8 +241,8 @@ ResourceString
   strInsertBlockComment = 'Insert &Block Comment';
   (** This is the caption for the Insert Line Comment Menu Item. **)
   strInsertLineComment = 'Insert &Line Comment';
-  (** This is the caption for the Insert InSitu Comment Menu Item. **)
-  strInsertInSituComment = 'Insert &InSitu Comment';
+  (** This is the caption for the Insert In-Situ Comment Menu Item. **)
+  strInsertInSituComment = 'Insert &In-Situ Comment';
   (** This is a message for checking out a single file. **)
   strLockedMsg = 'The module "%s" in project "%s" is read only and therefore probably ' +
     'locked by the Version Control System?'#13#13 +
@@ -276,7 +272,6 @@ uses
   BADI.OptionsForm,
   BADI.DocumentationOptionsForm,
   CodeFragmentsForm,
-  VBEIDEModuleExplorer,
   BADI.VB.Module,
   BADI.Options,
   BADI.Module.Dispatcher,
@@ -290,8 +285,6 @@ uses
   CodeSiteLogging;
 
 
-{ TIDEMenuItem }
-
 (**
 
   This is a constructor for the TIDEMEnuItem class.
@@ -299,10 +292,11 @@ uses
   @precon  None.
   @postcon Creates an instance of a event sink class.
 
-  @param   ClickProc as a TClickProc
+  @param   ClickProc as a TClickProc as a constant
 
 **)
-constructor TIDEMenuItem.Create(ClickProc: TClickProc);
+constructor TIDEMenuItem.Create(Const ClickProc: TClickProc);
+
 begin
   FSink := TEventSink.Create(ClickProc);
 end;
@@ -321,8 +315,6 @@ begin
   Inherited Destroy;
 end;
 
-{ TIDETools }
-
 (**
 
   This is the constructor method for the TIDETools class.
@@ -335,13 +327,17 @@ end;
              Creating and starting an event timer
              Loading the applications settings.
 
-  @param   VBEIDERef as a VBE
+  @nocheck ExceptionEating
+
+  @param   VBEIDERef as a VBE as a constant
 
 **)
-constructor TIDETools.Create(VBEIDERef : VBE);
+constructor TIDETools.Create(Const VBEIDERef : VBE);
+
+Const
+  iTimerInterval = 100;
 
 begin
-  CodeSite.TraceMethod('TIDETools.Create', tmoTiming);
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.Create', tmoTiming);{$ENDIF}
   Try
     FOldHandle := Application.Handle;
@@ -349,27 +345,24 @@ begin
     FPath := ExtractFilePath(TBADIOptions.BADIOptions.INIFileName) + 'Code Fragments\';
     System.SysUtils.ForceDirectories(FPath);
     FVBEIDE := VBEIDERef;
-    TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-    TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, ScopeChange, MEFormClose);
-    TfrmDockableModuleExplorer.SetModuleExplorerPosition(WindowPosition['ModuleExplorer']);
     FVBProject := Nil;
     FSinks := TObjectList.Create(True);
     CreateMenu;
     FBADIThreadMgr := TBADIThreadManager.Create(SuccessfulParse, RenderDocument, ExceptionMsg);
     FTimer := TTimer.Create(Nil);
-    FTimer.Interval := 100;
+    FTimer.Interval := iTimerInterval;
     FTimer.OnTimer := TimerEvent;
     FCounter := 0;
     FVBEIDE.MainWindow.SetFocus;
     LoadSettings;
     FIdleTimer := TTimer.Create(Nil);
-    FIdleTimer.Interval := 100;
+    FIdleTimer.Interval := iTimerInterval;
     FIdleTimer.OnTimer := IdleTimerEvent;
-    //FOldWndProc := TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC));
-    //FNewWndProc := Classes.MakeObjectInstance(WndProc);
-    //SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FNewWndProc));
+    //: @debug FOldWndProc := TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC));
+    //: FNewWndProc := Classes.MakeObjectInstance(WndProc);
+    //: SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FNewWndProc));
   Except
-    On E : Exception Do DisplayException(E.Message);
+    On E : Exception Do DisplayException(E);
   End;
 end;
 
@@ -383,16 +376,13 @@ end;
 **)
 destructor TIDETools.Destroy;
 begin
-  CodeSite.TraceMethod('TIDETools.Destroy', tmoTiming);
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.Destroy', tmoTiming);{$ENDIF}
   SaveSettings;
-  // Check that our WndProc is the current WndProc before removing.
-  //If TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC)) = FNewWndProc Then
-  //  SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FOldWndProc));
-  //Classes.FreeObjectInstance(FNewWndProc);
+  //: @debug Check that our WndProc is the current WndProc before removing.
+  //: If TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC)) = FNewWndProc Then
+  //:   SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FOldWndProc));
+  //: Classes.FreeObjectInstance(FNewWndProc);
   FActions.Free;
-  WindowPosition['ModuleExplorer'] := TfrmDockableModuleExplorer.GetModuleExplorerPosition;
-  TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
   FIdleTimer.Free;
   FTimer.Free;
   FBADIThreadMgr.Free;
@@ -411,10 +401,10 @@ End;
 
 (**
 
-  This method saves the applications settings to the ini file.
+  This method saves the applications settings to the INI file.
 
   @precon  None.
-  @postcon Saves the applications settings to the ini file.
+  @postcon Saves the applications settings to the INI file.
 
 **)
 procedure TIDETools.SaveSettings;
@@ -432,21 +422,21 @@ end;
 
 (**
 
-  This method positions the comment and function according to the options and
-  then places the cursor in the appropriate position for editing.
+  This method positions the comment and function according to the options and then places the cursor in 
+  the appropriate position for editing.
 
   @precon  None.
-  @postcon Positions the comment and function according to the options and
-           then places the cursor in the appropriate position for editing.
+  @postcon Positions the comment and function according to the options and then places the cursor in the
+           appropriate position for editing.
 
-  @param   CursorDelta as a TPoint
-  @param   iInsertLine as an Integer
-  @param   iIndent     as an Integer
-  @param   strComment  as a string
+  @param   CursorDelta as a TPoint as a constant
+  @param   iInsertLine as an Integer as a constant
+  @param   iIndent     as an Integer as a constant
+  @param   strComment  as a string as a constant
 
 **)
-procedure TIDETools.PositionCursorInFunction(CursorDelta: TPoint;
-  iInsertLine: Integer; iIndent: Integer; strComment: string);
+procedure TIDETools.PositionCursorInFunction(Const CursorDelta: TPoint;
+  Const iInsertLine: Integer; Const iIndent: Integer; Const strComment: string);
 
 Var
   Pt: TPoint;
@@ -466,32 +456,33 @@ end;
 
 (**
 
-  This method creates the menus required by the tools addin.
+  This method creates the menus required by the tools add-in.
 
   @precon  None.
-  @postcon Creates all the menus required by the tools addin.
+  @postcon Creates all the menus required by the tools add-in.
 
 **)
 Procedure TIDETools.CreateMenu;
 
   (**
 
-    This method creates a sub menu item to the main tools menu, sets the
-    caption, creates an event sink and hooks an event handler for the menu.
+    This method creates a sub menu item to the main tools menu, sets the caption, creates an event sink 
+    and hooks an event handler for the menu.
 
     @precon  None.
-    @postcon Creates a sub menu item to the main tools menu, sets the
-             caption, creates an event sink and hooks an event handler for the
-             menu.
+    @postcon Creates a sub menu item to the main tools menu, sets the caption, creates an event sink and
+             hooks an event handler for the menu.
 
-    @param   strCaption     as a String
-    @param   EventHandler   as a TClickProc
-    @param   boolBeginGroup as a Boolean
-    @param   strShortCut    as a String
+    @nohints strShortcut
+
+    @param   strCaption     as a String as a constant
+    @param   EventHandler   as a TClickProc as a constant
+    @param   boolBeginGroup as a Boolean as a constant
+    @param   strShortCut    as a String as a constant
 
   **)
-  Procedure CreateMenuItem(strCaption : String; EventHandler : TClickProc;
-    boolBeginGroup : Boolean; strShortCut : String = '');
+  Procedure CreateMenuItem(Const strCaption : String; Const EventHandler : TClickProc;
+    Const boolBeginGroup : Boolean; Const strShortCut : String = '');
 
   Var
     S : TIDEMenuItem;
@@ -563,6 +554,8 @@ End;
            Current Code Pane because I can not hook the events in the IDE - not sure you
            can in the VBE IDE.
 
+  @nocheck ExceptionEating
+
   @param   Sender as a TObject
 
 **)
@@ -621,16 +614,20 @@ end;
   @precon  None.
   @postcon Gets the project path for the given project name.
 
-  @param   strName as a String
+  @param   strName as a String as a constant
   @return  a String
 
 **)
-function TIDETools.GetProjectPath(strName: String): String;
+function TIDETools.GetProjectPath(Const strName: String): String;
+
+Const
+  strProjectPaths = 'ProjectPaths';
+
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.GetProjectPath', tmoTiming);{$ENDIF}
   With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) Do
     Try
-      Result := ReadString('ProjectPaths', strName, '');
+      Result := ReadString(strProjectPaths, strName, '');
     Finally
       Free;
     End;
@@ -643,20 +640,30 @@ end;
   @precon  None.
   @postcon Sets the project path for the given project name.
 
-  @param   strName  as a String
-  @param   strValue as a String
+  @param   strName  as a String as a constant
+  @param   strValue as a String as a constant
 
 **)
-procedure TIDETools.SetProjectPath(strName : String; strValue: String);
+procedure TIDETools.SetProjectPath(Const strName : String; Const strValue: String);
+
+Const
+  strProjectPaths = 'ProjectPaths';
+
+Var
+  iniFile: TMemIniFile;
+  strPath : String;
+
 begin
-  If strValue[Length(strValue)] <> '\' Then
-    strValue := strValue + '\';
-  With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) Do
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SetProjectPath', tmoTiming);{$ENDIF}
+  strPath := strValue;
+  If strPath[Length(strPath)] <> '\' Then
+    strPath := strPath + '\';
+  iniFile := TMemIniFile.Create(TBADIOPtions.BADIOptions.INIFileName);
     Try
-      WriteString('ProjectPaths', strName, strValue);
+    iniFile.WriteString(strProjectPaths, strName, strPath);
+    iniFile.UpdateFile;
     Finally
-      Free;
+    iniFile.Free;
     End;
 end;
 
@@ -665,15 +672,15 @@ end;
   This is a getter method for the Module property.
 
   @precon  None.
-  @postcon Gets the module reference for the given project and module name else returns
-           nil is they were not found.
+  @postcon Gets the module reference for the given project and module name else returns nil is they were
+           not found.
 
-  @param   strProject as a String
-  @param   strModule  as a String
+  @param   strProject as a String as a constant
+  @param   strModule  as a String as a constant
   @return  a VBComponent
 
 **)
-function TIDETools.GetModule(strProject, strModule: String): VBComponent;
+function TIDETools.GetModule(Const strProject, strModule: String): VBComponent;
 
 Var
   i, j : Integer;
@@ -743,13 +750,13 @@ end;
   @precon  None.
   @postcon Returns the full path for the project module given its type.
 
-  @param   strProject as a String
-  @param   strModule  as a String
-  @param   iType      as an Integer
+  @param   strProject as a String as a constant
+  @param   strModule  as a String as a constant
+  @param   iType      as an Integer as a constant
   @return  a String
 
 **)
-function TIDETools.GetFileName(strProject, strModule: String; iType: Integer): String;
+function TIDETools.GetFileName(Const strProject, strModule: String; Const iType: Integer): String;
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.GetFileName', tmoTiming);{$ENDIF}
   Result := ProjectPath[strProject] + strModule;
@@ -771,11 +778,11 @@ end;
   @precon  None.
   @postcon Gets the bounding rectangle for the named window from the registry.
 
-  @param   strName as a String
+  @param   strName as a String as a constant
   @return  a TRect
 
 **)
-function TIDETools.GetWindowPosition(strName: String): TRect;
+function TIDETools.GetWindowPosition(Const strName: String): TRect;
 
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.GetWindowPosition', tmoTiming);{$ENDIF}
@@ -797,11 +804,11 @@ end;
   @precon  None.
   @postcon Saves the bounding rectangle for the named window to the registry.
 
-  @param   strName as a String
+  @param   strName as a String as a constant
   @param   Value   as a TRect as a constant
 
 **)
-procedure TIDETools.SetWindowPosition(strName: String; const Value: TRect);
+procedure TIDETools.SetWindowPosition(Const strName: String; Const Value: TRect);
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SetWindowPosition', tmoTiming);{$ENDIF}
   With TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
@@ -822,12 +829,14 @@ end;
   @precon  None.
   @postcon Displays the tokens for the currently selected code pane.
 
+  @nocheck ExceptionEating
+  @nohint  Ctrl CancelDefault
+
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.ShowTokensClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.ShowTokensClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 Var
   doc : TBaseLanguageModule;
@@ -870,7 +879,7 @@ end;
   @postcon Re-enables the timer for the parsing of code once the parser has
            parsed the code successfully.
 
-  @param   boolSuccessfulParse as a Boolean
+  @param   boolSuccessfulParse as a Boolean as a constant
 
 **)
 procedure TIDETools.SuccessfulParse(Const boolSuccessfulParse: Boolean);
@@ -886,7 +895,7 @@ end;
   @precon  None.
   @postcon Outputs an exception message from the browse and doc it thread.
 
-  @param   strExceptionMsg as a String
+  @param   strExceptionMsg as a String as a constant
 
 **)
 procedure TIDETools.ExceptionMsg(Const strExceptionMsg: String);
@@ -904,12 +913,14 @@ end;
            the selected modules from the current project are exported to the
            selected path.
 
+  @nocheck ExceptionEating
+  @nohint  Ctrl CancelDefault
+
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.ExportClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.ExportClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 Var
   slModules : TStringList;
@@ -946,14 +957,12 @@ begin
               If FileExists(strFileName) Then
                 If FileGetAttr(strFileName) And faReadOnly <> 0 Then
                   Include(State, msLocked);
-              slModules.AddObject(Format('%s=%d', [Module.Name, Module.Type_]),
-                TObject(Byte(State)));
+              slModules.AddObject(Format('%s=%d', [Module.Name, Module.Type_]), TObject(Byte(State)));
             End;
           strPath := ProjectPath[vbp.Name];
           If strPath = '' Then strPath := GetCurrentDir;
           R := WindowPosition['Export'];
-          If TfrmExport.Execute('Export Modules', vbp.Name, slModules, strPath,
-            R) Then
+          If TfrmExport.Execute('Export Modules', vbp.Name, slModules, strPath, R) Then
             Begin
               WindowPosition['Export'] := R;
               ProjectPath[vbp.Name] := strPath;
@@ -979,11 +988,11 @@ end;
   @precon  None.
   @postcon exports the modules which are modified.
 
-  @param   Project   as a VBPRoject
-  @param   slModules as a TStringList
+  @param   Project   as a VBPRoject as a constant
+  @param   slModules as a TStringList as a constant
 
 **)
-Procedure TIDETools.SaveModules(Project : VBPRoject; slModules : TStringList);
+Procedure TIDETools.SaveModules(Const Project : VBPRoject; Const slModules : TStringList);
 
 Var
   i : Integer;
@@ -1011,8 +1020,6 @@ Begin
               Module.Export(strFileName);
               UpdateProgress(i, slModules[i]);
             End Else
-              DisplayException(Format('Module "%s" was not found in Project "%s".',
-                [slModules[i], Project.Name]));
               DisplayException('Module "%s" was not found in Project "%s".', [slModules[i], Project.Name]);
         End;
     Finally
@@ -1022,10 +1029,10 @@ End;
 
 (**
 
-  This event handler refreshes the tree view is thew scope list changes.
+  This event handler refreshes the tree view if the scope list changes.
 
   @precon  None.
-  @postcon Refreshes the tree view is thew scope list changes.
+  @postcon Refreshes the tree view if the scope list changes.
 
   @param   Sender as a TObject
 
@@ -1044,6 +1051,8 @@ end;
   @precon  None.
   @postcon Import a set of files into the current project creating or replace code
            as necessary.
+
+  @nohint  Ctrl CancelDefault
 
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
@@ -1093,11 +1102,13 @@ end;
   @precon  None.
   @postcon Contains code that needs to be processed when the current code pane changes.
 
-  @param   Pane    as a CodePane
-  @param   Project as a VBProject
+  @nohints Project
+
+  @param   Pane    as a CodePane as a constant
+  @param   Project as a VBProject as a constant
 
 **)
-procedure TIDETools.CodePaneChangeEvent(Pane : CodePane; Project : VBProject);
+procedure TIDETools.CodePaneChangeEvent(Const Pane : CodePane; Const Project : VBProject);
 
 Var
   strFileName : String;
@@ -1121,33 +1132,35 @@ end;
 
 (**
 
-  This method returns the vb component interface for the named file if found in
-  the active VB Project else returns nil.
+  This method returns the VB component interface for the named file if found in the active VB Project 
+  else returns nil.
 
   @precon  None.
-  @postcon Returns the vb component interface for the named file if found in
-           the active VB Project else returns nil.
+  @postcon Returns the VB component interface for the named file if found in the active VB Project else 
+           returns nil.
 
-  @param   strFileName as a String
+  @param   strFileName as a String as a constant
   @return  a VBComponent
 
 **)
-function TIDETools.VBFileExists(strFileName: String): VBComponent;
+function TIDETools.VBFileExists(Const strFileName: String): VBComponent;
 
 Var
   iFile : Integer;
   strVBCName : String;
+  strLFileName : String;
 
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.VBFileExists', tmoTiming);{$ENDIF}
   Result := Nil;
   If FVBProject = Nil Then
     Exit;
-  strFileName := ChangeFileExt(ExtractFileName(strFileName), '');
+  strLFileName := strFileName;
+  strLFileName := ChangeFileExt(ExtractFileName(strLFileName), '');
   For iFile := 1 To FVBProject.VBComponents.Count Do
     Begin
       strVBCName := FVBProject.VBComponents.Item(iFile).Name;
-      If CompareText(strFileName, strVBCName) = 0 Then
+      If CompareText(strLFileName, strVBCName) = 0 Then
         Begin
           Result := FVBProject.VBComponents.Item(iFile);
           Exit;
@@ -1162,10 +1175,10 @@ end;
   @precon  None.
   @postcon Contains code that needs to be processed when the current VB Project changes.
 
-  @param   Project as a VBProject
+  @param   Project as a VBProject as a constant
 
 **)
-procedure TIDETools.VBProjectChangeEvent(Project: VBProject);
+procedure TIDETools.VBProjectChangeEvent(Const Project: VBProject);
 
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.VBProjectChangeEvent', tmoTiming);{$ENDIF}
@@ -1200,7 +1213,10 @@ begin
         FileMenu := MainMenu.Controls_.Item[i] As CommandBarPopup;
         For j := 1 To FileMenu.Controls_.Count Do
           If Copy(FileMenu.Controls_.Item[j].Caption, 1, 5) = '&Save' Then
+            Begin
             FileMenu.Controls_.Item[j].Execute;
+              Exit;
+            End;
       End;
 end;
 
@@ -1209,14 +1225,15 @@ end;
   This is an on option click event handler.
 
   @precon  None.
-  @postcon Displays the optins dialogue.
+  @postcon Displays the options dialogue.
+
+  @nohint  Ctrl CancelDefault
 
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.OptionsClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.OptionsClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.OptionsClick', tmoTiming);{$ENDIF}
@@ -1247,6 +1264,7 @@ begin
   CP := CurrentCodePane;
   If CP = Nil Then
     Exit;
+  CP.Show;
   CP.Window_.SetFocus;
 end;
 
@@ -1257,12 +1275,14 @@ end;
   @precon  None.
   @postcon Focuses the editor window when this menu is selected.
 
+  @nohint  Ctrl CancelDefault
+
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.FocusEditorClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.FocusEditorClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
+
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.FocusEditorClick', tmoTiming);{$ENDIF}
   Focus(Self);
@@ -1347,6 +1367,8 @@ end;
   @precon  None.
   @postcon Shows the module explorer and refreshes the tree view.
 
+  @nohint  Ctrl CancelDefault
+
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
@@ -1369,7 +1391,7 @@ end;
   @precon  None.
   @postcon Renders the passed module in the module explorer.
 
-  @param   Module as a TBaseLanguageModule
+  @param   Module as a TBaseLanguageModule as a constant
 
 **)
 procedure TIDETools.RenderDocument(Const Module: TBaseLanguageModule);
@@ -1378,19 +1400,28 @@ begin
   FModuleExplorerFrame.RenderModule(Module);
 end;
 
+Procedure TIDETools.ResizeEvent(Sender: TObject);
+
+Begin
+  CodeSite.Send('Resize');
+End;
+
 (**
 
-  This is an on click event handler for the Documenation menu.
+  This is an on click event handler for the Documentation menu.
 
   @precon  None.
   @postcon Invokes the dialogue to document the code in the current project.
+
+  @nocheck ExceptionEating
+  @nohint  Ctrl CancelDefault
 
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.DocumentationClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.DocumentationClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
+
 var
   i: Integer;
 
@@ -1479,12 +1510,13 @@ end;
   @precon  None.
   @postcon Inserts a block documentation comment at the current line.
 
+  @nohint  Ctrl CancelDefault
+
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.InsertBlockCommentClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.InsertBlockCommentClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 Var
   iSL, iSC, iEL, iEC : Integer;
@@ -1515,12 +1547,15 @@ end;
   @postcon Inserts the selected code fragment into the current code pane at the
            cursor position.
 
+  @nocheck ExceptionEating
+
+  @nohint  Ctrl CancelDefault
+
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.InsertCodeFragmentClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.InsertCodeFragmentClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 Var
   R : TRect;
@@ -1554,17 +1589,18 @@ end;
 
 (**
 
-  This method is an on click event handler for the Insert InSitu Comment menu.
+  This method is an on click event handler for the Insert In-Situ Comment menu.
 
   @precon  None.
   @postcon Inserts a documentation comment at the cursor position.
+
+  @nohint  Ctrl CancelDefault
 
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.InsertInSituCommentClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.InsertInSituCommentClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 Var
   iSL, iSC, iEL, iEC : Integer;
@@ -1594,12 +1630,13 @@ end;
   @postcon Inserts a line comment above the current line at the current column
            position.
 
+  @nohint  Ctrl CancelDefault
+
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.InsertLineCommentClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.InsertLineCommentClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 Var
   iSL, iSC, iEL, iEC : Integer;
@@ -1631,12 +1668,13 @@ end;
   @precon  Sender is the object initiating the event .
   @postcon Inserts a Method comment into the editor avoid the current method .
 
+  @nohint  Ctrl CancelDefault
+
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.InsertMethodCommentClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.InsertMethodCommentClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 Var
   Module: TBaseLanguageModule;
@@ -1705,7 +1743,9 @@ end;
   method declaration.
 
   @precon  Sender is the object initiating the event .
-  @postcon Inserts a Porperty comment into the editor avoid the current method .
+  @postcon Inserts a Property comment into the editor avoid the current method .
+
+  @nohint  Ctrl CancelDefault
 
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
@@ -1773,13 +1813,14 @@ end;
 
 (**
 
-  This method loads the applications settings from the ini file.
+  This method loads the applications settings from the INI file.
 
   @precon  None.
-  @postcon Loads the applications settings from the ini file.
+  @postcon Loads the applications settings from the INI file.
 
 **)
 procedure TIDETools.LoadSettings;
+
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.LoadSettings', tmoTiming);{$ENDIF}
   With TIniFile.Create(TBADIOptions.BADIOptions.INIFileName) Do
@@ -1795,17 +1836,20 @@ end;
 
 (**
 
-  This method is an on click event handler for the Save Code Fragement menu item.
+  This method is an on click event handler for the Save Code Fragment menu item.
 
   @precon  None.
   @postcon Saves the currently selected text as a code fragment.
+
+  @nocheck ExceptionEating
+
+  @nohint  Ctrl CancelDefault
 
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.SaveCodeFragmentClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.SaveCodeFragmentClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 
 Var
   strFileName : String;
@@ -1862,8 +1906,7 @@ end;
   @return  a String
 
 **)
-Function TIDETools.EditorInfo(var strFileName: String;
-  var boolModified: Boolean) : String;
+Function TIDETools.EditorInfo(var strFileName: String; var boolModified: Boolean) : String;
 
 var
   CP: CodePane;
@@ -1883,7 +1926,7 @@ begin
     End;
 end;
 
-(**
+(** @debug
 
   This is a Windows procedure for handling keyboard shortcuts in the IDE.
 
@@ -1906,6 +1949,3 @@ begin
 end;**)
 
 End.
-
-
-

@@ -4,8 +4,8 @@
   module browser so that it can be independent of the application specifics.
 
   @Author  David Hoyle
-  @Version 7.193
-  @Date    21 Nov 2021
+  @Version 8.021
+  @Date    10 Sep 2023
 
   @license
 
@@ -271,6 +271,7 @@ Type
     Function  ExtractSpellingWord : String;
     Procedure CheckForIDEErrors(Const Container : TElementContainer);
     Function FollowMethodNodeData(Const iLine : Integer) : PBADITreeData;
+    procedure PromoteLabels;
     (**
       This property gets and set the filter text for the explorer view.
       @precon  None.
@@ -2379,6 +2380,13 @@ End;
 **)
 procedure TframeModuleExplorer.OutputModuleInfo(Const Container : TElementContainer);
 
+begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OutputModuleInfo', tmoTiming);{$ENDIF}
+  RenderContainers(FModule, Container, 1);
+  GetBodyCommentTags(Container As TBaseLanguageModule);
+end;
+
+Procedure TframeModuleExplorer.PromoteLabels;
 Const
   strPromotedLabels : Array[1..7] Of String = (
     strSpelling,
@@ -2395,9 +2403,7 @@ Var
   Node : PVirtualNode;
   NodeData : PBADITreeData;
 
-begin
-  RenderContainers(FModule, Container, 1);
-  GetBodyCommentTags(Container As TBaseLanguageModule);
+Begin
   For i := Low(strPromotedLabels) To High(strPromotedLabels) Do
     Begin
       Node := FExplorer.GetFirstChild(FModule);
@@ -2405,11 +2411,14 @@ begin
         Begin
           NodeData := FExplorer.GetNodeData(Node);
           If Pos(strPromotedLabels[i], NodeData.FNode.Text) = 1 Then
+            Begin
             FExplorer.MoveTo(Node, FModule, amAddChildFirst, False);
+              Break;
+            End;
           Node := FExplorer.GetNextSibling(Node);
         End;
     End;
-end;
+End;
 
 (**
 
@@ -2539,6 +2548,7 @@ Begin
         Module.AddTickCount(strSetup);
       FExplorer.EndUpdate;
     End;
+    PromoteLabels;
     Module.AddTickCount(strRender);
     UpdateStatusBar(Module);
   Finally

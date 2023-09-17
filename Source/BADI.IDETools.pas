@@ -967,7 +967,7 @@ begin
               WindowPosition['Export'] := R;
               ProjectPath[vbp.Name] := strPath;
               SaveModules(vbp, slModules);
-              //vbp.;
+              FVBEIDE.ActiveVBProject := vbp;
               Save;
             End;
         Finally

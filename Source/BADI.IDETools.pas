@@ -422,7 +422,6 @@ begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SaveSettings', tmoTiming);{$ENDIF}
   with TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
     try
-      WriteBool('ModuleExplorer', 'Visible', FMEVisible);
       WriteBool('ModuleExplorer', 'Visible', FToolWindow.Visible);
       WriteInteger('Documentation options', 'LastOption', Byte(FDocType));
       WriteInteger('Setup', 'CodeFragWidth', FCodeFragWidth);
@@ -576,7 +575,6 @@ Var
 
 begin
   Try
-    If Not TfrmDockableModuleExplorer.IsVisible Then
     If Not FModuleExplorerFrame.Visible Then
       Exit;
     If FVBEIDE.CodePanes.Count = 0 Then
@@ -612,7 +610,6 @@ begin
       End;
   Except
     On E: Exception Do
-      DisplayException(E.Message);
       DisplayException(E);
   End;
 end;
@@ -696,8 +693,6 @@ begin
               Exit;
             End;
       End;
-  DisplayException(Format('The module "%s" was not found in project "%s".',
-    [strModule, strProject]));
   DisplayException('The module "%s" was not found in project "%s".', [strModule, strProject]);
 end;
 
@@ -862,7 +857,6 @@ begin
     End;
   Except
     On E: Exception Do
-      DisplayException(E.Message);
       DisplayException(E);
   End;
 end;
@@ -1377,8 +1371,8 @@ end;
 **)
 procedure TIDETools.RenderDocument(Const Module: TBaseLanguageModule);
 begin
-  TfrmDockableModuleExplorer.RenderDocumentTree(Module);
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.RenderDocument', tmoTiming);{$ENDIF}
+  FModuleExplorerFrame.RenderModule(Module);
 end;
 
 (**
@@ -1423,7 +1417,6 @@ begin
     Else
       MessageDlg('There is no current active VB Project.', mtWarning, [mbOK], 0);
   Except
-    On E: Exception Do DisplayException(E.Message);
     On E: Exception Do DisplayException(E);
   End;
 end;
@@ -1470,19 +1463,10 @@ Var
 begin
   CheckSynchronize;
   GetWindowInfo(FVBEIDE.MainWindow.HWnd, recMainWndInfo);
-  GetWindowInfo(TfrmDockableModuleExplorer.GetWndHnd, recModExplWndInfo);
   If FVBEIDE.MainWindow.Visible And (
     (recMainWndInfo.dwOtherStuff And WS_ACTIVECAPTION > 0) Or
     (recModExplWndInfo.dwOtherStuff And WS_ACTIVECAPTION > 0)) Then
     Application.DoApplicationIdle;
-  If FVisible <> FVBEIDE.MainWindow.Visible Then
-    Begin
-      If Not FVBEIDE.MainWindow.Visible Then
-        TfrmDockableModuleExplorer.SetVisible(False)
-      Else
-        TfrmDockableModuleExplorer.SetVisible(FMEVisible);
-      FVisible := FVBEIDE.MainWindow.Visible;
-    End;
 end;
 
 (**
@@ -1561,7 +1545,6 @@ begin
         MessageDlg('There is no active Code Pane.', mtError, [mbOK], 0);
   Except
     On E: Exception Do
-      DisplayException(E.Message);
       DisplayException(E);
   End;
 end;
@@ -1858,7 +1841,6 @@ begin
       sl.Free;
     End;
   Except
-    On E: Exception Do DisplayException(E.Message);
     On E: Exception Do DisplayException(E);
   End;
 end;

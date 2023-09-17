@@ -2388,7 +2388,7 @@ end;
 
 Procedure TframeModuleExplorer.PromoteLabels;
 Const
-  strPromotedLabels : Array[1..7] Of String = (
+  strPromotedLabels: Array [1 .. 7] Of String = (
     strSpelling,
     strMetrics,
     strChecks,
@@ -2396,12 +2396,12 @@ Const
     strHints,
     strWarnings,
     strErrors    
-  );
+    );
 
 Var
   i: Integer;
-  Node : PVirtualNode;
-  NodeData : PBADITreeData;
+  Node: PVirtualNode;
+  NodeData: PBADITreeData;
 
 Begin
   For i := Low(strPromotedLabels) To High(strPromotedLabels) Do
@@ -2412,7 +2412,7 @@ Begin
           NodeData := FExplorer.GetNodeData(Node);
           If Pos(strPromotedLabels[i], NodeData.FNode.Text) = 1 Then
             Begin
-            FExplorer.MoveTo(Node, FModule, amAddChildFirst, False);
+              FExplorer.MoveTo(Node, FModule, amAddChildFirst, False);
               Break;
             End;
           Node := FExplorer.GetNextSibling(Node);

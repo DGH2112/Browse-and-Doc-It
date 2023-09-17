@@ -2,9 +2,9 @@
 
   This method contains functions that are used global through out the application.
 
-  @Version 1.108
+  @Version 1.385
   @Author  David Hoyle.
-  @Date    03 Sep 2023
+  @Date    10 Sep 2023
 
   @license
 
@@ -51,7 +51,7 @@ Type
   (** A set to determine the saved / locked state of a file. **)
   TStatuses = Set Of TStatus;
 
-  Procedure DisplayException(Const strMsg: String); Overload;
+  Procedure DisplayException(Const E : Exception); Overload;
   Procedure DisplayException(Const strMsg: String; Const Params: Array Of Const); Overload;
   Function  IsKeyWord(Const strWord: String; Const strWordList: Array Of String): Boolean;
   Function  IsInSet(Const C: Char; Const strCharSet: TSetOfAnsiChar): Boolean; InLine;
@@ -83,6 +83,15 @@ Implementation
 
 uses
   System.UITypes,
+  {$IFDEF EUREKALOG}
+  EException,
+  EComponent,
+  ELogBuilder,
+  ExceptionLog7,
+  EExceptionManager,
+  ECallStack,
+  eBase,
+  {$ENDIF EUREKALOG}
   Winapi.SHFolder,
   BADI.Constants,
   CodeSiteLogging;
@@ -654,13 +663,21 @@ End;
   @param   strMsg as a String as a constant
 
 **)
-Procedure DisplayException(const strMsg : String);
+Procedure DisplayException(Const E : Exception);
 
+{$IFNDEF EUREKALOG}
 ResourceString
   strException = 'Exception:'#13#10#13#10;
+{$ENDIF}
 
 Begin
-  ShowMessage(strException + StrMsg);
+  {$IFDEF CODESITE}CodeSite.TraceMethod('DisplayException', tmoTiming);{$ENDIF}
+  {$IFDEF EUREKALOG}
+  If ExceptionLog7.IsEurekaLogActive Then
+      ExceptionManager.StandardEurekaNotify(E, ExceptAddr)
+  {$ELSE}
+  ShowMessage(strException + E.Message);
+  {$ENDIF}
 End;
 
 (**

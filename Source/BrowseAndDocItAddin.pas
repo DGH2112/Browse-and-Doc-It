@@ -4,8 +4,8 @@
   handling the COM interfaces required.
 
   @Author  David Hoyle
-  @Version 1.591
-  @Date    09 Sep 2023
+  @Version 1.850
+  @Date    10 Sep 2023
 
 **)
 unit BrowseAndDocItAddin;
@@ -17,18 +17,22 @@ uses
   System.Win.StdVCL,
   Winapi.Windows,
   Winapi.ActiveX,
+  {$IFDEF WIN32}
   BrowseAndDocItVBEIDE_TLB,
+  {$ELSE}
+  BrowseAndDocItVBEIDE64_TLB,
+  {$ENDIF}
   AddInDesignerObjects_TLB,
   Office2000_TLB,
   BADI.IDETools,
-  BADI.VBEIDE.ActviveForm;
+  BADI.VBEIDE.ActiveForm;
 
 type
   (** A the add-in automation object **)
   TTVBDoc50Addin = class(TAutoObject, IBrowseAndDocItVBEIDETypeLib, IDTExtensibility2)
   Private
     FVBEIDE : TIDETools;
-    FDocObj : TTBADIActiveXToolWndForm;
+    FToolWindow : ITBADIActiveXToolWndForm;
   protected
     { Protected declarations }
     procedure OnConnection(const Application_: IDispatch;
@@ -98,10 +102,11 @@ Const
   strOnAddInsUpdate = 'OnAddInsUpdate: ';
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OnAddInsUpdate', tmoTiming);{$ENDIF}
   Try
     // Do Nothing;
   Except
-    On E : Exception Do DisplayException(strOnAddInsUpdate + E.Message);
+    On E : Exception Do DisplayException(E);
   End;
 end;
 
@@ -125,10 +130,11 @@ Const
   strOnBeginShutDown = 'OnBeginShutDown: ';
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OnBeginShutdown', tmoTiming);{$ENDIF}
   Try
     // Do nothing;
   Except
-    On E : Exception Do DisplayException(strOnBeginShutDown + E.Message);
+    On E : Exception Do DisplayException(E);
   End;
 end;
 
@@ -153,31 +159,33 @@ procedure TTVBDoc50Addin.OnConnection(
   const AddInInst: IDispatch; var custom: PSafeArray);
 
 Var
-  Wnd : VBIDE_TLB.Window_ ;
+  Wnd : VBIDE_TLB.Window_;
   DocObj : IDispatch;
   
 Const
   strOnConnection = 'OnConnection: ';
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OnConnection', tmoTiming);{$ENDIF}
   Try
     FVBEIDE := TIDETools.Create(Application_ As VBIDE_TLB.VBE);
-    {: @debug If Supports(FDocObj, IDispatch, DocObj) Then
-      Begin
-        Wnd := (Application_ As VBIDE_TLB.VBE).Windows.CreateToolWindow(
-          AddInInst As AddIn,
-          'TBADIActiveXToolWndForm',
-          'Browse and Doc It',
-          'BrowseAndDocIt.GuidPosition',
-          DocObj
-        );
-        FDocObj := DocObj As IDispatch;
-        Wnd.Visible := True;
-      End; }
+    Wnd := (Application_ As VBIDE_TLB.VBE).Windows.CreateToolWindow(
+      AddInInst As AddIn,
+      {$IFDEF Win32}
+      'BrowseAndDocItVBEIDE.TBADIActiveXToolWndForm',
+      {$ELSE}
+      'BrowseAndDocItVBEIDE64.TBADIActiveXToolWndForm',
+      {$ENDIF}
+      'Browse and Doc It',
+      'BrowseAndDocIt.GuidPosition',
+      DocObj
+    );
+    If Supports(DocObj, ITBADIActiveXToolWndForm, FToolWindow) Then
+      FVBEIDE.CreateModuleExplorer(FToolWindow, Wnd);
   Except
     On E : Exception Do
       Begin
-        DisplayException(strOnConnection + E.Message);
+        DisplayException(E);
         CodeSite.SendException(E);
       End;
   End;
@@ -204,12 +212,13 @@ Const
   strOnDisconnection = 'OnDisconnection: ';
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OnDisconnection', tmoTiming);{$ENDIF}
   Try
     //: @note THIS SHOULD NOT BE REQUIRED ON AN INTERFACED OBJECT BUT IS REQUIRED HERE
-    //: @debug FDocObj.Free;
+    FVBEIDE.DestroyModuleExplorer();
     FVBEIDE.Free;
   Except
-    On E : Exception Do DisplayException(strOnDisconnection + E.Message);
+    On E : Exception Do DisplayException(E);
   End;
 end;
 
@@ -233,10 +242,11 @@ Const
   strOnStartupComplete = 'OnStartupComplete: ';
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'OnStartupComplete', tmoTiming);{$ENDIF}
   Try
     // Do Nothing;
   Except
-    On E : Exception Do DisplayException(strOnStartupComplete + E.Message);
+    On E : Exception Do DisplayException(E);
   End;
 end;
 
@@ -265,6 +275,7 @@ constructor TOfficeAddInFactory.Create(ComServer: TComServerObject;
   Instancing: TClassInstancing; ThreadingModel: TThreadingModel;
   FriendlyName: String; LoadBehaviour: Integer);
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Create', tmoTiming);{$ENDIF}
   Inherited Create(ComServer, AutoClass, CLassID, Instancing, ThreadingModel);
   FFriendlyName := FriendlyName;
   FLoadBehaviour := LoadBehaviour;
@@ -288,6 +299,7 @@ Var
   i : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ReallyDeleteRegKey', tmoTiming);{$ENDIF}
   Values := TStringList.Create;
   Try
     R := TRegistry.Create;
@@ -332,12 +344,13 @@ Var
   R : TRegistry;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'RegisterAddIn', tmoTiming);{$ENDIF}
   R := TRegistry.Create;
   Try
     R.RootKey := HKEY_CURRENT_USER;
     If Not R.OpenKey(KeyName, True) Then
       Begin
-        DisplayException(strExceptionInRegisterAddIn);
+        DisplayException(strExceptionInRegisterAddIn, []);
         Exit;
       End;
     R.WriteString(strFriendlyName, FFriendlyName);
@@ -379,6 +392,7 @@ Var
   CurrentAddInKey : String;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'UpdateRegistry', tmoTiming);{$ENDIF}
   Inherited UpdateRegistry(Register);
   For i := iLowVBEVerNo To iHighVBEVerNo Do // Version of the VBE IDE
     Begin
@@ -394,3 +408,5 @@ initialization
   TOfficeAddinFactory.Create(ComServer, TTVBDoc50Addin, Class_BrowseAndDocItVBEIDETypeLib,
     ciMultiInstance, tmApartment, strBrowseAndDocItVBEIDETools, iLoadBehaviour);
 end.
+
+

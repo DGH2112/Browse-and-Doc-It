@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 10/Sep/2023 16:51:43 (- $Rev: 12980 $, 1319558984).
+// File generated on 10/Sep/2023 09:49:24 (- $Rev: 12980 $, 1294217890).
 
 [
   uuid(70668A3A-AC0E-49D2-83EB-A45301B8D460),
@@ -14,7 +14,7 @@
   control
 
 ]
-library BrowseAndDocItVBEIDE64
+library BrowseAndDocItVBEIDE
 {
 
   importlib("stdole2.tlb");

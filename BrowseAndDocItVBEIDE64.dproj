@@ -35,6 +35,12 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+        <Cfg_1_Win64>true</Cfg_1_Win64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
@@ -90,11 +96,11 @@
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <Icon_MainIcon>BrowseAndDocItVBEIDE_Icon.ico</Icon_MainIcon>
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <Manifest_File>(None)</Manifest_File>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
@@ -106,6 +112,10 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <Manifest_File>None</Manifest_File>
@@ -120,14 +130,13 @@
         <DCC_ExeOutput>.\</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Release>0</VerInfo_Release>
         <VerInfo_Build>0</VerInfo_Build>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
         <Debugger_HostApplication>C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE</Debugger_HostApplication>
         <OutputExt>DLL</OutputExt>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -144,9 +153,6 @@
         <DCCReference Include="Source\BrowseAndDocItAddin.pas"/>
         <DCCReference Include="..\..\Library\Office2000_TLB.pas"/>
         <DCCReference Include="..\..\Library\EventSink.pas"/>
-        <DCCReference Include="Source\VBEIDEModuleExplorer.pas">
-            <Form>frmDockableModuleExplorer</Form>
-        </DCCReference>
         <DCCReference Include="Source\BADI.VBEIDE.Initialisation.pas"/>
         <DCCReference Include="Source\BADI.IDETools.pas"/>
         <DCCReference Include="Source\BADI.Functions.pas"/>
@@ -242,14 +248,9 @@
         <DCCReference Include="Source\BADI.VB.ExceptionHandling.pas"/>
         <DCCReference Include="Source\BADI.Generic.PropertyDecl.pas"/>
         <DCCReference Include="Source\BADI.Generic.Constant.pas"/>
-        <DCCReference Include="Source\ToolWindowTestForm.pas">
-            <Form>frmMyTestForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="BrowseAndDocItVBEIDE64_TLB.pas"/>
         <DCCReference Include="Source\BADI.VBEIDE.ActiveForm.pas">
             <Form>TBADIActiveXToolWndForm</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TActiveForm</DesignClass>
             <CoClasses>TBADIActiveXToolWndForm</CoClasses>
         </DCCReference>
@@ -340,12 +341,6 @@
                 </DeployFile>
                 <DeployFile LocalName="BrowseAndDocItVBEIDE64.DLL" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
-                        <RemoteName>BrowseAndDocItVBEIDE64.dll</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="BrowseAndDocItVBEIDE64.dll" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
                         <RemoteName>BrowseAndDocItVBEIDE64.dll</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>

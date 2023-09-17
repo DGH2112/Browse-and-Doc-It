@@ -3,6 +3,7 @@ object TBADIActiveXToolWndForm: TTBADIActiveXToolWndForm
   Top = 0
   Width = 394
   Height = 330
+  AxBorderStyle = afbNone
   Caption = 'TBADIActiveXToolWndForm'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -11,19 +12,11 @@ object TBADIActiveXToolWndForm: TTBADIActiveXToolWndForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OnCreate = ActiveFormCreate
-  OnDestroy = ActiveFormDestroy
   TextHeight = 15
-  object pnl: TPanel
-    Left = 0
-    Top = 0
-    Width = 394
-    Height = 330
-    Align = alClient
-    Caption = 'Hello Dave'
-    TabOrder = 0
-    ExplicitLeft = 168
-    ExplicitTop = 80
-    ExplicitWidth = 185
-    ExplicitHeight = 41
+  object tmUpdateBounds: TTimer
+    Enabled = False
+    OnTimer = tmUpdateBoundsTimer
+    Left = 56
+    Top = 32
   end
 end

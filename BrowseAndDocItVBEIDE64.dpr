@@ -3,8 +3,8 @@
   This module contains a definition of a COM DLL that can be loaded by the
   VBE IDE.
 
-  @Version 1.865
-  @Date    09 Sep 2023
+  @Version 1.925
+  @Date    10 Sep 2023
   @Author  David Hoyle
 
 **)
@@ -16,14 +16,16 @@ uses
   EResLeaks,
   EDebugJCL,
   EDebugExports,
-  EFixSafeCallException,
   EMapWin32,
   EAppVCL,
   EDialogWinAPIMSClassic,
   EDialogWinAPIEurekaLogDetailed,
   EDialogWinAPIStepsToReproduce,
+  ESendMailMAPI,
+  ESendMailSMAPI,
   ExceptionLog7,
   {$ENDIF EurekaLog}
+  CodeSiteLogging,
   ComServ,
   VBIDE_TLB in '..\..\LIBRARY\VBIDE_TLB.pas',
   AddInDesignerObjects_TLB in '..\..\LIBRARY\AddInDesignerObjects_TLB.pas',
@@ -32,7 +34,6 @@ uses
   BrowseAndDocItAddin in 'Source\BrowseAndDocItAddin.pas',
   Office2000_TLB in '..\..\Library\Office2000_TLB.pas',
   EventSink in '..\..\Library\EventSink.pas',
-  VBEIDEModuleExplorer in 'Source\VBEIDEModuleExplorer.pas' {frmDockableModuleExplorer},
   BADI.VBEIDE.Initialisation in 'Source\BADI.VBEIDE.Initialisation.pas',
   BADI.IDETools in 'Source\BADI.IDETools.pas',
   BADI.Functions in 'Source\BADI.Functions.pas',
@@ -113,7 +114,6 @@ uses
   BADI.VB.ExceptionHandling in 'Source\BADI.VB.ExceptionHandling.pas',
   BADI.Generic.PropertyDecl in 'Source\BADI.Generic.PropertyDecl.pas',
   BADI.Generic.Constant in 'Source\BADI.Generic.Constant.pas',
-  ToolWindowTestForm in 'Source\ToolWindowTestForm.pas' {frmMyTestForm},
   BrowseAndDocItVBEIDE64_TLB in 'BrowseAndDocItVBEIDE64_TLB.pas',
   BADI.VBEIDE.ActiveForm in 'Source\BADI.VBEIDE.ActiveForm.pas' {TBADIActiveXToolWndForm: TActiveForm} {TBADIActiveXToolWndForm: CoClass};
 
@@ -145,4 +145,6 @@ begin
   SetEurekaLogState(DebugHook = 0);
   {$ENDIF}
 end.
+
+
 

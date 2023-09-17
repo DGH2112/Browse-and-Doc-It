@@ -12,7 +12,7 @@ unit BrowseAndDocItVBEIDE64_TLB;
 // ************************************************************************ //
 
 // $Rev: 98336 $
-// File generated on 09/Sep/2023 14:26:09 from Type Library described below.
+// File generated on 10/Sep/2023 16:27:59 from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: D:\Documents\RAD Studio\IDE Addins\BrowseAndDocIt\BrowseAndDocItVBEIDE64 (1)
@@ -189,6 +189,8 @@ type
     procedure Set_AlignWithMargins(Value: WordBool); safecall;
     function Get_ParentCustomHint: WordBool; safecall;
     procedure Set_ParentCustomHint(Value: WordBool); safecall;
+    function Get_VCLFormRef: TBADIActiveXToolWndForm; safecall;
+    procedure Set_VCLFormRef(const Value: TBADIActiveXToolWndForm); safecall;
     property Visible: WordBool read Get_Visible write Set_Visible;
     property AutoScroll: WordBool read Get_AutoScroll write Set_AutoScroll;
     property AutoSize: WordBool read Get_AutoSize write Set_AutoSize;
@@ -227,6 +229,7 @@ type
     property RaiseOnNonMainThreadUsage: WordBool read Get_RaiseOnNonMainThreadUsage write Set_RaiseOnNonMainThreadUsage;
     property AlignWithMargins: WordBool read Get_AlignWithMargins write Set_AlignWithMargins;
     property ParentCustomHint: WordBool read Get_ParentCustomHint write Set_ParentCustomHint;
+    property VCLFormRef: TBADIActiveXToolWndForm read Get_VCLFormRef write Set_VCLFormRef;
   end;
 
 // *********************************************************************//
@@ -274,6 +277,7 @@ type
     property RaiseOnNonMainThreadUsage: WordBool dispid 232;
     property AlignWithMargins: WordBool dispid 233;
     property ParentCustomHint: WordBool dispid 234;
+    property VCLFormRef: TBADIActiveXToolWndForm dispid 236;
   end;
 
 // *********************************************************************//

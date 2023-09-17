@@ -111,7 +111,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="BrowseAndDocItVBEIDE_TLB.pas"/>
         <DCCReference Include="..\..\LIBRARY\VBIDE_TLB.pas"/>
         <DCCReference Include="..\..\LIBRARY\AddInDesignerObjects_TLB.pas"/>
         <DCCReference Include="Source\CodeFragmentsForm.pas">
@@ -123,9 +122,6 @@
         <DCCReference Include="Source\BrowseAndDocItAddin.pas"/>
         <DCCReference Include="..\..\Library\Office2000_TLB.pas"/>
         <DCCReference Include="..\..\Library\EventSink.pas"/>
-        <DCCReference Include="Source\VBEIDEModuleExplorer.pas">
-            <Form>frmDockableModuleExplorer</Form>
-        </DCCReference>
         <DCCReference Include="Source\BADI.VBEIDE.Initialisation.pas"/>
         <DCCReference Include="Source\BADI.IDETools.pas"/>
         <DCCReference Include="Source\BADI.Functions.pas"/>
@@ -221,6 +217,13 @@
         <DCCReference Include="Source\BADI.VB.ExceptionHandling.pas"/>
         <DCCReference Include="Source\BADI.Generic.PropertyDecl.pas"/>
         <DCCReference Include="Source\BADI.Generic.Constant.pas"/>
+        <DCCReference Include="BrowseAndDocItVBEIDE_TLB.pas"/>
+        <DCCReference Include="Source\BADI.VBEIDE.ActiveForm.pas">
+            <Form>TBADIActiveXToolWndForm</Form>
+            <DesignClass>TActiveForm</DesignClass>
+            <CoClasses>TBADIActiveXToolWndForm</CoClasses>
+        </DCCReference>
+        <RidlCompile Include="BrowseAndDocItVBEIDE.ridl"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

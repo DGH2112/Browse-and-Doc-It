@@ -3,8 +3,8 @@
   This module defines the VBE IDE Tools interface between the IDE and the
   available tools.
 
-  @Version 1.297
-  @Date    09 Sep 2023
+  @Version 3.285
+  @Date    17 Sep 2023
   @Author  David Hoyle
 
 **)
@@ -30,7 +30,14 @@ uses
   BADI.Documentation.Dispatcher,
   BADI.Base.Module,
   BADI.CommonIDEFunctions,
-  BADI.Thread.Manager;
+  BADI.Thread.Manager,
+  BADI.VBEIDE.ActiveForm,
+  {$IFDEF WIN32}
+  BrowseAndDocItVBEIDE_TLB,
+  {$ELSE}
+  BrowseAndDocItVBEIDE64_TLB,
+  {$ENDIF}
+  BADI.ModuleExplorerFrame;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -41,7 +48,7 @@ Type
     FMenu : CommandBarButton;
     FSink : TEventSink;
   Public
-    Constructor Create(ClickProc: TClickProc);
+    constructor Create(Const ClickProc: TClickProc);
     Destructor Destroy; Override;
     (**
       This property holds a reference to the IDE Menu item.
@@ -68,7 +75,7 @@ Type
   (** This class represents the VBE IDE Tools interface between the IDE and
       the available tools. **)
   TIDETools = Class
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FOldHandle : Integer;
     FCounter : Cardinal;
     FOldLength : Integer;
@@ -91,6 +98,10 @@ Type
     //FNewWndProc : TFarProc;
     FLastCodePane: CodePane;
     FBADIThreadMgr : TBADIThreadManager;
+    FModuleExplorerFrame : TframeModuleExplorer;
+    FToolWindow : VBIDE_TLB.Window_;
+    FToolWindowForm : TTBADIActiveXToolWndForm;
+  Strict Protected
     procedure CreateMenu;
     function GetProjectPath(strName: String): String;
     procedure SetProjectPath(strName: String; strValue: String);
@@ -196,7 +207,11 @@ Type
     Property CurrentCodePane : CodePane Read GetCodePane;
   Public
     Constructor Create(VBEIDERef : VBE);
+    Constructor Create(Const VBEIDERef : VBE);
     Destructor Destroy; Override;
+    Procedure CreateModuleExplorer(Const ToolWindowForm : ITBADIActiveXToolWndForm;
+      Const ToolWindow : VBIDE_TLB.Window_);
+    Procedure DestroyModuleExplorer();
   End;
 
 ResourceString
@@ -386,6 +401,12 @@ begin
   inherited Destroy;
 end;
 
+Procedure TIDETools.DestroyModuleExplorer();
+
+Begin
+  FModuleExplorerFrame.Free;
+End;
+
 (**
 
   This method saves the applications settings to the ini file.
@@ -399,6 +420,7 @@ begin
   with TIniFile.Create(TBADIOPtions.BADIOptions.INIFileName) do
     try
       WriteBool('ModuleExplorer', 'Visible', FMEVisible);
+      WriteBool('ModuleExplorer', 'Visible', FToolWindow.Visible);
       WriteInteger('Documentation options', 'LastOption', Byte(FDocType));
       WriteInteger('Setup', 'CodeFragWidth', FCodeFragWidth);
     finally
@@ -513,6 +535,21 @@ Begin
     End;
 End;
 
+Procedure TIDETools.CreateModuleExplorer(Const ToolWindowForm : ITBADIActiveXToolWndForm;
+  Const ToolWindow : VBIDE_TLB.Window_);
+
+Begin
+  FToolWindow := ToolWindow;
+  FToolwindow.Visible := FMEVisible;
+  FToolWindowForm := (ToolWindowForm.VCLFormRef As TTBADIActiveXToolWndForm);
+  FModuleExplorerFrame := TframeModuleExplorer.Create(FToolWindowForm);
+  FModuleExplorerFrame.Parent := FToolWindowForm;
+  FModuleExplorerFrame.Align := alClient;
+  FModuleExplorerFrame.OnSelectionChange := SelectionChange;
+  FModuleExplorerFrame.OnFocus := Focus;
+  FModuleExplorerFrame.OnRefresh := ScopeChange;
+End;
+
 (**
 
   This is a timer event handler.
@@ -535,6 +572,7 @@ Var
 begin
   Try
     If Not TfrmDockableModuleExplorer.IsVisible Then
+    If Not FModuleExplorerFrame.Visible Then
       Exit;
     If FVBEIDE.CodePanes.Count = 0 Then
       Exit;
@@ -570,6 +608,7 @@ begin
   Except
     On E: Exception Do
       DisplayException(E.Message);
+      DisplayException(E);
   End;
 end;
 
@@ -651,6 +690,7 @@ begin
       End;
   DisplayException(Format('The module "%s" was not found in project "%s".',
     [strModule, strProject]));
+  DisplayException('The module "%s" was not found in project "%s".', [strModule, strProject]);
 end;
 
 (**
@@ -810,6 +850,7 @@ begin
   Except
     On E: Exception Do
       DisplayException(E.Message);
+      DisplayException(E);
   End;
 end;
 
@@ -961,6 +1002,7 @@ Begin
             End Else
               DisplayException(Format('Module "%s" was not found in Project "%s".',
                 [slModules[i], Project.Name]));
+              DisplayException('Module "%s" was not found in Project "%s".', [slModules[i], Project.Name]);
         End;
     Finally
       Free;
@@ -1284,12 +1326,15 @@ end;
   @param   CancelDefault as a WordBool as a reference
 
 **)
-procedure TIDETools.ModuleExplorerClick(const Ctrl: CommandBarButton;
-  var CancelDefault: WordBool);
+procedure TIDETools.ModuleExplorerClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
+
 begin
-  TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
-  FMEVisible := True;
-  FCounter := TBADIOPtions.BADIOptions.UpdateInterval;
+  {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.ModuleExplorerClick', tmoTiming);{$ENDIF}
+  FToolWindow.Visible := True;
+  FToolWindow.SetFocus;
+  FModuleExplorerFrame.SetFocus;
+  FCounter := TBADIOptions.BADIOptions.UpdateInterval;
+  FToolWindowForm.UpdateBounds;
 end;
 
 (**
@@ -1349,6 +1394,7 @@ begin
       MessageDlg('There is no current active VB Project.', mtWarning, [mbOK], 0);
   Except
     On E: Exception Do DisplayException(E.Message);
+    On E: Exception Do DisplayException(E);
   End;
 end;
 
@@ -1484,6 +1530,7 @@ begin
   Except
     On E: Exception Do
       DisplayException(E.Message);
+      DisplayException(E);
   End;
 end;
 
@@ -1774,6 +1821,7 @@ begin
     End;
   Except
     On E: Exception Do DisplayException(E.Message);
+    On E: Exception Do DisplayException(E);
   End;
 end;
 

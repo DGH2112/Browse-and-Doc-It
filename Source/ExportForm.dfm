@@ -7,10 +7,11 @@ object frmExport: TfrmExport
   Color = clBtnFace
   Constraints.MinHeight = 400
   Constraints.MinWidth = 350
+  DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -13
+  Font.Name = 'Tahoma'
   Font.Style = []
   Icon.Data = {
     0000010001002020100000000000E80200001600000028000000200000004000
@@ -37,11 +38,11 @@ object frmExport: TfrmExport
     0003FC000011FC000011FC000011FC000011FC000011FC00001FFC00001FFC00
     001FFC00001F8C00001F8C00001F8C00001F8C00001F8C00001FC400001FC400
     001FE000001FF000001FF800001FFC00003FFF03FFFFFFE7FFFFFFEFFFFF}
-  Position = poMainFormCenter
+  Position = poDesigned
   DesignSize = (
     342
     366)
-  TextHeight = 13
+  TextHeight = 16
   object lblProject: TLabel
     Left = 4
     Top = 4
@@ -64,12 +65,13 @@ object frmExport: TfrmExport
     Height = 145
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
+    ExplicitWidth = 332
   end
   object cmbDrive: TDriveComboBox
     Left = 4
     Top = 28
     Width = 336
-    Height = 19
+    Height = 22
     Anchors = [akLeft, akTop, akRight]
     DirList = lbDirectory
     TabOrder = 1
@@ -83,6 +85,8 @@ object frmExport: TfrmExport
     Kind = bkOK
     NumGlyphs = 2
     TabOrder = 2
+    ExplicitLeft = 262
+    ExplicitTop = 336
   end
   object btnCancel: TBitBtn
     Left = 186
@@ -93,6 +97,8 @@ object frmExport: TfrmExport
     Kind = bkCancel
     NumGlyphs = 2
     TabOrder = 3
+    ExplicitLeft = 182
+    ExplicitTop = 336
   end
   object btnNewDir: TBitBtn
     Left = 4
@@ -103,6 +109,7 @@ object frmExport: TfrmExport
     Caption = 'New &Dir'
     TabOrder = 4
     OnClick = btnNewDirClick
+    ExplicitTop = 336
   end
   object lvModules: TListView
     Left = 4
@@ -126,6 +133,8 @@ object frmExport: TfrmExport
     OnDrawItem = lvModulesDrawItem
     OnMouseDown = lvModulesMouseDown
     OnResize = lvModulesResize
+    ExplicitWidth = 332
+    ExplicitHeight = 132
   end
   object btnSelect: TBitBtn
     Left = 84
@@ -136,6 +145,7 @@ object frmExport: TfrmExport
     Caption = '&Select'
     TabOrder = 6
     OnClick = btnSelectClick
+    ExplicitTop = 336
   end
   object ilImages: TImageList
     Left = 32

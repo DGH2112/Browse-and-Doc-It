@@ -4,8 +4,8 @@
   to parser VB.NET code later).
 
   @Author     David Hoyle
-  @Version    1.821
-  @Date    09 Sep 2023
+  @Version    2.239
+  @Date    10 Sep 2023
 
   @license
 
@@ -126,6 +126,7 @@ Type
 Implementation
 
 Uses
+  CodeSiteLogging,
   Windows,
   BADI.Functions,
   BADI.Options,
@@ -166,6 +167,7 @@ Var
   iElement : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'TidyUpEmptyElements', tmoTiming);{$ENDIF}
   For iElement := ElementCount DownTo 1 Do
     If Elements[iElement].ElementCount = 0 Then
       DeleteElement(iElement);
@@ -193,6 +195,7 @@ var
   boolCascade: Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CreateParser', tmoTiming);{$ENDIF}
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FTypesLabel                 := Nil;
   FConstantsLabel             := Nil;
@@ -255,6 +258,7 @@ End;
 Destructor TVBModule.Destroy;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Destroy', tmoTiming);{$ENDIF}
   FEventHandlerPatterns.Free;
   FUnResolvedSymbols.Free;
   Inherited Destroy;
@@ -276,6 +280,7 @@ Var
   i : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ReservedWords', tmoTiming);{$ENDIF}
   SetLength(Result, Succ(High(strReservedWords)));
   For i := Low(strReservedWords) To High(strReservedWords) Do
     Result[i] := strReservedWords[i];
@@ -297,6 +302,7 @@ Var
   i : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Directives', tmoTiming);{$ENDIF}
   SetLength(Result, Succ(High(strDirectives)));
   For i := Low(strDirectives) To High(strDirectives) Do
     Result[i] := strDirectives[i];
@@ -312,6 +318,7 @@ end;
 **)
 procedure TVBModule.ProcessCompilerDirective;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ProcessCompilerDirective', tmoTiming);{$ENDIF}
   {Do nothing}
 end;
 
@@ -359,6 +366,7 @@ Var
   iChar: Integer;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'TokenizeStream', tmoTiming);{$ENDIF}
   BlockType := btNoBlock;
   iStreamPos := 0;
   iTokenLine := 1;
@@ -547,6 +555,7 @@ Var
   iLastCmtLine : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'GetComment', tmoTiming);{$ENDIF}
   Result := Nil;
   iLine := 0;
   iColumn := 0;
@@ -599,6 +608,7 @@ var
   Methods : Array[1..5] Of Function : Boolean Of Object;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Goal', tmoTiming);{$ENDIF}
   Try
     While Token.TokenType In [ttLineComment, ttBlockComment, ttLineEnd] Do
       NextNonCommentToken;
@@ -633,6 +643,7 @@ end;
 **)
 Function TVBModule.Implements : Boolean;
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Implements', tmoTiming);{$ENDIF}
   Result := False;
   While Token.UToken = 'IMPLEMENTS' Do
     Begin
@@ -674,6 +685,7 @@ Var
   V : TVBVersion;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Version', tmoTiming);{$ENDIF}
   Result := False;
   If IsKeyWord(Token.Token, ['version']) Then
     Begin
@@ -720,6 +732,7 @@ Var
   V : TVBVar;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Vars', tmoTiming);{$ENDIF}
   Result := False;
   Repeat
     boolWithevents := Token.UToken = 'WITHEVENTS';
@@ -768,6 +781,7 @@ Var
   strModifier: String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'VBBegin', tmoTiming);{$ENDIF}
   Result := False;
   Container := C;
   If IsKeyWord(Token.Token, ['begin', 'beginproperty']) Then
@@ -839,6 +853,7 @@ End;
 Function TVBModule.Attributes : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Attributes', tmoTiming);{$ENDIF}
   Result := False;
   While IsKeyWord(Token.Token, ['attribute']) Do
     Begin
@@ -870,6 +885,7 @@ Var
   A : TVBAttribute;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Attribute', tmoTiming);{$ENDIF}
   Result := False;
   If (Token.TokenType In [ttIdentifier, ttDirective]) And
     (CompareText(Token.Token, 'endproperty') <> 0) Then
@@ -940,6 +956,7 @@ Var
   O : TVBOption;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Options', tmoTiming);{$ENDIF}
   Result := False;
   While Token.UToken = 'OPTION' Do
     Begin
@@ -1027,6 +1044,7 @@ Var
   C : TComment;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Declarations', tmoTiming);{$ENDIF}
   Repeat
     C := GetComment;
     Result :=
@@ -1074,6 +1092,7 @@ Var
   DefaultValue: String;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Parameters', tmoTiming);{$ENDIF}
   Repeat
     boolOptional := Token.UToken = 'OPTIONAL';
     If boolOptional Then
@@ -1176,6 +1195,7 @@ Var
   M, tmpM : TVBMethod;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Subs', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'SUB' Then
     Begin
@@ -1228,6 +1248,7 @@ Var
   M, tmpM : TVBMethod;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Functions', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'FUNCTION' Then
     Begin
@@ -1274,6 +1295,7 @@ Var
   T : TVBTypeDecl;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'MethodDecl', tmoTiming);{$ENDIF}
   M.Comment := C;
   M.Identifier := Token.Token;
   M.ClassNames.Add(ModuleName);
@@ -1329,7 +1351,9 @@ Begin
             End;
         End Else
           ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual, Self);
-    End;
+    End Else
+      If M.MethodType = mtFunction Then
+        ErrorAndSeekToken(strFunctionReturnExpected, Token.Token, strSeekTokens, stActual, Self);
   If Token.TokenType In [ttLineEnd] Then
     NextNonCommentToken
   Else
@@ -1350,6 +1374,7 @@ End;
 procedure TVBModule.NextNonCommentToken;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'NextNonCommentToken', tmoTiming);{$ENDIF}
   Inherited NextNonCommentToken;
   If Token.TokenType In [ttLineContinuation] Then
     Begin
@@ -1378,6 +1403,7 @@ Procedure TVBModule.FindMethodEnd(Const AExceptionHnd : IExceptionHandling;
   Const strMethodType : String);
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'FindMethodEnd', tmoTiming);{$ENDIF}
   RollBackToken;
   Repeat
     NextNonCommentToken;
@@ -1467,6 +1493,7 @@ End;
 **)
 Function TVBModule.Privates(Const C : TComment) : Boolean;
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Privates', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'PRIVATE' Then
     Begin
@@ -1497,6 +1524,7 @@ End;
 **)
 Function TVBModule.Publics(Const C : TComment) : Boolean;
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Publics', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'PUBLIC' Then
     Begin
@@ -1530,6 +1558,7 @@ Var
   j : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckExceptionHandling', tmoTiming);{$ENDIF}
   I := FindElement(strImplementedMethodsLabel);
   If i <> Nil Then
     Begin
@@ -1564,6 +1593,7 @@ Var
   Con : TVBConstant;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Consts', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'CONST' Then
     Begin
@@ -1600,9 +1630,14 @@ Begin
           If Token.Token = '=' Then
             Begin
               AddToExpression(Con);
-              While Not (Token.TokenType In [ttReservedWord, ttLineEnd, ttFileEnd]) Do
-                AddToExpression(Con);
-            End;
+              If Not (Token.TokenType In [ttReservedWord, ttLineEnd, ttFileEnd]) Then
+                Begin
+                  While Not (Token.TokenType In [ttReservedWord, ttLineEnd, ttFileEnd]) Do
+                    AddToExpression(Con);
+                End Else
+                  ErrorAndSeekToken(strConstExprExpected, Token.Token, strSeekTokens, stActual, Self);
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, '=', strSeekTokens, stActual, Self);
           If Token.TokenType In [ttLineEnd] then
             NextNonCommentToken
           Else
@@ -1628,6 +1663,7 @@ End;
 Function TVBModule.Dims(Const Scope : TScope; Const C : TComment) : Boolean;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Dims', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'DIM' Then
     Begin
@@ -1655,6 +1691,7 @@ Var
   R : Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Declares', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'DECLARE' Then
     Begin
@@ -1688,6 +1725,7 @@ Var
   R : Boolean;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Friends', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'FRIEND' then
     Begin
@@ -1726,6 +1764,7 @@ Var
   T, T2 : TVBTypeDecl;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Props', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'PROPERTY' Then
     Begin
@@ -1802,6 +1841,7 @@ Var
   Com: TComment;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Records', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'TYPE' Then
     Begin
@@ -1914,6 +1954,7 @@ Function TVBModule.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
     i: Integer;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ReferenceSymbol/CheckElement', tmoTiming);{$ENDIF}
     // Check Module Local Methods, Properties, Declares, ...
     boolFound := False;
     If Section <> Nil Then
@@ -1930,6 +1971,7 @@ Function TVBModule.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
   End;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ReferenceSymbol', tmoTiming);{$ENDIF}
   Result := ReferenceSection(AToken, FVariablesLabel);
   If Result Then
     Exit;
@@ -1977,6 +2019,7 @@ procedure TVBModule.PatchAndCheckReferences;
     i: Integer;
 
   Begin
+    {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PatchAndCheckReferences/IsEventHandler', tmoTiming);{$ENDIF}
     Result := False;
     For i := 0 To FEventHandlerPatterns.Count - 1 Do
       Begin
@@ -1991,6 +2034,7 @@ Var
   I: TElementContainer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'PatchAndCheckReferences', tmoTiming);{$ENDIF}
   If FindElement(strErrors).ElementCount = 0 Then
     Begin
       I := FindElement(strImplementedMethodsLabel);
@@ -2025,6 +2069,7 @@ var
   iIndex : Integer;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'CheckElementExceptionHandling', tmoTiming);{$ENDIF}
   // Check Exception Push and Pop
   boolNoTag :=
     (Comment <> Nil) And (Comment.FindTag('noexception') > -1) Or
@@ -2095,6 +2140,7 @@ var
   T : TTokenInfo;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ResolvedForwardReferences', tmoTiming);{$ENDIF}
   For i := 0 To FUnResolvedSymbols.Count - 1 Do
     Begin
       T := TTokenInfo.Create(FUnResolvedSymbols[i], 0, 0, 0, 0, ttIdentifier);
@@ -2123,6 +2169,7 @@ var
   strLow: string;
 
 begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'ProcessVar', tmoTiming);{$ENDIF}
   if Token.Token = '(' then
     begin
       NextNonCommentToken;
@@ -2212,6 +2259,7 @@ Var
   I : TVBEnumIdent;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Enum', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'ENUM' Then
     Begin
@@ -2289,6 +2337,7 @@ Var
   E : TEventDecl;
 
 Begin
+  {$IFDEF CODESITE}CodeSite.TraceMethod(Self, 'Events', tmoTiming);{$ENDIF}
   Result := False;
   If Token.UToken = 'EVENT' Then
     Begin
@@ -2321,3 +2370,5 @@ Begin
 End;
 
 End.
+
+

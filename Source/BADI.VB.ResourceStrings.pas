@@ -3,8 +3,8 @@
   This module contains a set of resource strings for use with the VB parser.
 
   @Author  David Hoyle
-  @Version 1.020
-  @Date    09 Sep 2023
+  @Version 1.038
+  @Date    10 Sep 2023
 
   @license
 
@@ -82,6 +82,8 @@ ResourceString
   strEventsLabel = 'Events';
   (** This is an error message for duplicate identifiers. **)
   strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
+  (** A resource string for a missing function return type expected. **)
+  strFunctionReturnExpected = 'Function return type expected but "%s" found at line %d column %d!';
 
 Implementation
 

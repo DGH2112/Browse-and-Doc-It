@@ -60,7 +60,7 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
         item
           Position = 0
           Text = 'RegEx Pattern'
-          Width = 109
+          Width = 105
         end
         item
           Alignment = taCenter

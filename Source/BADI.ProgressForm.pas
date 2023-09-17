@@ -3,8 +3,8 @@
   This is a generic progress dialogue for use in the Browse and Doc It.
 
   @author     David Hoyle
-  @version    1.048
-  @Date    02 May 2021
+  @version    1.062
+  @Date    10 Sep 2023
 
   @license
 
@@ -65,10 +65,11 @@ implementation
 
 {$R *.DFM}
 
-{$IFNDEF STANDALONEAPP}
 Uses
-  BADI.ToolsAPIUtils;
+{$IFNDEF STANDALONEAPP}
+  BADI.ToolsAPIUtils,
 {$ENDIF}
+  System.UITypes;
 
 (**
 

@@ -3,9 +3,9 @@
   This module contains a class which represents a frame interface for excluded document
   files.
 
-  @Version 1.045
+  @Version 1.050
   @Author  David Hoyle
-  @Date    21 Nov 2021
+  @Date    10 Sep 2023
 
   @license
 
@@ -50,7 +50,7 @@ Uses
   Generics.Collections,
   BADI.Types,
   BADI.Exclusions,
-  BADI.CustomOptionsFrame;
+  BADI.CustomOptionsFrame, System.ImageList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -101,15 +101,16 @@ Implementation
 
 {$R *.dfm}
 
-Uses
+uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF DEBUG}
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
   {$ENDIF STANDALONEAPP}
-  RegularExpressions,
-  RegularExpressionsCore,
+  System.RegularExpressions,
+  System.RegularExpressionsCore,
+  System.UITypes,
   BADI.Base.Module,
   BADI.Options;
 

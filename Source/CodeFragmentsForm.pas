@@ -3,9 +3,9 @@
   This module contains a class which represents a form for viewing, editing and
   inserts code fragments.
 
-  @Version 1.025
+  @Version 1.027
   @Author  David Hoyle
-  @Date    02 Sep 2023
+  @Date    10 Sep 2023
 
 **)
 unit CodeFragmentsForm;
@@ -99,6 +99,7 @@ implementation
 {$R *.DFM}
 
 uses
+  System.UITypes,
   Winapi.ShellAPI,
   Vcl.FileCtrl,
   BADI.IDETools,

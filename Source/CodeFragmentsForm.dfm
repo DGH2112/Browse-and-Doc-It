@@ -2,8 +2,8 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
   Left = 485
   Top = 335
   Caption = 'Insert Code Fragments'
-  ClientHeight = 316
-  ClientWidth = 592
+  ClientHeight = 315
+  ClientWidth = 588
   Color = clBtnFace
   Constraints.MinHeight = 350
   Constraints.MinWidth = 600
@@ -44,20 +44,23 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
   object Splitter1: TSplitter
     Left = 209
     Top = 0
-    Height = 284
+    Height = 283
+    ExplicitHeight = 284
   end
   object Panel1: TPanel
     Left = 0
-    Top = 284
-    Width = 592
+    Top = 283
+    Width = 588
     Height = 32
     Align = alBottom
     TabOrder = 0
+    ExplicitTop = 284
+    ExplicitWidth = 592
     DesignSize = (
-      592
+      588
       32)
     object btnCancel: TBitBtn
-      Left = 358
+      Left = 350
       Top = 4
       Width = 75
       Height = 25
@@ -83,9 +86,10 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 0
+      ExplicitLeft = 358
     end
     object btnInsert: TBitBtn
-      Left = 514
+      Left = 506
       Top = 4
       Width = 75
       Height = 25
@@ -107,9 +111,10 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       ModalResult = 5
       NumGlyphs = 2
       TabOrder = 2
+      ExplicitLeft = 514
     end
     object btnOK: TBitBtn
-      Left = 435
+      Left = 427
       Top = 4
       Width = 75
       Height = 25
@@ -135,9 +140,10 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 1
+      ExplicitLeft = 435
     end
     object btnDelete: TBitBtn
-      Left = 280
+      Left = 272
       Top = 4
       Width = 75
       Height = 25
@@ -159,9 +165,10 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       NumGlyphs = 2
       TabOrder = 3
       OnClick = btnDeleteClick
+      ExplicitLeft = 280
     end
     object btnCreate: TBitBtn
-      Left = 200
+      Left = 192
       Top = 4
       Width = 75
       Height = 25
@@ -169,13 +176,14 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Caption = '&Create Dir'
       TabOrder = 4
       OnClick = btnCreateClick
+      ExplicitLeft = 200
     end
   end
   object edtCode: TSynEdit
     Left = 212
     Top = 0
-    Width = 380
-    Height = 284
+    Width = 376
+    Height = 283
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -213,6 +221,8 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
     HideSelection = True
     Highlighter = SynVBSyn1
     SelectedColor.Alpha = 0.400000005960464500
+    ExplicitWidth = 380
+    ExplicitHeight = 284
     RemovedKeystrokes = <
       item
         Command = ecContextHelp
@@ -228,7 +238,7 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
     Left = 0
     Top = 0
     Width = 209
-    Height = 284
+    Height = 283
     Align = alLeft
     DragMode = dmAutomatic
     Images = ilImages

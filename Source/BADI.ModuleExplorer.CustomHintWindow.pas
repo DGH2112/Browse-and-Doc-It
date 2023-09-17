@@ -4,8 +4,8 @@
   tree nodes.
 
   @Author  David Hoyle
-  @Version 1.034
-  @Date    19 Sep 2020
+  @Version 1.045
+  @Date    10 Sep 2023
 
   @license
 
@@ -38,6 +38,7 @@ Uses
   BADI.Types,
   VirtualTrees,
   Classes,
+  System.Generics.Collections,
   Windows,
   Graphics,
   BADI.Interfaces,
@@ -87,13 +88,14 @@ Type
 
 Implementation
 
-Uses
+uses
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
-  Forms,
-  SysUtils,
-  Types,
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  Vcl.Forms,
   BADI.Options,
   BADI.Functions,
   BADI.Comment.Tag;

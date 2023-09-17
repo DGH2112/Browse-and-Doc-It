@@ -4,8 +4,8 @@
   through a single method.
 
   @Author  David Hoyle
-  @Version 1.500
-  @Date    25 Apr 2021
+  @Version 1.505
+  @Date    10 Sep 2023
 
   @license
 
@@ -46,7 +46,7 @@ Uses
   CheckLst,
   BADI.Types,
   Vcl.ExtCtrls,
-  Vcl.ComCtrls;
+  Vcl.ComCtrls, System.ImageList, Vcl.ImgList;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -87,7 +87,7 @@ Type
 
 Implementation
 
-Uses
+uses
   {$IFNDEF STANDALONEAPP}
   ToolsAPI,
   BADI.ToolsAPIUtils,
@@ -96,6 +96,7 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   System.TypInfo,
+  System.UITypes,
   BADI.Constants,
   BADI.Functions;
 

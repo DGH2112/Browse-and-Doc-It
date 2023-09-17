@@ -1276,10 +1276,9 @@ end;
   @postcon Positions the cursor in the current code window based on the browsing
            options.
 
-  @param   iIdentLine   as an Integer
-  @param   iIdentCol    as an Integer
-  @param   iCommentLine as an Integer
-  @param   iCommentCol  as an Integer
+  @param   iIdentLine   as an Integer as a constant
+  @param   iIdentCol    as an Integer as a constant
+  @param   iCommentLine as an Integer as a constant
 
 **)
 procedure TIDETools.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine : Integer);
@@ -1288,6 +1287,7 @@ Var
   C : TEditPos;
   iLineInView: Integer;
   CP: CodePane;
+  iLCommentLine : Integer;
 
 begin
   {$IFDEF CODESITE}CodeSite.TraceMethod('TIDETools.SelectionChange', tmoTiming);{$ENDIF}
@@ -1300,11 +1300,14 @@ begin
         C.Col := iIdentCol;
         C.Line := iIdentLine;
         CP.SetSelection(C.Line, C.Col, C.Line, C.Col);
+        iLCommentLine := iCommentLine;
+        If iLCommentLine = 0 Then
+          iLCommentLine := iIdentLine;
         Case TBADIOPtions.BADIOptions.BrowsePosition Of
           bpCommentTop:
-            CP.TopLine := iIdentLine;
+            CP.TopLine := iLCommentLine;
           bpCommentCentre:
-            CP.TopLine := Max(iIdentLine - iLineInView, 1);
+            CP.TopLine := Max(iLCommentLine - iLineInView, 1);
           bpIdentifierTop:
             CP.TopLine := iIdentLine;
           bpIdentifierCentre:
@@ -1312,9 +1315,9 @@ begin
           bpIdentifierCentreShowAllComment:
             Begin
               CP.TopLine := Max(iIdentLine - iLineInView, 1);
-              If iCommentLine > 0 Then
-                If iCommentLine < CP.TopLine Then
-                  CP.TopLine := iCommentLine;
+              If iLCommentLine > 0 Then
+                If iLCommentLine < CP.TopLine Then
+                  CP.TopLine := iLCommentLine;
             End;
         End;
       End;

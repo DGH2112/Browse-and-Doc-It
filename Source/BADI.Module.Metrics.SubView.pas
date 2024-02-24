@@ -3,8 +3,8 @@
   A module to provide an custom editor sub view for displaying the metrics for a module.
 
   @Author  David Hoyle
-  @Version 1.012
-  @Date    06 Sep 2020
+  @Version 1.016
+  @Date    24 Feb 2024
 
   @license
 
@@ -275,7 +275,7 @@ End;
 Function TBADIModuleMetricsSubView.GetCanCloneView: Boolean;
 
 Begin
-  Result := False;
+  Result := True;
 End;
 
 (**

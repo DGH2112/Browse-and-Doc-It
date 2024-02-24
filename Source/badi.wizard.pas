@@ -3,8 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Version 1.922
-  @Date    21 Nov 2021
+  @Version 1.931
+  @Date    04 Jan 2024
 
   @license
 
@@ -153,6 +153,7 @@ Begin
   TBADIIDENotifier.UninstallIDENotifier;
   UnregisterEditorChecksSubView;
   UnregisterEditorMetricsSubView;
+  UnregisterSpellingEditorView;
   UnregisterChecksEditorView;
   UnregisterMetricsEditorView;
   If FEidolonHighlighterIndex > iWizardFailState Then

@@ -532,7 +532,7 @@
   {$DEFINE RS110}
 {$ENDIF}
 
-// Embarcadero Delphi 12.0 XXXXXXX (Studio 23.0), Version 29 Package version 290
+// Embarcadero Delphi 12.0 Athens (Studio 23.0), Version 29 Package version 290
 {$IFDEF VER360}
   {$DEFINE D0001}
   {$DEFINE D0002}

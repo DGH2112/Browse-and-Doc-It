@@ -44,24 +44,30 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create;
-    function GetIDString: string;
-    function GetName: string;
-    procedure Tokenize(StartClass: Byte; LineBuf: PAnsiChar; LineBufLen: Word;
+    Function GetIDString: string;
+    Function GetName: string;
+    {$IFDEF RS120}
+    Procedure Tokenize(StartClass: TOTALineClass; LineBuf: POTAEdChar; LineBufLen: TOTALineSize;
       HighlightCodes: POTASyntaxCode);
-    function TokenizeLineClass(StartClass: Byte; LineBuf: PAnsiChar;
-      LineBufLen: Word): Byte;
-    function  GetBlockEndCol: Integer;
-    function  GetBlockEndLine: Integer;
-    function  GetBlockStartCol: Integer;
-    function  GetBlockStartLine: Integer;
-    function  GetCurrentInstructionLine: Integer;
-    function  GetDisabledBreakpointLine: Integer;
-    function  GetDisplayName: string;
-    function  GetErrorLine: Integer;
-    function  GetInvalidBreakpointLine: Integer;
-    function  GetSampleSearchText: string;
-    function  GetSampleText: string;
-    function  GetValidBreakpointLine: Integer;
+    Function TokenizeLineClass(StartClass: TOTALineClass; LineBuf: POTAEdChar;
+      LineBufLen: TOTALineSize): TOTALineClass;
+    {$ELSE}
+    Procedure Tokenize(StartClass: Byte; LineBuf: PAnsiChar; LineBufLen: Word;
+      HighlightCodes: POTASyntaxCode);
+    Function TokenizeLineClass(StartClass: Byte; LineBuf: PAnsiChar; LineBufLen: Word): Byte;
+    {$ENDIF RS120}
+    Function  GetBlockEndCol: Integer;
+    Function  GetBlockEndLine: Integer;
+    Function  GetBlockStartCol: Integer;
+    Function  GetBlockStartLine: Integer;
+    Function  GetCurrentInstructionLine: Integer;
+    Function  GetDisabledBreakpointLine: Integer;
+    Function  GetDisplayName: String;
+    Function  GetErrorLine: Integer;
+    Function  GetInvalidBreakpointLine: Integer;
+    Function  GetSampleSearchText: String;
+    Function  GetSampleText: String;
+    Function  GetValidBreakpointLine: Integer;
   End;
 
 Implementation
@@ -347,8 +353,13 @@ end;
   @param   HighlightCodes as a POTASyntaxCode
 
 **)
-procedure TEidolonHighlighter.Tokenize(StartClass: Byte; LineBuf: PAnsiChar;
+{$IFDEF RS120}
+Procedure TEidolonHighlighter.Tokenize(StartClass: TOTALineClass; LineBuf: POTAEdChar;
+  LineBufLen: TOTALineSize; HighlightCodes: POTASyntaxCode);
+{$ELSE}
+Procedure TEidolonHighlighter.Tokenize(StartClass: Byte; LineBuf: PAnsiChar;
   LineBufLen: Word; HighlightCodes: POTASyntaxCode);
+{$ENDIF RS120}
 
 Type
   TBlockType = (btNone, btIdentifier, btSingleLiteral, btDoubleLiteral,
@@ -449,8 +460,13 @@ end;
   @return  a Byte
 
 **)
-function TEidolonHighlighter.TokenizeLineClass(StartClass: Byte; LineBuf: PAnsiChar;
+{$IFDEF RS120}
+Function TEidolonHighlighter.TokenizeLineClass(StartClass: TOTALineClass; LineBuf: POTAEdChar;
+  LineBufLen: TOTALineSize): TOTALineClass;
+{$ELSE}
+Function TEidolonHighlighter.TokenizeLineClass(StartClass: Byte; LineBuf: PAnsiChar;
   LineBufLen: Word): Byte;
+{$ENDIF RS120}
 
 Var
   i : Integer;

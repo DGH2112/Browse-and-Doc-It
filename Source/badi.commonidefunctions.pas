@@ -4,8 +4,8 @@
   implementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Version 2.010
-  @Date    03 May 2021
+  @Version 2.061
+  @Date    12 Oct 2023
 
   @license
 
@@ -36,6 +36,7 @@ Uses
   SysUtils,
   Windows,
   Classes,
+  Forms,
   BADI.Base.Module,
   BADI.ElementContainer,
   BADI.Generic.FunctionDecl,
@@ -58,6 +59,7 @@ Uses
     Const iLine: Integer): Integer;
   Function BuildBlockComment(Const CommentType: TCommentType; Const CommentStyle: TCommentStyle;
     Const iIndent: Integer; Const strSelectedText: String): String;
+  Procedure CentreForm(Const F : TForm; Const ParentHWnd : THandle);
 
 Const
   (** A simple array for outputting a or an. **)
@@ -336,6 +338,19 @@ Begin
         Result := Result + strAllCmtStart + #32 + strSelectedText + #32 + strLineCmtEnd + ' ';
       End;
   End;
+End;
+
+Procedure CentreForm(Const F: TForm; Const ParentHWnd : THandle);
+
+Var
+  R : TRect;
+
+Begin
+  If GetWindowRect(ParentHWnd, R) Then
+    Begin
+      F.Top := R.Top + R.Height Div 2 - F.Height Div 2;
+      F.Left := R.Left + R.Width Div 2 - F.Width Div 2;
+    End;
 End;
 
 (**

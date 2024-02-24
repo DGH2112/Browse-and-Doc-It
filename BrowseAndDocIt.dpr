@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.358
+  @Version 1.359
   @Author  David Hoyle
-  @Date    15 Oct 2022
+  @Date    03 Jan 2024
 
   @license
 
@@ -59,7 +59,7 @@ uses
   Graphics,
   {$IFDEF DEBUG}
   CodeSiteLogging,
-  {$ENDIF PROFILECODE}
+  {$ENDIF DEBUG}
   BADI.Initialisation in 'Source\BADI.Initialisation.pas',
   BADI.Options in 'Source\BADI.Options.pas',
   BADI.Module.Dispatcher in 'Source\BADI.Module.Dispatcher.pas',

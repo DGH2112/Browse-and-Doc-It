@@ -3,8 +3,8 @@
   A module to provide an custom editor sub view for displaying the Checks for a module.
 
   @Author  David Hoyle
-  @Version 1.017
-  @Date    06 Sep 2020
+  @Version 1.021
+  @Date    24 Feb 2024
 
   @license
 
@@ -273,7 +273,7 @@ End;
 Function TBADIModuleChecksSubView.GetCanCloneView: Boolean;
 
 Begin
-  Result := False;
+  Result := True;
 End;
 
 (**

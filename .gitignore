@@ -81,3 +81,5 @@ Test/dunit.ini
 Win32/Debug/dunitx-results.xml
 Dictionaries/
 *.dct
+VBE Test Files/*
+*.dsv

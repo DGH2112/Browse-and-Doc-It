@@ -4,8 +4,8 @@
   to parser VB.NET code later).
 
   @Author     David Hoyle
-  @Version    2.239
-  @Date    10 Sep 2023
+  @Version    2.243
+  @Date    24 Feb 2024
 
   @license
 
@@ -126,7 +126,9 @@ Type
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
   CodeSiteLogging,
+  {$ENDIF DEBUG}
   Windows,
   BADI.Functions,
   BADI.Options,

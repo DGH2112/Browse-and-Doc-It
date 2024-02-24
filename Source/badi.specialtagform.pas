@@ -4,8 +4,8 @@
   through a single method.
 
   @Author  David Hoyle
-  @Version 1.505
-  @Date    10 Sep 2023
+  @Version 1.506
+  @Date    24 Feb 2024
 
   @license
 
@@ -46,7 +46,7 @@ Uses
   CheckLst,
   BADI.Types,
   Vcl.ExtCtrls,
-  Vcl.ComCtrls, System.ImageList, Vcl.ImgList;
+  Vcl.ComCtrls;
 
 {$INCLUDE CompilerDefinitions.inc}
 

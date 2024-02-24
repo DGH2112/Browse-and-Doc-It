@@ -3,9 +3,9 @@
   This module contains a class which represents a frame interface for excluded document
   files.
 
-  @Version 1.050
+  @Version 1.051
   @Author  David Hoyle
-  @Date    10 Sep 2023
+  @Date    24 Feb 2024
 
   @license
 
@@ -50,7 +50,7 @@ Uses
   Generics.Collections,
   BADI.Types,
   BADI.Exclusions,
-  BADI.CustomOptionsFrame, System.ImageList;
+  BADI.CustomOptionsFrame;
 
 {$INCLUDE CompilerDefinitions.inc}
 

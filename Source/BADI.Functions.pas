@@ -2,9 +2,9 @@
 
   This method contains functions that are used global through out the application.
 
-  @Version 1.385
+  @Version 1.389
   @Author  David Hoyle.
-  @Date    10 Sep 2023
+  @Date    24 Feb 2024
 
   @license
 
@@ -82,6 +82,9 @@ Type
 Implementation
 
 uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF DEBUG}
   System.UITypes,
   {$IFDEF EUREKALOG}
   EException,
@@ -93,8 +96,7 @@ uses
   eBase,
   {$ENDIF EUREKALOG}
   Winapi.SHFolder,
-  BADI.Constants,
-  CodeSiteLogging;
+  BADI.Constants;
 
 Function ComputerName : String; Forward;
 Function PosOfNthChar(Const strText : String; Const Ch : Char; Const iIndex : Integer;

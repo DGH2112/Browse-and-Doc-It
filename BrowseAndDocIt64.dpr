@@ -3,9 +3,9 @@
   This module defines a RAD Studio plug-in DLL which provides the ability to
   browse, check and document your code.
 
-  @Version 1.361
+  @Version 1.362
   @Author  David Hoyle
-  @Date    12 Sep 2024
+  @Date    21 Jun 2025
 
   @license
 
@@ -30,7 +30,7 @@
   @nocheck EmptyBEGINEND
 
 **)
-library BrowseAndDocIt;
+library BrowseAndDocIt64;
 
 { Important note about DLL memory management: ShareMem must be the
   first unit in your library's USES clause AND your project's (select

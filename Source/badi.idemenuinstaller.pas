@@ -2,9 +2,9 @@
 
   This module encapsulates the creation of menus in the IDE.
 
-  @Version 23.735
+  @Version 24.559
   @Author  David Hoyle
-  @Date    21 Nov 2021
+  @Date    12 Sep 2024
 
   @license
 
@@ -168,40 +168,30 @@ Function TBADIIDEMenuInstaller.AddImagesToIDE : Integer;
 
 Var
   NTAS : INTAServices;
-  {$IFNDEF RS110}
   ilImages : TImageList;
-  {$ENDIF RS110}
   BM : TBitMap;
   iMenu: TBADIMenu;
 
 begin
   Result := -1;
   NTAS := (BorlandIDEServices As INTAServices);
-  {$IFNDEF RS110}
   ilImages := TImageList.Create(Nil);
   Try
-  {$ENDIF RS110}
-    For iMenu := Low(TBADIMenu) To High(TBADIMenu) Do
-      If FindResource(hInstance, PChar(BADIMenus[iMenu].FName + strImage), RT_BITMAP) > 0 Then
-        Begin
-          BM := TBitMap.Create;
-          Try
+    BM := TBitMap.Create;
+    Try
+      For iMenu := Low(TBADIMenu) To High(TBADIMenu) Do
+        If FindResource(hInstance, PChar(BADIMenus[iMenu].FName + strImage), RT_BITMAP) > 0 Then
+          Begin
             BM.LoadFromResourceName(hInstance, BADIMenus[iMenu].FName + strImage);
-            {$IFDEF RS110}
-            NTAS.AddImage(BADIMenus[iMenu].FName + strImage, [BM]);
-            {$ELSE}
-            ilImages.AddMasked(BM, BADIMenus[iMenu].FMaskColor);
-            {$ENDIF RS110}
-          Finally
-            BM.Free;
+            Result := ilImages.AddMasked(BM, BADIMenus[iMenu].FMaskColor);
           End;
-        End;
-  {$IFNDEF RS110}
+    Finally
+      BM.Free;
+    End;
     Result := NTAS.AddImages(ilImages);
   Finally
     ilImages.Free;
   End;
-  {$ENDIF RS110}
 end;
 
 (**
@@ -401,11 +391,7 @@ Begin
       Actn.OnExecute := ClickProc;
       Actn.OnUpdate := UpdateProc;
       Actn.ShortCut := TextToShortCut(TBADIOptions.BADIOptions.MenuShortcut[eBADIMenu]);
-      {$IFDEF RS110}
-      Actn.ImageName := BADIMenus[eBADIMenu].FName + strImage;
-      {$ELSE}
       Actn.ImageIndex := iImageIndex;
-      {$ENDIF RS110}
       Actn.Category := strCategory;
       FBADIActions[eBADIMenu] := Actn;
     End Else

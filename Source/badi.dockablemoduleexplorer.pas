@@ -3,8 +3,8 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Version 1.367
-  @Date    21 Nov 2021
+  @Version 1.372
+  @Date    02 Mar 2024
 
   @license
 
@@ -156,7 +156,7 @@ End;
 **)
 Class Procedure TfrmDockableModuleExplorer.CreateDockableForm(Var FormVar: TfrmDockableModuleExplorer;
   Const FormClass: TfrmDockableModuleExplorerClass);
-  
+
 Begin
   TCustomForm(FormVar) := FormClass.Create(Nil);
   RegisterDockableForm(FormClass, FormVar, TCustomForm(FormVar).Name);
@@ -191,13 +191,12 @@ Destructor TfrmDockableModuleExplorer.Destroy;
 Var
   ITS : IOTAIDEThemingServices;
 {$ENDIF RS102}
-  
+
 Begin
   {$IFDEF RS102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     ITS.RemoveNotifier(FIDEThemingServciesNotifierIndex);
   {$ENDIF RS102}
-  FModuleExplorerFrame.Free;
   SaveStateNecessary := True;
   Inherited;
 End;
